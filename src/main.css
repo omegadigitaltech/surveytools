@@ -1,0 +1,23 @@
+@import "'https://fonts.googleapis.com/css2?family=Inter:wght@500&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap";
+
+:root {
+    --ff-body: "Montserrat", sans-serif;
+    --ff-text: "Inter", sans-serif;
+
+    --cl: #149BBA;
+    --cl: #FFFFFF;
+    --cl: #000000;
+    --cl: #7CD4E4;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--ff-body);
+}
