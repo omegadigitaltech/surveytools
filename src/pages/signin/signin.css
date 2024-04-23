@@ -1,0 +1,73 @@
+.signin-field {
+    position: relative;
+    margin-bottom: var(--mb-sm);
+}
+
+.signin-label,
+.signin-input {
+    width: 100%;
+    display: block;
+}
+
+.signin-label {
+    margin-bottom: var(--mb-xs);
+}
+
+.signin-input {
+    border: 1px solid;
+    border-radius: 4px;
+    padding: 0.8em;
+}
+
+.signin-reset {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.signin-enter {
+    width: 100%;
+    display: block;
+    padding: 0.5em 0;
+    background-color: var(--cl-cyan-40);
+    margin-bottom: var(--mb-md);
+}
+
+.signin-hline {
+    position: relative;
+    text-align: center;
+    margin-bottom: var(--mb-md);
+}
+
+.signin-hline::before,
+.signin-hline::after {
+    content: "";
+    position: absolute;
+    width: 40%;
+    height: 2px;
+    background-color: black;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.signin-hline::before {
+    left: 0;
+}
+
+.signin-hline::after {
+    right: 0;
+}
+
+.signin-olink {
+    width: 300px;
+    margin: 0 auto;
+    border: 1px solid;
+    border-radius: 4px;
+    display: block;
+    padding: 0.5em;
+    margin-bottom: var(--mb-md);
+}
+
+.signin-oicon {
+    margin-right: 1em;
+}

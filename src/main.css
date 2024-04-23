@@ -4,10 +4,16 @@
     --ff-body: "Montserrat", sans-serif;
     --ff-text: "Inter", sans-serif;
 
-    --cl: #149BBA;
-    --cl: #FFFFFF;
-    --cl: #000000;
-    --cl: #7CD4E4;
+    --cl-cyan-40: #149BBA;
+    --cl-cyan-69: #7dd4e3;
+    --cl-white-100: #FFFFFF;
+    --cl-black-100: #000000;
+
+    --mb-xl: 3em;
+    --mb-lg: 1.5em;
+    --mb-md: 1em;
+    --mb-sm: 0.5em;
+    --mb-xs: 0.3em;
 }
 
 *,
@@ -20,4 +26,18 @@
 
 body {
     font-family: var(--ff-body);
+}
+
+input,
+button {
+    font: inherit;
+    border: none;
+    outline-style: none;
+    background-color: transparent;
+}
+
+.wrap {
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto;
 }
