@@ -1,6 +1,22 @@
+.signin {
+    --border: var(--surface4-light);
+}
+
+.signin-lead {
+    margin-bottom: var(--mb-xs);
+}
+
+.signin-link {
+    margin-bottom: var(--mb-md);
+}
+
+.signin-form {
+    margin-bottom: var(--mb-md);
+}
+
 .signin-field {
     position: relative;
-    margin-bottom: var(--mb-sm);
+    margin-bottom: var(--mb-md);
 }
 
 .signin-label,
@@ -10,33 +26,50 @@
 }
 
 .signin-label {
+    color: var(--cl-text);
     margin-bottom: var(--mb-xs);
 }
 
 .signin-input {
-    border: 1px solid;
+    border: 1px solid var(--border);
     border-radius: 4px;
     padding: 0.8em;
+    padding-right: 40px;
+    /* background-color: var(--border); */
+}
+
+.signin-fwrap {
+    position: relative;
+}
+
+.signin-icon {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
 }
 
 .signin-reset {
     position: absolute;
     top: 0;
     right: 0;
+    color: var(--cl-main);
 }
 
 .signin-enter {
     width: 100%;
     display: block;
-    padding: 0.5em 0;
-    background-color: var(--cl-cyan-40);
-    margin-bottom: var(--mb-md);
+    padding: 0.8em 0;
+    background-color: var(--brand-light);
+    margin: var(--mb-lg) 0;
+    border-radius: 4px;
 }
 
 .signin-hline {
     position: relative;
     text-align: center;
     margin-bottom: var(--mb-md);
+    text-transform: uppercase;
 }
 
 .signin-hline::before,
@@ -44,8 +77,8 @@
     content: "";
     position: absolute;
     width: 40%;
-    height: 2px;
-    background-color: black;
+    height: 1px;
+    background-color: var(--border);
     top: 50%;
     transform: translateY(-50%);
 }
@@ -59,15 +92,42 @@
 }
 
 .signin-olink {
+    color: var(--text2-light);
     width: 300px;
     margin: 0 auto;
-    border: 1px solid;
+    border: 1px solid var(--border);
     border-radius: 4px;
-    display: block;
-    padding: 0.5em;
     margin-bottom: var(--mb-md);
+    padding: 0.5em;
+    justify-content: center;
+    /* background-color: var(--border); */
 }
 
 .signin-oicon {
+    width: 20px;
     margin-right: 1em;
+}
+
+.signin-image {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .signin {
+        display: flex;
+        /* align-items: stretch; */
+    }
+
+    .signin-place,
+    .signin-image {
+        flex: 1;
+    }
+
+    .signin-image {
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        margin-left: 3em;
+        transform: scale(0.8);
+    }
 }
