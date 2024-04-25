@@ -1,4 +1,6 @@
+import "../utils.css";
 import "./signin.css";
+
 import { Link, Form } from "react-router-dom";
 
 import iconFB from "../../assets/img/img-fb.png";
@@ -6,7 +8,7 @@ import iconGL from "../../assets/img/img-gl.png";
 import iconMail from "../../assets/img/icon-mail.svg";
 import iconHide from "../../assets/img/icon-eye-hide.svg";
 import iconShow from "../../assets/img/icon-eye-show.svg";
-import features from "../../assets/img/illustration-signup.svg";
+import features from "../../assets/img/illustration-signin.svg";
 
 const SignIn = () => {
     const iconPass = true ? iconShow : iconHide;
@@ -15,7 +17,7 @@ const SignIn = () => {
             <div className="signin-col signin-place">
                 <h2 className="signin-lead">Sign In!</h2>
                 <div className="signin-link">Don't have an account?&nbsp;
-                    <Link to="#">Sign up</Link>
+                    <Link to="/signup">Sign up</Link>
                 </div>
                 <Form className="signin-form">
                     <div className="signin-field">
