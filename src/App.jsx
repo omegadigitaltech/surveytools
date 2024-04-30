@@ -14,9 +14,9 @@ import Verify from "./pages/verify/verify";
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
-            <Route index element={"Home"} />
+            {/* <Route index element={"Home"} /> */}
             <Route element={<Auth />}>
-                <Route path="signin" element={<SignIn />} />
+                <Route index element={<SignIn />} />
                 <Route path="signup" element={<SignUp />} />
                 <Route path="verify" element={<Verify />} />
             </Route>
