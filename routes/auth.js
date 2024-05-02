@@ -10,7 +10,7 @@ router.get('/auth/google',  passport.authenticate('google', { scope:
   [ 'email', 'profile' ] }
 ))
 // callback
-router.get('/google', passport.authenticate( 'google', { failureRedirect: '/login?error=Failed to login' }), googleLogin)
+router.get('/google', passport.authenticate( 'google', { failureRedirect: '/login?error=Gooogle Login Failed' }), googleLogin)
 
 router.get('/auth/facebook', passport.authenticate('facebook'))
 //callback
