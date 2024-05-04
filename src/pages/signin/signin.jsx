@@ -19,13 +19,13 @@ const SignIn = () => {
                 <div className="signin-link">Don't have an account?&nbsp;
                     <Link to="/signup">Sign up</Link>
                 </div>
-                <Form className="signin-form" action="/signin">
+                <Form className="signin-form" method="post" action="/signin">
                     <div className="signin-field">
                         <label className="signin-label" htmlFor="">
                             Email
                         </label>
                         <div className="signin-fwrap">
-                            <input className="signin-input" type="text" name="" id="" />
+                            <input className="signin-input" type="email" name="email" id="" />
                             <img className="signin-icon" src={iconMail} alt="" />
                         </div>
                     </div>
@@ -34,13 +34,14 @@ const SignIn = () => {
                             Password
                         </label>
                         <div className="signin-fwrap">
-                            <input className="signin-input" type="text" name="" id="" />
+                            <input className="signin-input" type="password" name="password" id="" />
                             <img className="signin-icon" src={iconPass} alt="" />
                         </div>
                         <Link className="signin-reset" to="#">
                             Forgot password?
                         </Link>
                     </div>
+                    {/* <Link className="signin-enter" to="/signin">Sign in</Link> */}
                     <button className="signin-enter">Sign in</button>
                 </Form>
                 <div className="signin-hline">or</div>

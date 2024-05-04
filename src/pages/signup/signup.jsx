@@ -1,10 +1,12 @@
 import "../utils.css";
 import "./signup.css";
 
-import { Form, Link } from "react-router-dom";
+import { Form, Link, useActionData } from "react-router-dom";
 import features from "../../assets/img/illustration-signup.svg";
 
 const SignUp = () => {
+    const data = useActionData();
+    console.log(data)
     return (
         <div className="signup">
             <div className="signup-col signup-place">
@@ -12,36 +14,42 @@ const SignUp = () => {
                 <div className="signup-link">Already have an account?&nbsp;
                     <Link to="/signin">Sign in</Link>
                 </div>
-                <Form>
+                { 
+                    data?.message && 
+                    <div className="">
+                        {data.message}
+                    </div>
+                }
+                <Form method="post" action="/signup">
                     <div className="signup-field">
                         <label className="signup-label" htmlFor="">
                             Fullname
                         </label>
-                        <input className="signup-input" type="text" name="" id="" />
+                        <input className="signup-input" type="text" name="fullname" id="" />
                     </div>
                     <div className="signup-field">
                         <label className="signup-label" htmlFor="">
                             Email
                         </label>
-                        <input className="signup-input" type="text" name="" id="" />
+                        <input className="signup-input" type="email" name="email" id="" />
                     </div>
                     <div className="signup-field">
                         <label className="signup-label" htmlFor="">
                             School ID
                         </label>
-                        <input className="signup-input" type="text" name="" id="" />
+                        <input className="signup-input" type="text" name="schoolId" id="" />
                     </div>
                     <div className="signup-field">
                         <label className="signup-label" htmlFor="">
                             Password
                         </label>
-                        <input className="signup-input" type="text" name="" id="" />
+                        <input className="signup-input" type="password" name="password" id="" />
                     </div>
                     <div className="signup-field">
                         <label className="signup-label" htmlFor="">
                             Confirm Password
                         </label>
-                        <input className="signup-input" type="text" name="" id="" />
+                        <input className="signup-input" type="password" name="check" id="" />
                     </div>
                     <label>
                         <input className="signup-check" type="checkbox" name="" id="" />

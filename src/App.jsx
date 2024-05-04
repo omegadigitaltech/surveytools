@@ -11,13 +11,16 @@ import SignIn from "./pages/signin/signin";
 import SignUp from "./pages/signup/signup";
 import Verify from "./pages/verify/verify";
 
+import signInAction from "./pages/signin/action";
+import signUpAction from "./pages/signup/action";
+
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
             {/* <Route index element={"Home"} /> */}
             <Route element={<Auth />}>
-                <Route index element={<SignIn />} />
-                <Route path="signup" element={<SignUp />} />
+                <Route path="signin" element={<SignIn />} action={signInAction} />
+                <Route path="signup" element={<SignUp />} action={signUpAction} />
                 <Route path="verify" element={<Verify />} />
             </Route>
         </Route>
