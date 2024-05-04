@@ -1,0 +1,72 @@
+@import "https://fonts.googleapis.com/css2?family=Inter:wght@500&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap";
+
+:root {
+    --ff-body: "Montserrat", sans-serif;
+    --ff-text: "Inter", sans-serif;
+
+    --brand-h: 191;
+    --brand-s: 81%;
+    --brand-l: 40%;
+    --brand-light: hsl(var(--brand-h) var(--brand-s) var(--brand-l));
+    --text1-light: hsl(var(--brand-h) var(--brand-s) 10%);
+    --text2-light: hsl(var(--brand-h) 30% 30%);
+    --surface1-light: hsl(var(--brand-h) 25% 90%);
+    --surface2-light: hsl(var(--brand-h) 20% 99%);
+    --surface2-light: hsl(var(--brand-h) 20% 97%);
+    --surface3-light: hsl(var(--brand-h) 20% 92%);
+    --surface4-light: hsl(var(--brand-h) 20% 85%);
+    --surface-shadow-light: var(--brand-hue) 10% calc(var(--brand-s) / 5);
+    --shadow-strength-light: .02;
+
+    --mb-xl: 3em;
+    --mb-lg: 1.5em;
+    --mb-md: 1em;
+    --mb-sm: 0.5em;
+    --mb-xs: 0.3em;
+
+    --bp-lg: 1044px;
+    --bp-md: 768px;
+    --bp-sm: 512px;
+    --bp-xs: 384px;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-size: 1rem;
+    font-family: var(--ff-body);
+}
+
+a {
+    text-decoration: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+input,
+button {
+    font: inherit;
+    border: none;
+    outline-style: none;
+    background-color: transparent;
+}
+
+.wrap {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+}
