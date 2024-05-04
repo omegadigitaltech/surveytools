@@ -1,0 +1,10 @@
+function isLoggedIn(req, res, next) {
+  if(req.user){
+    if(req.user.error) {
+      let error = req.user.error
+      return res.redirect(`/?error=${error}`)
+    }
+  }
+    
+    req.user ? next() : res.sendStatus(401);
+}
