@@ -1,4 +1,4 @@
-# surveypro
+# SurveyPro
 
 
 ## Introduction
