@@ -1,3 +1,5 @@
+require('express-async-errors');
+const { StatusCodes } = require('http-status-codes')
 const passport = require("passport");
 var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
@@ -10,11 +12,30 @@ passport.use(new GoogleStrategy({
     passReqToCallback: true
   }, 
   async function(request, accessToken, refreshToken, profile, done) {
-    if(!profile.email){
-      return done(null, {error: "Email not Found"})
+    try {
+      if(!profile.email){
+        return done(null, {error: "Email not Found", statusCode: 404})
+      }
+      await User.findOneAndUpdate({ id: profile.id }, {id: profile.id, type: "Google", fullname: profile.displayName, email: profile.email }, {upsert: true, new: true, runValidators: true})
+      done(null, profile);
+
+    } catch (err) {
+
+      let msg = "An error Occured"
+      let statusCode = 500
+      if(err.name === 'ValidationError'){
+        msg = Object.values(err.errors).map((item) => item.message).join(',')
+        statusCode = 400
+      }
+    
+      if(err.code && err.code === 11000){
+        msg = `Duplicate Value entered for ${Object.keys(err.keyValue)} field, please choose another value`
+        statusCode = StatusCodes.BAD_REQUEST
+      }
+      
+      return done(null, {error: msg, statusCode: statusCode})
     }
-    await User.findOneAndUpdate({ id: profile.id }, {id: profile.id, type: "Google", fullname: profile.displayName, email: profile.email }, {upsert: true, new: true, runValidators: true})
-    done(null, profile);
+    
   }
 ));
   
@@ -24,13 +45,29 @@ passport.use(new FacebookStrategy({
     callbackURL: "/auth/facebook/callback"
   },
   async function(accessToken, refreshToken, profile, done) {
-    console.log(profile)
-    if(!profile.email){
-      return done(null, {error: "Email not Found"})
-    }
-    await User.findOneAndUpdate({ id: profile.id }, {id: profile.id, type: "Facebook"}, {upsert: true, new: true, runValidators: true})
-    done(null, profile);
+    try {
+      console.log(profile)
+      if(!profile.email){
+        return done(null, {error: "Email not Found", statusCode: 404})
+      }
+      await User.findOneAndUpdate({ id: profile.id }, {id: profile.id, type: "Facebook"}, {upsert: true, new: true, runValidators: true})
+      done(null, profile);
+    } catch (err) {
+      let msg = "An error Occured"
+      let statusCode = 500
+      if(err.name === 'ValidationError'){
+        msg = Object.values(err.errors).map((item) => item.message).join(',')
+        statusCode = 400
+      }
     
+      if(err.code && err.code === 11000){
+        msg = `Duplicate Value entered for ${Object.keys(err.keyValue)} field, please choose another value`
+        statusCode = StatusCodes.BAD_REQUEST
+      }
+      
+      return done(null, {error: msg, statusCode: statusCode})
+    }
+     
   }
 ));
   

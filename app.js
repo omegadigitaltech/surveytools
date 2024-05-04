@@ -1,4 +1,6 @@
 require("dotenv").config();
+require('express-async-errors');
+
 const express = require("express");
 const session = require('express-session')
 const bodyParser = require("body-parser");
@@ -39,8 +41,8 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 
-app.use('', mainRouter)
-app.use('', authRouter)
+app.use('/', mainRouter)
+app.use('/', authRouter)
 
 
 // //error handler

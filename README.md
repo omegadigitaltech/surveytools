@@ -245,10 +245,33 @@ If the code provided does not match what is in db it returns a 400 Bad Request
 ### Google Login
 GET /auth/google
 
+Content-Type: application/json
+
+.Response:
+
+    {
+        status: "success",
+        code: 200,
+        msg: "User successfully logged in",
+        data: {
+            redirectUrl: redirectUrl
+        }
+    }
+
 Fix in the route to the href. It logins in the user with google account and redirect to either verification page or home.
 
 #### Error handling
-If an error occured it redirects to /login page with query parameter /login?error='error message'
+.Error-Response:
+
+If an error occured with login for example duplicate email found in db.
+
+    {
+        status: "failure",
+        code: 400,
+        msg: "Duplicate Value entered for email field, please choose another value"
+    }
+    
+If the google login fails to work, it redirects back to /login page with query parameter /login?error='error message'
 
 ### Logout Route
 

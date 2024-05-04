@@ -42,14 +42,14 @@ const postRegister = async (req,res) => {
     const fullname = first_name + " " + last_name
 
     // check for uniqueness of email
-    const check_email = await User.find({email: email})
-    if (check_email.length > 0) {
-        return res.status(400).json({
-            status: "failure",
-            code: 400,
-            msg: "User exists"
-        })
-    }
+    // const check_email = await User.find({email: email})
+    // if (check_email.length > 0) {
+    //     return res.status(400).json({
+    //         status: "failure",
+    //         code: 400,
+    //         msg: "User exists"
+    //     })
+    // }
 
     const user = await User.create({
         id: unique_id,  
@@ -140,7 +140,11 @@ const googleLogin = async (req, res) => {
     if(req.user){
         if(req.user.error) {
           let error = req.user.error
-          return res.redirect(`/login?error=${error}`)
+          return res.status(req.user.statusCode).json({
+            status: "failure",
+            code: req.user.statusCode,
+            msg: error
+        })
         }
     }
     const {verified} = await getVerification(req.user.id)
@@ -153,7 +157,15 @@ const googleLogin = async (req, res) => {
 
     const token = jwt.sign({userId: req.user.id}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_LIFETIME})
     res.cookie('token', token, {httpOnly: true})
-    res.redirect(redirectUrl)
+
+    res.status(200).json({
+        status: "success",
+        code: 200,
+        msg: "User successfully logged in",
+        data: {
+            redirectUrl: redirectUrl
+        }
+    })
 }
 
 
@@ -161,7 +173,11 @@ const facebookLogin = async (req, res) => {
     if(req.user){
         if(req.user.error) {
           let error = req.user.error
-          return res.redirect(`/login?error=${error}`)
+          return res.status(req.user.statusCode).json({
+            status: "failure",
+            code: req.user.statusCode,
+            msg: error
+        })
         }
     }
     // send verification code to their email.
@@ -175,7 +191,14 @@ const facebookLogin = async (req, res) => {
 
     const token = jwt.sign({userId: req.user.id}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_LIFETIME})
     res.cookie('token', token, {httpOnly: true})
-    res.redirect(redirectUrl)
+       res.status(200).json({
+        status: "success",
+        code: 200,
+        msg: "User successfully logged in",
+        data: {
+            redirectUrl: redirectUrl
+        }
+    })
 }
 
 const verify = async (req, res) => {

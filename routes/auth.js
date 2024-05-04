@@ -14,7 +14,7 @@ router.get('/google', passport.authenticate( 'google', { failureRedirect: '/logi
 
 router.get('/auth/facebook', passport.authenticate('facebook'))
 //callback
-router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login?error=Failed to login'  }), facebookLogin)
+router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login?error=Facebook Login Failed '  }), facebookLogin)
 
 // is logged in route
 router.get('/isLoggedIn', isLoggedIn)
