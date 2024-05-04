@@ -19,7 +19,7 @@ const SignIn = () => {
                 <div className="signin-link">Don't have an account?&nbsp;
                     <Link to="/signup">Sign up</Link>
                 </div>
-                <Form className="signin-form">
+                <Form className="signin-form" action="/signin">
                     <div className="signin-field">
                         <label className="signin-label" htmlFor="">
                             Email
