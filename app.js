@@ -9,6 +9,7 @@ const passport = require("passport");
 const nodemailer = require('nodemailer')
 const otpGenerator = require('otp-generator');
 const cookieParser = require('cookie-parser')
+const cors = require('cors');
 
 const User = require('./model/user')
 
@@ -21,7 +22,7 @@ const notFoundMiddleware = require('./middleware/not-found')
 const app = express();
 require('./middleware/passport');
 
-
+app.use(cors());
 app.use(express.static("public"));
 app.use(bodyParser.json());
 // app.set("view engine", "ejs");
