@@ -1,20 +1,34 @@
 import { redirect } from "react-router";
+import config from "../../config/config";
 
 const action = async ({ request }) => {
     const data = await request.formData();
+
     const user = {
-        fullname: data.get("fullname"),
-        password: data.get("password"),
-        schoolId: data.get("schoolId"),
+        first_name: "Demo",
+        last_name: "Null",
         email: data.get("email"),
-        check: data.get("check")
+        department: "elect",
+        password: data.get("password"),
+        confirm_password: data.get("password")
     }
 
-    if (user.password !== user.check) {
+    if (user.password !== user.confirm_password) {
         return { message: "Password does not match" }
     }
 
-    return redirect("/signin");
+    console.log(user)
+
+    const resp = await fetch(config.signup, {
+        method: "POST",
+        body: JSON.stringify({
+            ...user
+        })
+    });
+
+    console.log(resp)
+
+    return redirect("/signup");
 }
 
 export default action;

@@ -14,6 +14,7 @@ import Verify from "./pages/verify/verify";
 import signInAction from "./pages/signin/action";
 import signUpAction from "./pages/signup/action";
 
+
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
