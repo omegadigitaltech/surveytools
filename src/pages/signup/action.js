@@ -5,8 +5,8 @@ const action = async ({ request }) => {
     const data = await request.formData();
 
     const user = {
-        first_name: "Demo",
-        last_name: "Null",
+        first_name: "",
+        last_name: "",
         email: data.get("email"),
         department: "elect",
         password: data.get("password"),
@@ -17,16 +17,12 @@ const action = async ({ request }) => {
         return { message: "Password does not match" }
     }
 
-    console.log(user)
-
     const resp = await fetch(config.signup, {
         method: "POST",
         body: JSON.stringify({
             ...user
         })
     });
-
-    console.log(resp)
 
     return redirect("/signup");
 }
