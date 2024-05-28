@@ -14,15 +14,28 @@ const authMiddleware = async (req, res, next ) => {
     const token = req.cookies.token;
   
     if(!token) {
-      return res.redirect('/login')
+      return res.status(404).json({
+        status: "failure",
+        code: 404,
+        msg: "User is not Logged In: Token not found",
+        data: {
+          isLoggedIn: false,
+        }
+    })
     }
-  
-    
+      
     const decoded = jwt.verify(token, jwtSecret);
     //dont just find by Id, but by password
     const user = await User.findOne({id: decoded.userId})
     if(!user) {
-      return redirect('/login')
+      return res.status(404).json({
+        status: "failure",
+        code: 404,
+        msg: "User is not Logged In: Token corrupt",
+        data: {
+          isLoggedIn: false,
+        }
+      })
     }
     req.userId = decoded.userId;
     next();
@@ -31,9 +44,23 @@ const authMiddleware = async (req, res, next ) => {
     req.session.referer = req.originalUrl
     if(error instanceof jwt.JsonWebTokenError){
       res.clearCookie('token');
-      return res.redirect('/login')
+      return res.status(404).json({
+        status: "failure",
+        code: 404,
+        msg: "User is not Logged In: Token corrupt",
+        data: {
+          isLoggedIn: false,
+        }
+    })
     }
-    return res.redirect('/login')
+    return res.status(404).json({
+      status: "failure",
+      code: 404,
+      msg: "User is not Logged In: Token corrupt",
+      data: {
+        isLoggedIn: false,
+      }
+  })
   }
 
   }

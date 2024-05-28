@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer')
 const User = require('../model/user')
 
 
-const domain = "http://localhost:5000"
+const domain = "https://nasty-marrissa-surveypro-991645a4.koyeb.app/"
 
 async function sendNotification(email, owner, text, title) {
 

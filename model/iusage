@@ -1,0 +1,23 @@
+{
+  "title": "Customer Satisfaction Survey",
+  "description": "A survey to measure customer satisfaction.",
+  "questions": [
+    {
+      "questionText": "How satisfied are you with our service?",
+      "questionType": "five_point"
+    },
+    {
+      "questionText": "What can we improve?",
+      "questionType": "fill_in"
+    },
+    {
+      "questionText": "Which of our products do you use?",
+      "questionType": "multiple_choice",
+      "options": [
+        { "text": "Product A" },
+        { "text": "Product B" },
+        { "text": "Product C" }
+      ]
+    }
+  ]
+}
