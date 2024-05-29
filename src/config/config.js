@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000";
+const API_URL = "http://nasty-marrissa-surveypro-991645a4.koyeb.app";
 
 const config = {
     signin: `${API_URL}/register`,
