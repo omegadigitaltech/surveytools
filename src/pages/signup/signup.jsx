@@ -49,7 +49,7 @@ const SignUp = () => {
                         <label className="signup-label" htmlFor="">
                             Confirm Password
                         </label>
-                        <input className="signup-input" type="password" name="check" id="" />
+                        <input className="signup-input" type="password" name="confirm" id="" />
                     </div>
                     <label>
                         <input className="signup-check" type="checkbox" name="" id="" />
