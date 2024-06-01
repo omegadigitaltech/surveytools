@@ -22,7 +22,20 @@ const notFoundMiddleware = require('./middleware/not-found')
 const app = express();
 require('./middleware/passport');
 
-app.use(cors());
+const allowedOrigins = ['http://localhost:5000', 'http://localhost:5173'];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.static("public"));
 app.use(bodyParser.json());
 // app.set("view engine", "ejs");
