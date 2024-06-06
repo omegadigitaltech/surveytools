@@ -1,9 +1,6 @@
-const API_URL = "http://nasty-marrissa-surveypro-991645a4.koyeb.app";
-
 const config = {
-    signin: `${API_URL}/register`,
-    signup: `${API_URL}/register`,
-    verify: `${API_URL}/register`,
+    // API_URL: "https://nasty-marrissa-surveypro-991645a4.koyeb.app",
+    API_URL: "https://prospective-colette-surveypro-ee1a3b96.staging.koyeb.app"
 }
 
 export default config;

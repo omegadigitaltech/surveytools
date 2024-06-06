@@ -18,7 +18,9 @@ import signUpAction from "./pages/signup/action";
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
-            {/* <Route index element={"Home"} /> */}
+            <Route element={<Home />}>
+                <Route path="" element={""}></Route>
+            </Route>
             <Route element={<Auth />}>
                 <Route path="signin" element={<SignIn />} action={signInAction} />
                 <Route path="signup" element={<SignUp />} action={signUpAction} />

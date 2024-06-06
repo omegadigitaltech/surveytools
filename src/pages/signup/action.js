@@ -1,22 +1,38 @@
 import { redirect } from "react-router";
+import callAPI from "../../utils/helpers/callAPI";
 import config from "../../config/config";
 
 const action = async ({ request }) => {
     const data = await request.formData();
     const user = {
-        fullname: data.get("fullname"),
+        first_name: data.get("fullname"),
+        last_name: data.get("fullname"),
         email: data.get("email"),
+        department: null,
         password: data.get("password"),
         confirm_password: data.get("confirm")
     }
 
-    const req = await fetch(config.signup, {
+    const API_URL = `${config.API_URL}/register`;
+    const options = {
+        body: user,
         method: "POST",
-        body: user
-    });
-    const res = await req.json();
+        headers: {
+            "Content-Type": "application/json",
+            "Allow-Control-Allow-Origin": "*"
+        }
+    }
+
+    try {
+        const resp = await fetch(API_URL, options);
+        const json = await resp.json();
+        console.log(json)
+    } catch (err) {
+        console.log(err)
+        
+    }
+
     
-    console.log(res);
     return null;
 }
 
