@@ -6,7 +6,6 @@ import features from "../../assets/img/illustration-signup.svg";
 
 const SignUp = () => {
     const data = useActionData();
-    console.log(data)
     return (
         <div className="signup">
             <div className="signup-col signup-place">
@@ -14,11 +13,9 @@ const SignUp = () => {
                 <div className="signup-link">Already have an account?&nbsp;
                     <Link to="/signin">Sign in</Link>
                 </div>
-                { 
-                    data?.message && 
-                    <div className="">
-                        {data.message}
-                    </div>
+                {
+                    data?.message &&
+                    <div className="">{data.message}</div>
                 }
                 <Form method="post" action="/signup">
                     <div className="signup-field">
@@ -49,7 +46,7 @@ const SignUp = () => {
                         <label className="signup-label" htmlFor="">
                             Confirm Password
                         </label>
-                        <input className="signup-input" type="password" name="check" id="" />
+                        <input className="signup-input" type="password" name="confirm" id="" />
                     </div>
                     <label>
                         <input className="signup-check" type="checkbox" name="" id="" />
