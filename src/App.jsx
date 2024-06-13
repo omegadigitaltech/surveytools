@@ -9,7 +9,7 @@ import Home from "./layout/home/home";
 import Auth from "./layout/auth/auth";
 import SignIn from "./pages/signin/signin";
 import SignUp from "./pages/signup/signup";
-import Verify from "./pages/verify/verify";
+import Verify from "./pages/verify/verify"
 
 import signInAction from "./pages/signin/action";
 import signUpAction from "./pages/signup/action";
