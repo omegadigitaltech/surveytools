@@ -52,7 +52,7 @@ const SignIn = () => {
                     </Link>
                     <Link className="signin-olink flex" to="#">
                         <img className="signin-oicon" src={iconFB} alt="" />
-                        Sign in with Google
+                        Sign in with Facbook
                     </Link>
                 </div>
             </div>

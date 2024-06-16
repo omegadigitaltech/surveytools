@@ -28,6 +28,11 @@
     --bp-md: 768px;
     --bp-sm: 512px;
     --bp-xs: 384px;
+
+    /* Color */
+    --wht: #fff;
+    --blk:#000;
+    
 }
 
 *,
