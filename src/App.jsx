@@ -5,11 +5,14 @@ import {
     Route
 } from "react-router-dom";
 
-import Home from "./layout/home/home";
-import Auth from "./layout/auth/auth";
+import HomeLayout from "./layout/home/home";
+import AuthLayout from "./layout/auth/auth";
+
+import Home from "./pages/home/home";
 import SignIn from "./pages/signin/signin";
 import SignUp from "./pages/signup/signup";
 import Verify from "./pages/verify/verify";
+import Dashboard from "./pages/dashboard/dashboard";
 
 import signInAction from "./pages/signin/action";
 import signUpAction from "./pages/signup/action";
@@ -18,10 +21,11 @@ import signUpAction from "./pages/signup/action";
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
-            <Route element={<Home />}>
-                <Route path="" element={""}></Route>
+            <Route element={<HomeLayout />}>
+                <Route index element={<Home />} />
+                <Route path="dashboard" element={<Dashboard />} />
             </Route>
-            <Route element={<Auth />}>
+            <Route element={<AuthLayout />}>
                 <Route path="signin" element={<SignIn />} action={signInAction} />
                 <Route path="signup" element={<SignUp />} action={signUpAction} />
                 <Route path="verify" element={<Verify />} />
