@@ -15,7 +15,7 @@ flex-direction: column;
     /* gap: 5rem; */
     padding: 3rem;
     justify-content: space-between;
-    background: var(--brand-light) ;
+    background: var(--base) ;
     color: var(--wht);
     border-radius: .5rem;
 }

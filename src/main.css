@@ -9,30 +9,28 @@
     --fs-sm: 1rem;
     --fs-xs: 0.875rem;
 
-    --brand-h: 191;
-    --brand-s: 81%;
-    --brand-l: 40%;
-    --brand: hsl(var(--brand-h) var(--brand-s) var(--brand-l));
-    --text1: hsl(var(--brand-h) var(--brand-s) 10%);
-    --text2: hsl(var(--brand-h) 30% 30%);
-    --surface1: hsl(var(--brand-h) 25% 90%);
-    --surface2: hsl(var(--brand-h) 20% 99%);
-    --surface2: hsl(var(--brand-h) 20% 97%);
-    --surface3: hsl(var(--brand-h) 20% 92%);
-    --surface4: hsl(var(--brand-h) 20% 85%);
-    --surface-shadow: var(--brand-hue) 10% calc(var(--brand-s) / 5);
-    --shadow-strength: .02;
+    --brand-h: 188;
+    --brand-s: 69%;
+    --brand-l: 36%;
 
-    --base: #139ab9;
-    --text-dark: #293c4a;
-    --text-gray: #808a8f;
-    --text-lite: #daeaf2;
-    --surface-gray-100: #e6f2f7;
-    --surface-gray-200: #d3ebf2;
-    --surface-gray-300: #c0e4ed;
-    --surface-gray-400: #aec7e0;
-    --shadow-gray: #99babd;
-    --border-gray: #d2d8dc;
+    --base: hsl(var(--brand-h) var(--brand-s) var(--brand-l));
+    --text-dark: hsl(var(--brand-h) var(--brand-s) 10%);
+    --text-lite: hsl(var(--brand-h) var(--brand-s) 99%);
+    --text-gray: hsl(var(--brand-h) var(--brand-s) 50%);
+    --surface-dark-100: hsl(var(--brand-h) 10% 40%);
+    --surface-dark-200: hsl(var(--brand-h) 10% 30%);
+    --surface-dark-300: hsl(var(--brand-h) 10% 20%);
+    --surface-dark-400: hsl(var(--brand-h) 10% 10%);
+    --surface-lite-100: hsl(var(--brand-h) 10% 90%);
+    --surface-lite-200: hsl(var(--brand-h) 10% 80%);
+    --surface-lite-300: hsl(var(--brand-h) 10% 70%);
+    --surface-lite-400: hsl(var(--brand-h) 10% 60%);
+    --surface-gray-100: hsl(var(--brand-h) 10% 50%);
+    --surface-gray-200: hsl(var(--brand-h) 10% 50%);
+    --surface-gray-300: hsl(var(--brand-h) 10% 50%);
+    --surface-gray-400: hsl(var(--brand-h) 10% 50%);
+    --shadow-gray: hsl(var(--brand-h) var(--brand-s) 0%);
+    --border-gray: hsl(var(--brand-h) var(--brand-s) 0%);
 
     --mb-xl: 3em;
     --mb-lg: 1.5em;
@@ -91,8 +89,8 @@ button {
 
 .wrap {
     width: 92%;
-    max-width: 1200px;
     margin: 0 auto;
+    max-width: 1200px;
 }
 
 .flex {

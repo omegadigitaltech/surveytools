@@ -1,29 +1,42 @@
 .home {
     background: no-repeat top left url("../../assets/img/home-bg.jpg");
     background-size: cover;
+    position: relative;
 }
 
-.home-aside {
+.home::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 70%;
-    height: 300px;
+    height: 100%;
     background-color: var(--base);
+    background-image: url("../../assets/img/home-blob.svg");
+    background-size: contain;
+    background-position: bottom right;
+    background-repeat: no-repeat;
+    z-index: 0;
 }
 
 .home-inner {
-    height: 100%;
+    height: 300px;
     display: flex;
     align-items: start;
     justify-content: center;
     flex-direction: column;
+    position: relative;
+    z-index: 1;
 }
 
 .home-title {
+    display: grid;
     margin-bottom: var(--mb-md);
 }
 
 .home-text {
     color: var(--text-lite);
-    display: block;
+    grid-area: 1 / -1;
     animation: fadeIn 30ms infinite;
 }
 
@@ -32,10 +45,12 @@
 }
 
 .home-text-2 {
+    opacity: 0;
     animation-delay: 0s;
 }
 
 .home-text-3 {
+    opacity: 0;
     animation-delay: 0s;
 }
 
@@ -46,16 +61,5 @@
     color: var(--text-dark);
 }
 
-.home-blob {
-    position: absolute;
-    right: 0;
-}
-
-.home-blob-1 {
-    bottom: 0;
-}
-.home-blob-2 {
-    bottom: 0;
-}
 
 @keyframes fadeIn {}
