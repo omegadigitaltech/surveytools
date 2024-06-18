@@ -1,0 +1,65 @@
+.footer {
+    background-color: var(--base);
+    /* added by okiki */
+    margin-top: 2rem;
+}
+
+.footer-w1 {
+    margin-bottom: 2rem;
+}
+
+.footer-w1-logo {
+    color: var(--text-lite);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2rem;
+}
+
+.footer-w1-item {
+    margin-bottom: 1rem;
+}
+
+.footer-w1-link {
+    color: var(--text-lite);
+}
+
+.footer-w2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid;
+    padding: 1em 0;
+}
+
+.footer-w2-copy {
+    color: var(--text-lite);
+}
+
+.footer-w2-list {
+    display: flex;
+    align-items: center;
+    column-gap: 0.5rem;
+}
+
+.footer-w2-link {
+    --len: 40px;
+    width: var(--len);
+    height: var(--len);
+    border: 1px solid;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (min-width: 48em) {
+    .footer-w1 {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .footer-w1-list {
+        columns: 2;
+        column-gap: 5rem;
+    }
+}

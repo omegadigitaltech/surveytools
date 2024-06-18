@@ -1,11 +1,12 @@
 
 .dash_head{
 gap: 1rem;
+justify-content: space-between;
 }
 
 form {
     width: 100%;
-    max-width: 800px;
+    max-width: 850px;
     margin: 2em 0;
 }
 
@@ -40,19 +41,41 @@ form ::placeholder {
 .dashboard_sort img{
     border-radius: .3rem;
     padding: .5rem;
-border: 1px solid var(--brand-light) ;
+border: 1px solid var(--base) ;
 }
 .survey_head{
     gap: 1.5rem;
 }
 .survey_head .active_head{
-border-bottom: 2px solid var(--brand-light);
+border-bottom: 2.5px solid var(--base);
 }
 .survey_post{
     background: rgb(211, 243, 240);
     padding: 1rem;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    border-radius: 1rem;
 }
 .post_time{
     justify-content: space-between;
     margin-bottom: 1rem;
+}
+.survey_details{
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+.survey_info{
+    margin-bottom: 1.5rem;
+}
+.survey_class{
+    justify-content: space-between;
+}
+.survey_class img{
+    width: 1.5rem;
+}
+.dept, .participants {
+    gap: 1rem;
+}
+.survey_class .dept,.participants{
+    color: var(--gray)
 }

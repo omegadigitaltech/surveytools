@@ -9,7 +9,7 @@ import "./dashboard.css"
 const dashboard = () => {
     return (
         <section className="dashboard">
-            <div className="dashboard_inner">
+            <div className="dashboard_inner wrap">
            <div className="dash_head flex">
              <form>
             <div className="search desktop flex">
@@ -34,15 +34,15 @@ const dashboard = () => {
     <p className="posted">posted 2hr ago</p>
     <p className="duration">Duration: <b>20</b> min</p>
   </div>
-  <div className="survey_info flex">
+  <div className="survey_details flex">
     <h3 className="survey_title">Diet and Excercise survey</h3>
-    <h4 className="point">20pts</h4>
+    <h4 className="point">20Pts</h4>
   </div>
-  <p className="survey_details">
+  <p className="survey_info">
     This survey is part of a research that seeks how student sees the environment around and the response
-    to it, how to get to relate with Natureand feel their environment.
+    to it, how to get to relate with Natureand feel their environment. <a href="">...see more</a>
   </p>
-<div className="survey_details flex">
+<div className="survey_class flex">
   <div className="dept flex">
     <img src={dept} alt="" />
     <h4 className="department">Dept. of Foreign Languages</h4>

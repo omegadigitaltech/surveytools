@@ -37,7 +37,7 @@
 .home-text {
     color: var(--text-lite);
     grid-area: 1 / -1;
-    animation: fadeIn 30ms infinite;
+    animation: fadeIn 30s forwards infinite;
 }
 
 .home-text-1 {
@@ -45,12 +45,12 @@
 }
 
 .home-text-2 {
-    opacity: 0;
+    visibility: hidden;
     animation-delay: 0s;
 }
 
 .home-text-3 {
-    opacity: 0;
+    visibility: hidden;
     animation-delay: 0s;
 }
 
@@ -60,6 +60,5 @@
     background-color: var(--surface-gray-100);
     color: var(--text-dark);
 }
-
 
 @keyframes fadeIn {}

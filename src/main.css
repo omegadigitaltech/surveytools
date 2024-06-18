@@ -25,7 +25,7 @@
     --surface-lite-200: hsl(var(--brand-h) 10% 80%);
     --surface-lite-300: hsl(var(--brand-h) 10% 70%);
     --surface-lite-400: hsl(var(--brand-h) 10% 60%);
-    --surface-gray-100: hsl(var(--brand-h) 10% 50%);
+    --surface-gray-100: hsl(var(--brand-h) 20% 80%);
     --surface-gray-200: hsl(var(--brand-h) 10% 50%);
     --surface-gray-300: hsl(var(--brand-h) 10% 50%);
     --surface-gray-400: hsl(var(--brand-h) 10% 50%);
@@ -46,6 +46,7 @@
     /* Color */
     --wht: #fff;
     --blk:#000;
+    --gray: #777777;
 }
 
 *,
