@@ -7,7 +7,7 @@ import iconLogOut from "../../assets/img/icon-logout.svg";
 import "./navbar.css";
 
 const Navbar = () => {
-    const login = false;
+    const login = true;
     return ( 
         <header className={`header${login ? " header-logged" : ""}`}>
             <div className="header-wrap wrap">
@@ -57,6 +57,11 @@ const Navbar = () => {
                         <li className="header-w2-item hide header-w2-main">
                             <NavLink className="header-w2-link" to="">
                                 Sign Up
+                            </NavLink>
+                        </li>
+                        <li className="header-w2-item show header-w2-null">
+                            <NavLink className="header-w2-link" to="">
+                                Log Out
                             </NavLink>
                         </li>
                     </ul>

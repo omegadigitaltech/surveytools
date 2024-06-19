@@ -1,4 +1,7 @@
-
+.dashboard{
+    margin-bottom: 5rem;
+    margin-top: 1rem;
+}
 .dash_head{
 gap: 1rem;
 justify-content: space-between;
@@ -49,12 +52,17 @@ border: 1px solid var(--base) ;
 .survey_head .active_head{
 border-bottom: 2.5px solid var(--base);
 }
-.survey_post{
+.first_post{
     background: rgb(211, 243, 240);
+    box-shadow:0.5rem 1rem rgba(0,0,0,.1);
+
+}
+.survey_post{
     padding: 1rem;
     padding-top: 1.5rem;
     margin-top: 1.5rem;
     border-radius: 1rem;
+    border: 1px solid #dddddd;
 }
 .post_time{
     justify-content: space-between;
@@ -78,4 +86,12 @@ border-bottom: 2.5px solid var(--base);
 }
 .survey_class .dept,.participants{
     color: var(--gray)
+}
+
+
+@media(max-width:512px){
+
+}
+@media(max-width:384px){
+
 }

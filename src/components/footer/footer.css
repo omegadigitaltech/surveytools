@@ -1,7 +1,6 @@
 .footer {
+    padding: 3em 0;
     background-color: var(--base);
-    /* added by okiki */
-    margin-top: 2rem;
 }
 
 .footer-w1 {
@@ -17,6 +16,7 @@
 
 .footer-w1-item {
     margin-bottom: 1rem;
+    /* text-align: right; */
 }
 
 .footer-w1-link {
@@ -26,9 +26,9 @@
 .footer-w2 {
     display: flex;
     align-items: center;
+    padding-top: 1em;
     justify-content: space-between;
-    border-top: 1px solid;
-    padding: 1em 0;
+    border-top: 1px solid var(--border);
 }
 
 .footer-w2-copy {
@@ -45,7 +45,7 @@
     --len: 40px;
     width: var(--len);
     height: var(--len);
-    border: 1px solid;
+    border: 1px solid var(--border);
     border-radius: 50%;
     display: flex;
     align-items: center;

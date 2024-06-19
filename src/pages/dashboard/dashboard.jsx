@@ -29,7 +29,30 @@ const dashboard = () => {
               <h3>My Surveys</h3>
             </div>
             <div className="survey_posts">
-<div className="survey_post">
+<div className="survey_post first_post">
+  <div className="post_time flex">
+    <p className="posted">posted 2hr ago</p>
+    <p className="duration">Duration: <b>20</b> min</p>
+  </div>
+  <div className="survey_details flex">
+    <h3 className="survey_title">Diet and Excercise survey</h3>
+    <h4 className="point">20Pts</h4>
+  </div>
+  <p className="survey_info">
+    This survey is part of a research that seeks how student sees the environment around and the response
+    to it, how to get to relate with Natureand feel their environment. <a href="">...see more</a>
+  </p>
+<div className="survey_class flex">
+  <div className="dept flex">
+    <img src={dept} alt="" />
+    <h4 className="department">Dept. of Foreign Languages</h4>
+  </div>
+  <div className="participants flex">
+<img src={members} alt="" />
+<p>20 Participants</p>
+  </div>
+</div>
+</div><div className="survey_post">
   <div className="post_time flex">
     <p className="posted">posted 2hr ago</p>
     <p className="duration">Duration: <b>20</b> min</p>
@@ -53,6 +76,7 @@ const dashboard = () => {
   </div>
 </div>
 </div>
+
             </div>
            </div>
 

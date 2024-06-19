@@ -6,10 +6,8 @@ const Auth = () => {
         <section className="auth">
             <div className="wrap">
                 <h1 className="auth-lead">
-                    Survey
-                    <span className="auth-span">
-                        pro
-                    </span>
+                    Survey Pro
+                    <span className="auth-circ" aria-hidden></span>
                 </h1>
                 <Outlet />
             </div>

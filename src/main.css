@@ -15,22 +15,18 @@
 
     --base: hsl(var(--brand-h) var(--brand-s) var(--brand-l));
     --text-dark: hsl(var(--brand-h) var(--brand-s) 10%);
-    --text-lite: hsl(var(--brand-h) var(--brand-s) 99%);
-    --text-gray: hsl(var(--brand-h) var(--brand-s) 50%);
-    --surface-dark-100: hsl(var(--brand-h) 10% 40%);
-    --surface-dark-200: hsl(var(--brand-h) 10% 30%);
-    --surface-dark-300: hsl(var(--brand-h) 10% 20%);
-    --surface-dark-400: hsl(var(--brand-h) 10% 10%);
-    --surface-lite-100: hsl(var(--brand-h) 10% 90%);
-    --surface-lite-200: hsl(var(--brand-h) 10% 80%);
-    --surface-lite-300: hsl(var(--brand-h) 10% 70%);
-    --surface-lite-400: hsl(var(--brand-h) 10% 60%);
-    --surface-gray-100: hsl(var(--brand-h) 20% 80%);
-    --surface-gray-200: hsl(var(--brand-h) 10% 50%);
-    --surface-gray-300: hsl(var(--brand-h) 10% 50%);
-    --surface-gray-400: hsl(var(--brand-h) 10% 50%);
-    --shadow-gray: hsl(var(--brand-h) var(--brand-s) 0%);
-    --border-gray: hsl(var(--brand-h) var(--brand-s) 0%);
+    --text-lite: hsl(var(--brand-h) 15% 95%);
+    --text-gray: hsl(var(--brand-h) 10% 50%);
+    --surface-dark-100: hsl(var(--brand-h) 10% 10%);
+    --surface-dark-200: hsl(var(--brand-h) 10% 15%);
+    --surface-dark-300: hsl(var(--brand-h) 5% 20%);
+    --surface-dark-400: hsl(var(--brand-h) 5% 25%);
+    --surface-lite-100: hsl(var(--brand-h) 10% 99%);
+    --surface-lite-200: hsl(var(--brand-h) 15% 99%);
+    --surface-lite-300: hsl(var(--brand-h) 15% 95%);
+    --surface-lite-400: hsl(var(--brand-h) 20% 95%);
+    --shadow: hsl(var(--brand-h) 50% 50%);
+    --border: hsl(var(--brand-h) 12% 89%);
 
     --mb-xl: 3em;
     --mb-lg: 1.5em;

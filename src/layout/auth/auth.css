@@ -4,5 +4,15 @@
 
 .auth-lead {
     color: var(--cl-lead);
+    text-transform: uppercase;
     margin-bottom: var(--mb-lg);
+}
+
+.auth-circ {
+    --len: 5px;
+    width: var(--len);
+    height: var(--len);
+    margin-left: 2px;
+    background-color: var(--base);
+    display: inline-block;
 }
