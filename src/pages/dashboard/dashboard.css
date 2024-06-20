@@ -1,3 +1,6 @@
+.dash_head,.dashboard_inner,.dashboard,.survey_head,.survey_details,.survey_class{
+    flex-wrap: wrap;
+}
 .dashboard{
     margin-bottom: 5rem;
     margin-top: 1rem;
@@ -23,6 +26,7 @@ form ::placeholder {
     padding: 0 1em;
     border: 1px solid rgb(201, 201, 201);
     gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .search input {
@@ -54,8 +58,7 @@ border-bottom: 2.5px solid var(--base);
 }
 .first_post{
     background: rgb(211, 243, 240);
-    box-shadow:0.5rem 1rem rgba(0,0,0,.1);
-
+    box-shadow:.4rem 0.4rem .4rem rgba(0,0,0,.1);
 }
 .survey_post{
     padding: 1rem;
@@ -67,6 +70,7 @@ border-bottom: 2.5px solid var(--base);
 .post_time{
     justify-content: space-between;
     margin-bottom: 1rem;
+    font-size: .8rem;
 }
 .survey_details{
     justify-content: space-between;
@@ -90,8 +94,61 @@ border-bottom: 2.5px solid var(--base);
 
 
 @media(max-width:512px){
+.search{
+    gap: .5rem
+}
+.search input {
+    padding: .7em 0;
+    font-size: .9rem;
+}
+.dashboard_inner h3{
+font-size: .9rem;
+}
 
+.dashboard_sort h3{
+    gap: .5em;
+    font-size: .8rem;
+} 
+.dashboard_sort img{
+    padding: .4rem;
+    /* width: ; */
+}
+form {
+    width: 70%;
+}
 }
 @media(max-width:384px){
-
+    .dash_head {
+        gap: 0rem;
+    }
+    form{
+        margin: 1em 0;
+    }
+    .survey_info{
+        font-size: .9rem;
+    }
+    .dash_head {
+        margin-bottom: 1rem;
+    }
+    .post_time p{
+        font-size: .7rem;
+    }
+    .survey_class{
+        gap: .5rem;
+    }
+    .survey_class h4,p{
+        font-size: .9rem;
+    }
+    .survey_details h4{
+        font-size: .9rem;
+    }
+    .survey_class img{
+        width:15px
+    }
+    .search img{
+        width: 20px;
+    }
+    .first_post{
+        box-shadow:.2rem 0.2rem .2rem rgba(0,0,0,.1);
+    }
 }

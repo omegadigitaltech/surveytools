@@ -45,11 +45,11 @@ const dashboard = () => {
 <div className="survey_class flex">
   <div className="dept flex">
     <img src={dept} alt="" />
-    <h4 className="department">Dept. of Foreign Languages</h4>
+    <h4 className="department">Dept. of <span className="dept">Foreign Languages</span></h4>
   </div>
   <div className="participants flex">
 <img src={members} alt="" />
-<p>20 Participants</p>
+<p> <span className="num_participant">20</span> Participants</p>
   </div>
 </div>
 </div><div className="survey_post">
@@ -58,7 +58,7 @@ const dashboard = () => {
     <p className="duration">Duration: <b>20</b> min</p>
   </div>
   <div className="survey_details flex">
-    <h3 className="survey_title">Diet and Excercise survey</h3>
+    <h3 className="survey_title">Transport Management</h3>
     <h4 className="point">20Pts</h4>
   </div>
   <p className="survey_info">
@@ -68,11 +68,11 @@ const dashboard = () => {
 <div className="survey_class flex">
   <div className="dept flex">
     <img src={dept} alt="" />
-    <h4 className="department">Dept. of Foreign Languages</h4>
+    <h4 className="department">Dept. of <span className="dept">Physics</span></h4>
   </div>
   <div className="participants flex">
 <img src={members} alt="" />
-<p>20 Participants</p>
+<p><span className="num_participant">10</span> Participants</p>
   </div>
 </div>
 </div>
