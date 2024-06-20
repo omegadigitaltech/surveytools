@@ -1,63 +1,53 @@
-import "../utils.css";
+import { Form, Link } from "react-router-dom";
 import "./signup.css";
 
-import { Form, Link, useActionData } from "react-router-dom";
-import features from "../../assets/img/illustration-signup.svg";
-
 const SignUp = () => {
-    const data = useActionData();
     return (
-        <div className="signup">
-            <div className="signup-col signup-place">
-                <h2 className="signup-lead">Sign up!</h2>
-                <div className="signup-link">Already have an account?&nbsp;
-                    <Link to="/signin">Sign in</Link>
-                </div>
-                {
-                    data?.message &&
-                    <div className="">{data.message}</div>
-                }
-                <Form method="post" action="/signup">
-                    <div className="signup-field">
-                        <label className="signup-label" htmlFor="">
-                            Fullname
+        <div className="auth-w2">
+            <h2 className="auth-w2-lead">
+                Sign Up
+            </h2>
+            <p className="auth-w2-link">
+                Already have an account?&nbsp;
+                <Link className="auth-w2-uline" to="/signin">
+                    Sign in
+                </Link>                
+            </p>
+            <Form className="auth-w2-for">
+                <div className="auth-w2-grid">
+                    <div className="auth-w2-field">
+                        <label className="auth-w2-label" htmlFor="">
+                            First name
                         </label>
-                        <input className="signup-input" type="text" name="fullname" id="" />
+                        <input className="auth-w2-input" type="text" name="" id="" />
                     </div>
-                    <div className="signup-field">
-                        <label className="signup-label" htmlFor="">
+                    <div className="auth-w2-field">
+                        <label className="auth-w2-label" htmlFor="">
+                            Last name
+                        </label>
+                        <input className="auth-w2-input" type="text" name="" id="" />
+                    </div>
+                    <div className="auth-w2-field auth-w2-full">
+                        <label className="auth-w2-label" htmlFor="">
                             Email
                         </label>
-                        <input className="signup-input" type="email" name="email" id="" />
+                        <input className="auth-w2-input" type="text" name="" id="" />
                     </div>
-                    <div className="signup-field">
-                        <label className="signup-label" htmlFor="">
-                            School ID
-                        </label>
-                        <input className="signup-input" type="text" name="schoolId" id="" />
-                    </div>
-                    <div className="signup-field">
-                        <label className="signup-label" htmlFor="">
+                    <div className="auth-w2-field auth-w2-full">
+                        <label className="auth-w2-label" htmlFor="">
                             Password
                         </label>
-                        <input className="signup-input" type="password" name="password" id="" />
+                        <input className="auth-w2-input" type="text" name="" id="" />
                     </div>
-                    <div className="signup-field">
-                        <label className="signup-label" htmlFor="">
-                            Confirm Password
-                        </label>
-                        <input className="signup-input" type="password" name="confirm" id="" />
-                    </div>
-                    <label>
-                        <input className="signup-check" type="checkbox" name="" id="" />
-                        By creating an account, you agree to our <Link className="" to="#">Terms and Condition</Link> & <Link className="" to="#">Privacy Policy</Link>
-                    </label>
-                    <button className="signup-enter">Sign up</button>
-                </Form>
-            </div>
-            <div className="signup-col signup-image">
-                <img src={features} alt="" />
-            </div>
+                </div>
+                <label className="auth-w2-block" htmlFor="">
+                    <input className="auth-w2-check" type="text" />
+                    agree to <Link className="auth-w2-uline" to="">terms & condition</Link>
+                </label>
+                <button className="auth-w2-btn">
+                    Sign up
+                </button>
+            </Form>
         </div>
     )
 }

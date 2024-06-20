@@ -1,4 +1,4 @@
-.dash_head,.dashboard_inner,.dashboard,.survey_head,.survey_details,.survey_class{
+.dashboard_inner,.dashboard,.survey_head,.survey_details,.survey_class{
     flex-wrap: wrap;
 }
 .dashboard{
@@ -118,7 +118,9 @@ form {
 }
 }
 @media(max-width:384px){
+    
     .dash_head {
+    flex-wrap: wrap;
         gap: 0rem;
     }
     form{

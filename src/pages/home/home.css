@@ -64,4 +64,10 @@
         max-width: 50%;
         font-size: var(--fs-sm);
     }
-} 
+}
+
+@media (min-width: 768px) {
+    .home::after {
+        width: 60%;
+    }
+}
