@@ -1,43 +1,43 @@
-.auth-w2-lead {
+.auth-w3-lead {
     margin-bottom: var(--mb-xs);
 }
 
-.auth-w2-link {
+.auth-w3-link {
     margin-bottom: var(--mb-sm);
 }
 
-.auth-w2-form {
+.auth-w3-form {
     width: 100%;
 }
 
-.auth-w2-field {
+.auth-w3-field {
     margin-bottom: var(--mb-md);
 }
 
-.auth-w2-label {
+.auth-w3-label {
     display: block;
     margin-bottom: var(--mb-xs);
 }
 
-.auth-w2-input {
+.auth-w3-input {
     width: 100%;
     border: 1px solid var(--border);
     padding: 0.5em;
 }
 
-.auth-w2-third {
+.auth-w3-third {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--mb-xl);
 }
 
-.auth-w2-block {
+.auth-w3-block {
     display: flex;
     align-items: center;
 }
 
-.auth-w2-check {
+.auth-w3-check {
     --len: 20px;
     appearance: none;
     -webkit-appearance: none;
@@ -47,12 +47,12 @@
     margin-right: 0.5rem;
 }
 
-.auth-w2-check:hover {
+.auth-w3-check:hover {
     border-radius: 2px;
 }
 
-.auth-w2-check:checked,
-.auth-w2-check:focus {
+.auth-w3-check:checked,
+.auth-w3-check:focus {
     border-color: transparent;
     background-color: var(--base);
     background-image: url("../../assets/img/icon-check.svg");
@@ -61,7 +61,7 @@
     background-position: center;
 }
 
-.auth-w2-btn {
+.auth-w3-btn {
     width: 100%;
     display: block;
     background-color: var(--base);

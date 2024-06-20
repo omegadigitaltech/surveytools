@@ -3,39 +3,39 @@ import "./signin.css";
 
 const SignIn = () => {
     return (
-        <div className="auth-w2">
-            <h2 className="auth-w2-lead">
+        <div className="auth-w3">
+            <h2 className="auth-w3-lead">
                 Sign in
             </h2>
-            <p className="auth-w2-link">
+            <p className="auth-w3-link">
                 Don't have an account?&nbsp;
                 <Link className="" to="/signup">
                     Sign up
                 </Link>
             </p>
-            <Form className="auth-w2-form">
-                <div className="auth-w2-field">
-                    <label className="auth-w2-label" htmlFor="usermail">
+            <Form className="auth-w3-form">
+                <div className="auth-w3-field">
+                    <label className="auth-w3-label" htmlFor="usermail">
                         Username
                     </label>
-                    <input className="auth-w2-input" type="text" name="" id="usermail" />
+                    <input className="auth-w3-input" type="text" name="" id="usermail" />
                 </div>
-                <div className="auth-w2-field">
-                    <label className="auth-w2-label" htmlFor="password">
+                <div className="auth-w3-field">
+                    <label className="auth-w3-label" htmlFor="password">
                         Password
                     </label>
-                    <input className="auth-w2-input" type="text" name="" id="password" />
+                    <input className="auth-w3-input" type="text" name="" id="password" />
                 </div>
-                <div className="auth-w2-third">
-                    <label className="auth-w2-block" htmlFor="">
-                        <input className="auth-w2-check" type="checkbox" name="checkbox" />
+                <div className="auth-w3-third">
+                    <label className="auth-w3-block" htmlFor="">
+                        <input className="auth-w3-check" type="checkbox" name="checkbox" />
                         Remember me
                     </label>
-                    <Link className="auth-w2-reset">
+                    <Link className="auth-w3-reset">
                         Forgot password?
                     </Link>
                 </div>
-                <button className="auth-w2-btn">
+                <button className="auth-w3-btn">
                     {/* Sign in */}
                     Let's sign you in
                 </button>
