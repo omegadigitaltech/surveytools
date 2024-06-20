@@ -13,17 +13,17 @@ const Auth = () => {
                     <span className="auth-w1-circ" aria-hidden></span>
                 </h1>
                 <Outlet />
-                <div className="auth-w3">
-                    <div className="auth-w3-line">
+                <div className="auth-w4">
+                    <div className="auth-w4-line">
                         {/* OR CONTINUE WITH */}
                         Or continue with
                     </div>
-                    <div className="auth-w3-list">
-                        <Link className="auth-w3-link" to="">
-                            <img className="auth-w3-icon" src={iconFB} alt="" />
+                    <div className="auth-w4-list">
+                        <Link className="auth-w4-link" to="">
+                            <img className="auth-w4-icon" src={iconFB} alt="" />
                         </Link>
-                        <Link className="auth-w3-link" to="">
-                            <img className="auth-w3-icon" src={iconGL} alt="" />
+                        <Link className="auth-w4-link" to="">
+                            <img className="auth-w4-icon" src={iconGL} alt="" />
                         </Link>
                     </div>
                 </div>

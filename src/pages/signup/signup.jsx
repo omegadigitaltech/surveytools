@@ -9,7 +9,7 @@ const SignUp = () => {
             </h2>
             <p className="auth-w2-link">
                 Already have an account?&nbsp;
-                <Link className="auth-w2-uline" to="/signin">
+                <Link className="" to="/signin">
                     Sign in
                 </Link>                
             </p>
@@ -45,7 +45,8 @@ const SignUp = () => {
                     agree to <Link className="auth-w2-uline" to="">terms & condition</Link>
                 </label>
                 <button className="auth-w2-btn">
-                    Sign up
+                    {/* Sign up */}
+                    Let's sign you up
                 </button>
             </Form>
         </div>

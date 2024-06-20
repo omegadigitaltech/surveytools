@@ -25,42 +25,42 @@ const Navbar = () => {
                 <div className="header-w2">
                     <ul className="header-w2-list">
                         <li className="header-w2-item hide">
-                            <NavLink className="header-w2-link" to="">
+                            <NavLink className="header-w2-link" to="/">
                                 Home
                             </NavLink>
                         </li>
                         <li className="header-w2-item hide">
-                            <NavLink className="header-w2-link" to="">
+                            <NavLink className="header-w2-link" to="/">
                                 About Us
                             </NavLink>
                         </li>
                         <li className="header-w2-item show header-w2-hide">
-                            <NavLink className="header-w2-link" to="">
+                            <NavLink className="header-w2-link" to="/">
                                 Dashboard
                             </NavLink>
                         </li>
                         <li className="header-w2-item show header-w2-hide">
-                            <NavLink className="header-w2-link" to="">
+                            <NavLink className="header-w2-link" to="/">
                                 Post Survey
                             </NavLink>
                         </li>
                         <li className="header-w2-item show">
-                            <NavLink className="header-w2-link" to="">
+                            <NavLink className="header-w2-link" to="/">
                                 Contact Us
                             </NavLink>
                         </li>
                         <li className="header-w2-item hide">
-                            <NavLink className="header-w2-link" to="">
+                            <NavLink className="header-w2-link" to="/signin">
                                 Log In
                             </NavLink>
                         </li>
                         <li className="header-w2-item hide header-w2-main">
-                            <NavLink className="header-w2-link" to="">
+                            <NavLink className="header-w2-link" to="/signup">
                                 Sign Up
                             </NavLink>
                         </li>
                         <li className="header-w2-item show header-w2-null">
-                            <NavLink className="header-w2-link" to="">
+                            <NavLink className="header-w2-link" to="/">
                                 Log Out
                             </NavLink>
                         </li>
@@ -81,7 +81,7 @@ const Navbar = () => {
                     </NavLink>
                 </div>
                 <div className="header-w4 hide">
-                    <NavLink className="header-w4-link header-w4-side" to="">
+                    <NavLink className="header-w4-link header-w4-side" to="/signup">
                         Sign up
                     </NavLink>
                 </div>
