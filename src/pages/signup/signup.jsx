@@ -13,7 +13,7 @@ const SignUp = () => {
                     Sign in
                 </Link>                
             </p>
-            <Form className="auth-w2-for">
+            <Form className="auth-w2-form">
                 <div className="auth-w2-grid">
                     <div className="auth-w2-field">
                         <label className="auth-w2-label" htmlFor="">
