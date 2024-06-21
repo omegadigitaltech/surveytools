@@ -3,52 +3,48 @@ import "./signup.css";
 
 const SignUp = () => {
     return (
-        <div className="auth-w2">
-            <h2 className="auth-w2-lead">
-                Sign Up
-            </h2>
-            <p className="auth-w2-link">
-                Already have an account?&nbsp;
-                <Link className="" to="/signin">
-                    Sign in
-                </Link>                
-            </p>
-            <Form className="auth-w2-form">
-                <div className="auth-w2-grid">
-                    <div className="auth-w2-field">
-                        <label className="auth-w2-label" htmlFor="">
+        <div className="auth-w4">
+            <Form className="auth-w4-form">
+                <div className="auth-w4-grid">
+                    <div className="auth-w4-field">
+                        <label className="auth-w4-label" htmlFor="">
                             First name
                         </label>
-                        <input className="auth-w2-input" type="text" name="" id="" />
+                        <input className="auth-w4-input" type="text" name="" id="" />
                     </div>
-                    <div className="auth-w2-field">
-                        <label className="auth-w2-label" htmlFor="">
+                    <div className="auth-w4-field">
+                        <label className="auth-w4-label" htmlFor="">
                             Last name
                         </label>
-                        <input className="auth-w2-input" type="text" name="" id="" />
+                        <input className="auth-w4-input" type="text" name="" id="" />
                     </div>
-                    <div className="auth-w2-field auth-w2-full">
-                        <label className="auth-w2-label" htmlFor="">
+                    <div className="auth-w4-field auth-w4-full">
+                        <label className="auth-w4-label" htmlFor="">
                             Email
                         </label>
-                        <input className="auth-w2-input" type="text" name="" id="" />
+                        <input className="auth-w4-input" type="text" name="" id="" />
                     </div>
-                    <div className="auth-w2-field auth-w2-full">
-                        <label className="auth-w2-label" htmlFor="">
+                    <div className="auth-w4-field auth-w4-full">
+                        <label className="auth-w4-label" htmlFor="">
                             Password
                         </label>
-                        <input className="auth-w2-input" type="text" name="" id="" />
+                        <input className="auth-w4-input" type="text" name="" id="" />
                     </div>
                 </div>
-                <label className="auth-w2-block" htmlFor="">
-                    <input className="auth-w2-check" type="text" />
-                    agree to <Link className="auth-w2-uline" to="">terms & condition</Link>
+                <label className="auth-w4-block" htmlFor="">
+                    <input className="auth-w4-check" type="text" />
+                    agree to <Link className="" to="">terms & condition</Link>
                 </label>
-                <button className="auth-w2-btn">
-                    {/* Sign up */}
-                    Let's sign you up
+                <button className="auth-w4-btn">
+                    Sign up
                 </button>
             </Form>
+            <div className="auth-w4-">
+                Already have an account?&nbsp;
+                <Link className="auth-w4-" to="/signin">
+                    Sign in
+                </Link>
+            </div>
         </div>
     )
 }

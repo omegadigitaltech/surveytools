@@ -1,44 +1,36 @@
-.auth-w2-lead {
-    margin-bottom: var(--mb-xs);
-}
-
-.auth-w2-link {
-    margin-bottom: var(--mb-sm);
-}
-
-.auth-w2-form {
+.auth-w4-form {
     width: 100%;
 }
 
-.auth-w2-grid {
+.auth-w4-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
     margin-bottom: var(--mb-md);
 }
 
-.auth-w2-full {
+.auth-w4-full {
     grid-column: span 2;
 }
 
-.auth-w2-label {
+.auth-w4-label {
     display: block;
     margin-bottom: var(--mb-xs);
 }
 
-.auth-w2-input {
+.auth-w4-input {
     width: 100%;
     border: 1px solid var(--border);
     padding: 0.5em;
 }
 
-.auth-w2-block {
+.auth-w4-block {
     color: var(--text-dark);
     margin-bottom: var(--mb-lg);
     display: block;
 }
 
-.auth-w2-check {
+.auth-w4-check {
     --len: 20px;
     appearance: none;
     -webkit-appearance: none;
@@ -48,26 +40,7 @@
     margin-right: 0.5rem;
 }
 
-.auth-w2-check:hover {
-    border-radius: 2px;
-}
-
-.auth-w2-check:checked,
-.auth-w2-check:focus {
-    border-color: transparent;
-    background-color: var(--base);
-    background-image: url("../../assets/img/icon-check.svg");
-    background-size: 20px;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.auth-w2-uline {
-    color: inherit;
-    text-decoration: underline;
-}
-
-.auth-w2-btn {
+.auth-w4-btn {
     width: 100%;
     display: block;
     background-color: var(--base);

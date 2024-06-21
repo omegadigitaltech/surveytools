@@ -28,6 +28,29 @@
     --shadow: hsl(var(--brand-h) 50% 50%);
     --border: hsl(var(--brand-h) 12% 89%);
 
+    --color: #1c8a9b;
+    --d-A50: #197c8c;
+    --d-100: #166e7c;
+    --d-200: #14616d;
+    --d-300: #11535d;
+    --d-400: #0e454e;
+    --d-500: #0b373e;
+    --d-600: #08292e;
+    --d-700: #061c1f;
+    --d-800: #030e0f;
+    --d-900: #000000;
+
+    --l-A50: #3396a5;
+    --l-100: #49a1af;
+    --l-200: #60adb9;
+    --l-300: #77b9c3;
+    --l-400: #8ec5cd;
+    --l-500: #a4d0d7;
+    --l-600: #bbdce1;
+    --l-700: #d2e8eb;
+    --l-800: #e8f3f5;
+    --l-900: #ffffff;
+
     --mb-xl: 3em;
     --mb-lg: 1.5em;
     --mb-md: 1em;
@@ -85,7 +108,7 @@ button {
 }
 
 .wrap {
-    width: 92%;
+    width: 90%;
     margin: 0 auto;
     max-width: 1200px;
 }
