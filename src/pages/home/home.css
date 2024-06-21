@@ -36,6 +36,7 @@
     display: grid;
     max-width: 384px;
     margin-bottom: var(--mb-sm);
+    font-size: var(--fs-lg);
 }
 
 .home-text {
@@ -59,10 +60,10 @@
 }
 
 
-@media (max-width: 384px) {
+@media (max-width: 512px) {
     .home-title {
-        max-width: 50%;
-        font-size: var(--fs-sm);
+        max-width: 256px;
+        font-size: var(--fs-md);
     }
 }
 
