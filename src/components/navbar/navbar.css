@@ -85,7 +85,7 @@
 .header-w1-logo {
     color: var(--text-dark);
     font-weight: 700;
-    font-size: var(--fs-md);
+    font-size: var(--fs-lg);
 }
 
 .header-w1-circ {
@@ -138,8 +138,8 @@
     width: max-content;
     color: var(--text-lite);
     border: 1px solid transparent;
-    border-radius: 8px;
-    padding: 0.5em 1em;
+    border-radius: 30px;
+    padding: 0.8em 1.3em;
     background-color: var(--surface-dark-400);
 }
 
@@ -161,8 +161,8 @@
     display: none;
 }
 
-
-@media (max-width: 48em) {
+@media (max-width: 512px) {}
+@media (max-width: 768px) {
     .header-w1-menu {
         display: flex;
     }
@@ -194,7 +194,11 @@
     }
 }
 
-@media (min-width: 48em) {
+@media (min-width: 768px) {
+    .header-w1-logo {
+        font-size: var(--fs-xl);
+    }
+    
     .header-w2-list {
         width: 100%;
         display: flex;
