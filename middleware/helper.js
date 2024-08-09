@@ -1,8 +1,11 @@
 const nodemailer = require('nodemailer')
 const User = require('../model/user')
+const Sentiment = require('sentiment');
 
+const sentiment = new Sentiment();
 
 const domain = "https://nasty-marrissa-surveypro-991645a4.koyeb.app"
+
 
 async function sendNotification(email, owner, text, title) {
 
@@ -81,9 +84,23 @@ const getVerification = async (userid) => {
 
     return {verified: false}
 }
+
+// Function to calculate sentiment analysis
+const calculateSentiment = (responses) => {
+    const sentimentScores = responses.map(response => sentiment.analyze(response.response).score);
+    const positive = sentimentScores.filter(score => score > 0).length;
+    const neutral = sentimentScores.filter(score => score === 0).length;
+    const negative = sentimentScores.filter(score => score < 0).length;
+  
+    return { positive, neutral, negative };
+};
+
 module.exports = {
     sendNotification,
     generateID_users,
     getVerification,
+    calculateSentiment,
     url: domain
 }
+
+

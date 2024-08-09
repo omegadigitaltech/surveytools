@@ -34,6 +34,10 @@ const UserSchema = new Schema(
     },
     code: {
       type: Number
+    },
+    pointBalance: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }

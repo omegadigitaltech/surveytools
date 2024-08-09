@@ -1,27 +1,32 @@
+
+// preferredparticpants
+// frontend layer for dept check// checkSurveyPublished
+// test for correct sturture and avoidance of server error or stopage
+
+// midle ware that checks that the participants as submited the survey, and also that checks the max_participation
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 // Define the schema for survey answers
 const answerSchema = new Schema({
-  // userId: { type: String, required: true },
-  username: { type: String, required: [true, "Username is required"] },
-  response: { type: Schema.Types.Mixed, required: [true, "Response field is required"] }
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  fullname: { type: String, required: [true, "Username is required"] },
+  response: { type: String, required: [true, "Response field is required"] }
 });
 
 // Define the schema for survey options
 const optionSchema = new Schema({
-  id: { type: String, required: [true, "Options Id is required"]},
   text: { type: String,  required: [true, "Option text is required"]} 
 });
 
 // Define the schema for survey questions
 const questionSchema = new Schema({
-  questionId: { type: String, required: [true, "Question Id is required"] },
   questionText: { type: String, required: [true, "Question Text is required"] },
   questionType: { type: String, required: [true, "Question Type is required"], enum: {
     values: ['multiple_choice', 'five_point', 'fill_in'],
     message: 'Question type must be either "multiple_choice", "five_point", or "fill_in"'
   }},
+  required: { type: Boolean, default: false },
   options: {
     type:[optionSchema], // Only for multiple_choice questions
     validate: {
@@ -38,7 +43,10 @@ const questionSchema = new Schema({
   analytics: {
     totalResponses: { type: Number, default: 0 },
     distribution: { type: Map, of: Number }, // Flexible key-value pairs for different types of questions
-    averageRating: Number,
+    averageRating: {
+      type: Number,
+      default: 0
+    },
     responseRate: String,
     mostCommonResponse: Schema.Types.Mixed, // Flexible to handle different types of responses
     sentimentAnalysis: {
@@ -52,8 +60,9 @@ const questionSchema = new Schema({
 // Define the schema for the survey
 const surveySchema = new Schema({
     user_id:{
-     type: mongoose.Schema.Types.ObjectId,
-    required: [true, "User ID is required"]
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, "User ID is required"]
     },
     title: {
      type: String,
@@ -74,13 +83,19 @@ const surveySchema = new Schema({
     },
     max_participant: {
      type: Number,
+     default: 0
     },
     description: { type: String, required: [true, "Description Field is required"]},
+    submittedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Track users who submitted the survey
     questions: [questionSchema],// reference question documents
+    published: { type: Boolean, default: false },
+    link: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
 
+// Create an index on questions.questionId
+surveySchema.index({ 'questions.questionId': 1 });
 
 const Survey = mongoose.model('Survey', surveySchema);
 
