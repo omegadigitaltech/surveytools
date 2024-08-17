@@ -1,5 +1,9 @@
 import { Form, Link, useNavigate } from "react-router-dom";
 import backaro from "../../assets/img/backaro.svg";
+import dept from "../../assets/img/blu-dept.svg";
+import partp from "../../assets/img/partps.svg";
+
+
 
 import "./expandsurvey.css"
 
@@ -33,7 +37,23 @@ return(
   </ul>
   </div>
   <div className="activities">
-
+  <h4>Activities on this survey</h4>
+  <div className="activity_row center flex">
+  <li className="">Total participant required</li>
+    <p className="required_no"> <span className="participant_no">200</span> Participants</p>
+  </div>
+  <div className="activity_row center flex">
+  <li className="">Total participant required</li>
+    <p className="required_no"> <span className="participant_no">100</span> Participated</p>
+  </div>
+  <div className="activity_row center flex">
+    <li className="">Total participant required</li>
+    <p className="required_no"> <span className="participant_no">20</span> Left</p>
+  </div>
+  </div>
+  <div className="dept flex">
+    <img src={dept} alt="" />
+    <h4 className="department">Dept. of <span className="dept">Foreign Languages</span></h4>
   </div>
  </div>
     </section>

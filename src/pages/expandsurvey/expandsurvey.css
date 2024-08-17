@@ -1,3 +1,7 @@
+.center{
+    align-items: center;
+    justify-content: space-between;
+}
 .expand{
     margin-bottom: 2rem;
 }
@@ -28,4 +32,22 @@ margin-bottom: 1rem;
 .pre_participants li{
 margin-bottom: .5rem;
 font-size: .8rem;
+}
+.activities .activity_row{
+margin-bottom: 2rem;
+}
+.activities h4{
+    margin: 2rem 0;
+    font-style: italic ;
+    text-decoration: underline;
+}
+.activity_row li{
+    list-style:inside;
+}
+
+.activity_row .required_no{
+    text-align: left;
+}
+.activities .participant_no{
+    font-weight: 600;
 }
