@@ -46,3 +46,42 @@
     background-color: var(--base);
     padding: 0.8em;
 }
+
+/* Added */
+
+.signup-check {
+    --size: 20px;
+    appearance: none;
+    -webkit-appearance: none;
+    width: var(--size);
+    height: var(--size);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    margin-right: 0.5em;
+    vertical-align: middle;
+    position: relative;
+    cursor: pointer;
+}
+
+.signup-check::before {
+    --ring: calc(var(--size) * 0.3);
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--ring);
+    height: var(--ring);
+    border-radius: 50%;
+    background-color: var(--surface2-light);
+    display: none;
+}
+
+.signup-check:checked {
+    border-color: transparent;
+    background-color: var(--brand-light);
+}
+
+.signup-check:checked::before {
+    display: block;
+}

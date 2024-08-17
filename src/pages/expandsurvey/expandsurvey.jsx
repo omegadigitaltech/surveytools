@@ -1,7 +1,7 @@
 import { Form, Link, useNavigate } from "react-router-dom";
 import backaro from "../../assets/img/backaro.svg";
 import dept from "../../assets/img/blu-dept.svg";
-import partp from "../../assets/img/partps.svg";
+import partps from "../../assets/img/partps.svg";
 
 
 
@@ -51,10 +51,23 @@ return(
     <p className="required_no"> <span className="participant_no">20</span> Left</p>
   </div>
   </div>
+  
+<div className="survey_class flex">
   <div className="dept flex">
     <img src={dept} alt="" />
     <h4 className="department">Dept. of <span className="dept">Foreign Languages</span></h4>
   </div>
+  <div className="participants flex">
+<img src={partps} alt="" />
+<p> <span className="num_participant">20</span> Participants</p>
+  </div>
+</div>
+<div className="flex btn_div">
+  <button className="start-btn" onClick={() => navigate('')}>
+                    Start survey
+                </button>
+</div>
+
  </div>
     </section>
 )

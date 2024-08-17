@@ -3,7 +3,7 @@
     justify-content: space-between;
 }
 .expand{
-    margin-bottom: 2rem;
+    margin-bottom: 4rem;
 }
 .backaro{
     width: .7rem;
@@ -33,6 +33,9 @@ margin-bottom: 1rem;
 margin-bottom: .5rem;
 font-size: .8rem;
 }
+.activities{
+    margin-bottom: 4rem;
+}
 .activities .activity_row{
 margin-bottom: 2rem;
 }
@@ -50,4 +53,17 @@ margin-bottom: 2rem;
 }
 .activities .participant_no{
     font-weight: 600;
+}
+.btn_div{
+    justify-content: center;
+}
+.start-btn{
+    margin: 4rem 0;
+        width: 80%;
+        display: block;
+        background-color: var(--base);
+        padding: 0.8em;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 5px;
 }

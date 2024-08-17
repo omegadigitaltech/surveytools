@@ -1,6 +1,10 @@
 import { Form, Link } from "react-router-dom";
 import "./signup.css";
 
+import "../utils.css";
+import features from "../../assets/img/illustration-signup.svg";
+
+
 const SignUp = () => {
     return (
         <div className="auth-w4">
