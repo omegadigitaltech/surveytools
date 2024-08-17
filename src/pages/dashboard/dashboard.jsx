@@ -20,7 +20,7 @@ const dashboard = () => {
             </div>
           </form>
           <div className="dashboard_sort flex">
-<h3>Sort by</h3> <img src={sort} alt="" />
+<h4>Sort by</h4> <img src={sort} alt="" />
           </div>
             </div>
            <div className="dashboard_surveys">

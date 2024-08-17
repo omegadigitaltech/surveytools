@@ -43,7 +43,8 @@ form ::placeholder {
 }
 .dashboard_sort{
     gap: .5em;
-    font-size: .9rem;
+    font-size: .8rem;
+    width: 20%;
 }
 .dashboard_sort img{
     border-radius: .3rem;

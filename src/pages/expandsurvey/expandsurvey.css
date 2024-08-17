@@ -1,0 +1,31 @@
+.expand{
+    margin-bottom: 2rem;
+}
+.backaro{
+    width: .7rem;
+    margin: 2.5rem 0;
+}
+.description{
+    margin-right: 6rem;
+}
+.description h4{
+    font-style: italic ;
+    text-decoration: underline;
+margin-bottom: 1rem;
+}
+.description p{
+    font-size: .9rem;
+    margin-bottom: 2rem;
+}
+.pre_participants h4{
+    margin-bottom: 1rem;
+    font-style: italic ;
+    text-decoration: underline;
+}
+.pre_participants ul{
+    list-style:inside;
+}
+.pre_participants li{
+margin-bottom: .5rem;
+font-size: .8rem;
+}

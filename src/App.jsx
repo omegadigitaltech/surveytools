@@ -13,7 +13,7 @@ import SignIn from "./pages/signin/signin";
 import SignUp from "./pages/signup/signup";
 import Verify from "./pages/verify/verify";
 import Dashboard from "./pages/dashboard/dashboard";
-
+import ExpandSurvey from "./pages/expandsurvey/expandsurvey";
 import signInAction from "./pages/signin/action";
 import signUpAction from "./pages/signup/action";
 
@@ -24,6 +24,7 @@ const router = createBrowserRouter(
             <Route element={<HomeLayout />}>
                 <Route index element={<Home />} />
                 <Route path="dashboard" element={<Dashboard />} />
+                <Route path="expandsurvey" element={<ExpandSurvey />} />
             </Route>
             <Route element={<AuthLayout />}>
                 <Route path="signin" element={<SignIn />} action={signInAction} />

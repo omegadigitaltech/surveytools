@@ -1,7 +1,8 @@
-import { Form, Link } from "react-router-dom";
+import { Form, Link, useNavigate } from "react-router-dom";
 import "./signin.css";
 
 const SignIn = () => {
+    const navigate = useNavigate();
     return (
         <div className="auth-w5">
             <Form className="auth-w5-form">
@@ -26,7 +27,7 @@ const SignIn = () => {
                         Forgot password?
                     </Link>
                 </div>
-                <button className="auth-w5-btn">
+                <button className="auth-w5-btn" onClick={() => navigate('/dashboard')}>
                     Sign in
                 </button>
             </Form>
