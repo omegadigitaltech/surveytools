@@ -1,4 +1,6 @@
-import { Form, Link, useNavigate } from "react-router-dom";
+import { Form, Link, useNavigate} from "react-router-dom";
+import React, { useState } from 'react';
+
 import "./signin.css";
 import "../utils.css";
 import iconFB from "../../assets/img/img-fb.png";
@@ -9,10 +11,19 @@ import iconShow from "../../assets/img/icon-eye-show.svg";
 import features from "../../assets/img/illustration-signin.svg";
 
 const SignIn = () => {
+    // Temporary till authentication
     const navigate = useNavigate();
+    // Password toggle
+    const [showPassword, setShowPassword] = useState(false);
+    const handleToggle = () => {
+        setShowPassword(prevState => !prevState);
+    };
+    const iconPass = showPassword ? iconShow : iconHide;
+
     return (
-        <div className="auth-w5">
-            <Form className="auth-w5-form">
+        <div className="auth-w5 flex">
+            <div className="form-col">
+                <Form className="auth-w5-form">
                 <div className="auth-w5-field">
                     <label className="auth-w5-label" htmlFor="usermail">
                         Username
@@ -23,7 +34,10 @@ const SignIn = () => {
                     <label className="auth-w5-label" htmlFor="password">
                         Password
                     </label>
-                    <input className="auth-w5-input" type="text" name="" id="password" />
+                    <div className="auth-w5-wrap">
+                         <input className="auth-w5-input" type={showPassword ? "text" : "password"} name="password" id="password" />
+                    <img className="signin-icon pw-toggle" src={iconPass} alt=""  onClick={handleToggle}  />
+                    </div>
                 </div>
                 <div className="auth-w5-third">
                     <label className="auth-w5-block" htmlFor="">
@@ -43,6 +57,10 @@ const SignIn = () => {
                 <Link className="auth-w5-" to="/signup">
                     Sign up
                 </Link>
+            </div>
+            </div>
+            <div className="signin-col signin-image">
+                <img src={features} alt="" />
             </div>
         </div>
     )

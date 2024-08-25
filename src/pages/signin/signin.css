@@ -13,7 +13,8 @@
 
 .auth-w5-input {
     width: 100%;
-    border: 1px solid var(--border);
+    border: 1px solid var(--l-600);
+    background: var(--ltgray);
     padding: 0.5em;
 }
 
@@ -37,11 +38,42 @@
     height: var(--len);
     border: 1px solid var(--border);
     margin-right: 0.5rem;
+    border-radius: 50%;
+    vertical-align: middle;
+    position: relative;
+    cursor: pointer;
 }
 
+.auth-w5-check::before {
+    --ring: calc(var(--size) * 0.3);
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--ring);
+    height: var(--ring);
+    border-radius: 50%;
+    background-color: var(--surface2-light);
+    display: none;
+}
+
+.auth-w5-check:checked {
+    /* border-color: transparent; */
+    background-color: rgb(44, 44, 44);
+}
+
+.auth-w5-check:checked::before {
+    display: block;
+}
+.auth-w5 a{
+    color: var(--base);
+    font-weight: bold;
+   }
 .auth-w5-btn {
     width: 100%;
     display: block;
     background-color: var(--base);
+    color: var(--wht);
     padding: 0.8em;
 }

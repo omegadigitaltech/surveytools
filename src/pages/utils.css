@@ -42,8 +42,8 @@
     /* background-color: var(--border); */
 }
 
-.signin-fwrap,
-.signup-fwrap {
+.auth-w4-wrap,
+.auth-w5-wrap {
     position: relative;
 }
 

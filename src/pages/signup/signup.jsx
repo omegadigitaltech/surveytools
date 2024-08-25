@@ -1,12 +1,21 @@
 import { Form, Link, useActionData } from "react-router-dom";
+import React, { useState } from 'react';
+
 import "./signup.css";
 
 import "../utils.css";
 import features from "../../assets/img/illustration-signup.svg";
-
+import iconHide from "../../assets/img/icon-eye-hide.svg";
+import iconShow from "../../assets/img/icon-eye-show.svg";
 
 const SignUp = () => {
     const data = useActionData();
+ // Password toggle
+ const [showPassword, setShowPassword] = useState(false);
+ const handleToggle = () => {
+     setShowPassword(prevState => !prevState);
+ };
+ const iconPass = showPassword ? iconShow : iconHide;
 
     return (
         <div className="auth-w4 flex">
@@ -39,14 +48,20 @@ const SignUp = () => {
                         <label className="auth-w4-label" htmlFor="">
                             Password
                         </label>
-                        <input className="auth-w4-input" type="password" name="password" id="" />
+                    <div className="auth-w4-wrap">
+                        <input className="auth-w4-input pw-toggle" type={showPassword ? "text" : "password"} name="password" id="" />
+                    <img className="signin-icon"src={iconPass}  onClick={handleToggle} alt="" />
+                   </div>
                     </div>
                     <div className="auth-w4-field auth-w4-full">
                         <label className="auth-w4-label" htmlFor="">
                            Confirm Password
                         </label>
-                        <input className="auth-w4-input" type="password" name="password" id="" />
-                    </div>
+                    <div className="auth-w4-wrap">
+                        <input className="auth-w4-input pw-toggle" type={showPassword ? "text" : "password"} name="password" id="" />
+                    <img className="signin-icon" src={iconPass}  onClick={handleToggle} alt="" />
+                  </div>
+                   </div>
                 </div>
                 <label className="auth-w4-block" htmlFor="">
                     <input className="auth-w4-check" type="checkbox" />
@@ -56,7 +71,7 @@ const SignUp = () => {
                     Sign up
                 </button>
             </Form>
-            <div className="auth-w4">
+            <div className="auth-w4-">
                 Already have an account?&nbsp;
                 <Link className="auth-w4-" to="/signin">
                     Sign in
