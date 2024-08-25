@@ -38,6 +38,10 @@
     height: var(--len);
     border: 1px solid var(--border);
     margin-right: 0.5rem;
+    border-radius: 50%;
+    vertical-align: middle;
+    position: relative;
+    cursor: pointer;
 }
 
 .auth-w4-btn {
@@ -48,22 +52,7 @@
 }
 
 /* Added */
-
-.signup-check {
-    --size: 20px;
-    appearance: none;
-    -webkit-appearance: none;
-    width: var(--size);
-    height: var(--size);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    margin-right: 0.5em;
-    vertical-align: middle;
-    position: relative;
-    cursor: pointer;
-}
-
-.signup-check::before {
+.auth-w4-check::before {
     --ring: calc(var(--size) * 0.3);
     content: "";
     position: absolute;
@@ -77,11 +66,21 @@
     display: none;
 }
 
-.signup-check:checked {
-    border-color: transparent;
-    background-color: var(--brand-light);
+.auth-w4-check:checked {
+    /* border-color: transparent; */
+    background-color: rgb(44, 44, 44);
 }
 
-.signup-check:checked::before {
+.auth-w4-check:checked::before {
     display: block;
+}
+
+.form-col{
+    width: 50%;
+}
+
+@media (max-width: 768px) {
+    .form-col{
+        width: 100%;
+    }
 }

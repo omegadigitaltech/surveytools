@@ -1,5 +1,12 @@
 import { Form, Link, useNavigate } from "react-router-dom";
 import "./signin.css";
+import "../utils.css";
+import iconFB from "../../assets/img/img-fb.png";
+import iconGL from "../../assets/img/img-gl.png";
+import iconMail from "../../assets/img/icon-mail.svg";
+import iconHide from "../../assets/img/icon-eye-hide.svg";
+import iconShow from "../../assets/img/icon-eye-show.svg";
+import features from "../../assets/img/illustration-signin.svg";
 
 const SignIn = () => {
     const navigate = useNavigate();

@@ -1,10 +1,10 @@
 .auth {
     padding: 3em 0;
 }
-
+/* 
 .auth-wrap {
     max-width: 576px !important;
-}
+} */
 
 .auth-w1-lead {
     color: var(--cl-lead);

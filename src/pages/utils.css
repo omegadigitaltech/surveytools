@@ -96,8 +96,8 @@
     .signup-image {
         display: flex;
         align-items: center;
-        justify-content: end;
-        margin-left: 3em;
+        /* justify-content: end; */
+        /* margin-left: 3em; */
         transform: scale(0.8);
     }
 }
