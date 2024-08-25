@@ -9,7 +9,7 @@
 .auth-w1-lead {
     color: var(--cl-lead);
     text-transform: uppercase;
-    margin-bottom: var(--mb-lg);
+    margin-bottom: var(--mb-md);
 }
 
 .auth-w1-circ {
@@ -38,7 +38,7 @@
     top: 50%;
     transform: translateY(-50%);
     width: calc(50% - 5rem);
-    height: 2px;
+    height: 0.5px;
     background-color: var(--surface-dark-400);
 }
 
@@ -68,6 +68,6 @@
 }
 
 .auth-w3-icon {
-    width: 32px;
+    width: 22px;
     aspect-ratio: 1;
 }

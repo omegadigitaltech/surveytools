@@ -52,6 +52,19 @@ const SignIn = () => {
                     Sign in
                 </button>
             </Form>
+            <div className="auth-w3">
+                    <div className="auth-w3-line">
+                        Or login with
+                    </div>
+                    <div className="auth-w3-list">
+                        <Link className="auth-w3-link" to="">
+                            <img className="auth-w3-icon" src={iconFB} alt="" />
+                        </Link>
+                        <Link className="auth-w3-link" to="">
+                            <img className="auth-w3-icon" src={iconGL} alt="" />
+                        </Link>
+                    </div>
+                </div>
             <div className="auth-w5-">
                 Don't have an account?&nbsp;
                 <Link className="auth-w5-" to="/signup">
