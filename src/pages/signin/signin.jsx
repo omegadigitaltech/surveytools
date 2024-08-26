@@ -48,6 +48,7 @@ const SignIn = () => {
                         Forgot password?
                     </Link>
                 </div>
+                {/* REMOVE ONCLICK NAVIGATION */}
                 <button className="auth-w5-btn" onClick={() => navigate('/dashboard')}>
                     Sign in
                 </button>

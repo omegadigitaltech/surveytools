@@ -1,0 +1,33 @@
+.postsurvey{
+    margin-bottom: 2rem;
+}
+.post-head h3{
+    margin: 0 auto;
+}
+
+.postsurvey-field {
+    margin-bottom: var(--mb-md);
+}
+
+.postsurvey-label {
+    display: block;
+    margin-bottom: var(--mb-xs);
+}
+
+.postsurvey-input {
+    width: 80%;
+    background: var(--litgray);
+    padding: 0.5em;
+    border-radius: 6px;
+}
+.surveydescription{
+    width: 100%;
+    height:12rem;
+    background: var(--litgray);
+    padding: 0.5em;
+    border-radius: 6px;
+}
+form {
+    width: 100%;
+    max-width: 1050px;
+}
