@@ -54,6 +54,9 @@ border: 1px solid var(--base) ;
 .survey_head{
     gap: 1.5rem;
 }
+.survey_head:hover{
+    cursor: pointer;
+}
 .survey_head .active_head{
 border-bottom: 2.5px solid var(--base);
 }
@@ -67,6 +70,9 @@ border-bottom: 2.5px solid var(--base);
     margin-top: 1.5rem;
     border-radius: 1rem;
     border: 1px solid #dddddd;
+}
+.survey_post:hover{
+    cursor: pointer;
 }
 .post_time{
     justify-content: space-between;

@@ -7,8 +7,7 @@ import "./dashboard.css"
 import { Form, Link, useNavigate } from "react-router-dom";
 
 const dashboard = () => {
-  // Temporary
-  
+  // Temporary navigate
 const navigate = useNavigate();
 
     return (
@@ -33,6 +32,7 @@ const navigate = useNavigate();
               <h3>My Surveys</h3>
             </div>
             <div className="survey_posts">
+              {/* REmove onclick it's check to next page purpose */}
 <div className="survey_post first_post" onClick={() => navigate('/expandsurvey')}>
   <div className="post_time flex">
     <p className="posted">posted 2hr ago</p>

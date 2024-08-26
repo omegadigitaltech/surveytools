@@ -8,6 +8,9 @@ import partps from "../../assets/img/partps.svg";
 import "./expandsurvey.css"
 
 const expandsurvey = () =>{
+   // Temporary navigate
+const navigate = useNavigate();
+
 return(
     <section className="expand">
  <div className="dashboard_inner wrap">
@@ -63,7 +66,7 @@ return(
   </div>
 </div>
 <div className="flex btn_div">
-  <button className="start-btn" onClick={() => navigate('')}>
+  <button className="start-btn" onClick={() => navigate('/postsurvey')}>
                     Start survey
                 </button>
 </div>

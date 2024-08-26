@@ -5,6 +5,10 @@
     margin: 0 auto;
 }
 
+form {
+    width: 100%;
+    max-width: 1050px;
+}
 .postsurvey-field {
     margin-bottom: var(--mb-md);
 }
@@ -19,15 +23,25 @@
     background: var(--litgray);
     padding: 0.5em;
     border-radius: 6px;
+    padding: .6rem;
 }
 .surveydescription{
     width: 100%;
-    height:12rem;
+    /* height:12rem; */
     background: var(--litgray);
     padding: 0.5em;
     border-radius: 6px;
 }
-form {
+.postsurvey-field textarea{
+    resize:none;
+    height:15rem; 
     width: 100%;
-    max-width: 1050px;
-}
+    background: var(--litgray);
+    padding: 0.5em;
+    border-radius: 6px;
+    border: none;
+    padding: 1rem;
+  }
+  .postsurvey-field textarea{
+    font-size: 1rem;
+  }

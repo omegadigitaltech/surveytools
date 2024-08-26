@@ -67,3 +67,6 @@ margin-bottom: 2rem;
     font-weight: bold;
     border-radius: 5px;
 }
+.start-btn:hover{
+    cursor: pointer;
+}
