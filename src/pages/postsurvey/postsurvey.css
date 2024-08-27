@@ -45,6 +45,10 @@ form {
   .postsurvey-field textarea{
     font-size: 1rem;
   }
+.participants-fields{
+  gap: 1.5rem;
+  grid-template-columns: 1fr 1fr;
+}
 
   .custom-single-value {
     display: flex;
@@ -69,28 +73,29 @@ margin-bottom: 1rem;
   
   .custom-select {
     padding: 10px;
-    padding-right: 40px; 
+    padding-right: 50px; 
     border: none;
     border-radius: 4px;
-    appearance: none; /* Hide default dropdown arrow */
+    appearance: none;
     background: url('../../assets/img/downaro.svg') no-repeat right center; 
     background-size: 15px; 
     cursor: pointer;
     font-size: .9rem;
     background-color: var(--litgray);
     
+    background-position: right 15px center;
   }
   #range-dropdown{
     width: 100%;
 border-radius: 4px;
-
 }
-  /* Hide the default arrow in IE */
+.custom-select{
+  padding: 10px; 
+}
   .custom-select::-ms-expand {
     display: none;
   }
   
-  /* Optional: Style for focus and hover states */
   .custom-select:focus {
     border-color: #007bff;
     outline: none;

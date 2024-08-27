@@ -121,3 +121,6 @@ button {
     display: flex;
     align-items: center;
 }
+.grid{
+display: grid;
+}

@@ -37,24 +37,73 @@ return(
                     </label>
          <textarea name="surveydescription" id="" cols="30" rows="10" placeholder="Write your survey..." required></textarea>
                 </div>
-                 <div className="postsurvey-field custom-dropdown">
+                <div className="participants-fields grid">
+                <div className="postsurvey-field custom-dropdown">
 
-                 <label className="required-label" htmlFor="range-dropdown">
-                 <h4>Required Participants</h4> 
-                  </label>
-      <select
-        id="range-dropdown"
-        value={selectedRange}
-        onChange={handleChange}
-        className="custom-select"
-      >
-        <option className="option" value="0-200">0-200</option>
-        <option value="0-400">0-400</option>
-        <option value="0-600">0-600</option>
-        <option value="0-800">0-800</option>
-      </select>
-                </div> 
-   
+<label className="required-label" htmlFor="range-dropdown">
+<h4>Required Participants</h4> 
+ </label>
+<select
+id="range-dropdown"
+value={selectedRange}
+onChange={handleChange}
+className="custom-select"
+>
+<option className="option" value="0-200">0-200</option>
+<option value="0-400">0-400</option>
+<option value="0-600">0-600</option>
+<option value="0-800">0-800</option>
+</select>
+</div> 
+<div className="postsurvey-field custom-dropdown">
+<label className="required-label" htmlFor="range-dropdown">
+<h4>Total Point</h4> 
+</label>
+<select
+id="range-dropdown"
+value={selectedRange}
+onChange={handleChange}
+className="custom-select"
+>
+<option value="0-50">0-50 Points</option>
+<option value="0-100">0-100 Points</option>
+<option value="0-150">0-150 Points</option>
+<option value="0-200">0-200 Points</option>
+</select>
+</div> 
+<div className="postsurvey-field custom-dropdown">
+<label className="required-label" htmlFor="range-dropdown">
+<h4>Preferred Participants</h4> 
+</label>
+<select
+id="range-dropdown"
+value={selectedRange}
+onChange={handleChange}
+className="custom-select"
+>
+<option value="undergraduate">Undedrgraduate</option>
+<option value="Graduate">Graduate</option>
+<option value="Masters">Masters</option>
+</select>
+</div> 
+<div className="postsurvey-field custom-dropdown">
+<label className="required-label" htmlFor="range-dropdown">
+<h4>Participants Points</h4> 
+</label>
+<select
+id="range-dropdown"
+value={selectedRange}
+onChange={handleChange}
+className="custom-select"
+>
+<option value="10">10 Points</option>
+<option value="20">20 Points</option>
+<option value="30">30 Points</option>
+<option value="40">40 Points</option>
+</select>
+</div> 
+    </div>
+                
         </Form>
     </div>
 </div>
