@@ -45,3 +45,54 @@ form {
   .postsurvey-field textarea{
     font-size: 1rem;
   }
+
+  .custom-single-value {
+    display: flex;
+    align-items: center;
+  }
+  
+  .custom-single-value span {
+    font-size: 14px;
+  }
+  
+  .react-select__dropdown-indicator {
+    padding: 0;
+  }
+  .postsurvey-field h4{ 
+margin-bottom: 1rem;
+  }
+  .custom-dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+  
+  .custom-select {
+    padding: 10px;
+    padding-right: 40px; 
+    border: none;
+    border-radius: 4px;
+    appearance: none; /* Hide default dropdown arrow */
+    background: url('../../assets/img/downaro.svg') no-repeat right center; 
+    background-size: 15px; 
+    cursor: pointer;
+    font-size: .9rem;
+    background-color: var(--litgray);
+    
+  }
+  #range-dropdown{
+    width: 100%;
+border-radius: 4px;
+
+}
+  /* Hide the default arrow in IE */
+  .custom-select::-ms-expand {
+    display: none;
+  }
+  
+  /* Optional: Style for focus and hover states */
+  .custom-select:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
