@@ -11,9 +11,27 @@ import backaro from "../../assets/img/backaro.svg";
 
 const PostSurvey = () =>{
 
-  const [selectedRange, setSelectedRange] = useState('0-200');
-  const handleChange = (event) => {
-    setSelectedRange(event.target.value);
+    const [selectRange, setSelectRange] = useState('0-200');
+    const [totalPoint, setTotalPoint] = useState('0-50');
+    const [participantType, setparticipantType] = useState('undergraduate');
+    const [participantPoint, setParticipantPoint] = useState('10');
+//       const handleChange = (event) => {
+//     setSelectedRange(event.target.value);
+//   };
+  const handleSelectRange = (event) => {
+    setSelectRange(event.target.value);
+  };
+
+  const handleTotalPoint= (event) => {
+    setTotalPoint(event.target.value);
+  };
+
+  const handleParticipantType = (event) => {
+    setparticipantType(event.target.value);
+  };
+
+  const handleParticipantPoint = (event) => {
+    setParticipantPoint(event.target.value);
   };
 
 return(
@@ -45,8 +63,8 @@ return(
  </label>
 <select
 id="range-dropdown"
-value={selectedRange}
-onChange={handleChange}
+value={selectRange}
+onChange={handleSelectRange}
 className="custom-select"
 >
 <option className="option" value="0-200">0-200</option>
@@ -61,8 +79,8 @@ className="custom-select"
 </label>
 <select
 id="range-dropdown"
-value={selectedRange}
-onChange={handleChange}
+value={totalPoint}
+onChange={handleTotalPoint}
 className="custom-select"
 >
 <option value="0-50">0-50 Points</option>
@@ -77,8 +95,8 @@ className="custom-select"
 </label>
 <select
 id="range-dropdown"
-value={selectedRange}
-onChange={handleChange}
+value={participantType }
+onChange={handleParticipantType }
 className="custom-select"
 >
 <option value="undergraduate">Undedrgraduate</option>
@@ -92,8 +110,8 @@ className="custom-select"
 </label>
 <select
 id="range-dropdown"
-value={selectedRange}
-onChange={handleChange}
+value={participantPoint}
+onChange={handleParticipantPoint}
 className="custom-select"
 >
 <option value="10">10 Points</option>
