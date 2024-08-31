@@ -18,3 +18,81 @@
     width: 80%;
     padding: 2.5rem;
 }
+.form-container{
+    width: 80%;
+    /* background: red; */
+    margin-left: 4.7rem;
+}
+.question-field{
+    justify-content: space-between;
+}
+.question-field:hover{
+    cursor: pointer;
+}
+.copy-icon{
+    width: 1.8rem;
+}
+.delete-icon{
+    width: 1.2rem;
+}
+.question-option{
+    width: .3rem;
+}
+.question-input{
+     width: 80%;
+        background: var(--litgray);
+        padding: 1em;
+        border-radius: 6px;
+        border: 0.5px solid rgb(167, 167, 167);
+}
+
+.choice-field{
+    margin-top: .5rem;
+    gap: 1rem;
+}
+.custom-dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+  
+  .custom-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .dot-icon {
+    position: absolute;
+    left: 10px; 
+    width: 13px;
+    color: #333;
+  }
+  
+  .choice-select {
+    padding: 10px;
+    padding-left: 40px;
+    border: 1px solid #ccc; 
+    border-radius: 4px;
+    background-color: var(--ltgray);
+    font-size: .9rem;
+    cursor: pointer;
+    box-sizing: border-box; 
+    /* appearance: none;  */
+  }
+
+
+  
+  .option-select {
+    padding: 10px;
+    padding-right: 50px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px;
+    appearance: none;
+    background: url('../../assets/img/add.svg') no-repeat right center; 
+    background-size: 17px; 
+    cursor: pointer;
+    font-size: .9rem;
+    background-color: var(--litgray);
+    background-position: right 15px center;
+  }
