@@ -1,4 +1,4 @@
-import {Link, Form} from "react-router-dom";
+import {Link, Form, useNavigate} from "react-router-dom";
 import Select from 'react-select';
 import React, { useState } from 'react';
 
@@ -10,6 +10,9 @@ import backaro from "../../assets/img/backaro.svg";
 // import downaro from "../../assets/img/downaro.svg"
 
 const PostSurvey = () =>{
+ // Temporary navigate
+ const navigate = useNavigate();
+ // Temporary navigate
 
     const [selectRange, setSelectRange] = useState('0-200');
     const [totalPoint, setTotalPoint] = useState('0-50');
@@ -121,7 +124,10 @@ className="custom-select"
 </select>
 </div> 
     </div>
-                
+    <div className="flex btn_div">
+      {/* Temporary click Action to be authenticated */}
+                <button className="continue_survey btn" onClick={() => navigate('/surveyform')}>Continue</button>
+    </div>
         </Form>
     </div>
 </div>

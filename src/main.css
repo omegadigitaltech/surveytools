@@ -70,6 +70,7 @@
     --gray: #777777;
     --litgray: #f1f1f1;
     --ltgray: #f5f5f5;
+    --green: green;
 }
 
 *,
@@ -123,4 +124,14 @@ button {
 }
 .grid{
 display: grid;
+}
+.btn{
+    margin: 4rem 0;
+        width: 80%;
+        display: block;
+        background-color: var(--base);
+        padding: 0.8em;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 5px;
 }

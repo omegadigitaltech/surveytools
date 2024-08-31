@@ -66,7 +66,7 @@ return(
   </div>
 </div>
 <div className="flex btn_div">
-  <button className="start-btn" onClick={() => navigate('/postsurvey')}>
+  <button className="start-btn btn" onClick={() => navigate('/postsurvey')}>
                     Start survey
                 </button>
 </div>

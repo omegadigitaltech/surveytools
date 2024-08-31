@@ -17,6 +17,7 @@ import signInAction from "./pages/signin/action";
 import signUpAction from "./pages/signup/action";
 import ExpandSurvey from "./pages/expandsurvey/expandsurvey";
 import PostSurvey from "./pages/postsurvey/postsurvey";
+import SurveyForm from "./pages/surveyform/surveyform";
 
 
 const router = createBrowserRouter(
@@ -27,6 +28,7 @@ const router = createBrowserRouter(
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="expandsurvey" element={<ExpandSurvey />} />
                 <Route path="postsurvey" element={<PostSurvey />} />
+                <Route path="surveyform" element={<SurveyForm />} />
             </Route>
             <Route element={<AuthLayout />}>
                 <Route path="signin" element={<SignIn />} action={signInAction} />
