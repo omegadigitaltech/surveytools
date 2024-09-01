@@ -28,7 +28,7 @@ const SurveyForm = () =>{
         setChoiceOption(event.target.value);
       };
 return(
-<section className="form">
+<section className="form-page">
 <div className=" wrap">
 <div className="form-head flex">
 <Link to="/postsurvey"> <img src={backaro} className="backaro" /></Link>
@@ -37,8 +37,9 @@ return(
     </div>
 </div>
 <div className="form-container">
-    <Form className="">
-    <div className="question-field flex">
+    <Form className="" action="">
+      <div className="oneQuestion">
+      <div className="question-field flex">
                     <input className="question-input" type="text" placeholder="Untitled Question" name="qurestion" id="question" />
                <img src={copy} className="copy-icon" alt="" />
                <img src={del} className="delete-icon" alt="" />
@@ -69,13 +70,58 @@ onChange={handleChoiceOption}
 className="option-select"
 >
 <option value="Option A">A. Option A</option>
-<option value="Option B">Graduate</option>
-<option value="Option C">Masters</option>
+<option value="Option B">B. Option B</option>
+<option value="Option C">C. Option C</option>
+<option value="Option D">D. Option D</option>
 </select>
 </div>
 </div> 
       </div>
+      </div>
+{/* End of a question */}
+
+<div className="oneQuestion">
+      <div className="question-field flex">
+                    <input className="question-input" type="text" placeholder="Untitled Question" name="qurestion" id="question" />
+               <img src={copy} className="copy-icon" alt="" />
+               <img src={del} className="delete-icon" alt="" />
+               <img src={option} className="question-option" alt="" />
+                </div>
+
+                <div className="choice-field">       
+<div className="choice-field custom-dropdown flex">
+  {/* Choice */}
+   <div className=" wrap-icon flex">
+    <img src={dot} className="dot-icon" alt="" />
+<select
+id="choice-dropdown"
+value={choiceType }
+onChange={handleChoiceType }
+className="choice-select"
+>
+<option value="Mutiple Choice"> Mutiple Choice</option>
+<option value="Single Choice">Single Choice</option>
+</select>
+</div>
+{/* Option */}
+<div className="wrap-icon flex">
+    <select
+id="option-dropdown"
+value={choiceOption}
+onChange={handleChoiceOption}
+className="option-select"
+>
+<option value="Option A">A. Option A</option>
+<option value="Option B">B. Option B</option>
+<option value="Option C">C. Option C</option>
+<option value="Option D">D. Option D</option>
+</select>
+</div>
+</div> 
+      </div>
+      </div>
     </Form>
+    <button className="next-question flex">Next Question <img src={add} alt="" /></button>
 </div>
 </div>
 </section>

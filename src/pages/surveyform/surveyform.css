@@ -1,5 +1,5 @@
-.form{
-     margin-top: 1.5rem;
+.form-page{
+     margin: 1.5rem 0;
 }
 .form-head{
     gap: 4rem;
@@ -23,6 +23,9 @@
     /* background: red; */
     margin-left: 4.7rem;
 }
+.oneQuestion{
+    margin-bottom: 1rem;
+}
 .question-field{
     justify-content: space-between;
 }
@@ -36,7 +39,8 @@
     width: 1.2rem;
 }
 .question-option{
-    width: .3rem;
+    width: .4rem;
+    height: 1.2rem;
 }
 .question-input{
      width: 80%;
@@ -74,7 +78,7 @@
     padding-left: 40px;
     border: 1px solid #ccc; 
     border-radius: 4px;
-    background-color: var(--ltgray);
+    background-color: var(--wht);
     font-size: .9rem;
     cursor: pointer;
     box-sizing: border-box; 
@@ -87,7 +91,7 @@
     padding: 10px;
     padding-right: 50px; 
     border: 1px solid #ccc; 
-    border-radius: 4px;
+    border-radius: 6px;
     appearance: none;
     background: url('../../assets/img/add.svg') no-repeat right center; 
     background-size: 17px; 
@@ -96,3 +100,22 @@
     background-color: var(--litgray);
     background-position: right 15px center;
   }
+.form-container{
+        border: 1px solid var(--green);
+        border-radius: 8px;
+        width: 80%;
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+}
+.next-question{
+    padding: 10px;
+    border: 1px solid #ccc; 
+    border-radius: 8px; 
+    cursor: pointer;
+    font-size: .8rem;
+    background-color: var(--litgray);
+    gap: .8rem;
+}
+.next-question img{
+width: 1.1rem;
+}

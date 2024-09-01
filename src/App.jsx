@@ -18,7 +18,7 @@ import signUpAction from "./pages/signup/action";
 import ExpandSurvey from "./pages/expandsurvey/expandsurvey";
 import PostSurvey from "./pages/postsurvey/postsurvey";
 import SurveyForm from "./pages/surveyform/surveyform";
-
+import Payment from "./pages/payment/payment"
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -29,6 +29,7 @@ const router = createBrowserRouter(
                 <Route path="expandsurvey" element={<ExpandSurvey />} />
                 <Route path="postsurvey" element={<PostSurvey />} />
                 <Route path="surveyform" element={<SurveyForm />} />
+                <Route path="payment" element={<Payment />} />
             </Route>
             <Route element={<AuthLayout />}>
                 <Route path="signin" element={<SignIn />} action={signInAction} />

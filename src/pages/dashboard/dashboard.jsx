@@ -14,14 +14,14 @@ const navigate = useNavigate();
         <section className="dashboard">
             <div className="dashboard_inner wrap">
            <div className="dash_head flex">
-             <form>
+             <Form className="classForm">
             <div className="search desktop flex">
               <button className="flex" type={"submit"}>
                 <img src={search} />
               </button>
               <input type="text" placeholder="Search for surveys" onChange={(e) => setSearchKey(e.target.value)} />
             </div>
-          </form>
+          </Form>
           <div className="dashboard_sort flex">
 <h4>Sort by</h4> <img src={sort} alt="" />
           </div>
