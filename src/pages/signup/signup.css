@@ -51,6 +51,7 @@
     background-color: var(--base);
     color: var(--wht);
     padding: 0.8em;
+    margin-bottom: 1.5rem;
 }
 
 /* Added */

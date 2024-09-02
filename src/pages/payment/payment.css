@@ -1,0 +1,56 @@
+
+.payment-inner{
+    gap: 4rem;
+    width: 100%;
+    
+}
+.payform-body{
+    margin: 2rem 0;
+    width: 80%;
+    justify-content: center;
+
+}
+.payform-h{
+    width: 100% !important;
+}
+.payform-h h3{
+    font-size: 1.4rem;
+    font-weight: 400 !important;
+}
+.credit-cards{
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.2rem;
+}
+.credit-cards img{
+    width: 3rem;
+    margin-bottom: 1rem;
+}
+.paysection{
+    margin: 1rem 0;
+}
+.payform-field {
+    margin-bottom: var(--mb-md);
+    width: 100%;
+}
+
+.payform-label {
+    display: block;
+    margin-bottom: var(--mb-xs);
+}
+
+.payform-input {
+    width: 100%;
+    background: var(--litgray);
+    border-radius: 6px;
+    padding: 1rem;
+    border: 0.5px solid rgb(167, 167, 167);
+
+}
+.exp-cvv{
+    gap: 2rem;
+    width: 100%;
+}
+.submit-box{
+    justify-content: center;
+}
