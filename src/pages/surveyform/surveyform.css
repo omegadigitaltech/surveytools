@@ -83,6 +83,8 @@
     cursor: pointer;
     box-sizing: border-box; 
     /* appearance: none;  */
+    font-size: var(--fs-md);
+    font-family: var(--ff-body);
   }
 
 
@@ -99,7 +101,9 @@
     font-size: .9rem;
     background-color: var(--litgray);
     background-position: right 15px center;
-  }
+    font-size: var(--fs-md);
+    font-family: var(--ff-body);
+}
 .form-container{
         border: 1px solid var(--green);
         border-radius: 8px;

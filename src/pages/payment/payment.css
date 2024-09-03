@@ -2,7 +2,7 @@
 .payment-inner{
     gap: 4rem;
     width: 100%;
-    
+    align-items: normal !important;
 }
 .payform-body{
     margin: 2rem 0;
@@ -44,7 +44,7 @@
     background: var(--litgray);
     border-radius: 6px;
     padding: 1rem;
-    border: 0.5px solid rgb(167, 167, 167);
+    border:var(--border);
 
 }
 .exp-cvv{

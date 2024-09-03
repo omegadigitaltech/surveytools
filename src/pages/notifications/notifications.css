@@ -1,0 +1,52 @@
+.notifications{
+    margin: 2rem 0;
+
+}
+.notification-head{
+    justify-content: center;
+    gap: 2rem;
+}
+.notification-status button{
+    /* margin-right: 1rem; */
+    width: 5rem;
+    border: var(--border);
+    padding: .5rem;
+}
+.unread-notification{
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.all-notification{
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.active-notification{
+    background: var(--l-300);
+    font-weight: bold;
+}
+.filter-notification{
+    width: 100%;
+}
+.filter-field{
+    border-radius: 5px;
+    border: var(--border);
+
+}
+.filterForm input{
+    padding: .6rem;
+width: 100%;
+}
+.filter-field img{
+width: 1.5rem;
+margin: 0 .5rem;
+}
+.groupBy{
+padding: .5rem;
+border: var(--border);
+border-radius: 5px;
+font-size: var(--fs-md);
+font-family: var(--ff-body);
+}
+.groupBy option{
+    padding: 1rem;
+}
