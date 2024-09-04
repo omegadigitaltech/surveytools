@@ -3,10 +3,10 @@ import { components } from 'react-select';
 import React, { useState } from 'react';
 
 
-import notify from "../../assets/img/notification.svg";
 import clock from "../../assets/img/clock.svg";
 import filter from "../../assets/img/filter.svg";
-
+import notifyIcon from "../../assets/img/notifyicon.svg";
+import profileimg from "../../assets/img/profileimage.png"
 import "./notifications.css"
 
 
@@ -26,7 +26,7 @@ const changeStatus = (notifyStatus) =>{
       };
     //  
 return(
-    <section className="notifications">
+    <section className="notification-section">
 <div className="notification-inner wrap">
 <div className="notification-head flex">
     <div className="notification-status flex">
@@ -66,6 +66,27 @@ className="groupBy"
         </Form>
     </div>
 </div>
+<h3 className="notification-head" >Notifications</h3>
+<div className="notification-body">
+
+    {/* TEMPORARY JUST TO GET THE DESIGN */}
+    <Link to="" className="notification flex">
+<div className="notification-info flex">
+  <div className="notification-img">
+    <img src={profileimg} className="userImage" alt="" />
+  </div>
+  <div className="notification-info">
+    <p className="userName">David peter</p>
+    <span className="notifcation-msg">Name sent a new survey, check it out....</span>
+  </div>
+  </div>
+  <div className="notification-time flex">
+    <img src={clock} alt="" className="clock"/>
+    <span className="posted-time">9 mins ago</span>
+    <img src={notifyIcon} alt="" className="notifyIcon" />
+  </div>
+    </Link>
+    </div>
 </div>
     </section>
 )

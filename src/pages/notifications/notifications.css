@@ -1,7 +1,8 @@
-.notifications{
+.notification-section{
     margin: 2rem 0;
-
+    margin-bottom: 4rem;
 }
+
 .notification-head{
     justify-content: center;
     gap: 2rem;
@@ -49,4 +50,33 @@ font-family: var(--ff-body);
 }
 .groupBy option{
     padding: 1rem;
+}
+.notification-head{
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+}
+.notification{
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    color: black;
+}
+.notification-img{
+    margin-right: 1rem;
+}
+.notification-img .userImage{
+    width: 2.2rem;
+    border-radius: 50%;
+}
+.notification-info .userName{
+margin-bottom: .4rem;
+font-weight: 500;
+}
+.notification-time .clock{
+    margin-right: .5rem;
+}
+.notifyIcon{
+    margin-left: 3rem;
+}
+.clock, .notifyIcon{
+    width: 1.25rem;
 }
