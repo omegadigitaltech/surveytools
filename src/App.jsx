@@ -20,6 +20,7 @@ import PostSurvey from "./pages/postsurvey/postsurvey";
 import SurveyForm from "./pages/surveyform/surveyform";
 import Payment from "./pages/payment/payment"
 import Notifications from "./pages/notifications/notifications"
+import Withdraw from "./pages/withdraw/withdraw"
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -32,6 +33,7 @@ const router = createBrowserRouter(
                 <Route path="surveyform" element={<SurveyForm />} />
                 <Route path="payment" element={<Payment />} />
                 <Route path="notifications" element={<Notifications/>} />
+                <Route path="withdraw" element={<Withdraw/>} />
             </Route>
             <Route element={<AuthLayout />}>
                 <Route path="signin" element={<SignIn />} action={signInAction} />
