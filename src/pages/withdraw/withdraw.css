@@ -36,12 +36,17 @@
 }
 .withdraw-type-head{
     padding: 1.2rem;
+    padding-bottom: .6rem ;
+    border-bottom: var(--border);
 }
 .withdraw-type-head p{
     font-size: .8rem;
 }
 .withdraw-type-btn{
     margin-bottom: .5rem;
+}
+.withdraw-type-btn button:hover{
+    cursor: pointer;
 }
 .withdraw-type-btn button{
     padding: .7rem 1.5rem;
@@ -56,16 +61,40 @@ background: #d2f9ff;
  .withdraw-form-box{
     padding: 1rem 3rem ;
  }
+ .withdraw-form-box fieldset{
+    margin-bottom: .8rem;
+ }
 .withdraw-field {
     display: block;
     margin-bottom: var(--mb-xs);
     border: none;
 }
+.withdraw-field p{
+    margin-bottom: .5rem;
+}
 .withdraw-input {
-    width: 70%;
+    width: 80%;
     background: var(--litgray);
     border-radius: 6px;
     padding: .8rem;
     border:var(--border);
+}
+.withdraw-field-btn{
+    margin-top: 1.5rem;
+}
+.withdraw-btn{
+        display: block;
+        background-color: var(--base);
+        padding: 0.9em 1.6rem;
+        color: #fff;
+        font-weight: bold;
+        border-radius: 5px;
+}
+.withdraw-btn:hover{
+    cursor: pointer;
+}
 
+
+.hide-field{
+    display: none;
 }
