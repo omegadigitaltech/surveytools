@@ -1,0 +1,51 @@
+
+.profile-head{
+    gap: 3rem;
+}
+.profile-body{
+    gap: 4rem;
+    margin-top: -2rem;
+}
+.profile-card{
+    flex-direction: column ;
+    justify-content: space-between;
+    width: 40%;
+     background-image: url('../../assets/img/profile-bg.png');
+background-size: cover;
+background-repeat: no-repeat;
+margin-bottom: 5rem;
+/* height: 90vh; */
+gap: 16rem;
+padding: 3rem 2rem;
+}
+
+.profilecard-btns{
+    flex-direction: column !important;
+    justify-content: center;
+}
+.profilecard-btns{
+    width: 100%;
+}
+.userImage-div img{
+    width: 8rem;
+    border-radius: 50%;
+}
+.profilecard-btns hr{
+    width: 70%;
+    margin-bottom: 3rem;
+}
+.profilecard-btns button{
+    padding: .8rem 2rem;
+    border: 2px solid black;
+    font-weight: 600;
+    width: 70%;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+}
+.settings-btn{
+    border: 2px solid var(--base) !important;
+    color: var(--base);
+}
+.profile-info{
+    width: 100%;
+}

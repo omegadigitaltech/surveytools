@@ -18,9 +18,11 @@ import signUpAction from "./pages/signup/action";
 import ExpandSurvey from "./pages/expandsurvey/expandsurvey";
 import PostSurvey from "./pages/postsurvey/postsurvey";
 import SurveyForm from "./pages/surveyform/surveyform";
-import Payment from "./pages/payment/payment"
-import Notifications from "./pages/notifications/notifications"
-import Withdraw from "./pages/withdraw/withdraw"
+import Payment from "./pages/payment/payment";
+import Notifications from "./pages/notifications/notifications";
+import Withdraw from "./pages/withdraw/withdraw";
+import Profile from "./pages/profile/profile"
+
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -34,6 +36,7 @@ const router = createBrowserRouter(
                 <Route path="payment" element={<Payment />} />
                 <Route path="notifications" element={<Notifications/>} />
                 <Route path="withdraw" element={<Withdraw/>} />
+                <Route path="profile" element={<Profile/>} />
             </Route>
             <Route element={<AuthLayout />}>
                 <Route path="signin" element={<SignIn />} action={signInAction} />
