@@ -1,6 +1,7 @@
 
 .profile-head{
     gap: 3rem;
+    margin-bottom: 1rem;
 }
 .profile-body{
     gap: 4rem;
@@ -13,10 +14,11 @@
      background-image: url('../../assets/img/profile-bg.png');
 background-size: cover;
 background-repeat: no-repeat;
-margin-bottom: 5rem;
 /* height: 90vh; */
-gap: 16rem;
+gap: 14rem;
 padding: 3rem 2rem;
+/* box-shadow:0 .5rem 1rem rgba(0,0,0,.1); */
+
 }
 
 .profilecard-btns{
@@ -38,9 +40,12 @@ padding: 3rem 2rem;
     padding: .8rem 2rem;
     border: 2px solid black;
     font-weight: 600;
-    width: 70%;
+    width: 75%;
     margin-bottom: 1rem;
     border-radius: 6px;
+}
+.profilecard-btns button{
+cursor: pointer;
 }
 .settings-btn{
     border: 2px solid var(--base) !important;
@@ -48,4 +53,48 @@ padding: 3rem 2rem;
 }
 .profile-info{
     width: 100%;
+}
+.profile-info h4{
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+}
+.profile-info h5{
+    font-size: .9rem;
+}
+.profile-info hr{
+    margin-bottom: 1.5rem;
+}
+.profile-name-field h5{
+    margin-bottom: 1rem ;
+}
+.info-display{
+    margin-bottom: 1.5rem;
+    background: var(--ltgray);
+    padding: .8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    border: var(--border);
+    border-radius: 7px;
+}
+.profile-name-field p{
+    margin-bottom: 1.5rem;
+    padding-right: 4rem;
+    font-size: .8rem;
+}
+.name-display{
+    font-size: 1.1rem;
+    margin-bottom: .5rem;
+
+}
+.agesexdept{
+    grid-template-columns:1fr 1fr 2fr ;
+    gap: 1rem;
+}
+.bio-display{
+    margin-bottom: 1.5rem;
+    background: var(--ltgray);
+    padding: .8rem;
+    border: var(--border);
+    border-radius: 7px;
+    min-height: 12rem;
 }
