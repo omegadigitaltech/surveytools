@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const {authMiddleware} = require('../middleware/auth');
-const { getVerification, verify, failurePage, postLogin, logout, isLoggedIn, googleLogin, facebookLogin, postRegister} = require('../controllers/auth');
+const { getVerification, verify, failurePage, postLogin, logout, isLoggedIn, googleLogin, facebookLogin, postRegister, updateUser} = require('../controllers/auth');
 const passport = require("passport");
 const jwt = require('jsonwebtoken')
 
@@ -26,5 +26,8 @@ router.post('/login', postLogin)
 router.post('/register', postRegister)
 
 router.get('/auth/logout', logout)
+
+// update user
+router.patch('/update-user', authMiddleware, updateUser)
 
 module.exports = router

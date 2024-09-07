@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
+
 const UserSchema = new Schema(
   {
     id: {
@@ -8,6 +9,16 @@ const UserSchema = new Schema(
     },
     type: {
       type: String,
+    },
+    age: {
+      type: Number,
+    },
+    sex: {
+      type: String,
+      enum: {
+        values: ['male', 'female', 'other'],
+        message: 'Invalid sex type'
+      }
     },
     fullname: {
       type: String,
@@ -25,6 +36,9 @@ const UserSchema = new Schema(
     department: {
       type: String,
     },
+    bio: {
+      type: String
+    },
     password: {
       type: String,
     },
@@ -38,7 +52,26 @@ const UserSchema = new Schema(
     pointBalance: {
       type: Number,
       default: 0
-    }
+    },
+    pic_url: {
+      type: String
+    },
+    notification_settings: {
+      email: {
+        type: [String],
+        enum: {
+          values: ['comment', 'new_surveys', 'others'],
+          message: 'Invalid email type'
+        }
+      },
+      push_notification: {
+        type: [String],
+        enum: {
+          values: ['all', 'email', 'no'],
+          message: 'Invalid push notification type'
+        }
+      }
+    } // set permission from users
   },
   { timestamps: true }
 );

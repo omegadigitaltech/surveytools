@@ -4,10 +4,8 @@ const express = require('express');
 const router = express.Router();
 const { start, home,updateAnswer, submitAnswers, createSurvey, 
     deleteQuestion, getSurveyInfo, getUserSurveyData, 
-    checkUserFilledSurvey, checkSurveyMaxParticipants,
-    checkUserFilledSurvey, addOrUpdateQuestion,  deleteQuestion,
-  getSurveyAnalytics, getSurveyInfo, getSurveyQuestions,  getAllSurveys,
-  getUserSurveyData, publishSurvey, testController
+    checkUserFilledSurvey, checkSurveyMaxParticipants, addOrUpdateQuestion,
+  getSurveyAnalytics, getSurveyQuestions,  getAllSurveys, publishSurvey, testController
  } = require('../controllers/main')
 
 

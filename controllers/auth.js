@@ -305,6 +305,44 @@ const logout = async (req, res) => {
     });
 }
 
+const updateUser = async (req, res) => {
+    const { body: data } = req;
+    const userId = req.userId; // Ensure that req.userId is validated and sanitized
+
+    if (!userId) {
+        return res.status(404).json({
+            status: "failure",
+            code: 400,
+            msg: "User not found"
+        })
+    }
+    const user = await User.findOneAndUpdate(
+        { id: userId }, // Use _id for MongoDB queries
+        { $set: data }, // Use $set to ensure only specified fields are updated
+        {
+            runValidators: true,
+            new: true, // Return the updated document
+            omitUndefined: true // Optionally omit undefined fields from the update
+        }
+    );
+
+    if (!user) {
+        return res.status(404).json({
+            status: "failure",
+            code: 400,
+            msg: "User not found"
+        })
+    }
+
+    res.status(200).json({
+        status: "success",
+        code: 200,
+        msg: "User settings successfully updated",
+        data: user
+    })
+};
+
+
 module.exports = {
     getVerification,
     verify,
@@ -314,5 +352,6 @@ module.exports = {
     postRegister,
     isLoggedIn,
     googleLogin,
-    facebookLogin
+    facebookLogin,
+    updateUser
 }
