@@ -1,8 +1,5 @@
 import {Link, Form} from "react-router-dom";
 import backaro from "../../assets/img/backaro.svg";
-import okiki from "../../assets/img/okiki.png";
-import profileBg from "../../assets/img/profile-bg.png";
-
 import "./profile.css"
 import data from "../../utils/content/data";
 

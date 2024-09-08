@@ -7,7 +7,7 @@ const userInfos = [
         gender: "male",
         age: "18 - 25",
         department: "english",
-        userPic: "public/okiki.png",
+        userPic: "public/james.jpg",
         userBio: "I am an undergradaute hoping my research gets completed with your answers"
     }
 ]
