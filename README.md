@@ -69,12 +69,32 @@ Redirect url is to /verification page by default. Except if verified then will r
 
 .Response:
 
+    user_data should look like this: 
+    {
+      "notification_settings": {
+        "email": [],
+        "push_notification": []
+      },
+      "pointBalance": 0,
+      "_id": "663643b079c52919d22753ac",
+      "id": "100526437312614893169",
+      "__v": 0,
+      "createdAt": "2024-05-04T14:18:24.796Z",
+      "email": "akinluaolorunfunminiyi@gmail.com",
+      "fullname": "Olorunfunminiyi Akinlua",
+      "type": "Google",
+      "updatedAt": "2024-09-08T20:20:56.611Z",
+      "verified": false,
+      "code": 9837
+    }
+
     {
         status: "success",
         code: 200,
         msg: "User successfully logged in",
         data: {
-            redirectUrl: "redirectUrl"
+            redirectUrl: "redirectUrl",
+            user: user_data
         }
     }
 #### Error handling
@@ -125,7 +145,9 @@ Redirect url is to /verification page by default. Except if verified then will r
         code: 201,
         msg: "User successfully created and signed in",
         data: {
-            redirectUrl: redirectUrl
+            redirectUrl: redirectUrl,
+            user: user_data
+
         }
     }
 
@@ -254,7 +276,9 @@ Content-Type: application/json
         code: 200,
         msg: "User successfully logged in",
         data: {
-            redirectUrl: redirectUrl
+            redirectUrl: redirectUrl,
+            user: user_data
+
         }
     }
 

@@ -10,11 +10,11 @@ const postRegister = async (req,res) => {
     const {first_name, last_name, password, confirm_password, email, department} = req.body
 
     // check for password
-    if(!password || !confirm_password){
+    if(!password || !confirm_password || first_name || last_name){
         return res.status(400).json({
             status: "failure",
             code: 400,
-            msg: "You must fill in a password"
+            msg: "You must fill in all neccassary details"
         })
     }
     // confirm password
@@ -77,7 +77,8 @@ const postRegister = async (req,res) => {
         code: 201,
         msg: "User successfully created and signed in",
         data: {
-            redirectUrl: redirectUrl
+            redirectUrl: redirectUrl,
+            user: user
         }
     })
     
@@ -130,7 +131,8 @@ const postLogin = async (req, res) => {
         code: 200,
         msg: "User successfully logged in",
         data: {
-            redirectUrl: redirectUrl
+            redirectUrl: redirectUrl,
+            user: user
         }
     })
 }
@@ -147,7 +149,10 @@ const googleLogin = async (req, res) => {
         })
         }
     }
+
     const {verified} = await getVerification(req.user.id)
+    const user = await User.findOne({id: req.user.id})
+
     let redirectUrl;
     if(verified == true){
         redirectUrl = req.session.referer || url;
@@ -163,7 +168,8 @@ const googleLogin = async (req, res) => {
         code: 200,
         msg: "User successfully logged in",
         data: {
-            redirectUrl: redirectUrl
+            redirectUrl: redirectUrl,
+            user: user
         }
     })
 }
@@ -182,6 +188,7 @@ const facebookLogin = async (req, res) => {
     }
     // send verification code to their email.
     const {verified} = await getVerification(req.user.id)
+    const user = await User.findOne({id: req.user.id})
     let redirectUrl;
     if(verified == true){
         redirectUrl = req.session.referer || url;
@@ -196,7 +203,8 @@ const facebookLogin = async (req, res) => {
         code: 200,
         msg: "User successfully logged in",
         data: {
-            redirectUrl: redirectUrl
+            redirectUrl: redirectUrl,
+            user: user
         }
     })
 }
