@@ -278,7 +278,6 @@ Content-Type: application/json
         data: {
             redirectUrl: redirectUrl,
             user: user_data
-
         }
     }
 
