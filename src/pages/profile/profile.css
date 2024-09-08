@@ -1,4 +1,6 @@
-
+.Profile-section{
+    margin-bottom: 5rem;
+}
 .profile-head{
     gap: 3rem;
     margin-bottom: 1rem;
@@ -8,28 +10,23 @@
     margin-top: -2rem;
 }
 .profile-card{
-    flex-direction: column ;
-    justify-content: space-between;
-    width: 40%;
-     background-image: url('../../assets/img/profile-bg.png');
+ background-image: url('../../assets/img/profile-bg.png');
 background-size: cover;
-background-repeat: no-repeat;
-/* height: 90vh; */
-gap: 14rem;
-padding: 3rem 2rem;
-/* box-shadow:0 .5rem 1rem rgba(0,0,0,.1); */
-
+background-repeat: no-repeat; 
+box-shadow:0 .5rem 1rem rgba(0,0,0,.1);
+width: 40%;
+flex-direction: column ;
+justify-content: space-between;
+padding:2rem;
+gap: 12rem;
 }
-
 .profilecard-btns{
     flex-direction: column !important;
     justify-content: center;
-}
-.profilecard-btns{
     width: 100%;
 }
 .userImage-div img{
-    width: 8rem;
+    width: 9rem;
     border-radius: 50%;
 }
 .profilecard-btns hr{
@@ -40,7 +37,7 @@ padding: 3rem 2rem;
     padding: .8rem 2rem;
     border: 2px solid black;
     font-weight: 600;
-    width: 75%;
+    width: 85%;
     margin-bottom: 1rem;
     border-radius: 6px;
 }

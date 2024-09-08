@@ -22,8 +22,8 @@ const useInfos = data.userInfos[0]
 </div>
 <div className="profile-body flex">
         <div className="profile-card flex">
-           <div className="userImage-div">
-    <img src={okiki} className="userImage" alt="" />
+                      <div className="userImage-div">
+    <img src={useInfos.userPic} className="userImage" alt="" />
     {/* Upload profile image */}
 </div>
 <div className="profilecard-btns flex">
@@ -32,7 +32,7 @@ const useInfos = data.userInfos[0]
     <button className="edit-profile">Edit Profile</button>
 </div>
     </div>
-    
+         
     <div className="profile-info">
 <h4>Public Profile</h4>
 <hr />
