@@ -16,7 +16,7 @@ const Home = () => {
                         Fill questionnaires anonymously with 100% data privacy.   
                     </span>
                 </h1>
-                <Link className="home-link" to="">
+                <Link className="home-link" to="/signup">
                     Get Started
                 </Link>
             </div>

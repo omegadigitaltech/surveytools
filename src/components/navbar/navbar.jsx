@@ -7,7 +7,7 @@ import iconLogOut from "../../assets/img/icon-logout.svg";
 import "./navbar.css";
 
 const Navbar = () => {
-    const login = false;
+    const login = true;
     return ( 
         <header className={`header${login ? " header-logged" : ""}`}>
             <div className="header-wrap wrap">
@@ -35,17 +35,17 @@ const Navbar = () => {
                             </NavLink>
                         </li>
                         <li className="header-w2-item show header-w2-hide">
-                            <NavLink className="header-w2-link" to="/">
+                            <NavLink className="header-w2-link" to="/dashboard">
                                 Dashboard
                             </NavLink>
                         </li>
                         <li className="header-w2-item show header-w2-hide">
-                            <NavLink className="header-w2-link" to="/">
+                            <NavLink className="header-w2-link" to="/postsurvey">
                                 Post Survey
                             </NavLink>
                         </li>
                         <li className="header-w2-item show">
-                            <NavLink className="header-w2-link" to="/">
+                            <NavLink className="header-w2-link" to="">
                                 Contact Us
                             </NavLink>
                         </li>
@@ -76,7 +76,7 @@ const Navbar = () => {
                         </div>
                         Omega Tech
                     </button>
-                    <NavLink className="header-w3-link" to="">
+                    <NavLink className="header-w3-link" to="/">
                         <img className="header-w3-icon" src={iconLogOut} alt="logout" />
                     </NavLink>
                 </div>
