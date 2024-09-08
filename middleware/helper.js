@@ -4,7 +4,7 @@ const Sentiment = require('sentiment');
 
 const sentiment = new Sentiment();
 
-const domain = "https://nasty-marrissa-surveypro-991645a4.koyeb.app"
+const domain = "https://surveypro.onrender.com"
 
 
 async function sendNotification(email, owner, text, title) {
