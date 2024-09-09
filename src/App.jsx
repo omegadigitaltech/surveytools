@@ -1,12 +1,15 @@
 import {
-    createBrowserRouter,
-    createRoutesFromElements,
-    RouterProvider,
-    Route
+  createBrowserRouter,
+  createRoutesFromElements,
+  RouterProvider,
+  Route,
 } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import HomeLayout from "./layout/home/home";
 import AuthLayout from "./layout/auth/auth";
+import StoreProvider from "./components/store/StoreProvider";
 
 import Home from "./pages/home/home";
 import SignIn from "./pages/signin/signin";
@@ -18,36 +21,41 @@ import signUpAction from "./pages/signup/action";
 import ExpandSurvey from "./pages/expandsurvey/expandsurvey";
 import PostSurvey from "./pages/postsurvey/postsurvey";
 import SurveyForm from "./pages/surveyform/surveyform";
-import Payment from "./pages/payment/payment"
-import Notifications from "./pages/notifications/notifications"
-import Withdraw from "./pages/withdraw/withdraw"
+import Payment from "./pages/payment/payment";
+import Notifications from "./pages/notifications/notifications";
+import Withdraw from "./pages/withdraw/withdraw";
 
 const router = createBrowserRouter(
-    createRoutesFromElements(
-        <Route>
-            <Route element={<HomeLayout />}>
-                <Route index element={<Home />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="expandsurvey" element={<ExpandSurvey />} />
-                <Route path="postsurvey" element={<PostSurvey />} />
-                <Route path="surveyform" element={<SurveyForm />} />
-                <Route path="payment" element={<Payment />} />
-                <Route path="notifications" element={<Notifications/>} />
-                <Route path="withdraw" element={<Withdraw/>} />
-            </Route>
-            <Route element={<AuthLayout />}>
-                <Route path="signin" element={<SignIn />} action={signInAction} />
-                <Route path="signup" element={<SignUp />} action={signUpAction} />
-                <Route path="verify" element={<Verify />} />
-            </Route>
-        </Route>
-    )
-)
+  createRoutesFromElements(
+    <Route>
+      <Route element={<HomeLayout />}>
+        <Route index element={<Home />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="expandsurvey" element={<ExpandSurvey />} />
+        <Route path="postsurvey" element={<PostSurvey />} />
+        <Route path="surveyform" element={<SurveyForm />} />
+        <Route path="payment" element={<Payment />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="withdraw" element={<Withdraw />} />
+      </Route>
+      <Route element={<AuthLayout />}>
+        <Route path="signin" element={<SignIn />} action={signInAction} />
+        <Route path="signup" element={<SignUp />} action={signUpAction} />
+        <Route path="verify" element={<Verify />} />
+      </Route>
+    </Route>
+  )
+);
 
 const App = () => {
-    return (
-        <RouterProvider router={router} />
-    )
-}
+  return (
+    <>
+      <StoreProvider>
+        <RouterProvider router={router} />{" "}
+        <ToastContainer position="top-right" />
+      </StoreProvider>
+    </>
+  );
+};
 
 export default App;
