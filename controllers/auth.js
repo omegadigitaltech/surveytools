@@ -10,7 +10,7 @@ const postRegister = async (req,res) => {
     const {first_name, last_name, password, confirm_password, email, department} = req.body
 
     // check for password
-    if(!password || !confirm_password || first_name || last_name){
+    if(!password || !confirm_password || !first_name || !last_name){
         return res.status(400).json({
             status: "failure",
             code: 400,
