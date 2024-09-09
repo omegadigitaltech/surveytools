@@ -18,7 +18,7 @@ const Navbar = () => {
                         <div className="header-w1-line" aria-hidden></div>
                     </button>
                     <NavLink className="header-w1-logo" to="/">
-                        SURVEY PRO
+                        SURVEYPRO
                         <div className="header-w1-circ" aria-hidden></div>
                     </NavLink>
                 </div>

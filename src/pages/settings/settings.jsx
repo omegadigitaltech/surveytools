@@ -20,18 +20,18 @@ const Settings = () => {
         <Form>
             <div className="profile-settings">
             <h5>Profile Settings</h5>
-            <div className="Profile-names flex">
-                <fieldset className="pf-firstname-field">
-                    <label className="pf-firstname-label" htmlFor="">
+            <div className="profile-names flex">
+                <fieldset className="settings-field">
+                    <label className="settings-label" htmlFor="">
                        First Name
                     </label>
-                    <input className="pf-firstname-input " type="text" name="pf-firstname" id="" />
+                    <input className="pf-firstname-input settings-input" type="text" name="pf-firstname" id="" />
                 </fieldset>
-                <fieldset className="pf-lastname-field">
-                    <label className="pf-lastn-ame-label" htmlFor="">
+                <fieldset className="settings-field">
+                    <label className="settings-label" htmlFor="">
                        Last Name
                     </label>
-                    <input className="pf-lastname-input" type="text" name="pf-lastname" id="" />
+                    <input className="pf-lastname-input settings-input" type="text" name="pf-lastname" id="" />
                 </fieldset>    
                 </div>
             </div>

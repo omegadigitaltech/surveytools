@@ -78,3 +78,6 @@
     padding: 0.8em;
     margin-bottom: 1.5rem;
 }
+.auth-w5-btn:hover {
+cursor: pointer;
+}

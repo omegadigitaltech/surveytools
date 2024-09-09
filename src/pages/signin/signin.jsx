@@ -1,5 +1,6 @@
 import { Form, Link, useNavigate} from "react-router-dom";
 import React, { useState } from 'react';
+import { useActionData } from "react-router";
 
 import "./signin.css";
 import "../utils.css";
@@ -11,6 +12,9 @@ import iconShow from "../../assets/img/icon-eye-show.svg";
 import features from "../../assets/img/illustration-signin.svg";
 
 const SignIn = () => {
+
+    const data = useActionData();
+
     // Temporary till authentication
     const navigate = useNavigate();
     // Password toggle
@@ -22,13 +26,15 @@ const SignIn = () => {
 
     return (
         <div className="auth-w5 flex">
+            {/* Display Message for login status will come here */}
+          
             <div className="form-col">
-                <Form className="auth-w5-form">
+                <Form method="post" action="/signin" className="auth-w5-form">
                 <div className="auth-w5-field">
                     <label className="auth-w5-label" htmlFor="usermail">
-                        Username
+                        Email
                     </label>
-                    <input className="auth-w5-input" type="text" name="" id="usermail" />
+                    <input className="auth-w5-input" type="text" name="usermail" id="usermail" />
                 </div>
                 <div className="auth-w5-field">
                     <label className="auth-w5-label" htmlFor="password">
@@ -49,7 +55,7 @@ const SignIn = () => {
                     </Link>
                 </div>
                 {/* REMOVE ONCLICK NAVIGATION */}
-                <button className="auth-w5-btn" onClick={() => navigate('/dashboard')}>
+                <button className="auth-w5-btn" >
                     Sign in
                 </button>
             </Form>
