@@ -1,7 +1,6 @@
 import { Form, Link, useNavigate} from "react-router-dom";
 import React, { useState } from 'react';
 import { useActionData } from "react-router";
-
 import "./signin.css";
 import "../utils.css";
 import iconFB from "../../assets/img/img-fb.png";
@@ -27,7 +26,6 @@ const SignIn = () => {
     return (
         <div className="auth-w5 flex">
             {/* Display Message for login status will come here */}
-          
             <div className="form-col">
                 <Form method="post" action="/signin" className="auth-w5-form">
                 <div className="auth-w5-field">
