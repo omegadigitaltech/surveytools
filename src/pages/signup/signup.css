@@ -1,93 +1,95 @@
 .auth-w4-form {
-    width: 100%;
+  width: 100%;
 }
 
 .auth-w4-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin-bottom: var(--mb-md);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: var(--mb-md);
 }
 
 .auth-w4-full {
-    grid-column: span 2;
+  grid-column: span 2;
 }
 
 .auth-w4-label {
-    display: block;
-    margin-bottom: var(--mb-xs);
+  display: block;
+  margin-bottom: var(--mb-xs);
 }
 
 .auth-w4-input {
-    width: 100%;
-    border: 1px solid var(--l-600);
-    background: var(--ltgray);
-    padding: 0.5em;
+  width: 100%;
+  border: 1px solid var(--l-600);
+  background: var(--ltgray);
+  padding: 0.5em;
 }
 
 .auth-w4-block {
-    color: var(--text-dark);
-    margin-bottom: var(--mb-lg);
-    display: block;
+  color: var(--text-dark);
+  margin-bottom: var(--mb-lg);
+  display: block;
 }
 
 .auth-w4-check {
-    --len: 20px;
-    appearance: none;
-    -webkit-appearance: none;
-    width: var(--len);
-    height: var(--len);
-    border: 1px solid var(--border);
-    margin-right: 0.5rem;
-    border-radius: 50%;
-    vertical-align: middle;
-    position: relative;
-    cursor: pointer;
+  --len: 20px;
+  appearance: none;
+  -webkit-appearance: none;
+  width: var(--len);
+  height: var(--len);
+  border: 1px solid var(--border);
+  margin-right: 0.5rem;
+  border: 20px;
+  border-radius: 50%;
+  vertical-align: middle;
+  position: relative;
+  cursor: pointer;
 }
 
 .auth-w4-btn {
-    width: 100%;
-    display: block;
-    background-color: var(--base);
-    color: var(--wht);
-    padding: 0.8em;
-    margin-bottom: 1.5rem;
+  width: 100%;
+  display: block;
+  background-color: var(--base);
+  color: var(--wht);
+  padding: 0.8em;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
 }
 
 /* Added */
 .auth-w4-check::before {
-    --ring: calc(var(--size) * 0.3);
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: var(--ring);
-    height: var(--ring);
-    border-radius: 50%;
-    background-color: var(--surface2-light);
-    display: none;
+  --ring: calc(var(--size) * 0.3);
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--ring);
+  height: var(--ring);
+  border-radius: 50%;
+  background-color: var(--surface2-light);
+  display: none;
 }
 
 .auth-w4-check:checked {
-    /* border-color: transparent; */
-    background-color: rgb(44, 44, 44);
+  /* border-color: transparent; */
+  background-color: rgb(44, 44, 44);
 }
 
 .auth-w4-check:checked::before {
-    display: block;
+  display: block;
 }
 
-.auth-w4 a{
- color: var(--base);
- font-weight: bold;
+.auth-w4 a {
+  color: var(--base);
+  font-weight: bold;
 }
-.form-col{
-    width: 50%;
+.form-col {
+  width: 50%;
 }
 
 @media (max-width: 768px) {
-    .form-col{
-        width: 100%;
-    }
+  .form-col {
+    width: 100%;
+  }
 }

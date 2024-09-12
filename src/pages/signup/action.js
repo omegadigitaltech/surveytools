@@ -1,39 +1,44 @@
 import { redirect } from "react-router";
+import { toast } from "react-toastify";
+
+import { uiSliceAction } from "../../components/store/uiSlice";
 import callAPI from "../../utils/helpers/callAPI";
 import config from "../../config/config";
 
 const action = async ({ request }) => {
-    const data = await request.formData();
-    const user = {
-        first_name: data.get("fullname"),
-        last_name: data.get("fullname"),
-        email: data.get("email"),
-        department: null,
-        password: data.get("password"),
-        confirm_password: data.get("confirm")
-    }
+  const data = await request.formData();
+  const user = {
+    first_name: data.get("firstname"),
+    last_name: data.get("lastname"),
+    email: data.get("email"),
+    password: data.get("password"),
+    confirm_password: data.get("confirm"),
+  };
+  console.log(user);
 
-    const API_URL = `${config.API_URL}/register`;
-    const options = {
-        body: user,
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Allow-Control-Allow-Origin": "*"
-        }
-    }
+  const API_URL = `${config.API_URL}/register`;
+  const options = {
+    body: JSON.stringify(user),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Allow-Control-Allow-Origin": "*",
+    },
+  };
 
-    try {
-        const resp = await fetch(API_URL, options);
-        const json = await resp.json();
-        console.log(json)
-    } catch (err) {
-        console.log(err)
-        
-    }
+  try {
+    const resp = await fetch(API_URL, options);
+    const json = await resp.json();
+    console.log(json);
+    if (json.code !== 201) throw new Error(json.msg);
 
-    
-    return null;
-}
+    toast.success(json.msg);
+    return redirect("/verify");
+  } catch (err) {
+    toast.error(err.message);
+  }
+
+  return null;
+};
 
 export default action;

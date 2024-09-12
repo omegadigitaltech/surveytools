@@ -1,30 +1,40 @@
-import { redirect } from "react-router-dom";
+import { redirect } from "react-router";
+import { useDispatch } from "react-redux";
+
+import callAPI from "../../utils/helpers/callAPI";
 import config from "../../config/config";
+import { uiSliceAction } from "../../components/store/uiSlice";
 
-const SignInAction = async ({ request }) => {
-    let formData = await request.formData();
+const action = async ({ request }) => {
+  //   const dispatch = useDispatch();
 
-    const username = formData.get("usermail");
-    const password = formData.get("password");
+  const data = await request.formData();
+  const user = {
+    username: data.get("username"),
+    confirm_password: data.get("password"),
+  };
 
-    try {
-        const data = await fetch(`${config.API_URL}/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*"
-            },
-            body: JSON.stringify({
-                username: username, password: password
-            })
-        });
-        const resp = await data.json();
-        console.log(resp)
-        return redirect("/dashboard")  
-    } catch (error) {
-        return { message: error.message }
-    }
+  const API_URL = `${config.API_URL}/register`;
+  const options = {
+    body: user,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Allow-Control-Allow-Origin": "*",
+    },
+  };
 
-}
+  try {
+    const resp = await fetch(API_URL, options);
+    const json = await resp.json();
+    console.log(json);
 
-export default SignInAction;
+    redirect("/dashboard");
+  } catch (err) {
+    console.log(err);
+  }
+
+  return null;
+};
+
+export default action;
