@@ -111,7 +111,9 @@ border-bottom: 2.5px solid var(--base);
 .dashboard_inner h3{
 font-size: .9rem;
 }
-
+.survey_info{
+    font-size: .8rem;
+}
 .dashboard_sort h3{
     gap: .5em;
     font-size: .8rem;
@@ -119,6 +121,16 @@ font-size: .9rem;
 .dashboard_sort img{
     padding: .4rem;
     /* width: ; */
+}
+.survey_class h4{
+    font-size: .8rem;
+}
+.num_participant{
+    font-size: .8rem;
+
+}
+.survey_class img {
+    width: 1.2rem;
 }
 form {
     width: 70%;

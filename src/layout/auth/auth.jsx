@@ -9,7 +9,7 @@ const Auth = () => {
         <section className="auth">
             <div className="auth-wrap wrap">
                 <h1 className="auth-w1-lead">
-                    Survey Pro
+                    SurveyPro
                     <span className="auth-w1-circ" aria-hidden></span>
                 </h1>
                 {/* <div className="auth-w3">

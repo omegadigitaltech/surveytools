@@ -35,7 +35,7 @@ const navigate = useNavigate();
               {/* REmove onclick it's check to next page purpose */}
 <div className="survey_post first_post" onClick={() => navigate('/expandsurvey')}>
   <div className="post_time flex">
-    <p className="posted">posted 2hr ago</p>
+    <p className="posted">Posted 2hr ago</p>
     <p className="duration">Duration: <b>20</b> min</p>
   </div>
   <div className="survey_details flex">
@@ -58,7 +58,7 @@ const navigate = useNavigate();
 </div>
 </div><div className="survey_post">
   <div className="post_time flex">
-    <p className="posted">posted 2hr ago</p>
+    <p className="posted">Posted 2hr ago</p>
     <p className="duration">Duration: <b>20</b> min</p>
   </div>
   <div className="survey_details flex">
