@@ -10,17 +10,20 @@ const action = async ({ request }) => {
 
   const data = await request.formData();
   const user = {
-    username: data.get("username"),
-    confirm_password: data.get("password"),
+    email: data.get("email"),
+    password: data.get("password"),
   };
 
-  const API_URL = `${config.API_URL}/register`;
+  const API_URL = `${config.API_URL}/login`;
   const options = {
-    body: user,
+    body: JSON.stringify(user),
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Allow-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Origin": "http://localhost:5174",
+      // "Access-Control-Allow-Methods": "POST",
+      // "Access-Control-Allow-Headers": "Content-Type",
+
     },
   };
 
@@ -29,9 +32,15 @@ const action = async ({ request }) => {
     const json = await resp.json();
     console.log(json);
 
-    redirect("/dashboard");
+    if(json.status !== "success"){
+      throw new Error(resp.msg);
+    }
+    
+      return redirect("/dashboard");
+
   } catch (err) {
     console.log(err);
+    return err.message
   }
 
   return null;

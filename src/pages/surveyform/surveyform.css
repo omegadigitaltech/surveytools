@@ -88,7 +88,21 @@
   }
 
 
-  
+  .options-list{
+    justify-content: space-between; 
+    width: 70%;
+ }
+ .option-input{
+     border: 0.5px solid rgb(167, 167, 167);
+ padding: 10px;
+ border-radius: 8px;
+ width: 100%;
+ margin-bottom: .3rem;
+ }
+ .option{
+     width: 65%;
+ }
+ 
   .option-select {
     padding: 10px;
     padding-right: 50px; 
@@ -122,4 +136,16 @@
 }
 .next-question img{
 width: 1.1rem;
+}
+.post-btn{
+    display: block;
+    background-color: var(--base);
+    padding: 0.8em 3rem;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-left: 4.5rem;
+}
+.post-btn:hover{
+    cursor: pointer;
 }

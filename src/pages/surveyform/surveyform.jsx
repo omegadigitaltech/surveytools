@@ -1,130 +1,181 @@
-import {Link, Form} from "react-router-dom";
-import Select from 'react-select';
-import React, { useState } from 'react';
-
-// import React from 'react';
-import { components } from 'react-select';
-
-import "./surveyform.css"
+import { Link, Form } from "react-router-dom";
+import React, { useState } from "react";
+import "./surveyform.css";
 import backaro from "../../assets/img/backaro.svg";
 import del from "../../assets/img/del.svg";
 import add from "../../assets/img/add.svg";
 import dot from "../../assets/img/dot.svg";
 import option from "../../assets/img/option.svg";
-import copy from "../../assets/img/copy.svg"
-import dropdown from "../../assets/img/dropdown.svg"
+import copy from "../../assets/img/copy.svg";
 
+const SurveyForm = () => {
+  // Managing the list of questions and their options
+  const [questions, setQuestions] = useState([
+    {
+      id: 1,
+      text: "",
+      type: "Multiple Choice",
+      options: [""],
+    },
+  ]);
 
-const SurveyForm = () =>{
-    // Handle the form choice
-    const [choiceType, setChoiceType] = useState('Mutiple Choice');
-    const [choiceOption, setChoiceOption] = useState('A. Option A');
+  // Handle adding a new question
+  const addNewQuestion = () => {
+    const newQuestion = {
+      id: questions.length + 1,
+      text: "",
+      type: "Multiple Choice",
+      options: [""],
+    };
+    setQuestions([...questions, newQuestion]);
+  };
 
-    const handleChoiceType = (event) => {
-        setChoiceType(event.target.value);
+  // Handle deleting a question
+  const deleteQuestion = (id) => {
+    setQuestions(questions.filter((question) => question.id !== id));
+  };
+
+  // Handle duplicating a question
+  const duplicateQuestion = (id) => {
+    const questionToDuplicate = questions.find((q) => q.id === id);
+    if (questionToDuplicate) {
+      const duplicatedQuestion = {
+        ...questionToDuplicate,
+        id: questions.length + 1,
       };
+      setQuestions([...questions, duplicatedQuestion]);
+    }
+  };
 
-      const handleChoiceOption = (event) => {
-        setChoiceOption(event.target.value);
-      };
-return(
-<section className="form-page">
-<div className=" wrap">
-<div className="form-head flex">
-<Link to="/postsurvey"> <img src={backaro} className="backaro" /></Link>
-<div className="form-h">
-    <h3>Form Page</h3>
-    </div>
-</div>
-<div className="form-container">
-    <Form className="" action="">
-      <div className="oneQuestion">
-      <div className="question-field flex">
-                    <input className="question-input" type="text" placeholder="Untitled Question" name="qurestion" id="question" />
-               <img src={copy} className="copy-icon" alt="" />
-               <img src={del} className="delete-icon" alt="" />
-               <img src={option} className="question-option" alt="" />
+  // Handle updating a question's text or type
+  const handleQuestionChange = (id, field, value) => {
+    const updatedQuestions = questions.map((q) =>
+      q.id === id ? { ...q, [field]: value } : q
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  // Handle adding new options
+  const addOption = (id) => {
+    const updatedQuestions = questions.map((q) =>
+      q.id === id
+        ? { ...q, options: [...q.options, ""] }
+        : q
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  // Handle option change
+  const handleOptionChange = (questionId, index, value) => {
+    const updatedQuestions = questions.map((q) =>
+      q.id === questionId
+        ? {
+            ...q,
+            options: q.options.map((option, i) =>
+              i === index ? value : option
+            ),
+          }
+        : q
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  return (
+    <section className="form-page">
+      <div className="wrap">
+        <div className="form-head flex">
+          <Link to="/postsurvey">
+            <img src={backaro} className="backaro" alt="Back" />
+          </Link>
+          <div className="form-h">
+            <h3>Form Page</h3>
+          </div>
+        </div>
+
+        <div className="form-container">
+          <Form>
+            {questions.map((question) => (
+              <div className="oneQuestion" key={question.id}>
+                <div className="question-field flex">
+                  <input
+                    className="question-input"
+                    type="text"
+                    placeholder="Untitled Question"
+                    value={question.text}
+                    onChange={(e) =>
+                      handleQuestionChange(question.id, "text", e.target.value)
+                    }
+                  />
+                  <img
+                    src={copy}
+                    className="copy-icon"
+                    alt="Duplicate"
+                    onClick={() => duplicateQuestion(question.id)}
+                  />
+                  <img
+                    src={del}
+                    className="delete-icon"
+                    alt="Delete"
+                    onClick={() => deleteQuestion(question.id)}
+                  />
+                  <img src={option} className="question-option" alt="Options" />
                 </div>
 
-                <div className="choice-field">       
-<div className="choice-field custom-dropdown flex">
-  {/* Choice */}
-   <div className=" wrap-icon flex">
-    <img src={dot} className="dot-icon" alt="" />
-<select
-id="choice-dropdown"
-value={choiceType }
-onChange={handleChoiceType }
-className="choice-select"
->
-<option value="Mutiple Choice"> Mutiple Choice</option>
-<option value="Single Choice">Single Choice</option>
-</select>
-</div>
-{/* Option */}
-<div className="wrap-icon flex">
-    <select
-id="option-dropdown"
-value={choiceOption}
-onChange={handleChoiceOption}
-className="option-select"
->
-<option value="Option A">A. Option A</option>
-<option value="Option B">B. Option B</option>
-<option value="Option C">C. Option C</option>
-<option value="Option D">D. Option D</option>
-</select>
-</div>
-</div> 
-      </div>
-      </div>
-{/* End of a question */}
+                <div className="choice-field custom-dropdown flex">
+                  <div className="wrap-icon flex">
+                    <img src={dot} className="dot-icon" alt="Dot" />
+                    <select
+                      value={question.type}
+                      onChange={(e) =>
+                        handleQuestionChange(question.id, "type", e.target.value)
+                      }
+                      className="choice-select"
+                    >
+                      <option value="Multiple Choice">Multiple Choice</option>
+                      <option value="Single Choice">Single Choice</option>
+                    </select>
+                  </div>
 
-<div className="oneQuestion">
-      <div className="question-field flex">
-                    <input className="question-input" type="text" placeholder="Untitled Question" name="qurestion" id="question" />
-               <img src={copy} className="copy-icon" alt="" />
-               <img src={del} className="delete-icon" alt="" />
-               <img src={option} className="question-option" alt="" />
+                  <div className="options-list flex">
+                    <div className="option">
+                        {question.options.map((option, index) => (
+                      <div className="wrap-icon flex" key={index}>
+                        <input
+                          type="text"
+                          placeholder={`Option ${index + 1}`}
+                          value={option}
+                          onChange={(e) =>
+                            handleOptionChange(question.id, index, e.target.value)
+                          }
+                          className="option-input"
+                        />
+                      </div>
+                    ))}
+                    </div>
+                  
+                    <button
+                      className="option-select flex"
+                      type="button"
+                      onClick={() => addOption(question.id)}
+                    >
+                     Add option 
+                      {/* <span className="add-icon">+</span>  */}
+                    </button>
+                  </div>
                 </div>
+              </div>
+            ))}
+          </Form>
 
-                <div className="choice-field">       
-<div className="choice-field custom-dropdown flex">
-  {/* Choice */}
-   <div className=" wrap-icon flex">
-    <img src={dot} className="dot-icon" alt="" />
-<select
-id="choice-dropdown"
-value={choiceType }
-onChange={handleChoiceType }
-className="choice-select"
->
-<option value="Mutiple Choice"> Mutiple Choice</option>
-<option value="Single Choice">Single Choice</option>
-</select>
-</div>
-{/* Option */}
-<div className="wrap-icon flex">
-    <select
-id="option-dropdown"
-value={choiceOption}
-onChange={handleChoiceOption}
-className="option-select"
->
-<option value="Option A">A. Option A</option>
-<option value="Option B">B. Option B</option>
-<option value="Option C">C. Option C</option>
-<option value="Option D">D. Option D</option>
-</select>
-</div>
-</div> 
+          <button className="next-question flex" onClick={addNewQuestion}>
+            Next Question <img src={add} alt="Add" />
+          </button>
+        </div>
+
+        <button className="post-btn">Post</button>
       </div>
-      </div>
-    </Form>
-    <button className="next-question flex">Next Question <img src={add} alt="" /></button>
-</div>
-</div>
-</section>
-)
-}
+    </section>
+  );
+};
+
 export default SurveyForm;

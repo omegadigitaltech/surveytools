@@ -9,6 +9,7 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
+  "proxy": "https://surveypro.onrender.com",
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.7",
     "react": "^18.2.0",

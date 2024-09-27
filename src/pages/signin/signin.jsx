@@ -25,14 +25,14 @@ const SignIn = () => {
       <div className="form-col">
         <Form className="auth-w5-form" method="post" action="/signin">
           <div className="auth-w5-field">
-            <label className="auth-w5-label" htmlFor="usermail">
-              Username
+            <label className="auth-w5-label" htmlFor="email">
+              Email
             </label>
             <input
               className="auth-w5-input"
               type="text"
-              name="username"
-              id="usermail"
+              name="email"
+              id="email"
             />
           </div>
           <div className="auth-w5-field">

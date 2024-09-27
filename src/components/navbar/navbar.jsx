@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import iconBell from "../../assets/img/icon-bell.svg";
 import iconUser from "../../assets/img/icon-user.svg";
@@ -8,6 +8,9 @@ import "./navbar.css";
 
 const Navbar = () => {
     const login = true;
+
+const navigate = useNavigate();
+
     return ( 
         <header className={`header${login ? " header-logged" : ""}`}>
             <div className="header-wrap wrap">
@@ -70,7 +73,7 @@ const Navbar = () => {
                     <button className="header-w3-bell">
                         <img className="header-w3-icon" src={iconBell} alt="bell" />
                     </button>
-                    <button className="header-w3-chip">
+                    <button className="header-w3-chip" onClick={() => navigate('/profile')} >
                         <div className="header-w3-user">
                             <img className="header-w3-icon" src={iconUser} alt="user" />
                         </div>

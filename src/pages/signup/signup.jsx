@@ -29,43 +29,43 @@ const SignUp = () => {
         <Form className="auth-w4-form" method="post" action="/signup">
           <div className="auth-w4-grid">
             <div className="auth-w4-field">
-              <label className="auth-w4-label" htmlFor="">
+              <label className="auth-w4-label" htmlFor="firstname">
                 First name
               </label>
               <input
                 className="auth-w4-input"
                 type="text"
                 name="firstname"
-                id=""
+                id="firstname"
                 required
               />
             </div>
             <div className="auth-w4-field">
-              <label className="auth-w4-label" htmlFor="">
+              <label className="auth-w4-label" htmlFor="lastname">
                 Last name
               </label>
               <input
                 className="auth-w4-input"
                 type="text"
                 name="lastname"
-                id=""
+                id="lastname"
                 required
               />
             </div>
             <div className="auth-w4-field auth-w4-full">
-              <label className="auth-w4-label" htmlFor="">
+              <label className="auth-w4-label" htmlFor="email">
                 Email
               </label>
               <input
                 className="auth-w4-input"
                 type="email"
                 name="email"
-                id=""
+                id="email"
                 required
               />
             </div>
             <div className="auth-w4-field auth-w4-full">
-              <label className="auth-w4-label" htmlFor="">
+              <label className="auth-w4-label" htmlFor="password">
                 Password
               </label>
               <div className="auth-w4-wrap">
@@ -73,7 +73,7 @@ const SignUp = () => {
                   className="auth-w4-input pw-toggle"
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  id=""
+                  id="password"
                   required
                 />
                 <img
@@ -85,7 +85,7 @@ const SignUp = () => {
               </div>
             </div>
             <div className="auth-w4-field auth-w4-full">
-              <label className="auth-w4-label" htmlFor="">
+              <label className="auth-w4-label" htmlFor="confirm">
                 Confirm Password
               </label>
               <div className="auth-w4-wrap">
@@ -93,7 +93,7 @@ const SignUp = () => {
                   className="auth-w4-input pw-toggle"
                   type={showPassword ? "text" : "password"}
                   name="confirm"
-                  id=""
+                  id="confirm"
                 />
                 <img
                   className="signin-icon"

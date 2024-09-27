@@ -18,7 +18,9 @@ const userSurvey = [
         surveyTitle: "Diet and Excercise",
         surveyDesc: "This survey is part of a research project to determine the average position of students who are aware of the occupational therapy seesion in OAU, how important their professional courses are to the nation, other opportunities out there waiting for them and the future of they all holds about their courses",
         participantsType: "Undergraduate",
-        surveypoint: ""
+        surveypoint: "50",
+        participantNum: "20",
+        postTime: "30"
     }
     
 ]

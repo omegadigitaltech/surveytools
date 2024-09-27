@@ -28,7 +28,7 @@
     align-items: center;
     padding-top: 1em;
     justify-content: space-between;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid #fff;
 }
 
 .footer-w2-copy {
