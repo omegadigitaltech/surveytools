@@ -105,7 +105,7 @@ const SignUp = () => {
             </div>
           </div>
           <label className="auth-w4-block" htmlFor="">
-            <input className="" type="checkbox" />
+            <input className="check" type="checkbox" />
             Agree to{" "}
             <Link className="" to="">
               terms & condition
