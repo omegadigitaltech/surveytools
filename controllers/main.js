@@ -4,6 +4,8 @@ const User = require('../model/user')
 const mongoose = require('mongoose');
 const {calculateSentiment} = require('../middleware/helper')
 
+const main_url = "localhost:5000"
+
 const start = async (req, res) => {
   const filePath = path.join(__dirname, '../index.html');
   res.sendFile(filePath);
@@ -65,6 +67,7 @@ const createSurvey = async (req, res, next) => {
       status: "success",
       code: 201,
       msg: `Survey successfully created by ${user.fullname}`,
+      survey
     })
   } catch (error) {
     await session.abortTransaction();
@@ -91,13 +94,14 @@ const updateAnswer = async (req, res, next) => {
     }
 
     const survey = await Survey.findOne({ 'questions._id': questionId }).session(session);
+    console.log(survey)
     if (!survey) {
       await session.abortTransaction();
       session.endSession();
       return res.status(404).json({ status: "failure", code: 404, msg: 'Question not found' });
     }
 
-    const question = survey.questions.find(q => q._id === questionId);
+    const question = survey.questions.find(q => q._id.toString() === questionId);
     if (!question) {
       await session.abortTransaction();
       session.endSession();
@@ -121,27 +125,30 @@ const updateAnswer = async (req, res, next) => {
     }
 
     // Validate response for five_point and multiple_choice questions
-    if (question.questionType === 'five_point') {
-      if (parseInt(response)  < 1 || parseInt(response) > 5) {
-        await session.abortTransaction();
-        session.endSession();
-        return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be between 1 and 5 for five_point question' });
+    console.log(response)
+    if (response) {
+      if (question.questionType === 'five_point') {
+        if (isNaN(parseInt(response, 10)) || parseInt(response, 10)  < 1 || parseInt(response, 10) > 5) {
+          await session.abortTransaction();
+          session.endSession();
+          return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be between 1 and 5 for five_point question' });
+        }
+      } else if (question.questionType === 'multiple_choice') {
+        const validOptions = question.options.map(opt => opt.text);
+        if (!validOptions.includes(response)) {
+          await session.abortTransaction();
+          session.endSession();
+          return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be one of the provided options for multiple_choice question' });
+        }
       }
-    } else if (question.questionType === 'multiple_choice') {
-      const validOptions = question.options.map(opt => opt.text);
-      if (!validOptions.includes(response)) {
-        await session.abortTransaction();
-        session.endSession();
-        return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be one of the provided options for multiple_choice question' });
+  
+  
+      const existingAnswer = question.answers.find(a => a.userId.equals(user._id));
+      if (existingAnswer) {
+        existingAnswer.response = response;
+      } else {
+        question.answers.push({ fullname: user.fullname, response, userId: user._id });
       }
-    }
-
-
-    const existingAnswer = question.answers.find(a => a.userId.equals(user._id));
-    if (existingAnswer) {
-      existingAnswer.response = response;
-    } else {
-      question.answers.push({ fullname: user.fullname, response, userId: user._id });
     }
 
     await survey.save({ session });
@@ -149,7 +156,7 @@ const updateAnswer = async (req, res, next) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({ status: "success", code: 200, msg: `Answer successfully updated by ${user.fullname}` });
+    res.status(200).json({ status: "success", code: 200, msg: `Answer successfully updated by ${user.fullname}`, survey });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -195,6 +202,7 @@ const submitAnswers = async (req, res, next) => {
     }
 
     // Validate answers structure
+    console.log(answers)
     if (!Array.isArray(answers) || answers.some(answer => !answer.questionId || typeof answer.response === 'undefined')) {
       await session.abortTransaction();
       session.endSession();
@@ -209,10 +217,11 @@ const submitAnswers = async (req, res, next) => {
         return res.status(400).json({ status: "failure", code: 400, msg: `Required question ${question._id} is not answered` });
       }
 
-      if (answer) {
+      if (answer && answer.response) {
         // Validate response for five_point and multiple_choice questions
         if (question.questionType === 'five_point') {
-          if (parseInt(answer.response) < 1 || parseInt(answer.response) > 5) {
+          if (isNaN(parseInt(answer.response, 10)) || parseInt(answer.response, 10)  < 1 || parseInt(answer.response, 10) > 5) {
+          
             await session.abortTransaction();
             session.endSession();
             return res.status(400).json({ status: "failure", code: 400, msg: `Response for question ${question._id} must be between 1 and 5 for five_point question` });
@@ -236,7 +245,13 @@ const submitAnswers = async (req, res, next) => {
         }
 
         question.analytics.totalResponses += 1;
+        // Ensure `distribution` is initialized as a Map
+        if (!question.analytics.distribution) {
+          question.analytics.distribution = new Map();
+        }
+
         if (question.questionType === 'multiple_choice' || question.questionType === 'five_point') {
+          
           question.analytics.distribution.set(answer.response, (question.analytics.distribution.get(answer.response) || 0) + 1);
           if (question.questionType === 'five_point') {
             question.analytics.averageRating = (question.analytics.averageRating * (question.analytics.totalResponses - 1) + parseInt(answer.response)) / question.analytics.totalResponses;
@@ -249,8 +264,13 @@ const submitAnswers = async (req, res, next) => {
           question.analytics.sentimentAnalysis = sentimentAnalysis;
         }
 
-        const maxResponse = [...question.analytics.distribution.entries()].reduce((a, b) => b[1] > a[1] ? b : a);
-        question.analytics.mostCommonResponse = maxResponse[0];
+        if (question.analytics.distribution && question.analytics.distribution.size > 0) {
+          const maxResponse = [...question.analytics.distribution.entries()].reduce((a, b) => b[1] > a[1] ? b : a, [null, 0]);
+          question.analytics.mostCommonResponse = maxResponse[0];
+        } else {
+          question.analytics.mostCommonResponse = null; // Fallback if there are no responses yet
+        }
+
         question.analytics.responseRate = `${((question.analytics.totalResponses / survey.max_participant) * 100).toFixed(2)}%`;
       }
     }
@@ -266,7 +286,7 @@ const submitAnswers = async (req, res, next) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({ status: "success", code: 200, msg: 'Survey successfully submitted' });
+    res.status(200).json({ status: "success", code: 200, msg: 'Survey successfully submitted', survey });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -292,10 +312,10 @@ const checkUserFilledSurvey = async (req, res, next) => {
     }
 
     if (survey.submittedUsers.includes(user._id)) {
-      return res.status(200).json({ status: "success", code: 200, filled: true });
+      return res.status(200).json({ status: "success", code: 200, submitted: true });
     }
 
-    res.status(200).json({ status: "success", code: 200, filled: false });
+    res.status(200).json({ status: "success", code: 200, submitted: false });
   } catch (error) {
     next(error);
   }
@@ -325,6 +345,7 @@ const addOrUpdateQuestion = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
     const { questionId, questionText, questionType, required, options } = req.body;
+    console.log(req.body)
 
     const user = await User.findOne({ id: req.userId });
 
@@ -341,13 +362,27 @@ const addOrUpdateQuestion = async (req, res, next) => {
       return res.status(403).json({ status: "failure", code: 403, msg: 'User not authorized to add questions to this survey' });
     }
 
+    // Ensure `questionText`, `questionType`, and other required fields are defined
+    if (!questionText || !questionType) {
+      return res.status(400).json({ status: "failure", code: 400, msg: 'Question text and type are required.' });
+    }
 
-    const question = survey.find(q => q._id === questionId);
+
+    // Format `options` array if questionType is multiple_choice
+    let formattedOptions = [];
+    if (questionType === 'multiple_choice' && Array.isArray(options)) {
+      formattedOptions = options.map(option => ({
+        text: option // Convert each option string to an object with `text` property
+      }));
+    }
+
+  
+    const question = survey.questions.find(q => q._id.toString() === questionId);
     if (question) {
       question.questionText = questionText;
       question.questionType = questionType;
-      question.required = required;
-      question.options = options;
+      question.required = required !== undefined ? required : question.required; // Use existing value if undefined
+      question.options = questionType === 'multiple_choice' ? formattedOptions : [];
       survey.updatedAt = new Date();
     } else {
       survey.questions.push({
@@ -355,13 +390,16 @@ const addOrUpdateQuestion = async (req, res, next) => {
         questionType,
         required,
         options,
+        required: required || false,
+        options: questionType === 'multiple_choice' ? formattedOptions : []
+
       });
       survey.updatedAt = new Date();
     }
 
     await survey.save();
 
-    res.status(200).json({ status: "success", code: 200, msg: 'Question added/updated successfully' });
+    res.status(200).json({ status: "success", code: 200, msg: 'Question added/updated successfully', survey });
   } catch (error) {
     next(error);
   }
@@ -417,7 +455,8 @@ const deleteQuestion = async (req, res, next) => {
       return res.status(403).json({ status: "failure", code: 403, msg: 'User not authorized to delete questions from this survey' });
     }
 
-    const questionIndex = survey.questions.findIndex(q => q._id === questionId);
+    const questionIndex = survey.questions.findIndex(q => q._id.toString() === questionId);
+    console.log(questionIndex)
     if (questionIndex === -1) {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Question not found' });
     }
@@ -483,6 +522,7 @@ const publishSurvey = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
     const survey = await Survey.findById(surveyId);
+    const user = await User.findOne({ id: req.userId });
 
     if (!survey) {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
@@ -494,7 +534,7 @@ const publishSurvey = async (req, res, next) => {
 
 
     survey.published = true;
-    survey.link = `https://yourapp.com/surveys/${surveyId}`;
+    survey.link = `https://${main_url}/surveys/${surveyId}/info`;
     await survey.save();
 
     res.status(200).json({ status: "success", code: 200, msg: 'Survey published', link: survey.link });

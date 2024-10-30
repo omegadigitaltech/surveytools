@@ -10,21 +10,21 @@ const { start, home,updateAnswer, submitAnswers, createSurvey,
 
 
 // Answer-related endpoints
-router.put('/questions/:questionId/answers', updateAnswer);
-router.post('/surveys/:surveyId/submit', submitAnswers);
+router.put('/questions/:questionId/answers', authMiddleware, updateAnswer);
+router.post('/surveys/:surveyId/submit',authMiddleware, submitAnswers);
 
 // Survey-related endpoints
-router.post('/surveys', createSurvey);
-router.post('/surveys/:surveyId/questions', addOrUpdateQuestion);
-router.delete('/surveys/:surveyId/questions/:questionId', deleteQuestion);
-router.get('/surveys/:surveyId/info', getSurveyInfo);
-router.get('/surveys/:surveyId/user-data', getUserSurveyData);
-router.get('/surveys/:surveyId/user-filled', checkUserFilledSurvey);
-router.get('/surveys/:surveyId/max-participants', checkSurveyMaxParticipants);
-router.get('/surveys', getAllSurveys);
-router.get('/surveys/:surveyId/questions', getSurveyQuestions);
-router.post('/surveys/:surveyId/publish', publishSurvey);
-router.get('/surveys/:surveyId/analytics', getSurveyAnalytics);
+router.post('/surveys', authMiddleware, createSurvey);
+router.post('/surveys/:surveyId/questions', authMiddleware, addOrUpdateQuestion);
+router.delete('/surveys/:surveyId/questions/:questionId', authMiddleware, deleteQuestion);
+router.get('/surveys/:surveyId/info',authMiddleware, getSurveyInfo);
+router.get('/surveys/:surveyId/user-data', authMiddleware, getUserSurveyData);
+router.get('/surveys/:surveyId/user-submitted',authMiddleware, checkUserFilledSurvey);
+router.get('/surveys/:surveyId/max-participants',authMiddleware, checkSurveyMaxParticipants);
+router.get('/surveys',authMiddleware, getAllSurveys);
+router.get('/surveys/:surveyId/questions',authMiddleware, getSurveyQuestions);
+router.post('/surveys/:surveyId/publish',authMiddleware, publishSurvey);
+router.get('/surveys/:surveyId/analytics',authMiddleware, getSurveyAnalytics);
 
 module.exports = router;
 
