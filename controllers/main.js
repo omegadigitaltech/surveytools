@@ -24,6 +24,9 @@ const createSurvey = async (req, res, next) => {
 
   const session = await mongoose.startSession();
   session.startTransaction();
+  console.log(req.body)
+  console.log(req.userId)
+
   
   try {
     const {title, description, max_participant, point, duration, preferred_participants } = req.body
@@ -82,6 +85,8 @@ const createSurvey = async (req, res, next) => {
 const updateAnswer = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
+  console.log(req.body)
+  console.log(req.userId)
   try {
     const { questionId } = req.params;
     const { response } = req.body;
@@ -167,6 +172,8 @@ const updateAnswer = async (req, res, next) => {
 const submitAnswers = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
+  console.log(req.body)
+  console.log(req.userId)
   try {
     const { surveyId } = req.params;
     const { answers } = req.body;
@@ -342,6 +349,8 @@ const checkSurveyMaxParticipants = async (req, res, next) => {
 
 // Add or update question
 const addOrUpdateQuestion = async (req, res, next) => {
+  console.log(req.body)
+  console.log(req.userId)
   try {
     const { surveyId } = req.params;
     const { questionId, questionText, questionType, required, options } = req.body;
