@@ -1,0 +1,36 @@
+
+.complete-box {
+    justify-content: center;
+    position: fixed;
+    top: 41%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    margin-top: 0; 
+    z-index: 50;
+}
+
+.complete-msg{
+    flex-direction:column;
+    border: 1px solid rgb(209, 209, 209);
+    max-width: 400px;
+    padding: 1.75rem;
+    border-radius: 1.5rem;
+    text-align: center;
+     background: #fff;
+}
+.complete-msg img{
+width: 5rem;
+margin-bottom: 1.25rem;
+}
+.success-msg{
+font-size:1.2rem ;
+font-weight: 500;
+margin-bottom: 1rem;
+}
+.thank-you{
+    font-size: 1rem;
+    font-weight: 400;
+}
+.post-btn{
+    margin-top: 2rem !important;
+}

@@ -2,10 +2,12 @@ import config from "../../config/config";
 import { toast } from "react-toastify";
 
 const action = async ({ request }) => {
+  // Experiment
   const authToken = localStorage.getItem("authToken");
 const isLoggedIn = !!authToken;
 console.log("User logged in:", isLoggedIn);
-
+console.log(document.cookie);
+// Expo
   const formData = await request.formData();
 
   const title = formData.get("title");

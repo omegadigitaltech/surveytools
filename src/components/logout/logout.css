@@ -1,0 +1,52 @@
+.logout-box {
+    justify-content: center;
+    position: fixed;
+    top: 30%; /* Positions the element vertically 40% down the viewport */
+    right: 2%; 
+    transform: translateY(-50%); 
+    margin-top: 0;
+    z-index: 50;
+}
+
+.logout {
+border: 1px solid rgb(209, 209, 209);
+max-width: 400px;
+padding: 2.75rem;
+border-radius: 1rem;
+text-align: center;
+ background: #fff;
+ flex-direction: column;
+}
+
+p{
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+.btn-options {
+    gap: 2rem;
+}
+.btn-options button{
+    display: block;
+    padding: 0.8em 3rem;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 5px;
+    /* margin-left: 4.5rem; */
+    margin-top: 1rem;
+}
+.post-btn:hover{
+    cursor: pointer;
+}
+.out-yes{
+    background-color: var(--base);
+}
+.out-yes:hover{
+    background-color: var(--l-200);
+}
+.out-no{
+    background-color: var(--gray);
+}
+.out-no:hover{
+    background-color: #adadad;
+}

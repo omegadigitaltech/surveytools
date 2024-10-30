@@ -2,12 +2,17 @@ import {Link, Form} from "react-router-dom";
 import backaro from "../../assets/img/backaro.svg";
 import "./profile.css"
 import data from "../../utils/content/data";
+import Complete from "../../components/completed/complete"
+import Logout from "../../components/logout/logout" 
 
 const Profile = () =>{
 
 const useInfos = data.userInfos[0]
 
     return(
+        <>
+<Complete/>
+<Logout/>
         <section className="Profile-section">
 <div className="wrap">
 <div className="profile-inner ">
@@ -72,6 +77,8 @@ const useInfos = data.userInfos[0]
         </div>
         </div>
         </section>
+        </>
+
     )
 }
 export default Profile;
