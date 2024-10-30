@@ -144,7 +144,8 @@ width: 1.1rem;
     color: #fff;
     font-weight: bold;
     border-radius: 5px;
-    margin-left: 4.5rem;
+    /* margin-left: 4.5rem; */
+    margin-top: 3rem;
 }
 .post-btn:hover{
     cursor: pointer;

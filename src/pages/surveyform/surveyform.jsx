@@ -1,4 +1,4 @@
-import { Link, Form } from "react-router-dom";
+import { Link, Form, useActionData } from "react-router-dom";
 import React, { useState } from "react";
 import "./surveyform.css";
 import backaro from "../../assets/img/backaro.svg";
@@ -9,7 +9,9 @@ import option from "../../assets/img/option.svg";
 import copy from "../../assets/img/copy.svg";
 
 const SurveyForm = () => {
-  // Managing the list of questions and their options
+
+  const data = useActionData();
+
   const [questions, setQuestions] = useState([
     {
       id: 1,
@@ -19,7 +21,6 @@ const SurveyForm = () => {
     },
   ]);
 
-  // Handle adding a new question
   const addNewQuestion = () => {
     const newQuestion = {
       id: questions.length + 1,
@@ -30,12 +31,10 @@ const SurveyForm = () => {
     setQuestions([...questions, newQuestion]);
   };
 
-  // Handle deleting a question
   const deleteQuestion = (id) => {
     setQuestions(questions.filter((question) => question.id !== id));
   };
 
-  // Handle duplicating a question
   const duplicateQuestion = (id) => {
     const questionToDuplicate = questions.find((q) => q.id === id);
     if (questionToDuplicate) {
@@ -47,7 +46,6 @@ const SurveyForm = () => {
     }
   };
 
-  // Handle updating a question's text or type
   const handleQuestionChange = (id, field, value) => {
     const updatedQuestions = questions.map((q) =>
       q.id === id ? { ...q, [field]: value } : q
@@ -55,17 +53,13 @@ const SurveyForm = () => {
     setQuestions(updatedQuestions);
   };
 
-  // Handle adding new options
   const addOption = (id) => {
     const updatedQuestions = questions.map((q) =>
-      q.id === id
-        ? { ...q, options: [...q.options, ""] }
-        : q
+      q.id === id ? { ...q, options: [...q.options, ""] } : q
     );
     setQuestions(updatedQuestions);
   };
 
-  // Handle option change
   const handleOptionChange = (questionId, index, value) => {
     const updatedQuestions = questions.map((q) =>
       q.id === questionId
@@ -79,7 +73,6 @@ const SurveyForm = () => {
     );
     setQuestions(updatedQuestions);
   };
-
   return (
     <section className="form-page">
       <div className="wrap">
@@ -93,13 +86,14 @@ const SurveyForm = () => {
         </div>
 
         <div className="form-container">
-          <Form>
+          <Form method="post" action="/surveyform">
             {questions.map((question) => (
               <div className="oneQuestion" key={question.id}>
                 <div className="question-field flex">
                   <input
                     className="question-input"
                     type="text"
+                    required
                     placeholder="Untitled Question"
                     value={question.text}
                     onChange={(e) =>
@@ -138,41 +132,47 @@ const SurveyForm = () => {
 
                   <div className="options-list flex">
                     <div className="option">
-                        {question.options.map((option, index) => (
-                      <div className="wrap-icon flex" key={index}>
-                        <input
-                          type="text"
-                          placeholder={`Option ${index + 1}`}
-                          value={option}
-                          onChange={(e) =>
-                            handleOptionChange(question.id, index, e.target.value)
-                          }
-                          className="option-input"
-                        />
-                      </div>
-                    ))}
+                      {question.options.map((option, index) => (
+                        <div className="wrap-icon flex" key={index}>
+                          <input
+                            type="text"
+                            placeholder={`Option ${index + 1}`}
+                            value={option}
+                            onChange={(e) =>
+                              handleOptionChange(
+                                question.id,
+                                index,
+                                e.target.value
+                              )
+                            }
+                            className="option-input"
+                          />
+                        </div>
+                      ))}
                     </div>
-                  
+
                     <button
                       className="option-select flex"
                       type="button"
                       onClick={() => addOption(question.id)}
                     >
-                     Add option 
-                      {/* <span className="add-icon">+</span>  */}
+                      Add option
                     </button>
                   </div>
                 </div>
               </div>
             ))}
-          </Form>
 
-          <button className="next-question flex" onClick={addNewQuestion}>
+<button className="next-question flex" onClick={addNewQuestion}>
             Next Question <img src={add} alt="Add" />
           </button>
+
+        <button type="submit" className="post-btn">Post</button>
+          </Form>
+
+         
         </div>
 
-        <button className="post-btn">Post</button>
       </div>
     </section>
   );
