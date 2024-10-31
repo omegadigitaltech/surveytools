@@ -79,7 +79,8 @@ const postRegister = async (req,res) => {
         data: {
             redirectUrl: redirectUrl,
             user: user
-        }
+        },
+        token
     })
     
 }
@@ -133,7 +134,8 @@ const postLogin = async (req, res) => {
         data: {
             redirectUrl: redirectUrl,
             user: user
-        }
+        },
+        token
     })
 }
 
