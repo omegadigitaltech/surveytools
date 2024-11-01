@@ -1,31 +1,53 @@
-import { Form } from "react-router-dom";
-import "./verify.css";
+import { Form, useActionData, useNavigation } from "react-router-dom";
+import { useRef, useState } from "react";
+import { toast } from "react-toastify";
 import otp from "../../assets/img/otp.png";
-import { useRef } from "react";
+import "./verify.css";
 
 const Verify = () => {
   const inputRefs = useRef([]);
+  const actionData = useActionData();
+  const navigation = useNavigation();
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const handleInputChange = (e, index) => {
     const value = e.target.value;
-
-    // Only allow single digit and move to the next input
     if (value.length > 1) {
       e.target.value = value.slice(0, 1);
     }
-
-    // Automatically focus the next input if a number is entered
     if (value && index < inputRefs.current.length - 1) {
       inputRefs.current[index + 1].focus();
     }
   };
 
   const handleKeyDown = (e, index) => {
-    // Handle backspace and move to the previous input
-    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+    if (e.key === "Backspace" && !e.target.value && index > 0) {
       inputRefs.current[index - 1].focus();
     }
   };
+
+  const handleVerify = (e) => {
+    e.preventDefault();
+    setIsVerifying(true);
+
+    const otpCode = inputRefs.current.map((input) => input.value).join("");
+    if (otpCode.length === 4) {
+      // Add hidden input field to capture OTP
+      const otpField = document.createElement("input");
+      otpField.setAttribute("type", "hidden");
+      otpField.setAttribute("name", "otpCode");
+      otpField.setAttribute("value", otpCode);
+      e.target.appendChild(otpField);
+      e.target.submit();
+    } else {
+      setIsVerifying(false);
+      toast.error("Please enter a 4-digit code.");
+    }
+  };
+
+  if (actionData?.status === "error") {
+    toast.error(actionData.message);
+  }
 
   return (
     <section className="verify">
@@ -35,37 +57,35 @@ const Verify = () => {
           <div className="verify_info flex">
             <div className="v_info">
               <h3>Fill in the box below with the code</h3>
-              <p>
-                Kindly check the verification code sent to your email
-                adegoke******@email.com
-              </p>
+              <p>Check the verification code sent to your email adegoke******@email.com</p>
             </div>
             <img src={otp} alt="OTP Illustration" />
           </div>
           <div className="verify_codes">
-            <Form>
+            <Form method="post" onSubmit={handleVerify} action="/verify">
               <div className="flex input_codes">
                 {[...Array(4)].map((_, index) => (
                   <input
                     key={index}
                     type="number"
-                    className=""
                     onChange={(e) => handleInputChange(e, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     ref={(el) => (inputRefs.current[index] = el)}
-                    max="9" // Max digit is 9
-                    min="0" // Min digit is 0
-                    inputMode="numeric" // Ensures numeric keyboard on mobile devices
+                    max="9"
+                    min="0"
+                    inputMode="numeric"
                   />
                 ))}
+              </div>
+              <div className="flex verify-sec">
+                <p>Didn’t receive the code? Resend (<span className="verify-count">20s</span>)</p>
+                <button className="verify-enter" disabled={isVerifying}>
+                  {isVerifying ? "Verifying..." : "Verify"}
+                </button>
               </div>
             </Form>
           </div>
         </div>
-        <p>
-          Didn't receive the code? Resend (<span className="verify-count">20s</span>)
-        </p>
-        <button className="verify-enter">Verify</button>
       </div>
     </section>
   );

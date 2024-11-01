@@ -15,6 +15,7 @@ import Home from "./pages/home/home";
 import SignIn from "./pages/signin/signin";
 import SignUp from "./pages/signup/signup";
 import Verify from "./pages/verify/verify";
+import verifyAction from "./pages/verify/action"
 import Dashboard from "./pages/dashboard/dashboard";
 import signInAction from "./pages/signin/action";
 import signUpAction from "./pages/signup/action";
@@ -46,7 +47,7 @@ const router = createBrowserRouter(
       <Route element={<AuthLayout />}>
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />
-        <Route path="verify" element={<Verify />} />
+        <Route path="verify" element={<Verify />} action={verifyAction}/>
       </Route>
     </Route>
   )
