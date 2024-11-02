@@ -32,10 +32,9 @@ const Verify = () => {
 
     const otpCode = inputRefs.current.map((input) => input.value).join("");
     if (otpCode.length === 4) {
-      // Add hidden input field to capture OTP
       const otpField = document.createElement("input");
       otpField.setAttribute("type", "hidden");
-      otpField.setAttribute("name", "otpCode");
+      otpField.setAttribute("name", "code");
       otpField.setAttribute("value", otpCode);
       e.target.appendChild(otpField);
       e.target.submit();
