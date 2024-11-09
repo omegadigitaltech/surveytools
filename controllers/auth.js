@@ -222,8 +222,12 @@ const verify = async (req, res) => {
         })
     }
     const {code} = req.body
+    console.log("code body: ", code)
   
     let code_ = parseInt(code)
+    console.log("code body 2: ", code_)
+    console.log("user code: ", user.code)
+
     if(code_ == user.code){
       const user_ = await User.findOneAndUpdate({id: req.userId}, {verified: true, code: null}, {new: true})
       return res.status(200).json({
