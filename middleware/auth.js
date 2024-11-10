@@ -72,9 +72,9 @@ const authMiddleware = async (req, res, next) => {
 
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(404).json({
+      return res.status(401).json({
         status: "failure",
-        code: 404,
+        code: 401,
         msg: "User is not Logged In: Token not found",
         data: {
           isLoggedIn: false,
@@ -88,9 +88,9 @@ const authMiddleware = async (req, res, next) => {
     // Find the user by id and optionally include password verification if needed
     const user = await User.findOne({ id: decoded.userId });
     if (!user) {
-      return res.status(404).json({
+      return res.status(401).json({
         status: "failure",
-        code: 404,
+        code: 401,
         msg: "User is not Logged In: Token corrupt",
         data: {
           isLoggedIn: false,
@@ -105,9 +105,9 @@ const authMiddleware = async (req, res, next) => {
     req.session.referer = req.originalUrl;
 
     if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(404).json({
+      return res.status(401).json({
         status: "failure",
-        code: 404,
+        code: 401,
         msg: "User is not Logged In: Token corrupt",
         data: {
           isLoggedIn: false,
@@ -115,9 +115,9 @@ const authMiddleware = async (req, res, next) => {
       });
     }
 
-    return res.status(404).json({
+    return res.status(401).json({
       status: "failure",
-      code: 404,
+      code: 401,
       msg: "User is not Logged In: Token corrupt",
       data: {
         isLoggedIn: false,

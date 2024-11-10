@@ -244,63 +244,72 @@ const verify = async (req, res) => {
     }
 }
 
-
-const isLoggedIn = async (req, res ) => {
+const isLoggedIn = async (req, res) => {
     try {
-      req.session.referer = req.originalUrl
-      const token = req.cookies.token;
-    
-      if(!token) {
+      req.session.referer = req.originalUrl;
+  
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return res.status(401).json({
-            status: "failure",
-            code: 401,
-            msg: "User is not Logged in",
-            data: {
-                isLoggedIn: false,
-            }
-        })
+          status: "failure",
+          code: 401,
+          msg: "User is not Logged in: Token not found",
+          data: {
+            isLoggedIn: false,
+          },
+        });
       }
-    
+  
+      const token = authHeader.split(" ")[1];
       const decoded = jwt.verify(token, jwtSecret);
-      //dont just find by Id, but by password
-      const user = await User.find({id: decoded.userId})
-      if(!user) {
+  
+      // Find the user by id and verify if they exist
+      const user = await User.findOne({ id: decoded.userId });
+      if (!user) {
         return res.status(401).json({
-            status: "failure",
-            code: 401,
-            msg: "Token error. User not found",
-            data: {
-                isLoggedIn: false,
-            }
-        })
+          status: "failure",
+          code: 401,
+          msg: "Token error. User not found",
+          data: {
+            isLoggedIn: false,
+          },
+        });
       }
-
+  
       res.status(200).json({
         status: "success",
         code: 200,
         msg: "User is Logged in",
         data: {
-            isLoggedIn: true,
-        }
-      })
-    } catch(error) {
-        console.log(error)
-        req.session.referer = req.originalUrl
-        if(error instanceof jwt.JsonWebTokenError){
-          res.clearCookie('token');
-        }
-        res.status(401).json({
-            status: "failure",
-            code: 401,
-            msg: "An Error Occured: User is not Logged in",
-            data: {
-                isLoggedIn: false,
-                error: error
-            }
-        })
-    }
+          isLoggedIn: true,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      req.session.referer = req.originalUrl;
   
-}
+      if (error instanceof jwt.JsonWebTokenError) {
+        return res.status(401).json({
+          status: "failure",
+          code: 401,
+          msg: "User is not Logged in: Invalid token",
+          data: {
+            isLoggedIn: false,
+          },
+        });
+      }
+  
+      res.status(500).json({
+        status: "failure",
+        code: 500,
+        msg: "An Error Occurred: User is not Logged in",
+        data: {
+          isLoggedIn: false,
+          error: error.message || "An error occured",
+        },
+      });
+    }
+  };
 
 const failurePage = async (req,res) => {
     res.send('Something went wrong')
