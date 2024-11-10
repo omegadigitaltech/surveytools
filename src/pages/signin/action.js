@@ -25,13 +25,20 @@ const action = async ({ request }) => {
       return { status: "error", message: json.msg || "Login failed. Please try again." };
     }
 
+    console.log("Login response:", json);
+
     // Store token in localStorage/sessionStorage for future requests
-    localStorage.setItem("token", json.data.token);
+ const token = json.token;
+  if (token) {
+    localStorage.setItem("token", token);
+  }
 
-    // Optionally trigger global login state update
-    // dispatch or use some global state update function here
-
-    return redirect("/dashboard");
+  // Redirect based on verification status
+  if (!json.data.user.verified) {
+    return redirect("/verify"); // Redirect to verification page if not verified
+  }
+  
+  return redirect("/dashboard"); // Redirect to dashboard if verified
 
   } catch (err) {
     return { status: "error", message: "An error occurred. Please try again." };

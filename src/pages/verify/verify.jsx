@@ -1,5 +1,5 @@
 import { Form, useActionData, useNavigation } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import otp from "../../assets/img/otp.png";
 import "./verify.css";
@@ -9,6 +9,7 @@ const Verify = () => {
   const actionData = useActionData();
   const navigation = useNavigation();
   const [isVerifying, setIsVerifying] = useState(false);
+  const [hasDisplayedError, setHasDisplayedError] = useState(false); // Track if error toast has been shown
 
   const handleInputChange = (e, index) => {
     const value = e.target.value;
@@ -27,26 +28,38 @@ const Verify = () => {
   };
 
   const handleVerify = (e) => {
-    e.preventDefault();
-    setIsVerifying(true);
-
     const otpCode = inputRefs.current.map((input) => input.value).join("");
+    console.log("OTP Code being sent:", otpCode);
     if (otpCode.length === 4) {
+      // Add hidden input field to capture OTP
       const otpField = document.createElement("input");
       otpField.setAttribute("type", "hidden");
       otpField.setAttribute("name", "code");
       otpField.setAttribute("value", otpCode);
       e.target.appendChild(otpField);
-      e.target.submit();
+      setIsVerifying(true);
+      setHasDisplayedError(false); // Reset error display for new submission
     } else {
+      e.preventDefault();  // Block submission if OTP isn't valid
       setIsVerifying(false);
       toast.error("Please enter a 4-digit code.");
     }
   };
 
-  if (actionData?.status === "error") {
-    toast.error(actionData.message);
-  }
+  useEffect(() => {
+    if (actionData?.status === "error" && !hasDisplayedError) {
+      toast.error(actionData.message);
+      setIsVerifying(false); // Reset verifying state after error
+      setHasDisplayedError(true); // Mark error as displayed
+    }
+  }, [actionData, hasDisplayedError]);
+
+  // Reset error display state whenever verification starts
+  useEffect(() => {
+    if (isVerifying) {
+      setHasDisplayedError(false);
+    }
+  }, [isVerifying]);
 
   return (
     <section className="verify">

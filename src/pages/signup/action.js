@@ -33,7 +33,15 @@ const action = async ({ request }) => {
     if (json.code !== 201) throw new Error(json.msg);
 
     toast.success(json.msg);
-    return redirect("/verify");
+    
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(redirect("/verify"));
+      }, 1500);
+    });
+
+    // return redirect("/verify");
+
   } catch (err) {
     toast.error(err.message);
   }
