@@ -1,5 +1,9 @@
 import { Form, Link, useNavigate, useActionData } from "react-router-dom";
 import React, { useState, useEffect } from "react";
+// import { useDispatch } from "react-redux";
+// import { uiSliceAction } from "../../components/store/uiSlice";
+import useAuthStore from "../../components/store/useAuthStore";
+import action from "./action";
 import "./signin.css";
 import "../utils.css";
 import iconFB from "../../assets/img/img-fb.png";
@@ -9,8 +13,8 @@ import iconShow from "../../assets/img/icon-eye-show.svg";
 import features from "../../assets/img/illustration-signin.svg";
 
 const SignIn = () => {
-  const actionData = useActionData();
   const navigate = useNavigate();
+  const setAuthData = useAuthStore((state) => state.setAuthData);
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,32 +22,39 @@ const SignIn = () => {
   const handleToggle = () => setShowPassword(!showPassword);
   const iconPass = showPassword ? iconShow : iconHide;
 
-  // Start loading spinner on form submit
-  const handleSubmit = (e) => {
-    setLoading(true);
-  };
-
   // Stop loading spinner when actionData updates
-  useEffect(() => {
-    if (actionData) {
+  const handleSubmit = async (e) => {
+    e.preventDefault(); 
+  
+    setLoading(true);
+  
+    // Create FormData from the event target (the form element)
+    const formData = new FormData(e.target);
+  
+    // Run the login action
+    const response = await action({ formData });
+  
+    // Check if login was successful and set auth data in Zustand store
+    if (response?.status === "success") {
+      setAuthData(response.token, response.userEmail, response.userName);
+      setTimeout(() => {
+        if (response.userVerified) {
+          navigate("/dashboard");
+        } else {
+          navigate("/verify");
+        }
+      }, 1500);
+    } else {
       setLoading(false);
     }
-  }, [actionData]);
+  };
+  
 
   return (
     <div className="auth-w5 flex">
       <div className="form-col">
-        {actionData && (
-          <div
-            className={`auth-message ${
-              actionData.status === "success" ? "auth-success" : "auth-error"
-            }`}
-          >
-            {actionData.message}
-          </div>
-        )}
 
-        <Form className="auth-w5-form" method="post" action="/signin" onSubmit={handleSubmit}>
+        <Form className="auth-w5-form" method="post" action="/signin"  onSubmit={handleSubmit} >
           <div className="auth-w5-field">
             <label className="auth-w5-label" htmlFor="email">Email</label>
             <input className="auth-w5-input" type="text" name="email" id="email" required />

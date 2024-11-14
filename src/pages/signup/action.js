@@ -40,8 +40,6 @@ const action = async ({ request }) => {
       }, 1500);
     });
 
-    // return redirect("/verify");
-
   } catch (err) {
     toast.error(err.message);
   }

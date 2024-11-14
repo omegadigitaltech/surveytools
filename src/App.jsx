@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import HomeLayout from "./layout/home/home";
 import AuthLayout from "./layout/auth/auth";
 import StoreProvider from "./components/store/StoreProvider";
+import ProtectRoute from "./components/protectroute/protectroute"
 
 import Home from "./pages/home/home";
 import SignIn from "./pages/signin/signin";
@@ -35,6 +36,8 @@ const router = createBrowserRouter(
     <Route>
       <Route element={<HomeLayout />}>
         <Route index element={<Home />} />
+
+        <Route element={<ProtectRoute />}>
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="expandsurvey" element={<ExpandSurvey />} />
         <Route path="postsurvey" element={<PostSurvey />} action={surveyAction}/>
@@ -43,7 +46,9 @@ const router = createBrowserRouter(
         <Route path="notifications" element={<Notifications />} />
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="profile" element={<Profile />} />
+        </Route>
       </Route>
+
       <Route element={<AuthLayout />}>
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />

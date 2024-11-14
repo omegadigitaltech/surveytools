@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Link, useActionData } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -11,14 +11,23 @@ import iconHide from "../../assets/img/icon-eye-hide.svg";
 import iconShow from "../../assets/img/icon-eye-show.svg";
 
 const SignUp = () => {
-  const data = useActionData();
-  // Password toggle
+  const actionData = useActionData();
   const [showPassword, setShowPassword] = useState(false);
   const handleToggle = () => {
     setShowPassword((prevState) => !prevState);
   };
   const iconPass = showPassword ? iconShow : iconHide;
-  const isLoading = useSelector((state) => state.ui.isLoading);
+  
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    setLoading(true);
+  }
+  useEffect(() => {
+    if (actionData) {
+      setLoading(false);
+    }
+  }, [actionData]);
 
   return (
     <div className="auth-w4 flex">
@@ -26,7 +35,7 @@ const SignUp = () => {
         <img src={features} alt="" />
       </div>
       <div className="form-col">
-        <Form className="auth-w4-form" method="post" action="/signup">
+        <Form className="auth-w4-form" method="post" action="/signup" onSubmit={handleSubmit}>
           <div className="auth-w4-grid">
             <div className="auth-w4-field">
               <label className="auth-w4-label" htmlFor="firstname">
@@ -111,8 +120,9 @@ const SignUp = () => {
               terms & condition
             </Link>
           </label>
-          <button className="auth-w4-btn">
-            {isLoading ? <AiOutlineLoading3Quarters size={24} /> : "Sign up"}
+          <button className="auth-w4-btn" disabled={loading}>
+            {/* {isLoading ? <AiOutlineLoading3Quarters size={24} /> : "Sign up"} */}
+            {loading ? "Loading..." : "Sign up"}
           </button>
         </Form>
         <div className="auth-w4-">

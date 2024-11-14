@@ -3,14 +3,15 @@ import { useState, useEffect } from 'react';
 import iconBell from "../../assets/img/icon-bell.svg";
 import iconUser from "../../assets/img/icon-user.svg";
 import iconLogOut from "../../assets/img/icon-logout.svg";
-
+import useAuthStore from "../store/useAuthStore";
 import "./navbar.css";
 
 const Navbar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // initially false
-
+    const { userName} = useAuthStore();
     const navigate = useNavigate();
-
+    // Log out
+    const logout = useAuthStore((state) => state.logout);
     useEffect(() => {
       // Check login status from localStorage or API
       const token = localStorage.getItem("token");
@@ -26,6 +27,7 @@ const Navbar = () => {
       localStorage.removeItem("token");
       setIsLoggedIn(false);
       navigate("/signin");
+      logout();
     };
 
     return (
@@ -98,7 +100,7 @@ const Navbar = () => {
                           <div className="header-w3-user">
                               <img className="header-w3-icon" src={iconUser} alt="user" />
                           </div>
-                          Omega Tech
+                          {userName}
                       </button>
                       <NavLink className="header-w3-link" to="/">
                           <img className="header-w3-icon" src={iconLogOut} alt="logout" />

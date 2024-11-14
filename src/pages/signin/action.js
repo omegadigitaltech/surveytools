@@ -1,11 +1,12 @@
 import { redirect } from "react-router";
 import config from "../../config/config";
+import { toast } from "react-toastify";
 
-const action = async ({ request }) => {
-  const data = await request.formData();
+const action = async ({ formData }) => {
+  // const data = await request.formData();
   const user = {
-    email: data.get("email"),
-    password: data.get("password"),
+    email: formData.get("email"),
+    password: formData.get("password"),
   };
 
   const API_URL = `${config.API_URL}/login`;
@@ -22,9 +23,10 @@ const action = async ({ request }) => {
     const json = await resp.json();
 
     if (json.status !== "success") {
-      return { status: "error", message: json.msg || "Login failed. Please try again." };
+      toast.error(json.msg || "Login failed. Please try again.");
+      return { status: "error", message: json.msg || "Login failed. Please try again." };  
     }
-
+    toast.success(json.msg);
     console.log("Login response:", json);
 
     // Store token in localStorage/sessionStorage for future requests
@@ -33,14 +35,16 @@ const action = async ({ request }) => {
     localStorage.setItem("token", token);
   }
 
-  // Redirect based on verification status
-  if (!json.data.user.verified) {
-    return redirect("/verify"); // Redirect to verification page if not verified
-  }
-  
-  return redirect("/dashboard"); // Redirect to dashboard if verified
-
+return {
+  status: "success",
+  token,
+  userEmail: json.data.user.email,
+  userName: json.data.user.fullname,
+  userVerified: json.data.user.verified,
+};
+    
   } catch (err) {
+    toast.error("An error occurred. Please try again.");
     return { status: "error", message: "An error occurred. Please try again." };
   }
 };

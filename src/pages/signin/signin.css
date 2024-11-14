@@ -84,7 +84,7 @@ cursor: pointer;
 
 /* MESSAGE STATUS */
 /* Style for success and error messages */
-.auth-message {
+/* .auth-message {
   padding: 1rem;
   margin: 1rem 0;
   border-radius: 4px;
@@ -102,4 +102,4 @@ cursor: pointer;
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
-}
+} */

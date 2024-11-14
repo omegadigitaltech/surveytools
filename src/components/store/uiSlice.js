@@ -27,8 +27,14 @@ const uiSlice = createSlice({
     setUserName(state, action) {
       state.userName = action.payload;
     },
+    logout(state) {
+      state.authToken = "";
+      state.isAuthenticated = false;
+      state.userEmail = "";
+      state.userName = "";
+    }
   },
 });
 
 export const uiSliceAction = uiSlice.actions;
-export default uiSlice;
+export default uiSlice.reducer;
