@@ -5,6 +5,7 @@ import backaro from "../../assets/img/backaro.svg";
 
 const PostSurvey = () => {
   const data = useActionData();
+  console.log(data)
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -12,17 +13,6 @@ const PostSurvey = () => {
   const [totalPoint, setTotalPoint] = useState('0-50');
   const [participantType, setParticipantType] = useState('undergraduate');
   const [participantPoint, setParticipantPoint] = useState('10');
-
-  // const handleContinue = () => {
-  //   console.log("Title:", title);
-  //   console.log("Description:", description);
-  //   console.log("Select Range:", selectRange);
-  //   console.log("Total Point:", totalPoint);
-  //   console.log("Participant Type:", participantType);
-  //   console.log("Participant Point:", participantPoint);
-
-  //   navigate('/surveyform'); 
-  // };
 
   return (
     <section className="postsurvey">

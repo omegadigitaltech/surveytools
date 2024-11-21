@@ -1,15 +1,18 @@
 import { Form, useActionData, useNavigation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import useAuthStore from "../../components/store/useAuthStore";
 import { toast } from "react-toastify";
 import otp from "../../assets/img/otp.png";
 import "./verify.css";
 
 const Verify = () => {
   const inputRefs = useRef([]);
+  const { signupEmail } = useAuthStore();
   const actionData = useActionData();
-  const navigation = useNavigation();
   const [isVerifying, setIsVerifying] = useState(false);
   const [hasDisplayedError, setHasDisplayedError] = useState(false); // Track if error toast has been shown
+  const [countdown, setCountdown] = useState(0); // Countdown state
+  const [canResend, setCanResend] = useState(false); // State to enable/disable resend action
 
   const handleInputChange = (e, index) => {
     const value = e.target.value;
@@ -39,11 +42,32 @@ const Verify = () => {
       e.target.appendChild(otpField);
       setIsVerifying(true);
       setHasDisplayedError(false); // Reset error display for new submission
+      // Start the countdown
+      setCountdown(40); // Start at 40 seconds
+      setCanResend(false); // Disable the resend button during countdown
     } else {
       e.preventDefault();  // Block submission if OTP isn't valid
       setIsVerifying(false);
       toast.error("Please enter a 4-digit code.");
     }
+  };
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (countdown === 0) {
+      setCanResend(true); // Enable resend action when countdown ends
+    }
+  }, [countdown]);
+
+  const handleResend = () => {
+    // Reset countdown and disable resend button
+    setCountdown(40);
+    setCanResend(false);
+
+    // Add your logic here to handle resend action (e.g., API call)
+    toast.info("Verification code resent.");
   };
 
   useEffect(() => {
@@ -69,7 +93,7 @@ const Verify = () => {
           <div className="verify_info flex">
             <div className="v_info">
               <h3>Fill in the box below with the code</h3>
-              <p>Check the verification code sent to your email adegoke******@email.com</p>
+              <p>Check the verification code sent to {signupEmail}</p>
             </div>
             <img src={otp} alt="OTP Illustration" />
           </div>
@@ -90,7 +114,15 @@ const Verify = () => {
                 ))}
               </div>
               <div className="flex verify-sec">
-                <p>Didn’t receive the code? Resend (<span className="verify-count">20s</span>)</p>
+                <p>Didn’t receive the code? Resend (<span className="verify-count">
+                  {canResend ? (
+                    <button onClick={handleResend} disabled={!canResend}>
+                      Resend
+                    </button>
+                  ) : (
+                    `${countdown}s`
+                  )}
+                </span>)</p>
                 <button className="verify-enter" disabled={isVerifying}>
                   {isVerifying ? "Verifying..." : "Verify"}
                 </button>

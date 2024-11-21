@@ -16,14 +16,6 @@ const action = async ({ request }) => {
     },
     body: JSON.stringify({ code: otpCode }),
   };
- // Log details being submitted to the backend
- console.log("Submitting to backend:");
- console.log("URL:", `${config.API_URL}/verify`);
- console.log("Headers:", {
-   "Content-Type": "application/json",
-   "Authorization": `Bearer ${token}`,
- });
- console.log("Body:", { code: otpCode });
 
   try {
     const response = await fetch(API_URL, options);
@@ -33,7 +25,6 @@ const action = async ({ request }) => {
     console.log("API Response Data:", result); 
 
     const isVerified = result.status === "success";
-    console.log("Verification status:", isVerified);
 
     if (result.status !== "success") {
       console.error("Verification failed:", result.message); 
@@ -45,7 +36,7 @@ const action = async ({ request }) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(redirect("/dashboard"));
-      }, 3000); // 2-second delay for toast display
+      }, 2000); 
     });
 
 

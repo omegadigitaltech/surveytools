@@ -1,5 +1,5 @@
 import { Link, Form, useActionData } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./surveyform.css";
 import backaro from "../../assets/img/backaro.svg";
 import del from "../../assets/img/del.svg";
@@ -7,25 +7,43 @@ import add from "../../assets/img/add.svg";
 import dot from "../../assets/img/dot.svg";
 import option from "../../assets/img/option.svg";
 import copy from "../../assets/img/copy.svg";
+import Publish from "../../components/publishsurvey/publish";
+import useAuthStore from "../../components/store/useAuthStore";
+
 
 const SurveyForm = () => {
 
   const data = useActionData();
+  const { currentSurveyId } = useAuthStore();
+  console.log(currentSurveyId, "New Id")
+
+  const [isPublishVisible, setIsPublishVisible] = useState(false);
+
+  const handlePostSubmit = async () => {
+    // Assume this function is triggered when the Post button is clicked
+    try {
+      // Simulate successful response from action
+      setIsPublishVisible(true); // Show Publish component after success
+    } catch (error) {
+      console.error("Error posting questions:", error);
+    }
+  };
 
   const [questions, setQuestions] = useState([
     {
-      id: 1,
+      id: currentSurveyId,
       text: "",
       type: "Multiple Choice",
       options: [""],
     },
   ]);
 
-  const addNewQuestion = () => {
+  const addNewQuestion = (id) => {
     const newQuestion = {
-      id: questions.length + 1,
-      text: "",
-      type: "Multiple Choice",
+      questionId: id,
+      questionText: "",
+      questionType: "Multiple Choice",
+      required: "",
       options: [""],
     };
     setQuestions([...questions, newQuestion]);
@@ -64,11 +82,11 @@ const SurveyForm = () => {
     const updatedQuestions = questions.map((q) =>
       q.id === questionId
         ? {
-            ...q,
-            options: q.options.map((option, i) =>
-              i === index ? value : option
-            ),
-          }
+          ...q,
+          options: q.options.map((option, i) =>
+            i === index ? value : option
+          ),
+        }
         : q
     );
     setQuestions(updatedQuestions);
@@ -87,12 +105,16 @@ const SurveyForm = () => {
 
         <div className="form-container">
           <Form method="post" action="/surveyform">
+            {/* To pass id to action */}
+            <input type="hidden" name="currentSurveyId" value={currentSurveyId} />
+
             {questions.map((question) => (
               <div className="oneQuestion" key={question.id}>
                 <div className="question-field flex">
                   <input
                     className="question-input"
                     type="text"
+                    name="questionText"
                     required
                     placeholder="Untitled Question"
                     value={question.text}
@@ -119,6 +141,7 @@ const SurveyForm = () => {
                   <div className="wrap-icon flex">
                     <img src={dot} className="dot-icon" alt="Dot" />
                     <select
+                      name="questionType"
                       value={question.type}
                       onChange={(e) =>
                         handleQuestionChange(question.id, "type", e.target.value)
@@ -136,6 +159,7 @@ const SurveyForm = () => {
                         <div className="wrap-icon flex" key={index}>
                           <input
                             type="text"
+                            name="options"
                             placeholder={`Option ${index + 1}`}
                             value={option}
                             onChange={(e) =>
@@ -163,16 +187,15 @@ const SurveyForm = () => {
               </div>
             ))}
 
-<button className="next-question flex" onClick={addNewQuestion}>
-            Next Question <img src={add} alt="Add" />
-          </button>
+            <button className="next-question flex" onClick={addNewQuestion}>
+              Next Question <img src={add} alt="Add" />
+            </button>
 
-        <button type="submit" className="post-btn">Post</button>
+            <button type="submit" className="post-btn" onClick={handlePostSubmit}>Post</button>
           </Form>
-
-         
         </div>
-
+        {/* Render Publish component conditionally */}
+        {/* {isPublishVisible && <Publish />} */}
       </div>
     </section>
   );

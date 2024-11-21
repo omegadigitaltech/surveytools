@@ -1,20 +1,19 @@
 import { redirect } from "react-router";
 import { toast } from "react-toastify";
-
-import { uiSliceAction } from "../../components/store/uiSlice";
-import callAPI from "../../utils/helpers/callAPI";
 import config from "../../config/config";
+// import { uiSliceAction } from "../../components/store/uiSlice";
+// import callAPI from "../../utils/helpers/callAPI";
 
-const action = async ({ request }) => {
-  const data = await request.formData();
+const action = async ({ formData }) => {
+  // const data = await request.formData();
   const user = {
-    first_name: data.get("firstname"),
-    last_name: data.get("lastname"),
-    email: data.get("email"),
-    password: data.get("password"),
-    confirm_password: data.get("confirm"),
+    first_name: formData.get("firstname"),
+    last_name: formData.get("lastname"),
+    email: formData.get("email"),
+    department: formData.get("department"),
+    password: formData.get("password"),
+    confirm_password: formData.get("confirm"),
   };
-  console.log(user);
 
   const API_URL = `${config.API_URL}/register`;
   const options = {
@@ -29,19 +28,18 @@ const action = async ({ request }) => {
   try {
     const resp = await fetch(API_URL, options);
     const json = await resp.json();
-    console.log(json);
-    if (json.code !== 201) throw new Error(json.msg);
-
+    if (json.code !== 201) {
+      throw new Error(json.msg);
+    }
     toast.success(json.msg);
     
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(redirect("/verify"));
-      }, 1500);
-    });
-
+    return{
+      signupEmail: json.data.user.email,
+    };
+    
   } catch (err) {
     toast.error(err.message);
+    // throw err;
   }
 
   return null;

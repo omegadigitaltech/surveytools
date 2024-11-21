@@ -1,40 +1,63 @@
 import config from "../../config/config";
 import { toast } from "react-toastify";
+// import useAuthStore from "../../components/store/useAuthStore";
 
 const action = async ({ request }) => {
-  try {
-    // Parsing form data and logging it
-    const formData = await request.formData();
-    const questions = JSON.parse(formData.get("questions"));
-    console.log("Parsed questions:", questions);
 
-    // Making the API request
-    const response = await fetch(`${config.API_URL}/surveys`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json",
+  // const {currentSurveyId} = useAuthStore()
+
+  const formData = await request.formData();
+  const currentSurveyId = formData.get("currentSurveyId");
+  const questionType = formData.get("questionType");
+  const questionText = formData.get("questionText");
+  const options = formData.getAll("options");
+  // Convert the array of options into a single string
+  const optionsString = options.join(",");
+
+  const questions = {
+    questionId: currentSurveyId,
+    questionType: questionType,
+    questionText: questionText,
+    required: "",
+    options: optionsString,
+  }
+
+  console.log("Parsed questions:", questions);
+
+  const API_URL = `${config.API_URL}/surveys/${currentSurveyId}questions`;
+  const API_option = {
+    body: JSON.stringify(questions),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
       "Allow-Control-Allow-Origin": "*"
-       },
-      body: JSON.stringify({ questions }),
-    });
 
+    },
+  };
+
+  // Making the API request
+  const response = await fetch(API_URL, API_option);
+  const json = await response.json();
+
+  console.log(json)
+
+  try {
     // Log response status and text
     console.log("Response status:", response.status);
     console.log("Response text:", await response.text());
 
-    // Check if the request was successful
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Error response text:", response.status, "Details:", errorText);
       throw new Error("Failed to submit survey");
-    } else {
-      console.log("Survey submitted successfully");
-    }
+    } 
+    toast.success("Questions Added")
+    // return new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     resolve(redirect("/dashboard"));
+    //   }, 1500); 
+    // });
 
-    // If successful, show success toast
-    toast.success("Survey submitted successfully!");
   } catch (error) {
-    // Show error toast and log the error
-    toast.error("Error submitting survey");
+    toast.error("Error adding questions");
     console.error("Caught error:", error);
   }
   return null;

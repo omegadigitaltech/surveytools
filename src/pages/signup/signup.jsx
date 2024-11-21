@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Form, Link, useActionData } from "react-router-dom";
+import { Form, Link, useActionData, useNavigate, } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-
+import useAuthStore from "../../components/store/useAuthStore";
+import action from "./action";
 import "./signup.css";
 import "../utils.css";
-
 import features from "../../assets/img/illustration-signup.svg";
 import iconHide from "../../assets/img/icon-eye-hide.svg";
 import iconShow from "../../assets/img/icon-eye-show.svg";
 
 const SignUp = () => {
-  const actionData = useActionData();
+  const navigate = useNavigate();
+  const setSignupEmail = useAuthStore((state) => state.setSignupEmail);
+  // const actionData = useActionData();
   const [showPassword, setShowPassword] = useState(false);
   const handleToggle = () => {
     setShowPassword((prevState) => !prevState);
@@ -20,14 +22,29 @@ const SignUp = () => {
   
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
-  }
-  useEffect(() => {
-    if (actionData) {
+
+    try {
+    const formData = new FormData(e.target);  
+    const response = await action({ formData });
+    
+    if (response?.status === "success") {
+      setSignupEmail(response.signupEmail);
+      setTimeout(() => {
+        setLoading(false);
+          navigate("/verify");
+      }, 1500);
+    } else {
       setLoading(false);
     }
-  }, [actionData]);
+  }
+    catch (err) {
+    console.error("Unexpected error:", err);
+    setLoading(false);
+  }
+    };
 
   return (
     <div className="auth-w4 flex">
@@ -74,6 +91,18 @@ const SignUp = () => {
               />
             </div>
             <div className="auth-w4-field auth-w4-full">
+              <label className="auth-w4-label" htmlFor="department">
+                Department
+              </label>
+              <input
+                className="auth-w4-input"
+                type="text"
+                name="department"
+                id="department"
+                required
+              />
+            </div>
+            <div className="auth-w4-field auth-w4-full">
               <label className="auth-w4-label" htmlFor="password">
                 Password
               </label>
@@ -114,7 +143,7 @@ const SignUp = () => {
             </div>
           </div>
           <label className="auth-w4-block" htmlFor="">
-            <input className="check" type="checkbox" />
+            <input className="check" type="checkbox" required />
             Agree to{" "}
             <Link className="" to="">
               terms & condition
