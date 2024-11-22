@@ -122,7 +122,7 @@ POST /register
 
 Content-Type: application/json
 
-Every other field are required except department.
+Every other field are required except instituition.
 
 .Request:
 
@@ -130,7 +130,7 @@ Every other field are required except department.
         "first_name": "test"
         'last_name": "user"
         "email": "test@gmail.com",
-        "department": "elect"
+        "instituition": "elect"
         "password": "1234",
         "confirm_password": "1234",
 

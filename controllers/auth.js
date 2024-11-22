@@ -7,7 +7,7 @@ const {url}  = require('../middleware/helper')
 
 const postRegister = async (req,res) => {
 
-    const {first_name, last_name, password, confirm_password, email, department} = req.body
+    const {first_name, last_name, password, confirm_password, email, instituition} = req.body
 
     // check for password
     if(!password || !confirm_password || !first_name || !last_name){
@@ -56,7 +56,7 @@ const postRegister = async (req,res) => {
         type: "Normal",
         fullname, 
         email, 
-        department,
+        instituition,
         password: hashedPassword,
     })
 

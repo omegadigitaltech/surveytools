@@ -42,14 +42,14 @@ const createSurvey = async (req, res, next) => {
       })
     }
   
-    // check that user has department filled
-    if(!user.department){
+    // check that user has instituition filled
+    if(!user.instituition){
       await session.abortTransaction();
       session.endSession();
       return res.status(400).json({
         status: "failure",
         code: 400,
-        msg: "To create a survey, fill in your department"
+        msg: "To create a survey, fill in your instituition"
       })
     }
   

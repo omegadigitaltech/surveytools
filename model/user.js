@@ -33,8 +33,9 @@ const UserSchema = new Schema(
     ],
       unique: true,
     },
-    department: {
+    instituition: {
       type: String,
+      required: true
     },
     bio: {
       type: String
