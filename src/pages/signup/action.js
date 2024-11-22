@@ -10,11 +10,10 @@ const action = async ({ formData }) => {
     first_name: formData.get("firstname"),
     last_name: formData.get("lastname"),
     email: formData.get("email"),
-    department: formData.get("department"),
+    instituition: formData.get("institution"),
     password: formData.get("password"),
     confirm_password: formData.get("confirm"),
   };
-
   const API_URL = `${config.API_URL}/register`;
   const options = {
     body: JSON.stringify(user),
@@ -28,15 +27,22 @@ const action = async ({ formData }) => {
   try {
     const resp = await fetch(API_URL, options);
     const json = await resp.json();
+
+    console.log(json)
     if (json.code !== 201) {
       throw new Error(json.msg);
     }
+    const token = json.token;
+  if (token) {
+    localStorage.setItem("token", token);
+  }
     toast.success(json.msg);
-    
-    return{
+
+    return {
+      status: "success",
       signupEmail: json.data.user.email,
     };
-    
+
   } catch (err) {
     toast.error(err.message);
     // throw err;

@@ -92,12 +92,12 @@ const SignUp = () => {
             </div>
             <div className="auth-w4-field auth-w4-full">
               <label className="auth-w4-label" htmlFor="department">
-                Department
+                Institution
               </label>
               <input
                 className="auth-w4-input"
                 type="text"
-                name="department"
+                name="institution"
                 id="department"
                 required
               />

@@ -6,16 +6,18 @@ const action = async ({ request }) => {
   const data = await request.formData();
   const otpCode = data.get("code");
   const API_URL = `${config.API_URL}/verify`;
-  const token = localStorage.getItem("token");
+  const authToken = localStorage.getItem("token");
   const options = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Allow-Control-Allow-Origin": "*",
-      "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      "Authorization": `Bearer ${authToken}`
     },
     body: JSON.stringify({ code: otpCode }),
   };
+
+  console.log(authToken)
 
   try {
     const response = await fetch(API_URL, options);
@@ -23,8 +25,6 @@ const action = async ({ request }) => {
 
     console.log("API Response Status:", response.status); 
     console.log("API Response Data:", result); 
-
-    const isVerified = result.status === "success";
 
     if (result.status !== "success") {
       console.error("Verification failed:", result.message); 
@@ -36,7 +36,7 @@ const action = async ({ request }) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(redirect("/dashboard"));
-      }, 2000); 
+      }, 1500); 
     });
 
 

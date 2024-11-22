@@ -34,7 +34,7 @@ const action = async ({ formData }) => {
   if (token) {
     localStorage.setItem("token", token);
   }
-
+console.log(token)
 return {
   status: "success",
   token,
