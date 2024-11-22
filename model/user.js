@@ -35,7 +35,7 @@ const UserSchema = new Schema(
     },
     instituition: {
       type: String,
-      required: true
+      required: [true, "Please provide an instituition"]
     },
     bio: {
       type: String
