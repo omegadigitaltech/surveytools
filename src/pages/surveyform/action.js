@@ -1,10 +1,10 @@
 import config from "../../config/config";
 import { toast } from "react-toastify";
-// import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../components/store/useAuthStore";
+import { redirect } from "react-router-dom";
 
 const action = async ({ request }) => {
 
-  // const {currentSurveyId} = useAuthStore()
 
   const formData = await request.formData();
   const currentSurveyId = formData.get("currentSurveyId");
@@ -14,24 +14,25 @@ const action = async ({ request }) => {
   // Convert the array of options into a single string
   const optionsString = options.join(",");
 
+  const token = localStorage.getItem("token");
   const questions = {
     questionId: currentSurveyId,
-    questionType: questionType,
+    questionType: "fill_in",
     questionText: questionText,
     required: "",
-    options: optionsString,
+    options: "",
   }
 
-  console.log("Parsed questions:", questions);
+  console.log(questions)
 
-  const API_URL = `${config.API_URL}/surveys/${currentSurveyId}questions`;
+  const API_URL = `${config.API_URL}/surveys/${currentSurveyId}/questions`;
   const API_option = {
     body: JSON.stringify(questions),
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Allow-Control-Allow-Origin": "*"
-
+      "Allow-Control-Allow-Origin": "*",
+      "Authorization": `Bearer ${token}`
     },
   };
 
@@ -43,18 +44,20 @@ const action = async ({ request }) => {
 
   try {
     // Log response status and text
-    console.log("Response status:", response.status);
-    console.log("Response text:", await response.text());
 
-    if (!response.ok) {
-      throw new Error("Failed to submit survey");
-    } 
+    // if (!response.ok) {
+    //   throw new Error("Failed to submit survey");
+    // } 
     toast.success("Questions Added")
-    // return new Promise((resolve) => {
-    //   setTimeout(() => {
-    //     resolve(redirect("/dashboard"));
-    //   }, 1500); 
-    // });
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(null)
+        // resolve(redirect("/dashboard"));
+      }, 1500); 
+    });
+    // return {
+    //   status: "success"
+    // }
 
   } catch (error) {
     toast.error("Error adding questions");

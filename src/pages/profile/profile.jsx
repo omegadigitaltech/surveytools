@@ -12,7 +12,7 @@ const Profile = () => {
 
     return (
         <>
-<Publish/>
+{/* <Publish/> */}
             <Complete />
             <Logout />
             <section className="Profile-section">

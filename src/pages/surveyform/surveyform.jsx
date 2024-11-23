@@ -14,8 +14,8 @@ import useAuthStore from "../../components/store/useAuthStore";
 const SurveyForm = () => {
 
   const data = useActionData();
-  const { currentSurveyId } = useAuthStore();
-  console.log(currentSurveyId, "New Id")
+  console.log(data)
+  const { currentSurveyId } = useAuthStore();git 
 
   const [isPublishVisible, setIsPublishVisible] = useState(false);
 
@@ -28,6 +28,8 @@ const SurveyForm = () => {
       console.error("Error posting questions:", error);
     }
   };
+
+  
 
   const [questions, setQuestions] = useState([
     {
@@ -148,8 +150,8 @@ const SurveyForm = () => {
                       }
                       className="choice-select"
                     >
-                      <option value="Multiple Choice">Multiple Choice</option>
-                      <option value="Single Choice">Single Choice</option>
+                      <option value="Multiple Choice" key="multiple">Multiple Choice</option>
+                      <option value="Single Choice" key="single">Single Choice</option>
                     </select>
                   </div>
 
@@ -195,7 +197,7 @@ const SurveyForm = () => {
           </Form>
         </div>
         {/* Render Publish component conditionally */}
-        {/* {isPublishVisible && <Publish />} */}
+        {isPublishVisible && <Publish id={currentSurveyId} />}
       </div>
     </section>
   );

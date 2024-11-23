@@ -5,7 +5,7 @@ import useAuthStore from "../../components/store/useAuthStore";
 
 const action = async ({ request }) => {
   // Experiment
-  const authToken = localStorage.getItem("authToken");
+  const authToken = localStorage.getItem("token");
   console.log(authToken)
   // const isLoggedIn = !!authToken;
   // console.log("User logged in:", isLoggedIn);
