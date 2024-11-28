@@ -9,23 +9,31 @@ import option from "../../assets/img/option.svg";
 import copy from "../../assets/img/copy.svg";
 import Publish from "../../components/publishsurvey/publish";
 import useAuthStore from "../../components/store/useAuthStore";
-
+import { toast } from "react-toastify";
 
 const SurveyForm = () => {
 
   const data = useActionData();
   console.log(data)
-  const { currentSurveyId } = useAuthStore();git 
+  const { currentSurveyId } = useAuthStore();
 
   const [isPublishVisible, setIsPublishVisible] = useState(false);
+  const [isPosting, setIsPosting] = useState(false);
 
-  const handlePostSubmit = async () => {
+  const handlePostSubmit = async (e) => {
+    e.preventDefault()
     // Assume this function is triggered when the Post button is clicked
     try {
+      setIsPosting(true);
       // Simulate successful response from action
-      setIsPublishVisible(true); // Show Publish component after success
+      toast.success("Survey posted successfully!",{
+        onClose: () => setIsPublishVisible(true), // Show Publish after toast closes
+        autoClose: 1500, // Delay to show Publish component
+      }); // Show Publish component after success
     } catch (error) {
       console.error("Error posting questions:", error);
+    } finally {
+      setIsPosting(false); // Reset posting state
     }
   };
 
@@ -193,7 +201,10 @@ const SurveyForm = () => {
               Next Question <img src={add} alt="Add" />
             </button>
 
-            <button type="submit" className="post-btn" onClick={handlePostSubmit}>Post</button>
+            <button type="submit" className="post-btn" onClick={handlePostSubmit}
+            disabled={isPosting}>
+               {isPosting ? "Posting..." : "Post"}
+            </button>
           </Form>
         </div>
         {/* Render Publish component conditionally */}

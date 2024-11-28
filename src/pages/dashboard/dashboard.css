@@ -86,6 +86,10 @@ border-bottom: 2.5px solid var(--base);
 .survey_info{
     margin-bottom: 1.5rem;
 }
+.survey_info a{
+    margin-bottom: 1.5rem;
+    color: var(--base);
+}
 .survey_class{
     justify-content: space-between;
 }
@@ -95,10 +99,12 @@ border-bottom: 2.5px solid var(--base);
 .dept, .participants {
     gap: 1rem;
 }
-.survey_class .dept,.participants{
+.survey_class .dept, .participants{
     color: var(--gray)
 }
-
+.participants p{
+    margin-bottom: 0 !important;
+}
 
 @media(max-width:512px){
 .search{
