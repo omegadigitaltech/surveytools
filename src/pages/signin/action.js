@@ -41,6 +41,7 @@ return {
   userEmail: json.data.user.email,
   userName: json.data.user.fullname,
   userVerified: json.data.user.verified,
+  Department: json.data.user.department,
 };
     
   } catch (err) {

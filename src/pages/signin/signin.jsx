@@ -36,7 +36,7 @@ const SignIn = () => {
   
     // Check if login was successful and set auth data in Zustand store
     if (response?.status === "success") {
-      setAuthData(response.token, response.userEmail, response.userName);
+      setAuthData(response.token, response.userEmail, response.userName, response.Department);
       setTimeout(() => {
         if (response.userVerified) {
           navigate("/dashboard");

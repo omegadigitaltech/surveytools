@@ -8,11 +8,12 @@ const useAuthStore = create(
       isAuthenticated: false,
       userEmail: '',
       userName: '',
+      Department: '',
       currentSurveyId: '',
       signupEmail: '',
       // Action to set authentication data after successful login
-      setAuthData: (token, email, name) => {
-        set({ authToken: token, isAuthenticated: true, userEmail: email, userName: name });
+      setAuthData: (token, email, name, department) => {
+        set({ authToken: token, isAuthenticated: true, userEmail: email, userName: name, Department: department, });
       },
 
       setSignupEmail: (email) => {

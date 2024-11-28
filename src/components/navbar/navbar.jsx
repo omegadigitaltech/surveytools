@@ -68,11 +68,6 @@ const Navbar = () => {
                                 Post Survey
                               </NavLink>
                             </li>
-                            <li className="header-w2-item show">
-                              <button className="header-w2-link" onClick={handleLogout}>
-                                Log Out
-                              </button>
-                            </li>
                           </>
                         )}
                         {!isLoggedIn && (
@@ -93,7 +88,7 @@ const Navbar = () => {
                 </div>
                 {isLoggedIn && (
                   <div className="header-w3 show">
-                      <button className="header-w3-bell">
+                      <button className="header-w3-bell"  onClick={() => navigate('/notifications')}>
                           <img className="header-w3-icon" src={iconBell} alt="bell" />
                       </button>
                       <button className="header-w3-chip" onClick={() => navigate('/profile')}>
@@ -102,7 +97,7 @@ const Navbar = () => {
                           </div>
                           {userName}
                       </button>
-                      <NavLink className="header-w3-link" to="/">
+                      <NavLink className="header-w3-link" onClick={handleLogout}>
                           <img className="header-w3-icon" src={iconLogOut} alt="logout" />
                       </NavLink>
                   </div>

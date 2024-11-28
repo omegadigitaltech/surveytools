@@ -2,19 +2,15 @@ import { Link, Form } from "react-router-dom";
 import backaro from "../../assets/img/backaro.svg";
 import "./profile.css"
 import data from "../../utils/content/data";
-import Complete from "../../components/completed/complete"
-import Logout from "../../components/logout/logout"
-import Publish from "../../components/publishsurvey/publish";
+import useAuthStore from "../../components/store/useAuthStore";
+// import Complete from "../../components/completed/complete"
+// import Logout from "../../components/logout/logout"
+// import Publish from "../../components/publishsurvey/publish";
 
 const Profile = () => {
-
-    const useInfos = data.userInfos[0]
+    const { userName, Department} = useAuthStore();
 
     return (
-        <>
-{/* <Publish/> */}
-            <Complete />
-            <Logout />
             <section className="Profile-section">
                 <div className="wrap">
                     <div className="profile-inner ">
@@ -27,7 +23,7 @@ const Profile = () => {
                         <div className="profile-body flex">
                             <div className="profile-card flex">
                                 <div className="userImage-div">
-                                    <img src={useInfos.userPic} className="userImage" alt="" />
+                                    <img src="" className="userImage" alt="" />
                                     {/* Upload profile image */}
                                 </div>
                                 <div className="profilecard-btns flex">
@@ -43,34 +39,33 @@ const Profile = () => {
                                 <div className="profile-name-field">
                                     <h5>Name</h5>
                                     <div className="name-display info-display">
-                                        {useInfos.firstName} {useInfos.lastName}
+                                      {userName}
                                     </div>
                                     <p>Ensure to use your real name based on your bank account to help make withdrawal easier and faster</p>
                                     <div className="agesexdept grid">
                                         <div className="age-box ">
                                             <h5>Age</h5>
                                             <div className="age-display info-display">
-                                                {useInfos.age}
-
+                                       
                                             </div>
                                         </div>
                                         <div className="gender-box">
                                             <h5>Sex</h5>
                                             <div className="gender-display info-display">
-                                                {useInfos.gender}
+                                           
                                             </div>
                                         </div>
                                         <div className="dept-box">
                                             <h5>Department</h5>
                                             <div className="dept-display info-display">
-                                                {useInfos.department}
+                                          {Department}
                                             </div>
                                         </div>
                                     </div>
                                     <div className="bio-box">
                                         <h5>Bio</h5>
                                         <div className="bio-display">
-                                            {useInfos.userBio}
+
                                         </div>
                                     </div>
                                 </div>
@@ -79,7 +74,6 @@ const Profile = () => {
                     </div>
                 </div>
             </section>
-        </>
 
     )
 }

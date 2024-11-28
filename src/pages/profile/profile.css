@@ -69,7 +69,6 @@ cursor: pointer;
     background: var(--ltgray);
     padding: .8rem;
     font-weight: 500;
-    text-transform: capitalize;
     border: var(--border);
     border-radius: 7px;
 }
@@ -81,6 +80,7 @@ cursor: pointer;
 .name-display{
     font-size: 1.1rem;
     margin-bottom: .5rem;
+    text-transform: capitalize;
 
 }
 .agesexdept{
