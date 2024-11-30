@@ -161,6 +161,9 @@
     display: none;
 }
 
+button:hover{
+cursor: pointer;
+}
 @media (max-width: 512px) {}
 @media (max-width: 768px) {
     .header-w1-menu {

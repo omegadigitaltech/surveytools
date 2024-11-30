@@ -11,6 +11,8 @@ import HomeLayout from "./layout/home/home";
 import AuthLayout from "./layout/auth/auth";
 import StoreProvider from "./components/store/StoreProvider";
 import ProtectRoute from "./components/protectroute/protectroute"
+import useAuthStore from "./components/store/useAuthStore";
+import Logout from "./components/logout/logout";
 
 import Home from "./pages/home/home";
 import SignIn from "./pages/signin/signin";
@@ -59,11 +61,13 @@ const router = createBrowserRouter(
 );
 
 const App = () => {
+  const { isLogoutVisible } = useAuthStore();
   return (
     <>
       <StoreProvider>
         <RouterProvider router={router} />{" "}
         <ToastContainer position="top-right" />
+        {isLogoutVisible && <Logout />}
       </StoreProvider>
     </>
   );

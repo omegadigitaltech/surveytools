@@ -41,9 +41,8 @@ return {
   userEmail: json.data.user.email,
   userName: json.data.user.fullname,
   userVerified: json.data.user.verified,
-  Department: json.data.user.department,
+  userInst: json.data.user.instituition,
 };
-    
   } catch (err) {
     toast.error("An error occurred. Please try again.");
     return { status: "error", message: "An error occurred. Please try again." };

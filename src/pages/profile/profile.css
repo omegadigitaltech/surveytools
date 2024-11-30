@@ -87,6 +87,9 @@ cursor: pointer;
     grid-template-columns:1fr 1fr 2fr ;
     gap: 1rem;
 }
+.dept-display{
+    text-transform: capitalize;
+}
 .bio-display{
     margin-bottom: 1.5rem;
     background: var(--ltgray);

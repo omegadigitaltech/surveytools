@@ -8,12 +8,14 @@ const useAuthStore = create(
       isAuthenticated: false,
       userEmail: '',
       userName: '',
-      Department: '',
+      userInst: '',
       currentSurveyId: '',
       signupEmail: '',
+      isLogoutVisible: false,
+
       // Action to set authentication data after successful login
-      setAuthData: (token, email, name, department) => {
-        set({ authToken: token, isAuthenticated: true, userEmail: email, userName: name, Department: department, });
+      setAuthData: (token, email, name, inst) => {
+        set({ authToken: token, isAuthenticated: true, userEmail: email, userName: name, userInst: inst, });
       },
 
       setSignupEmail: (email) => {
@@ -23,7 +25,12 @@ const useAuthStore = create(
       setSurveyId: (surveyId) => {
         set({ currentSurveyId: surveyId });
       },
-      // Action to clear user data on logout
+
+       // Actions for logout confirmation
+       showLogoutConfirmation: () => set({ isLogoutVisible: true }),
+       hideLogoutConfirmation: () => set({ isLogoutVisible: false }),
+     
+       // Action to clear user data on logout
       logout: () => {
         set({ authToken: '', isAuthenticated: false, userEmail: '', userName: '', currentSurveyId: '' });
       }

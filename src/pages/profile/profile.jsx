@@ -3,12 +3,10 @@ import backaro from "../../assets/img/backaro.svg";
 import "./profile.css"
 import data from "../../utils/content/data";
 import useAuthStore from "../../components/store/useAuthStore";
-// import Complete from "../../components/completed/complete"
-// import Logout from "../../components/logout/logout"
-// import Publish from "../../components/publishsurvey/publish";
+
 
 const Profile = () => {
-    const { userName, Department} = useAuthStore();
+    const { userName, userInst} = useAuthStore();
 
     return (
             <section className="Profile-section">
@@ -56,9 +54,9 @@ const Profile = () => {
                                             </div>
                                         </div>
                                         <div className="dept-box">
-                                            <h5>Department</h5>
+                                            <h5>Institution</h5>
                                             <div className="dept-display info-display">
-                                          {Department}
+                                          {userInst}
                                             </div>
                                         </div>
                                     </div>
