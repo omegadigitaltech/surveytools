@@ -3,7 +3,7 @@ import backaro from "../../assets/img/backaro.svg";
 import "./profile.css"
 import data from "../../utils/content/data";
 import useAuthStore from "../../components/store/useAuthStore";
-
+import user from "../../assets/img/user.png"
 
 const Profile = () => {
     const { userName, userInst} = useAuthStore();
@@ -21,7 +21,7 @@ const Profile = () => {
                         <div className="profile-body flex">
                             <div className="profile-card flex">
                                 <div className="userImage-div">
-                                    <img src="" className="userImage" alt="" />
+                                    <img src={user} className="userImage" alt="" />
                                     {/* Upload profile image */}
                                 </div>
                                 <div className="profilecard-btns flex">

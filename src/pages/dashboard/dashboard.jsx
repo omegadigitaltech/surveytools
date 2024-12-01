@@ -3,7 +3,8 @@ import sort from "../../assets/img/sort.svg";
 import dept from "../../assets/img/dept.svg";
 import members from "../../assets/img/members.svg";
 import "./dashboard.css"
-
+import view from "../../assets/img/eye.svg"
+import nextaro from "../../assets/img/nextaro.svg"
 
 import { Form, Link, useNavigate } from "react-router-dom";
 
@@ -14,6 +15,22 @@ const dashboard = () => {
   return (
     <section className="dashboard">
       <div className="dashboard_inner wrap">
+
+      <div class="points-board">
+            <div class="points-head flex">
+              <div class="points-label flex">
+                Points Balance:
+                <img src={view}  alt="View Points" />
+              </div>
+            <div class="transactions-history">
+              <Link href="">Transactions History <img src={nextaro} alt="" /> </Link>
+            </div>
+            </div>
+            <div>
+              <div class="points-value">1500.00</div>
+            </div>
+          </div>
+
         <div className="dash_head flex">
           <Form className="classForm">
             <div className="search desktop flex">
