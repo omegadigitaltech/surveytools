@@ -27,7 +27,7 @@ const dashboard = () => {
             </div>
             </div>
             <div>
-              <div class="points-value">1500.00</div>
+              <div class="points-value">0.00</div>
             </div>
           </div>
 
