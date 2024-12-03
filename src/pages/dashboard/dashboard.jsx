@@ -6,11 +6,11 @@ import "./dashboard.css"
 import view from "../../assets/img/eye.svg"
 import nextaro from "../../assets/img/nextaro.svg"
 
-import { Form, Link, useNavigate } from "react-router-dom";
+import { Form, Link } from "react-router-dom";
+import config from "../../config/config";
+import useAuthStore from "../../components/store/useAuthStore";
 
 const dashboard = () => {
-  // Temporary navigate
-  const navigate = useNavigate();
 
   return (
     <section className="dashboard">
@@ -51,7 +51,7 @@ const dashboard = () => {
           </div>
           <div className="survey_posts">
             {/* REmove onclick it's check to next page purpose */}
-            <div className="survey_post first_post" onClick={() => navigate('/expandsurvey')}>
+            <div className="survey_post first_post">
               <div className="post_time flex">
                 <p className="posted">Posted 2hr ago</p>
                 <p className="duration">Duration: <b>20</b> min</p>

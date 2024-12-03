@@ -12,6 +12,7 @@ const useAuthStore = create(
       currentSurveyId: '',
       signupEmail: '',
       isLogoutVisible: false,
+      surveys: [],
 
       // Action to set authentication data after successful login
       setAuthData: (token, email, name, inst) => {
@@ -24,6 +25,9 @@ const useAuthStore = create(
 
       setSurveyId: (surveyId) => {
         set({ currentSurveyId: surveyId });
+      },
+      setSurveys: (fetchedSurveys) => {
+        set({ surveys: fetchedSurveys });
       },
 
        // Actions for logout confirmation
