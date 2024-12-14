@@ -5,12 +5,60 @@ import members from "../../assets/img/members.svg";
 import "./dashboard.css"
 import view from "../../assets/img/eye.svg"
 import nextaro from "../../assets/img/nextaro.svg"
-
+import { useEffect, useState } from "react";
 import { Form, Link } from "react-router-dom";
 import config from "../../config/config";
 import useAuthStore from "../../components/store/useAuthStore";
+import { toast } from "react-toastify";
+import { formatDistanceToNow, parseISO } from "date-fns";
 
 const dashboard = () => {
+
+  const [searchKey, setSearchKey] = useState("");
+  const authToken = useAuthStore((state) => state.authToken);
+  const surveys = useAuthStore((state) => state.surveys);
+  const setSurveys = useAuthStore((state) => state.setSurveys);
+
+useEffect(() => {
+  const fetchSurveys = async () => {
+    const API_URL = `${config.API_URL}/surveys`;
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    };
+
+  const response = await fetch(API_URL, options);
+  const json = await response.json();
+  
+  try {
+
+    if (!response.ok) {
+      throw new Error(json.message || "Failed to fetch surveys");
+    }
+
+  // Sort surveys by createdAt in descending order
+  const sortedSurveys = json.surveys.sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
+  setSurveys(sortedSurveys);
+    setSurveys(json.surveys);
+    
+  } catch (error) {
+    toast.error(error.message || "Error fetching surveys");
+    console.error("Error fetching surveys:", error);
+  }
+  }
+  fetchSurveys();
+
+},  [authToken, setSurveys])
+
+const filteredSurveys = surveys.filter((survey) =>
+  survey.title.toLowerCase().includes(searchKey.toLowerCase())
+);
 
   return (
     <section className="dashboard">
@@ -50,57 +98,50 @@ const dashboard = () => {
             <h3>My Surveys</h3>
           </div>
           <div className="survey_posts">
-            {/* REmove onclick it's check to next page purpose */}
-            <div className="survey_post first_post">
-              <div className="post_time flex">
-                <p className="posted">Posted 2hr ago</p>
-                <p className="duration">Duration: <b>20</b> min</p>
-              </div>
-              <div className="survey_details flex">
-                <h3 className="survey_title">Diet and Excercise survey</h3>
-                <h4 className="point">20Pts</h4>
-              </div>
-              <p className="survey_info">
-                This survey is part of a research that seeks how student sees the environment around and the response
-                to it, how to get to relate with Natureand feel their environment. <a href="">...see more</a>
-              </p>
-              <div className="survey_class flex">
-                <div className="dept flex">
-                  <img src={dept} alt="" />
-                  <h4 className="department">Dept. of <span className="dept">Foreign Languages</span></h4>
-                </div>
-                <div className="participants flex">
-                  <img src={members} alt="" />
-                  <p> <span className="num_participant">20</span> Participants</p>
-                </div>
-              </div>
-            </div>
-            <div className="survey_post">
-              <div className="post_time flex">
-                <p className="posted">Posted 2hr ago</p>
-                <p className="duration">Duration: <b>20</b> min</p>
-              </div>
-              <div className="survey_details flex">
-                <h3 className="survey_title">Transport Management</h3>
-                <h4 className="point">20Pts</h4>
-              </div>
-              <p className="survey_info">
-                This survey is part of a research that seeks how student sees the environment around and the response
-                to it, how to get to relate with Natureand feel their environment. <a href="">...see more</a>
-              </p>
-              <div className="survey_class flex">
-                <div className="dept flex">
-                  <img src={dept} alt="" />
-                  <h4 className="department">Dept. of <span className="dept">Physics</span></h4>
-                </div>
-                <div className="participants flex">
-                  <img src={members} alt="" />
-                  <p><span className="num_participant">10</span> Participants</p>
-                </div>
-              </div>
-            </div>
-
+  {/* Remove onclick; it's for checking the next page purpose */}
+  {filteredSurveys.length > 0 ? (
+    filteredSurveys.map((survey, index) => (
+      <div
+        className={`survey_post ${index === 0 ? "first_post" : ""}`}
+        key={survey._id}
+      >
+        <div className="post_time flex">
+          <p className="posted">Posted {formatDistanceToNow(parseISO(survey.createdAt), { addSuffix: true }) || "N/A"}
+            </p>
+          <p className="duration">
+            Duration: <b>{survey.duration || 0}</b> min
+          </p>
+        </div>
+        <div className="survey_details flex">
+          <h3 className="survey_title">{survey.title}</h3>
+          <h4 className="point">{survey.point || 0} Pts</h4>
+        </div>
+        <p className="survey_info">
+          {survey.description}
+          <a href="">...see more</a>
+        </p>
+        <div className="survey_class flex">
+          <div className="dept flex">
+            <img src={dept} alt="" />
+            <h4 className="department">
+              Inst. of <span className="dept">{survey.instituition || "N/A"}</span>
+            </h4>
           </div>
+          <div className="participants flex">
+            <img src={members} alt="" />
+            <p>
+              <span className="num_participant">{survey.max_participant || 0}</span>{" "}
+              Participants
+            </p>
+          </div>
+        </div>
+      </div>
+    ))
+  ) : (
+    <p>No surveys available</p>
+  )}
+</div>
+
         </div>
 
       </div>

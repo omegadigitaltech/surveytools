@@ -121,14 +121,24 @@ border-bottom: 2.5px solid var(--base);
 .post_time{
     justify-content: space-between;
     margin-bottom: 1rem;
-    font-size: .8rem;
+    font-size: .7rem;
+}
+.post_time p{
+    font-size: .8rem ;
 }
 .survey_details{
     justify-content: space-between;
     margin-bottom: 2rem;
 }
 .survey_info{
+    font-size: .96rem;
     margin-bottom: 1.5rem;
+}
+.survey_info::first-letter{
+    text-transform: uppercase;
+}
+.survey_title{
+    text-transform: capitalize;
 }
 .survey_info a{
     margin-bottom: 1.5rem;
@@ -136,6 +146,9 @@ border-bottom: 2.5px solid var(--base);
 }
 .survey_class{
     justify-content: space-between;
+}
+.department{
+    font-size: .9rem;
 }
 .survey_class img{
     width: 1.5rem;
@@ -148,6 +161,7 @@ border-bottom: 2.5px solid var(--base);
 }
 .participants p{
     margin-bottom: 0 !important;
+    font-size: .9rem;
 }
 
 @media(max-width:512px){

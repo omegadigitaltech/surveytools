@@ -14,7 +14,7 @@ const Navbar = () => {
   // const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
-    console.log("Auth state changed:", isAuthenticated);
+    // console.log("Auth state changed:", isAuthenticated);
     // const token = localStorage.getItem("token");
     // setIsLoggedIn(!!token);
 
