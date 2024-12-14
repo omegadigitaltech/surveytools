@@ -138,7 +138,7 @@ const filteredSurveys = surveys.filter((survey) =>
       </div>
     ))
   ) : (
-    <p>No surveys available</p>
+    <p className="no_result">Opps! Survey not found..</p>
   )}
 </div>
 

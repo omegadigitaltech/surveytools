@@ -163,6 +163,9 @@ border-bottom: 2.5px solid var(--base);
     margin-bottom: 0 !important;
     font-size: .9rem;
 }
+.no_result{
+    margin: 3rem;
+}
 
 @media(max-width:512px){
 .search{
