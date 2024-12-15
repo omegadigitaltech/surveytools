@@ -555,7 +555,7 @@ const publishSurvey = async (req, res, next) => {
 
 const getAllSurveys = async (req, res, next) => {
   try {
-    const surveys = await Survey.find({published: true}).select('title description point duration max_participant createdAt updatedAt');
+    const surveys = await Survey.find({published: true});
     res.status(200).json({ status: "success", code: 200, surveys });
   } catch (error) {
     next(error);
