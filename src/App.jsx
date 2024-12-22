@@ -32,6 +32,7 @@ import Notifications from "./pages/notifications/notifications";
 import Withdraw from "./pages/withdraw/withdraw";
 import Profile from "./pages/profile/profile";
 import AnswerSurvey from "./pages/answersurvey/answersurvey"
+import Settings from "./pages/settings/settings"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -49,6 +50,7 @@ const router = createBrowserRouter(
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="profile" element={<Profile />} />
         <Route path="answersurvey" element={<AnswerSurvey/>} />
+        <Route path="settings" element={<Settings/>} />
 
         </Route>
       </Route>

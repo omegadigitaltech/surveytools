@@ -1,59 +1,69 @@
-.dashboard_inner,.dashboard,.survey_head,.survey_details,.survey_class{
+.dashboard_inner,
+.dashboard,
+.survey_head,
+.survey_details,
+.survey_class {
     flex-wrap: wrap;
 }
-.dashboard{
+
+.dashboard {
     margin-bottom: 5rem;
     margin-top: 1rem;
 }
 
 .points-board {
-    background-color: var(--base); 
+    background-color: var(--base);
     color: white;
     border-radius: 15px;
     padding: 30px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     font-size: 16px;
     width: 80%;
-    margin: 20px auto; 
+    margin: 20px auto;
     flex-wrap: wrap;
-  }
-  .points-head{
+}
+
+.points-head {
     justify-content: space-between;
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
 
-  }
-  .points-label {
+}
+
+.points-label {
     font-size: 16px;
     font-weight: bold;
     gap: 1rem;
 }
-  .points-label img{
-width: 1.8rem;
-  }
- 
- .points-value {
+
+.points-label img {
+    width: 1.8rem;
+}
+
+.points-value {
     font-size: 36px;
     font-weight: 500;
-  }
-  
-  .transactions-history a {
+}
+
+.transactions-history a {
     color: white;
     font-size: 16px;
     text-decoration: none;
     display: flex;
     align-items: center;
-  }
-  .transactions-history img{
-    width: .7rem;
-    margin-left: 1rem;
-  }
-.dash_head{
-gap: 1rem;
-justify-content: space-between;
 }
 
-.classForm{
+.transactions-history img {
+    width: .7rem;
+    margin-left: 1rem;
+}
+
+.dash_head {
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.classForm {
     width: 100%;
     max-width: 850px;
     margin: 2em 0;
@@ -84,162 +94,243 @@ form ::placeholder {
     cursor: pointer;
     justify-content: center;
 }
-.dashboard_sort{
+
+.dashboard_sort {
     gap: .5em;
     font-size: .8rem;
     /* width: 20%; */
 }
-.dashboard_sort img{
+
+.dashboard_sort img {
     border-radius: .3rem;
     padding: .5rem;
-border: 1px solid var(--base) ;
+    border: 1px solid var(--base);
 }
-.survey_head{
+
+.survey_head {
     gap: 1.5rem;
 }
-.survey_head:hover{
+
+.survey_head:hover {
     cursor: pointer;
 }
-.survey_head .active_head{
-border-bottom: 2.5px solid var(--base);
+
+.survey_head .active_head {
+    border-bottom: 2.5px solid var(--base);
 }
-.first_post{
+
+.first_post {
     background: rgb(211, 243, 240);
-    box-shadow:.4rem 0.4rem .4rem rgba(0,0,0,.1);
+    box-shadow: .4rem 0.4rem .4rem rgba(0, 0, 0, .1);
 }
-.survey_post{
+
+.survey_post {
     padding: 1rem;
     padding-top: 1.5rem;
     margin-top: 1.5rem;
     border-radius: 1rem;
     border: 1px solid #dddddd;
 }
-.survey_post:hover{
+
+.survey_post:hover {
     cursor: pointer;
 }
-.survey_posts a{
-        color: inherit; 
-        text-decoration: none; 
+
+.survey_posts a {
+    color: inherit;
+    text-decoration: none;
 }
-.post_time{
+
+.post_time {
     justify-content: space-between;
     margin-bottom: 1rem;
     font-size: .7rem;
 }
-.post_time p{
-    font-size: .8rem ;
+
+.post_time p {
+    font-size: .8rem;
 }
-.survey_details{
+
+.survey_details {
     justify-content: space-between;
     margin-bottom: 2rem;
 }
-.survey_info{
+
+.survey_info {
     font-size: .96rem;
     margin-bottom: 1.5rem;
 }
-.survey_info::first-letter{
+
+.survey_info::first-letter {
     text-transform: uppercase;
 }
-.survey_title{
+
+.survey_title {
     text-transform: capitalize;
 }
-.survey_info a{
+
+.survey_info a {
     margin-bottom: 1.5rem;
     color: var(--base);
 }
-.survey_class{
+
+.survey_class {
     justify-content: space-between;
 }
-.department{
+
+.department {
     font-size: .9rem;
 }
-.survey_class img{
+
+.survey_class img {
     width: 1.5rem;
 }
-.dept, .participants {
+
+.dept,
+.participants {
     gap: 1rem;
 }
-.survey_class .dept, .participants{
+
+.survey_class .dept,
+.participants {
     color: var(--gray)
 }
-.participants p{
+
+.participants p {
     margin-bottom: 0 !important;
     font-size: .9rem;
 }
-.no_result{
+
+.no_result {
     margin: 3rem;
 }
 
-@media(max-width:512px){
-.search{
-    gap: .5rem
-}
-.search input {
-    padding: .7em 0;
-    font-size: .9rem;
-}
-.dashboard_inner h3{
-font-size: .9rem;
-}
-.survey_info{
-    font-size: .8rem;
-}
-.dashboard_sort h3{
-    gap: .5em;
-    font-size: .8rem;
-} 
-.dashboard_sort img{
-    padding: .4rem;
-    /* width: ; */
-}
-.survey_class h4{
-    font-size: .8rem;
-}
-.num_participant{
-    font-size: .8rem;
+@media(max-width:512px) {
+    .search {
+        gap: .5rem
+    }
 
-}
-.survey_class img {
-    width: 1.2rem;
-}
-form {
-    width: 70%;
-}
-}
-@media(max-width:385px){
-    
-    .dash_head {
-    flex-wrap: wrap;
-        gap: 0rem;
+    .search input {
+        padding: .7em 0;
+        font-size: .9rem;
     }
-    form{
-        margin: 1em 0;
+
+    .dashboard_inner h3 {
+        font-size: .9rem;
     }
-    .survey_info{
+
+    .survey_info {
         font-size: .8rem;
     }
+
+    .dashboard_sort h3 {
+        gap: .5em;
+        font-size: .8rem;
+    }
+
+    .dashboard_sort img {
+        padding: .4rem;
+        /* width: ; */
+    }
+
+    .survey_class h4 {
+        font-size: .8rem;
+    }
+
+    .num_participant {
+        font-size: .8rem;
+
+    }
+
+    .survey_class img {
+        width: 1.2rem;
+    }
+
+    form {
+        width: 70%;
+    }
+}
+
+@media(max-width:385px) {
+
+    .dash_head {
+        flex-wrap: wrap;
+        gap: 0rem;
+    }
+
+    .points-board {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .points-head {
+        margin-bottom: 0.5rem;
+    }
+
+    .points-label {
+        font-size: 12.5px;
+        font-weight: 500;
+        gap: 0.2rem;
+    }
+
+    .points-label img {
+        width: 1.2rem;
+    }
+
+    .points-value {
+        font-size: 25px;
+    }
+    .dashboard_inner h3 {
+        font-size: .8rem;
+    }    
+    .dashboard_sort {
+        display: none !important;
+    }
+
+    .classForm {
+        margin: .5em 0;
+    }
+
+    form {
+        margin: 1em 0;
+    }
+
+    .survey_info {
+        font-size: .8rem;
+    }
+
     .dash_head {
         margin-bottom: 1rem;
     }
-    .post_time p{
+
+    .post_time p {
         font-size: .7rem;
     }
-    .survey_class{
+
+    .survey_class {
         gap: .5rem;
     }
-    .survey_class h4,p{
+
+    .survey_class h4, p {
+        font-size: .7rem;
+    }
+
+    .survey_details h4 {
         font-size: .9rem;
     }
-    .survey_details h4{
-        font-size: .9rem;
+
+    .survey_class img {
+        width: 15px
     }
-    .survey_class img{
-        width:15px
-    }
-    .search img{
+
+    .search img {
         width: 20px;
     }
-    .first_post{
-        box-shadow:.2rem 0.2rem .2rem rgba(0,0,0,.1);
+
+    .first_post {
+        box-shadow: .2rem 0.2rem .2rem rgba(0, 0, 0, .1);
+    }
+    .participants p {
+        font-size: 0.7rem;
     }
 }

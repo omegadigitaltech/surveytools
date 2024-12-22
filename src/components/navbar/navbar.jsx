@@ -10,29 +10,10 @@ const Navbar = () => {
   // const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { userName, showLogoutConfirmation,  isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
-  // Log out
-  // const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
-    // console.log("Auth state changed:", isAuthenticated);
-    // const token = localStorage.getItem("token");
-    // setIsLoggedIn(!!token);
-
-
-    // const token = localStorage.getItem("token");
-    // if (token) {
-    //   setIsLoggedIn(true); // Assume logged in if token exists
-    // } else {
-    //   setIsLoggedIn(false);
-    // }
+    
   }, [isAuthenticated]);
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem("token");
-  //   setIsLoggedIn(false);
-  //   navigate("/signin");
-  //   logout();
-  // };
 
   return (
     <header className={`header${isAuthenticated ? " header-logged" : ""}`}>
@@ -99,7 +80,8 @@ const Navbar = () => {
               <div className="header-w3-user">
                 <img className="header-w3-icon" src={iconUser} alt="user" />
               </div>
-              {userName}
+              <span className="username">{userName}</span>
+              
             </button>
             <button className="header-w3-link" onClick={showLogoutConfirmation}>
               <img className="header-w3-icon" src={iconLogOut} alt="logout" />
