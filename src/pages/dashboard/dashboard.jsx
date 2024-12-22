@@ -45,7 +45,6 @@ useEffect(() => {
   );
 
   setSurveys(sortedSurveys);
-    setSurveys(json.surveys);
     
   } catch (error) {
     toast.error(error.message || "Error fetching surveys");
@@ -64,18 +63,18 @@ const filteredSurveys = surveys.filter((survey) =>
     <section className="dashboard">
       <div className="dashboard_inner wrap">
 
-      <div class="points-board">
-            <div class="points-head flex">
-              <div class="points-label flex">
+      <div className="points-board">
+            <div className="points-head flex">
+              <div className="points-label flex">
                 Points Balance:
                 <img src={view}  alt="View Points" />
               </div>
-            <div class="transactions-history">
-              <Link href="">Transactions History <img src={nextaro} alt="" /> </Link>
+            <div className="transactions-history">
+              {/* <Link href="">Transactions History <img src={nextaro} alt="" /> </Link> */}
             </div>
             </div>
             <div>
-              <div class="points-value">0.00</div>
+              <div className="points-value">0.00</div>
             </div>
           </div>
 
@@ -101,6 +100,7 @@ const filteredSurveys = surveys.filter((survey) =>
   {/* Remove onclick; it's for checking the next page purpose */}
   {filteredSurveys.length > 0 ? (
     filteredSurveys.map((survey, index) => (
+    <Link key={survey._id}  to={`/expandsurvey/${survey._id}`}>
       <div
         className={`survey_post ${index === 0 ? "first_post" : ""}`}
         key={survey._id}
@@ -124,7 +124,7 @@ const filteredSurveys = surveys.filter((survey) =>
           <div className="dept flex">
             <img src={dept} alt="" />
             <h4 className="department">
-              Inst. of <span className="dept">{survey.instituition || "N/A"}</span>
+              Inst. of <span className="dept">{survey.institution || "N/A"}</span>
             </h4>
           </div>
           <div className="participants flex">
@@ -136,6 +136,7 @@ const filteredSurveys = surveys.filter((survey) =>
           </div>
         </div>
       </div>
+      </Link>
     ))
   ) : (
     <p className="no_result">Opps! Survey not found..</p>

@@ -31,7 +31,7 @@ import Payment from "./pages/payment/payment";
 import Notifications from "./pages/notifications/notifications";
 import Withdraw from "./pages/withdraw/withdraw";
 import Profile from "./pages/profile/profile";
-
+import AnswerSurvey from "./pages/answersurvey/answersurvey"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -41,13 +41,15 @@ const router = createBrowserRouter(
 
         <Route element={<ProtectRoute />}>
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="expandsurvey" element={<ExpandSurvey />} />
+        <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
         <Route path="postsurvey" element={<PostSurvey />} action={surveyAction}/>
         <Route path="surveyform" element={<SurveyForm />} action={postAction}/>
         <Route path="payment" element={<Payment />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="answersurvey" element={<AnswerSurvey/>} />
+
         </Route>
       </Route>
 
