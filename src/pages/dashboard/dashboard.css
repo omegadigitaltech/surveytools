@@ -280,9 +280,11 @@ form ::placeholder {
     .points-value {
         font-size: 25px;
     }
+
     .dashboard_inner h3 {
         font-size: .8rem;
-    }    
+    }
+
     .dashboard_sort {
         display: none !important;
     }
@@ -311,12 +313,13 @@ form ::placeholder {
         gap: .5rem;
     }
 
-    .survey_class h4, p {
+    .survey_class h4,
+    p {
         font-size: .7rem;
     }
 
     .survey_details h4 {
-        font-size: .9rem;
+        font-size: .8rem;
     }
 
     .survey_class img {
@@ -330,6 +333,7 @@ form ::placeholder {
     .first_post {
         box-shadow: .2rem 0.2rem .2rem rgba(0, 0, 0, .1);
     }
+
     .participants p {
         font-size: 0.7rem;
     }

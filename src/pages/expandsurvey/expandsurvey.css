@@ -1,70 +1,176 @@
-.loading_survey{
+.loading_survey {
     text-align: center;
     font-size: 1.2rem;
     font-style: italic;
     margin: 3rem 0;
 }
-.center{
+
+.expand_class {
+    flex-wrap: wrap;
+}
+
+.expand p {
+    margin-bottom: 0rem;
+}
+
+.center {
     align-items: center;
     justify-content: space-between;
 }
-.expand{
+
+.expand {
     margin-bottom: 4rem;
 }
-.backaro{
+
+.backaro {
     width: .7rem;
     margin: 2.5rem 0;
 }
-.description{
+
+.description {
     margin-right: 6rem;
 }
-.description h4{
-    font-style: italic ;
+
+.description h4 {
+    font-style: italic;
     text-decoration: underline;
-margin-bottom: 1rem;
+    margin-bottom: 1rem;
 }
-.description p{
+
+.description p {
     font-size: .9rem;
     margin-bottom: 2rem;
 }
-.pre_participants h4{
+
+.pre_participants h4 {
     margin-bottom: 1rem;
-    font-style: italic ;
+    font-style: italic;
     text-decoration: underline;
-}
-.pre_participants ul{
-    list-style:inside;
-    font-size: .9rem;
-}
-.pre_participants li{
-margin-bottom: .5rem;
-font-size: .8rem;
-}
-.activities{
-    margin-bottom: 4rem;
-}
-.activities .activity_row{
-margin-bottom: 2rem;
-}
-.activities h4{
-    margin: 2rem 0;
-    font-style: italic ;
-    text-decoration: underline;
-}
-.activity_row li{
-    list-style:inside;
 }
 
-.activity_row .required_no{
+.pre_participants ul {
+    list-style: inside;
+    font-size: .9rem;
+}
+
+.pre_participants li {
+    margin-bottom: .5rem;
+    font-size: .8rem;
+}
+
+.activities {
+    margin-bottom: 4rem;
+}
+
+.activities .activity_row {
+    margin-bottom: 2rem;
+}
+
+.activities h4 {
+    margin: 2rem 0;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+.activity_row li {
+    list-style: inside;
+}
+
+.activity_row .required_no {
     text-align: left;
 }
-.activities .participant_no{
+
+.activities .participant_no {
     font-weight: 600;
 }
-.btn_div{
+
+.expand_class img {
+    width: 1.5rem;
+}
+
+.expand_class {
+    justify-content: space-between;
+}
+
+.expand_class .dept,
+.participants {
+    color: var(--gray)
+}
+
+.btn_div {
     justify-content: center;
 }
 
-.start-btn:hover{
+.start-btn:hover {
     cursor: pointer;
+}
+
+@media (max-width: 512px) {
+    .expand_class h4 {
+        font-size: .8rem;
+    }
+
+    .expand_class img {
+        width: 1.2rem;
+    }
+}
+
+@media (max-width: 385px) {
+    .loading_survey {
+        font-size: 1rem;
+    }
+
+    .expand_title {
+        font-size: 1rem;
+    }
+
+    .expand_info {
+        font-size: .9rem;
+    }
+
+    .description {
+        margin-right: 0rem;
+    }
+
+    .description h4 {
+        font-size: .85rem;
+    }
+
+    .description p {
+        font-size: .85rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .pre_participants {
+        font-size: .85rem;
+    }
+
+    .expand_class {
+        gap: .5rem;
+    }
+
+    .expand_class img {
+        width: 15px
+    }
+
+    .activities {
+        margin: 0 1rem;
+    }
+
+    .activities h4 {
+        font-size: .85rem;
+    }
+
+    .activities li {
+        font-size: .85rem;
+    }
+
+    .exp-mobile {
+        display: none;
+    }
+
+    .expand_class h4,
+    p {
+        font-size: .85rem;
+    }
 }

@@ -19,64 +19,64 @@ const dashboard = () => {
   const surveys = useAuthStore((state) => state.surveys);
   const setSurveys = useAuthStore((state) => state.setSurveys);
 
-useEffect(() => {
-  const fetchSurveys = async () => {
-    const API_URL = `${config.API_URL}/surveys`;
-    const options = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-    };
+  useEffect(() => {
+    const fetchSurveys = async () => {
+      const API_URL = `${config.API_URL}/surveys`;
+      const options = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      };
 
-  const response = await fetch(API_URL, options);
-  const json = await response.json();
-  
-  try {
+      const response = await fetch(API_URL, options);
+      const json = await response.json();
 
-    if (!response.ok) {
-      throw new Error(json.message || "Failed to fetch surveys");
+      try {
+
+        if (!response.ok) {
+          throw new Error(json.message || "Failed to fetch surveys");
+        }
+
+        // Sort surveys by createdAt in descending order
+        const sortedSurveys = json.surveys.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        setSurveys(sortedSurveys);
+
+      } catch (error) {
+        toast.error(error.message || "Error fetching surveys");
+        console.error("Error fetching surveys:", error);
+      }
     }
+    fetchSurveys();
 
-  // Sort surveys by createdAt in descending order
-  const sortedSurveys = json.surveys.sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  }, [authToken, setSurveys])
+
+  const filteredSurveys = surveys.filter((survey) =>
+    survey.title.toLowerCase().includes(searchKey.toLowerCase())
   );
-
-  setSurveys(sortedSurveys);
-    
-  } catch (error) {
-    toast.error(error.message || "Error fetching surveys");
-    console.error("Error fetching surveys:", error);
-  }
-  }
-  fetchSurveys();
-
-},  [authToken, setSurveys])
-
-const filteredSurveys = surveys.filter((survey) =>
-  survey.title.toLowerCase().includes(searchKey.toLowerCase())
-);
 
   return (
     <section className="dashboard">
       <div className="dashboard_inner wrap">
 
-      <div className="points-board">
-            <div className="points-head flex">
-              <div className="points-label flex">
-                Points Balance:
-                <img src={view}  alt="View Points" />
-              </div>
+        <div className="points-board">
+          <div className="points-head flex">
+            <div className="points-label flex">
+              Points Balance:
+              <img src={view} alt="View Points" />
+            </div>
             <div className="transactions-history">
               {/* <Link href="">Transactions History <img src={nextaro} alt="" /> </Link> */}
             </div>
-            </div>
-            <div>
-              <div className="points-value">0.00</div>
-            </div>
           </div>
+          <div>
+            <div className="points-value">0.00</div>
+          </div>
+        </div>
 
         <div className="dash_head flex">
           <Form className="classForm">
@@ -97,51 +97,51 @@ const filteredSurveys = surveys.filter((survey) =>
             <h3>My Surveys</h3>
           </div>
           <div className="survey_posts">
-  {/* Remove onclick; it's for checking the next page purpose */}
-  {filteredSurveys.length > 0 ? (
-    filteredSurveys.map((survey, index) => (
-    <Link key={survey._id}  to={`/expandsurvey/${survey._id}`}>
-      <div
-        className={`survey_post ${index === 0 ? "first_post" : ""}`}
-        key={survey._id}
-      >
-        <div className="post_time flex">
-          <p className="posted">Posted {formatDistanceToNow(parseISO(survey.createdAt), { addSuffix: true }) || "N/A"}
-            </p>
-          <p className="duration">
-            Duration: <b>{survey.duration || 0}</b> min
-          </p>
-        </div>
-        <div className="survey_details flex">
-          <h3 className="survey_title">{survey.title}</h3>
-          <h4 className="point">{survey.point || 0} Pts</h4>
-        </div>
-        <p className="survey_info">
-          {survey.description}
-          <a href="">...see more</a>
-        </p>
-        <div className="survey_class flex">
-          <div className="dept flex">
-            <img src={dept} alt="" />
-            <h4 className="department">
-              Inst. of <span className="dept">{survey.institution || "N/A"}</span>
-            </h4>
+            {/* Remove onclick; it's for checking the next page purpose */}
+            {filteredSurveys.length > 0 ? (
+              filteredSurveys.map((survey, index) => (
+                <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
+                  <div
+                    className={`survey_post ${index === 0 ? "first_post" : ""}`}
+                    key={survey._id}
+                  >
+                    <div className="post_time flex">
+                      <p className="posted">Posted {formatDistanceToNow(parseISO(survey.createdAt), { addSuffix: true }) || "N/A"}
+                      </p>
+                      <p className="duration">
+                        Duration: <b>{survey.duration || 0}</b> min
+                      </p>
+                    </div>
+                    <div className="survey_details flex">
+                      <h3 className="survey_title">{survey.title}</h3>
+                      <h4 className="point">{survey.point || 0} Pts</h4>
+                    </div>
+                    <p className="survey_info">
+                      {survey.description}
+                      <a href="">...see more</a>
+                    </p>
+                    <div className="survey_class flex">
+                      <div className="dept flex">
+                        <img src={dept} alt="" />
+                        <h4 className="department">
+                          Inst. of <span className="dept">{survey.institution || "N/A"}</span>
+                        </h4>
+                      </div>
+                      <div className="participants flex">
+                        <img src={members} alt="" />
+                        <p>
+                          <span className="num_participant">{survey.max_participant || 0}</span>{" "}
+                          Participants
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="no_result">Opps! Survey not found..</p>
+            )}
           </div>
-          <div className="participants flex">
-            <img src={members} alt="" />
-            <p>
-              <span className="num_participant">{survey.max_participant || 0}</span>{" "}
-              Participants
-            </p>
-          </div>
-        </div>
-      </div>
-      </Link>
-    ))
-  ) : (
-    <p className="no_result">Opps! Survey not found..</p>
-  )}
-</div>
 
         </div>
 

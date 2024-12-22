@@ -8,11 +8,11 @@ import "./navbar.css";
 
 const Navbar = () => {
   // const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { userName, showLogoutConfirmation,  isAuthenticated } = useAuthStore();
+  const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
-    
+
   }, [isAuthenticated]);
 
   return (
@@ -41,7 +41,7 @@ const Navbar = () => {
                 About Us
               </NavLink>
             </li>
-            {isAuthenticated  && (
+            {isAuthenticated && (
               <>
                 <li className="header-w2-item show header-w2-hide">
                   <NavLink className="header-w2-link" to="/dashboard">
@@ -55,7 +55,7 @@ const Navbar = () => {
                 </li>
               </>
             )}
-            {!isAuthenticated  && (
+            {!isAuthenticated && (
               <>
                 <li className="header-w2-item hide">
                   <NavLink className="header-w2-link" to="/signin">
@@ -71,7 +71,7 @@ const Navbar = () => {
             )}
           </ul>
         </div>
-        {isAuthenticated  && (
+        {isAuthenticated && (
           <div className="header-w3 show">
             <button className="header-w3-bell" onClick={() => navigate('/notifications')}>
               <img className="header-w3-icon" src={iconBell} alt="bell" />
@@ -81,7 +81,7 @@ const Navbar = () => {
                 <img className="header-w3-icon" src={iconUser} alt="user" />
               </div>
               <span className="username">{userName}</span>
-              
+
             </button>
             <button className="header-w3-link" onClick={showLogoutConfirmation}>
               <img className="header-w3-icon" src={iconLogOut} alt="logout" />

@@ -30,11 +30,11 @@ const useAuthStore = create(
         set({ surveys: fetchedSurveys });
       },
 
-       // Actions for logout confirmation
-       showLogoutConfirmation: () => set({ isLogoutVisible: true }),
-       hideLogoutConfirmation: () => set({ isLogoutVisible: false }),
-     
-       // Action to clear user data on logout
+      // Actions for logout confirmation
+      showLogoutConfirmation: () => set({ isLogoutVisible: true }),
+      hideLogoutConfirmation: () => set({ isLogoutVisible: false }),
+
+      // Action to clear user data on logout
       logout: () => {
         set({ authToken: '', isAuthenticated: false, userEmail: '', userName: '', currentSurveyId: '' });
       }
