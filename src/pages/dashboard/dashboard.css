@@ -329,7 +329,9 @@ form ::placeholder {
     .search img {
         width: 20px;
     }
-
+    .activities .activity_row {
+        margin-bottom: 1rem !important;
+    }
     .first_post {
         box-shadow: .2rem 0.2rem .2rem rgba(0, 0, 0, .1);
     }
