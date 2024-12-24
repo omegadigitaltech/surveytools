@@ -126,7 +126,7 @@ const Navbar = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink to="" className="menu-item" onClick={() => { closeMenu(); showLogoutConfirmation(); }}>
+              <NavLink to="" className="menu-item" onClick={() => { closeMenu }}>
                 Contact Us
               </NavLink>
             </li>
