@@ -21,16 +21,12 @@ const home = async (req, res) => {
 
 
 const createSurvey = async (req, res, next) => {
-
   const session = await mongoose.startSession();
   session.startTransaction();
-  console.log(req.body)
-  console.log(req.userId)
-
   
   try {
-    const {title, description, max_participant, point, duration, preferred_participants } = req.body
-    const user = await User.findOne({id: req.userId})
+    const {title, description, max_participant, point, duration, preferred_participants } = req.body;
+    const user = await User.findOne({id: req.userId});
     
     if(!user){
       await session.abortTransaction();
@@ -39,7 +35,7 @@ const createSurvey = async (req, res, next) => {
         status: "failure",
         code: 404,
         msg: "User Not Found"
-      })
+      });
     }
   
     // check that user has instituition filled
@@ -50,10 +46,11 @@ const createSurvey = async (req, res, next) => {
         status: "failure",
         code: 400,
         msg: "To create a survey, fill in your instituition"
-      })
+      });
     }
   
-    const survey = await Survey.create({
+    // First create the survey
+    const survey = await Survey.create([{
       user_id: user._id,
       title,
       description,
@@ -61,8 +58,16 @@ const createSurvey = async (req, res, next) => {
       duration,
       preferred_participants,
       max_participant
-    })
-  
+    }], { session });
+
+    // Then populate the user data
+    const populatedSurvey = await Survey.findById(survey[0]._id)
+      .populate({
+        path: 'user_id',
+        select: 'fullname email instituition pic_url'
+      })
+      .session(session);
+
     await session.commitTransaction();
     session.endSession();
     
@@ -70,14 +75,14 @@ const createSurvey = async (req, res, next) => {
       status: "success",
       code: 201,
       msg: `Survey successfully created by ${user.fullname}`,
-      survey
-    })
+      survey: populatedSurvey
+    });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
     next(error);
   }
-}
+};
 
 
 
@@ -555,8 +560,17 @@ const publishSurvey = async (req, res, next) => {
 
 const getAllSurveys = async (req, res, next) => {
   try {
-    const surveys = await Survey.find({published: true});
-    res.status(200).json({ status: "success", code: 200, surveys });
+    const surveys = await Survey.find({published: true})
+      .populate({
+        path: 'user_id',
+        select: 'fullname email instituition pic_url' // Select only the fields you want to return
+      });
+      
+    res.status(200).json({ 
+      status: "success", 
+      code: 200, 
+      surveys 
+    });
   } catch (error) {
     next(error);
   }
