@@ -14,7 +14,7 @@ const Withdraw = () => {
     return (
         <section className="withdraw-section">
             <div className="wrap withdraw-wrap">
-                <div className="form-head flex">
+                <div className="withdraw-head flex">
                     <div>
                         <Link to=""> <img src={backaro} className="withdraw-backaro backaro" /></Link>
                     </div>
