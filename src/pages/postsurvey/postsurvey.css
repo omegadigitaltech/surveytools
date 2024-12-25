@@ -1,106 +1,131 @@
-.postsurvey{
-    margin-bottom: 2rem;
+.postsurvey {
+  margin-bottom: 2rem;
 }
-.post-head h3{
-    margin: 0 auto;
+
+.post-head h3 {
+  margin: 0 auto;
 }
 
 form {
-    width: 100%;
-    max-width: 1050px;
+  width: 100%;
+  max-width: 1050px;
 }
+
 .postsurvey-field {
-    margin-bottom: var(--mb-md);
+  margin-bottom: var(--mb-md);
 }
 
 .postsurvey-label {
-    display: block;
-    margin-bottom: var(--mb-xs);
+  display: block;
+  margin-bottom: var(--mb-xs);
 }
 
 .postsurvey-input {
-    width: 80%;
-    background: var(--litgray);
-    padding: 0.5em;
-    border-radius: 6px;
-    padding: .6rem;
+  width: 80%;
+  background: var(--litgray);
+  padding: 0.5em;
+  border-radius: 6px;
+  padding: .6rem;
 }
-.surveydescription{
-    width: 100%;
-    /* height:12rem; */
-    background: var(--litgray);
-    padding: 0.5em;
-    border-radius: 6px;
+
+.surveydescription {
+  width: 100%;
+  /* height:12rem; */
+  background: var(--litgray);
+  padding: 0.5em;
+  border-radius: 6px;
 }
-.postsurvey-field textarea{
-    resize:none;
-    height:15rem; 
-    width: 100%;
-    background: var(--litgray);
-    padding: 0.5em;
-    border-radius: 6px;
-    border: none;
-    padding: 1rem;
-  }
-  .postsurvey-field textarea{
-    font-size: 1rem;
-  }
-.participants-fields{
+
+.postsurvey-field textarea {
+  resize: none;
+  height: 15rem;
+  width: 100%;
+  background: var(--litgray);
+  padding: 0.5em;
+  border-radius: 6px;
+  border: none;
+  padding: 1rem;
+}
+
+.postsurvey-field textarea {
+  font-size: 1rem;
+}
+
+.participants-fields {
   gap: 1.5rem;
   grid-template-columns: 1fr 1fr;
 }
 
-  .custom-single-value {
-    display: flex;
-    align-items: center;
-  }
-  
-  .custom-single-value span {
-    font-size: 14px;
-  }
-  
-  .react-select__dropdown-indicator {
-    padding: 0;
-  }
-  .postsurvey-field h4{ 
-margin-bottom: 1rem;
-  }
-
-  .custom-dropdown {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-  }
-  
-  .custom-select {
-    padding: 10px;
-    padding-right: 50px; 
-    border: none;
-    border-radius: 4px;
-    appearance: none;
-    background: url('../../assets/img/downaro.svg') no-repeat right center; 
-    background-size: 15px; 
-    cursor: pointer;
-    font-size: .9rem;
-    background-color: var(--litgray);
-    background-position: right 15px center;
-    font-size: var(--fs-md);
-    font-family: var(--ff-body);
-  }
-
-  #range-dropdown{
-    width: 100%;
-border-radius: 4px;
+.custom-single-value {
+  display: flex;
+  align-items: center;
 }
-.custom-select{
-  padding: 10px; 
+
+.custom-single-value span {
+  font-size: 14px;
 }
-  .custom-select::-ms-expand {
-    display: none;
+
+.react-select__dropdown-indicator {
+  padding: 0;
+}
+
+.postsurvey-field h4 {
+  margin-bottom: 1rem;
+}
+
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.custom-select {
+  padding: 10px;
+  padding-right: 50px;
+  border: none;
+  border-radius: 4px;
+  appearance: none;
+  background: url('../../assets/img/downaro.svg') no-repeat right center;
+  background-size: 15px;
+  cursor: pointer;
+  font-size: .9rem;
+  background-color: var(--litgray);
+  background-position: right 15px center;
+  font-size: var(--fs-md);
+  font-family: var(--ff-body);
+}
+
+#range-dropdown {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.custom-select {
+  padding: 10px;
+}
+
+.custom-select::-ms-expand {
+  display: none;
+}
+
+.custom-select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* MEDIA QUERY */
+@media(max-width:385px) {
+  .post-head h3 {
+    font-size: 1rem;
+  } 
+  .postsurvey_div h4 {
+    font-size: .85rem;
   }
-  
-  .custom-select:focus {
-    border-color: #007bff;
-    outline: none;
+  .participants-fields {
+    display: flex !important;
+    flex-wrap: wrap;
   }
-  
+  .custom-select{
+    font-size: .85rem;
+  }
+  }

@@ -39,7 +39,7 @@ const Footer = () => {
                         </li>
                     </ul>
                 </div>
-                <div className="footer-w2">
+                <div className="footer-w2 flex">
                     <div className="footer-w2-copy">
                         SurveyPro &copy; 2024
                     </div>

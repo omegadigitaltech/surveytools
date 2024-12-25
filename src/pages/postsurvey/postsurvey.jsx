@@ -18,7 +18,7 @@ const PostSurvey = () => {
     <section className="postsurvey">
       <div className="postsurvey_wrap wrap">
         <div className="post-head flex">
-          <Link to="/expandsurvey"><img src={backaro} className="backaro" /></Link>
+          <Link to="/dashboard"><img src={backaro} className="backaro" /></Link>
           <h3>Post Questionnaire</h3>
         </div>
         <div className="postsurvey_div">

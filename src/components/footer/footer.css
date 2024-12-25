@@ -25,6 +25,7 @@
 
 .footer-w2 {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     padding-top: 1em;
     justify-content: space-between;
@@ -52,12 +53,20 @@
     justify-content: center;
 }
 
+/* MEDIA QUERY */
+@media(max-width: 385px){
+    .footer-w2 {
+        padding-top: 1em;
+        justify-content: center;
+        gap: 1rem;
+        flex-direction: column-reverse;
+    }
+}
 @media (min-width: 48em) {
     .footer-w1 {
         display: flex;
         justify-content: space-between;
     }
-
     .footer-w1-list {
         columns: 2;
         column-gap: 5rem;

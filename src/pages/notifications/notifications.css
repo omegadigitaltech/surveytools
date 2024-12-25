@@ -123,22 +123,41 @@
     .notifcation-msg {
         font-size: .8rem;
     }
-    .clock, .notifyIcon {
+
+    .clock,
+    .notifyIcon {
         width: 1rem;
     }
-    .posted-time{
+
+    .posted-time {
         font-size: .75rem;
     }
+
     .notifyIcon {
         margin-left: .6rem;
     }
+
     .notification-time .clock {
         margin-right: 0.2rem;
     }
 }
 
 @media(max-width:385px) {
-    .notification-time{
+    .filter-field img {
+        width: 1rem;
+    }
+
+    .notification-head button,
+    .groupBy,
+    ::placeholder {
+        font-size: .8rem;
+    }
+
+    .notification-head form {
+        margin: 0.2em 0;
+    }
+
+    .notification-time {
         width: 80%;
     }
 }

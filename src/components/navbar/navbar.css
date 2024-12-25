@@ -311,6 +311,13 @@ button:hover {
 }
 
 @media (max-width: 385px) {
+    .header-w1-logo {
+font-size: 1rem;
+    }
+    .header-w3-bell, .header-w3-chip img{
+        width: 1.2rem;
+    }
+ 
     .header-w3 {
         column-gap: 0.2rem;
     }
