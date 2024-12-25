@@ -7,7 +7,7 @@
 }
 .form-head h3{
     font-size: 1.4rem;
-    font-weight: 400 !important;
+    font-weight: 500 !important;
 }
 .form-h{
     border: 1px solid var(--green);
@@ -144,9 +144,95 @@ width: 1.1rem;
     color: #fff;
     font-weight: bold;
     border-radius: 5px;
-    /* margin-left: 4.5rem; */
     margin-top: 3rem;
 }
 .post-btn:hover{
     cursor: pointer;
+}
+
+/* MEDAI QUERY */
+@media(max-width:512px) {
+    .form-head {
+        gap: 2rem
+    }
+    .form-head h3 {
+        font-size: 1.1rem;
+    }
+    .form-h {
+        padding: 1.5rem;
+        width: 85%;
+}
+.form-container {
+    width: 100%;
+    margin-left: 0rem;
+    padding: 1rem;
+}
+.copy-icon{
+    width: 1.3rem;
+}
+.delete-icon{
+    width: .8rem;
+}
+.question-option {
+    width: 0.3rem;
+    height: .7rem;
+}
+.options-list {
+    width: 100%;
+}
+.option-input {
+margin-bottom: .5rem;
+}
+.choice-field{
+    flex-wrap: wrap;
+}
+.post-btn {
+    padding: 0.6em 2.5rem;
+    font-size: .9rem;
+}
+.options-list{
+    flex-wrap: wrap;
+}
+}
+
+@media(max-width:385px) {
+    .form-head {
+        gap: 1rem
+    }
+    .form-head h3 {
+        font-size: 1rem;
+    }
+    .form-h {
+        padding: 1.2rem;
+        width: 85%;
+}
+.form-container {
+    width: 100%;
+    margin-left: 0rem;
+    padding: 1rem;
+}
+.question-input {
+    width: 75%;
+    background: var(--litgray);
+    padding: 0.8em;
+}
+.copy-icon{
+    width: 1.2rem;
+}
+.delete-icon{
+    width: .75rem;
+}
+.question-option {
+    width: 0.3rem;
+    height: .7rem;
+}
+.options-list {
+    width: 100%;
+}
+.option-input {
+margin-bottom: .5rem;
+}
+.choice-select, .option-select{
+    font-size: .8rem;
+}
 }

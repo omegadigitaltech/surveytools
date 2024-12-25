@@ -25,9 +25,8 @@ const SurveyForm = () => {
     // Assume this function is triggered when the Post button is clicked
     try {
       setIsPosting(true);
-      // Simulate successful response from action
       toast.success("Survey posted successfully!",{
-        onClose: () => setIsPublishVisible(true), // Show Publish after toast closes
+        onClose: () => setIsPublishVisible(true),
         autoClose: 1500, // Delay to show Publish component
       }); // Show Publish component after success
     } catch (error) {
@@ -109,7 +108,7 @@ const SurveyForm = () => {
             <img src={backaro} className="backaro" alt="Back" />
           </Link>
           <div className="form-h">
-            <h3>Form Page</h3>
+            <h3>Add Questions</h3>
           </div>
         </div>
 

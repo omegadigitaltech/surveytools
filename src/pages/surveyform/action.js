@@ -5,7 +5,6 @@ import { redirect } from "react-router-dom";
 
 const action = async ({ request }) => {
 
-
   const formData = await request.formData();
   const currentSurveyId = formData.get("currentSurveyId");
   const questionType = formData.get("questionType");
@@ -22,8 +21,6 @@ const action = async ({ request }) => {
     required: "",
     options: "",
   }
-
-  console.log(questions)
 
   const API_URL = `${config.API_URL}/surveys/${currentSurveyId}/questions`;
   const API_option = {
@@ -43,21 +40,13 @@ const action = async ({ request }) => {
   console.log(json)
 
   try {
-    // Log response status and text
-
-    // if (!response.ok) {
-    //   throw new Error("Failed to submit survey");
-    // } 
+   
     toast.success("Questions Added")
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(null)
-        // resolve(redirect("/dashboard"));
       }, 1500); 
     });
-    // return {
-    //   status: "success"
-    // }
 
   } catch (error) {
     toast.error("Error adding questions");
