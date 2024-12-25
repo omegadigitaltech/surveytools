@@ -1,34 +1,40 @@
+.payment {
+    margin: 2rem 4rem;
+}
 
-.payment-inner{
+.pay-head {
     gap: 4rem;
-    width: 100%;
-    align-items: normal !important;
 }
-.payform-body{
-    margin: 2rem 0;
-    width: 80%;
-    justify-content: center;
 
+.withdraw-body {
+    width: 90%;
+    margin-left: 7%;
 }
-.payform-h{
+
+.payform-h {
     width: 100% !important;
 }
-.payform-h h3{
+
+.payform-h h3 {
     font-size: 1.4rem;
-    font-weight: 400 !important;
+    font-weight: 500;
 }
-.credit-cards{
+
+.credit-cards {
     justify-content: center;
     gap: 2rem;
     margin-top: 1.2rem;
 }
-.credit-cards img{
+
+.credit-cards img {
     width: 3rem;
     margin-bottom: 1rem;
 }
-.paysection{
+
+.paysection {
     margin: 1rem 0;
 }
+
 .payform-field {
     margin-bottom: var(--mb-md);
     width: 100%;
@@ -44,13 +50,89 @@
     background: var(--litgray);
     border-radius: 6px;
     padding: 1rem;
-    border:var(--border);
+    border: var(--border);
 
 }
-.exp-cvv{
+
+.exp-cvv {
     gap: 2rem;
     width: 100%;
 }
-.submit-box{
+
+.submit-box {
     justify-content: center;
+}
+
+/* MEDIA QUERY */
+@media(max-width:780px) {
+    .pay-wrap {
+        width: 100% !important;
+    }
+}
+
+@media(max-width:550px) {
+    .payment {
+        margin: 2rem 1.5rem;
+    }
+
+    .pay-head {
+        gap: 2rem;
+    }
+
+    .form-h {
+        padding: 1rem;
+    }
+
+    .form-h h3 {
+        font-weight: 500;
+        font-size: 1rem;
+    }
+
+    .credit-cards img {
+        width: 2.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .payform-field p {
+        font-size: .8rem;
+    }
+    .payform-input {
+    padding: .8rem;
+    }
+    .exp-cvv{
+        flex-wrap: wrap;
+        gap: 0rem;
+    }
+}
+
+@media(max-width:385px) {
+    .payment {
+        margin: 1rem;
+    }
+
+    .pay-head {
+        gap: 1.5rem;
+    }
+
+    .form-h h3 {
+        font-weight: 500;
+        font-size: 1rem;
+    }
+    .credit-cards {
+        margin-top: 1rem;
+    }
+    .credit-cards img {
+        width: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .payform-field p {
+        font-size: .8rem;
+    }
+    .payform-input {
+    padding: .8rem;
+    }
+   .paysection .btn{
+        margin: 2rem 0;
+    }
 }

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import iconFb from "../../assets/img/icon-fb.svg";
 import iconLk from "../../assets/img/icon-lk.svg";
+import iconX from "../../assets/img/icon-x.png";
+import iconIg from "../../assets/img/icon-ig.svg";
 import "./footer.css";
 
 const Footer = () => {
@@ -45,16 +47,16 @@ const Footer = () => {
                     </div>
                     <div className="footer-w2-list">
                         <Link className="footer-w2-link">
-                            <img className="footer-w2-icon" src={iconFb} alt="" />
-                        </Link>
-                        <Link className="footer-w2-link">
                             <img className="footer-w2-icon" src={iconLk} alt="" />
                         </Link>
                         <Link className="footer-w2-link">
+                            <img className="footer-w2-icon tw-x" src={iconX} alt="" />
+                        </Link>
+                        <Link className="footer-w2-link">
                             <img className="footer-w2-icon" src={iconFb} alt="" />
                         </Link>
                         <Link className="footer-w2-link">
-                            <img className="footer-w2-icon" src={iconLk} alt="" />
+                            <img className="footer-w2-icon" src={iconIg} alt="" />
                         </Link>
                     </div>
                 </div>

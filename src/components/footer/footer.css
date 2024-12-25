@@ -53,6 +53,9 @@
     justify-content: center;
 }
 
+.tw-x{
+    width: 1.2rem;
+}
 /* MEDIA QUERY */
 @media(max-width: 385px){
     .footer-w2 {
@@ -60,6 +63,12 @@
         justify-content: center;
         gap: 1rem;
         flex-direction: column-reverse;
+    }
+    .footer-w2-list img{
+        width: 1.2rem;
+    }
+     .tw-x{
+        width: .8rem;
     }
 }
 @media (min-width: 48em) {
