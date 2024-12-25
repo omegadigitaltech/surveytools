@@ -25,7 +25,7 @@ const SurveyForm = () => {
     // Assume this function is triggered when the Post button is clicked
     try {
       setIsPosting(true);
-      toast.success("Survey posted successfully!",{
+      toast.success("Survey posted successfully!", {
         onClose: () => setIsPublishVisible(true),
         autoClose: 1500, // Delay to show Publish component
       }); // Show Publish component after success
@@ -36,7 +36,7 @@ const SurveyForm = () => {
     }
   };
 
-  
+
 
   const [questions, setQuestions] = useState([
     {
@@ -201,8 +201,8 @@ const SurveyForm = () => {
             </button>
 
             <button type="submit" className="post-btn" onClick={handlePostSubmit}
-            disabled={isPosting}>
-               {isPosting ? "Posting..." : "Post"}
+              disabled={isPosting}>
+              {isPosting ? "Posting..." : "Post"}
             </button>
           </Form>
         </div>

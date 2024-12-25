@@ -1,15 +1,18 @@
-.form-page{
-     margin: 1.5rem 0;
+.form-page {
+    margin: 1.5rem 0;
 }
-.form-head{
+
+.form-head {
     gap: 4rem;
     margin-bottom: 2rem;
 }
-.form-head h3{
+
+.form-head h3 {
     font-size: 1.4rem;
     font-weight: 500 !important;
 }
-.form-h{
+
+.form-h {
     border: 1px solid var(--green);
     border-top: 12px solid var(--green);
     border-radius: 3px;
@@ -18,99 +21,112 @@
     width: 80%;
     padding: 2.5rem;
 }
-.form-container{
+
+.form-container {
     width: 80%;
     /* background: red; */
     margin-left: 4.7rem;
 }
-.oneQuestion{
+
+.oneQuestion {
     margin-bottom: 1rem;
 }
-.question-field{
+
+.question-field {
     justify-content: space-between;
 }
-.question-field:hover{
+
+.question-field:hover {
     cursor: pointer;
 }
-.copy-icon{
+
+.copy-icon {
     width: 1.8rem;
 }
-.delete-icon{
+
+.delete-icon {
     width: 1.2rem;
 }
-.question-option{
+
+.question-option {
     width: .4rem;
     height: 1.2rem;
 }
-.question-input{
-     width: 80%;
-        background: var(--litgray);
-        padding: 1em;
-        border-radius: 6px;
-        border: 0.5px solid rgb(167, 167, 167);
+
+.question-input {
+    width: 80%;
+    background: var(--litgray);
+    padding: 1em;
+    border-radius: 6px;
+    border: 0.5px solid rgb(167, 167, 167);
 }
 
-.choice-field{
+.choice-field {
     margin-top: .5rem;
     gap: 1rem;
+    flex-wrap: wrap;
 }
+
 .custom-dropdown {
     position: relative;
     display: inline-block;
     width: 100%;
-  }
-  
-  .custom-select-wrapper {
+}
+
+.custom-select-wrapper {
     position: relative;
     display: flex;
     align-items: center;
-  }
-  
-  .dot-icon {
+}
+
+.dot-icon {
     position: absolute;
-    left: 10px; 
+    left: 10px;
     width: 13px;
     color: #333;
-  }
-  
-  .choice-select {
+}
+
+.choice-select {
     padding: 10px;
     padding-left: 40px;
-    border: 1px solid #ccc; 
+    border: 1px solid #ccc;
     border-radius: 4px;
     background-color: var(--wht);
     font-size: .9rem;
     cursor: pointer;
-    box-sizing: border-box; 
+    box-sizing: border-box;
     /* appearance: none;  */
     font-size: var(--fs-md);
     font-family: var(--ff-body);
-  }
+}
 
 
-  .options-list{
-    justify-content: space-between; 
+.options-list {
+    justify-content: space-between;
     width: 70%;
- }
- .option-input{
-     border: 0.5px solid rgb(167, 167, 167);
- padding: 10px;
- border-radius: 8px;
- width: 100%;
- margin-bottom: .3rem;
- }
- .option{
-     width: 65%;
- }
- 
-  .option-select {
+    flex-wrap: wrap;
+}
+
+.option-input {
+    border: 0.5px solid rgb(167, 167, 167);
     padding: 10px;
-    padding-right: 50px; 
-    border: 1px solid #ccc; 
+    border-radius: 8px;
+    width: 100%;
+    margin-bottom: .3rem;
+}
+
+.option {
+    width: 65%;
+}
+
+.option-select {
+    padding: 10px;
+    padding-right: 50px;
+    border: 1px solid #ccc;
     border-radius: 6px;
     appearance: none;
-    background: url('../../assets/img/add.svg') no-repeat right center; 
-    background-size: 17px; 
+    background: url('../../assets/img/add.svg') no-repeat right center;
+    background-size: 17px;
     cursor: pointer;
     font-size: .9rem;
     background-color: var(--litgray);
@@ -118,26 +134,30 @@
     font-size: var(--fs-md);
     font-family: var(--ff-body);
 }
-.form-container{
-        border: 1px solid var(--green);
-        border-radius: 8px;
-        width: 80%;
-        padding: 1rem 1.5rem;
-        margin-bottom: 2rem;
+
+.form-container {
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    width: 80%;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
 }
-.next-question{
+
+.next-question {
     padding: 10px;
-    border: 1px solid #ccc; 
-    border-radius: 8px; 
+    border: 1px solid #ccc;
+    border-radius: 8px;
     cursor: pointer;
     font-size: .8rem;
     background-color: var(--litgray);
     gap: .8rem;
 }
-.next-question img{
-width: 1.1rem;
+
+.next-question img {
+    width: 1.1rem;
 }
-.post-btn{
+
+.post-btn {
     display: block;
     background-color: var(--base);
     padding: 0.8em 3rem;
@@ -146,93 +166,118 @@ width: 1.1rem;
     border-radius: 5px;
     margin-top: 3rem;
 }
-.post-btn:hover{
+
+.post-btn:hover {
     cursor: pointer;
 }
 
 /* MEDAI QUERY */
+@media(max-width:1050px) {}
+
 @media(max-width:512px) {
     .form-head {
         gap: 2rem
     }
+
     .form-head h3 {
         font-size: 1.1rem;
     }
+
     .form-h {
         padding: 1.5rem;
         width: 85%;
-}
-.form-container {
-    width: 100%;
-    margin-left: 0rem;
-    padding: 1rem;
-}
-.copy-icon{
-    width: 1.3rem;
-}
-.delete-icon{
-    width: .8rem;
-}
-.question-option {
-    width: 0.3rem;
-    height: .7rem;
-}
-.options-list {
-    width: 100%;
-}
-.option-input {
-margin-bottom: .5rem;
-}
-.choice-field{
-    flex-wrap: wrap;
-}
-.post-btn {
-    padding: 0.6em 2.5rem;
-    font-size: .9rem;
-}
-.options-list{
-    flex-wrap: wrap;
-}
+    }
+
+    .form-container {
+        width: 100%;
+        margin-left: 0rem;
+        padding: 1rem;
+    }
+
+    .copy-icon {
+        width: 1.3rem;
+    }
+
+    .delete-icon {
+        width: .8rem;
+    }
+
+    .question-option {
+        width: 0.3rem;
+        height: .7rem;
+    }
+
+    .options-list {
+        width: 100%;
+    }
+
+    .option-input {
+        margin-bottom: .5rem;
+    }
+
+    .choice-field {
+        flex-wrap: wrap;
+    }
+
+    .post-btn {
+        padding: 0.6em 2.5rem;
+        font-size: .9rem;
+    }
+
+    .options-list {
+        flex-wrap: wrap;
+    }
 }
 
 @media(max-width:385px) {
     .form-head {
         gap: 1rem
     }
+
     .form-head h3 {
         font-size: 1rem;
     }
+
     .form-h {
         padding: 1.2rem;
         width: 85%;
-}
-.form-container {
-    width: 100%;
-    margin-left: 0rem;
-    padding: 1rem;
-}
-.question-input {
-    width: 75%;
-    background: var(--litgray);
-    padding: 0.8em;
-}
-.copy-icon{
-    width: 1.2rem;
-}
-.delete-icon{
-    width: .75rem;
-}
-.question-option {
-    width: 0.3rem;
-    height: .7rem;
-}
-.options-list {
-    width: 100%;
-}
-.option-input {
-margin-bottom: .5rem;
-}
-.choice-select, .option-select{
-    font-size: .8rem;
-}
+    }
+
+    .form-container {
+        width: 100%;
+        margin-left: 0rem;
+        padding: 1rem;
+    }
+
+    .question-input {
+        width: 75%;
+        background: var(--litgray);
+        padding: 0.8em;
+    }
+
+    .copy-icon {
+        width: 1.2rem;
+    }
+
+    .delete-icon {
+        width: .75rem;
+    }
+
+    .question-option {
+        width: 0.3rem;
+        height: .7rem;
+    }
+
+    .options-list {
+        width: 100%;
+    }
+
+    .option-input {
+        margin-bottom: .5rem;
+    }
+
+    .choice-select,
+    .option-select {
+        font-size: .8rem;
+    }
 }
