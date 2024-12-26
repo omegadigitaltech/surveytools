@@ -13,6 +13,7 @@ const useAuthStore = create(
       signupEmail: '',
       isLogoutVisible: false,
       surveys: [],
+      notifications: [],
 
       // Action to set authentication data after successful login
       setAuthData: (token, email, name, inst) => {
@@ -29,7 +30,9 @@ const useAuthStore = create(
       setSurveys: (fetchedSurveys) => {
         set({ surveys: fetchedSurveys });
       },
-
+      setNotifications: (fetchedNotifications) => {
+        set({ notifications: fetchedNotifications });
+      },
       // Actions for logout confirmation
       showLogoutConfirmation: () => set({ isLogoutVisible: true }),
       hideLogoutConfirmation: () => set({ isLogoutVisible: false }),

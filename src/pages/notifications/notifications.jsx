@@ -15,7 +15,8 @@ const Notifications = () => {
 
   const [searchKey, setSearchKey] = useState("");
   const [activeNotify, setActiveNotify] = useState("all-notification");
-  const [notifications, setNotifications] = useState([]);
+  const notifications = useAuthStore((state) => state.notifications);
+  const setNotifications = useAuthStore((state) => state.setNotifications);
   const authToken = useAuthStore((state) => state.authToken);
   // For Group By
   const [groupBy, setGroupBy] = useState('date');
@@ -27,6 +28,8 @@ const Notifications = () => {
 
   useEffect(() => {
     const fetchNotifications = async () => {
+      if (notifications.length > 0) return;  // Skip fetching if
+
       const API_URL = `${config.API_URL}/surveys`;
       const options = {
         method: "GET",
@@ -56,7 +59,7 @@ const Notifications = () => {
     };
 
     fetchNotifications();
-  }, [authToken]);
+  }, [authToken, notifications, setNotifications]);
 
   const filteredNotifications = notifications.filter((notification) =>
     notification.title.toLowerCase().includes(searchKey.toLowerCase())
