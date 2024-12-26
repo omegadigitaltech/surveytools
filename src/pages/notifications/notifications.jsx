@@ -1,5 +1,4 @@
 import { Form, Link } from "react-router-dom";
-// import { components } from 'react-select';
 import { useState, useEffect } from 'react';
 import { formatDistanceToNow, parseISO } from "date-fns";
 import config from "../../config/config";
@@ -118,8 +117,9 @@ const Notifications = () => {
                     <img src={profileimg} className="userImage" alt="" />
                   </div>
                   <div className="notification-info">
-                    <p className="userName">{notification.fullname} Name</p>
-                    <span className="notifcation-msg"> {notification.username}Name sent a new survey, check it out....</span>
+                    <p className="userName">{notification.user_id ? notification.user_id.fullname : "Unknown User"}
+                    </p>
+                    <span className="notifcation-msg">Sent a new survey, check it out....</span>
                   </div>
                 </div>
                 <div className="notification-time flex">

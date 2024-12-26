@@ -124,7 +124,7 @@ const dashboard = () => {
                       <div className="dept flex">
                         <img src={dept} alt="" />
                         <h4 className="department">
-                          Inst. of <span className="dept">{survey.institution || "N/A"}</span>
+                          Inst. of <span className="dept">{survey.user_id ? survey.user_id.instituition : "N/A"}</span>
                         </h4>
                       </div>
                       <div className="participants flex">
