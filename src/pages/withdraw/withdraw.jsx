@@ -16,7 +16,7 @@ const Withdraw = () => {
             <div className="wrap withdraw-wrap">
                 <div className="withdraw-head flex">
                     <div>
-                        <Link to=""> <img src={backaro} className="withdraw-backaro backaro" /></Link>
+                        <Link to="/dashboard"> <img src={backaro} className="withdraw-backaro backaro" /></Link>
                     </div>
                     <h3>Withdrawal</h3>
                 </div>
