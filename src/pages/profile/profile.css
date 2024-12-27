@@ -40,16 +40,17 @@
     margin-bottom: 3rem;
 }
 
-.profilecard-btns button {
+.profilecard-btns a{
     padding: .8rem 2rem;
     border: 2px solid black;
     font-weight: 600;
     width: 85%;
     margin-bottom: 1rem;
     border-radius: 6px;
+    text-align: center;
 }
 
-.profilecard-btns button {
+.profilecard-btns a {
     cursor: pointer;
 }
 
@@ -57,7 +58,9 @@
     border: 2px solid var(--base) !important;
     color: var(--base);
 }
-
+.edit-profile{
+    color: black;
+}
 .profile-info {
     width: 100%;
 }
@@ -148,7 +151,7 @@
         width: 50%;
     }
 
-    .profilecard-btns button {
+    .profilecard-btns a {
         width: 90%;
     }
 }
@@ -156,6 +159,9 @@
 @media(min-width: 601px) {
     .card-mob {
         display: none;
+    }
+    .mob-pro-btn{
+        display: none !important;
     }
 }
 
@@ -189,5 +195,9 @@
     }
     .agesex {
         gap: 2rem;
+    }    
+    .profilecard-btns a {
+        width: 65%;
+        font-size: .85rem;
     }    
 }

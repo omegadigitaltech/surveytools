@@ -13,7 +13,7 @@ const Profile = () => {
             <div className="wrap profile-wrap">
                 <div className="profile-inner ">
                     <div className="profile-head flex">
-                        <Link to=""> <img src={backaro} className="backaro" /></Link>
+                        <Link to="/dashboard"> <img src={backaro} className="backaro" /></Link>
                         <div className="">
                             <h3>Form Page</h3>
                         </div>
@@ -34,8 +34,8 @@ const Profile = () => {
                             </div>
                             <div className="profilecard-btns flex">
                                 <hr />
-                                <button className="settings-btn"> Settings</button>
-                                <button className="edit-profile">Edit Profile</button>
+                                <Link to="/settings" className="settings-btn"> Settings</Link>
+                                <Link to="/settings" className="edit-profile">Edit Profile</Link>
                             </div>
                         </div>
 
@@ -52,14 +52,13 @@ const Profile = () => {
                                     <div className="age-box ">
                                         <h5>Age</h5>
                                         <div className="age-display info-display">
-                                            20
+                                            
                                         </div>
                                     </div>
                                     <div className="gender-box">
                                         <h5>Sex</h5>
                                         <div className="gender-display info-display">
-                                            Male
-                                        </div>
+                                                                                    </div>
                                     </div>
                                 </div>
                                 <div className="dept-box">
@@ -74,6 +73,10 @@ const Profile = () => {
 
                                     </div>
                                 </div>
+                            </div>
+                            <div className="profilecard-btns mob-pro-btn flex ">
+                                <Link to="/settings" className="settings-btn"> Settings</Link>
+                                <Link to="/settings"  className="edit-profile">Edit Profile</Link>
                             </div>
                         </div>
                     </div>
