@@ -117,15 +117,18 @@ form {
 @media(max-width:385px) {
   .post-head h3 {
     font-size: 1rem;
-  } 
+  }
+
   .postsurvey_div h4 {
     font-size: .85rem;
   }
+
   .participants-fields {
     display: flex !important;
     flex-wrap: wrap;
   }
-  .custom-select{
+
+  .custom-select {
     font-size: .85rem;
   }
-  }
+}

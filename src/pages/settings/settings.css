@@ -1,35 +1,44 @@
-.settings{
+.settings {
     margin-top: 2rem;
     width: 100%;
 }
-.settings-inner{
+
+.settings-inner {
     gap: 2rem;
     /* margin-top: 3rem; */
     align-items: normal !important;
 
 }
-.settings-backaro{
+
+.settings-backaro {
     margin: 0 !important;
 }
-.settings-body{
+
+.settings-body {
     width: 100%;
 }
-.settings-head h3{
+
+.settings-head h3 {
     margin-bottom: 1.6rem;
     font-size: 1.4rem;
 }
-.settings-form-div h5{
+
+.settings-form-div h5 {
     margin-bottom: 1rem;
     font-size: 1.1rem;
     font-weight: 600;
 }
-.profile-names{
+
+.profile-names {
     width: 100%;
     gap: 2rem;
+    margin-bottom: 1.5rem;
 }
-.profile-names fieldset{
-border: none;
+
+.settings fieldset {
+    border: none;
 }
+
 .settings-field {
     width: 100%;
 }
@@ -37,6 +46,7 @@ border: none;
 .settings-label {
     display: block;
     margin-bottom: var(--mb-xs);
+    font-weight: 500;
 }
 
 .settings-input {
@@ -44,6 +54,74 @@ border: none;
     /* background: var(--litgray); */
     border-radius: 6px;
     padding: 1rem;
-    border:1px solid var(--gray);
+    border: 1px solid var(--gray);
+}
 
+.set-about {
+    height: 10rem;
+    margin-bottom: 1rem;
+}
+
+.profile-picture-content {
+    gap: 2rem;
+}
+
+.pr-set-img {
+    width: 8rem;
+    border-radius: 50%;
+}
+
+.btn-change {
+    display: block;
+    background-color: var(--base);
+    padding: 0.8em;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-bottom: .5rem;
+}
+
+.btn-delete {
+    display: block;
+    padding: 0.8em;
+    color: #000;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    gap: .6rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-delete img {
+    width: .8rem;
+}
+
+.settings p {
+    font-size: .9rem;
+    color: #4b4b4b;
+    margin-top: .8rem;
+}
+
+.change-password {
+    margin-bottom: 2rem;
+}
+
+.change-password label {
+    font-weight: 500;
+    margin-bottom: .4rem;
+}
+
+.change-password fieldset {
+    margin-bottom: .5rem;
+}
+
+
+/* MEDIA QUERY */
+@media(max-width: 780px) {}
+
+@media(max-width: 550px) {
+    .profile-names {
+        flex-wrap: wrap;
+    }
 }
