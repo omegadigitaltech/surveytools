@@ -6,7 +6,7 @@ import "./settings.css";
 const Settings = () => {
   return (
     <section className="settings">
-      <div className="wrap">
+      <div className="wrap settingswrap">
         <div className="settings-inner flex">
           <div className="form-head">
             <Link to="">
@@ -68,7 +68,7 @@ const Settings = () => {
                       alt="Profile"
                       className="pr-set-img"
                     />
-                    <div className="profile-actions ">
+                    <div className="profile-actions">
                       <button type="button" className="btn-change ">Change Picture</button>
                       <button type="button" className="btn-delete flex">
                         <img src={del} alt="Delete" /> Delete
@@ -120,33 +120,40 @@ const Settings = () => {
                 </div>
 
                 {/* Notifications */}
-                <div className="notifications">
+                <div className="set-notifications">
                   <h5>Notifications</h5>
                   <p>
                     Never miss any survey, we’ll let you know when a new survey that fits your profile comes up.
                   </p>
-                  <div className="notification-options">
+                  <div className="set-notify-opt">
                     <fieldset>
-                      <label>
-                        <input type="checkbox" name="email-comments" /> Comments
-                      </label>
-                      <label>
-                        <input type="checkbox" name="email-new-surveys" /> New Surveys
-                      </label>
-                      <label>
-                        <input type="checkbox" name="email-others" /> Others
-                      </label>
+                      <h5>Email</h5>
+                      <div className="mail-notify">
+                        <label>
+                          <input type="checkbox" name="email-comments" /> Comments
+                        </label>
+                        <label>
+                          <input type="checkbox" name="email-new-surveys" /> New Surveys
+                        </label>
+                        <label>
+                          <input type="checkbox" name="email-others" /> Others
+                        </label>
+                      </div>
+
                     </fieldset>
                     <fieldset>
-                      <label>
-                        <input type="checkbox" name="push-everything" /> Everything
-                      </label>
-                      <label>
-                        <input type="checkbox" name="push-same-as-email" /> Same as email
-                      </label>
-                      <label>
-                        <input type="checkbox" name="push-none" /> No notification
-                      </label>
+                      <h5>Push Notification</h5>
+                      <div className="push-notify-box">
+                        <label>
+                          <input type="checkbox" name="push-everything" /> Everything
+                        </label>
+                        <label>
+                          <input type="checkbox" name="push-same-as-email" /> Same as email
+                        </label>
+                        <label>
+                          <input type="checkbox" name="push-none" /> No notification
+                        </label>
+                      </div>
                     </fieldset>
                   </div>
                 </div>
@@ -161,7 +168,7 @@ const Settings = () => {
                 </div>
 
                 {/* Save Changes */}
-                <div className="form-actions">
+                <div className="setting-action flex">
                   <button type="button" className="btn-cancel">Cancel</button>
                   <button type="submit" className="btn-save">Save Changes</button>
                 </div>

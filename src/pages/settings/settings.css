@@ -1,6 +1,7 @@
 .settings {
     margin-top: 2rem;
     width: 100%;
+    margin-bottom: 5rem;
 }
 
 .settings-inner {
@@ -71,21 +72,21 @@
     border-radius: 50%;
 }
 
-.btn-change {
+.btn-change,
+.btn-save {
     display: block;
     background-color: var(--base);
     padding: 0.8em;
     color: #fff;
-    font-weight: bold;
+    font-weight: 500;
     border-radius: 5px;
-    margin-bottom: .5rem;
 }
 
 .btn-delete {
     display: block;
     padding: 0.8em;
     color: #000;
-    font-weight: bold;
+    font-weight: 500;
     border-radius: 5px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     gap: .6rem;
@@ -109,19 +110,146 @@
 
 .change-password label {
     font-weight: 500;
-    margin-bottom: .4rem;
+    margin-bottom: .6rem;
 }
 
 .change-password fieldset {
     margin-bottom: .5rem;
 }
 
+.set-notifications {
+    margin-bottom: 2rem;
+}
+
+.set-notifications fieldset {
+    margin-bottom: 1.4rem;
+}
+
+.set-notifications h5 {
+    font-size: 1rem;
+}
+
+.set-notify-opt label {
+    margin-right: 2.5rem;
+}
+
+.btn-delete-account {
+    color: red;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.setting-action {
+    gap: 2rem;
+    float: right;
+}
+
+.setting-action button {
+    width: 10rem;
+}
+
+.btn-cancel {
+    display: block;
+    padding: 0.8em;
+    color: #000;
+    font-weight: 500;
+    border-radius: 5px;
+    border: 1px solid #000;
+}
 
 /* MEDIA QUERY */
-@media(max-width: 780px) {}
+@media(max-width: 780px) {
+    .settingswrap {
+        width: 90% !important;
+    }
+}
 
 @media(max-width: 550px) {
+    .settingswrap {
+        width: 95% !important;
+    }
+
+    .settings-form-div {
+        margin-left: -1rem;
+    }
+
+    .settings-head h3 {
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+
+    .settings-form-div h5 {
+        font-size: .9rem;
+    }
+
+    .settings-label {
+        font-size: .9rem;
+    }
+
     .profile-names {
         flex-wrap: wrap;
+    }
+
+    .profile-names {
+        gap: 1rem
+    }
+}
+
+@media(max-width: 380px) {
+    .settings-form-div {
+        margin-left: -2rem;
+    }
+
+    .profile-picture-content {
+        gap: 1rem;
+        flex-direction: column;
+    }
+
+    .profile-actions {
+        width: 100%;
+        gap: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .profile-actions button {
+        width: 80%;
+        font-size: .85rem;
+    }
+
+    .mail-notify,
+    .push-notify-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .set-notify-opt label {
+        margin-right: 1.5rem;
+    }
+
+    .btn-delete img {
+        width: 0.7rem;
+    }
+
+    .setting-action {
+        gap: 1em;
+        float: none;
+        width: 100%;
+    }
+
+    .setting-action {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .setting-action button {
+        width: 100%;
+        font-size: 0.85rem;
+    }
+
+    .btn-delete-account {
+        margin-bottom: 2rem;
     }
 }
