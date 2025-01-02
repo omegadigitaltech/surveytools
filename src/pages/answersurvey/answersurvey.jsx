@@ -10,7 +10,7 @@ const answerSurvey = () => {
     const { id } = useParams(); // Get the survey ID from the URL
     const navigate = useNavigate();
     const authToken = useAuthStore((state) => state.authToken);
-    const [survey, setSurvey] = useState(null);
+    // const [survey, setSurvey] = useState(null);
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [answers, setAnswers] = useState({});
@@ -30,8 +30,14 @@ const answerSurvey = () => {
                 const json = await response.json();
                 if (!response.ok) throw new Error(json.msg || "Failed to fetch survey questions");
 
-                setSurvey(json.survey);
-                setQuestions(json.survey.questions || []);
+                console.log("API URL:", API_URL);
+                console.log("Auth Token:", authToken);
+                console.log("Request Headers:", options.headers);
+                console.log("Response JSON:", json);
+                
+
+                // setSurvey(json.survey);
+                setQuestions(json.questions || []);
             } catch (error) {
                 console.error("Error:", error);
             } finally {
@@ -40,13 +46,22 @@ const answerSurvey = () => {
         }
         fetchQuestions();
     }, [id, authToken]);
-
+    
+    const handleAnswerChange = (questionId, response) => {
+      setAnswers((prevAnswers) => ({
+        ...prevAnswers,
+        [questionId]: response,
+      }));
+    };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         const answerArray = Object.entries(answers).map(([questionId, response]) => ({
             questionId,
             response,
         }));
+        
+
         const API_URL = `${config.API_URL}/surveys/${id}/submit`;
         const options = {
             method: "POST",
@@ -69,7 +84,7 @@ const answerSurvey = () => {
     };
 
     if (loading) return <p>Loading survey questions...</p>;
-    if (!survey) return <p>Survey not found.</p>;
+    if (questions.length === 0) return <p>Survey not found or does not contain any questions.</p>;
 
     return (
         <section className="fillsurvey">
@@ -78,18 +93,17 @@ const answerSurvey = () => {
                     <div className="flex ans-back-title">
                         <Link to={`/expandsurvey/${id}`}> <img src={backaro} className="backaro" /></Link>
                         <div>
-                            <h3 className="survey_title">{survey.title}</h3>
+                            <h3 className="survey_title">--</h3>
                             <p className="ans-post-time">
-                                Posted <span>{new Date(survey.createdAt).toLocaleString()}</span>
+                                Posted <span>--</span>
                             </p>
                         </div>
                     </div>
                     <div>
                         <h4 className="">Points to Earn</h4>
-                        <h5 className="ans-point">{survey.point}</h5>
+                        <h5 className="ans-point">--</h5>
                     </div>
                 </div>
-
                 <Form onSubmit={handleSubmit}>
                 {questions.map((question, index) => (
             <div key={question._id} className="question-answer">
@@ -97,22 +111,22 @@ const answerSurvey = () => {
                 <span>{index + 1}.</span> {question.questionText}
               </p>
               {question.questionType === "multiple_choice" ? (
-                question.options.map((option, optIndex) => (
+               question.options.map((option, optIndex) => (
                   <label key={optIndex} className="answer-ques-opt">
                     <input
                       type="checkbox"
                       name={`question-${question._id}`}
-                      value={option}
+                      value={option._id}
                       onChange={(e) =>
                         handleAnswerChange(
                           question._id,
                           e.target.checked
-                            ? [...(answers[question._id] || []), option]
-                            : (answers[question._id] || []).filter((opt) => opt !== option)
+                            ? [...(answers[question._id] || []), option._id]
+                            : (answers[question._id] || []).filter((opt) => opt !== option._id)
                         )
                       }
                     />
-                    {option}
+                     {option.text}
                   </label>
                 ))
               ) : (
@@ -132,7 +146,7 @@ const answerSurvey = () => {
             </button>
           </div>
                 </Form>
-            </div>
+                </div>
         </section>
     )
 }
