@@ -49,7 +49,7 @@ const router = createBrowserRouter(
         <Route path="notifications" element={<Notifications />} />
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="profile" element={<Profile />} />
-        <Route path="answersurvey" element={<AnswerSurvey/>} />
+        <Route path="answersurvey/:id" element={<AnswerSurvey/>} />
         <Route path="settings" element={<Settings/>} />
 
         </Route>

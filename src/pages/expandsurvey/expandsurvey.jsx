@@ -106,7 +106,7 @@ const expandsurvey = () => {
           </div>
         </div>
         <div className="flex btn_div">
-          <button className="start-btn btn" onClick={() => navigate('/surveyform/${id}')}>
+        <button className="start-btn btn" onClick={() => navigate(`/answersurvey/${id}`)}>
             Start survey
           </button>
         </div>
