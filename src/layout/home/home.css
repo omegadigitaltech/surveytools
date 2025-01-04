@@ -1,0 +1,22 @@
+/* Ensure the root container takes up full height */
+html, body, #root {
+    height: 100%;
+    margin: 0;
+}
+
+/* Home layout is a flex container */
+.home-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%; /* Ensure it spans the full height of the viewport */
+}
+
+/* Make the main content grow to fill available space */
+.main-content {
+    flex: 1; /* Allows the content to stretch and push the footer down */
+}
+
+/* Footer stays at the bottom */
+.footer {
+    flex-shrink: 0; /* Prevents shrinking */
+}

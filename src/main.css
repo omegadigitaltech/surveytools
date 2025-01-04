@@ -140,6 +140,11 @@ button {
 }
 
 /* MEDIA QUERY */
+@media(max-width:550px) {
+.wrap{
+    width: 95%;
+}
+}
 @media(max-width:385px) {
 .btn {
     font-size: .85rem;

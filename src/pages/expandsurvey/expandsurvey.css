@@ -4,7 +4,11 @@
     font-style: italic;
     margin: 3rem 0;
 }
-
+.survey_details{
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
 .expand_class {
     flex-wrap: wrap;
 }
@@ -106,6 +110,9 @@
 }
 
 @media (max-width: 512px) {
+    .expand_inner .backaro{
+        margin: 1.2rem 0;
+    }
     .expand_class h4 {
         font-size: .8rem;
     }
@@ -121,13 +128,12 @@
     }
 
     .expand_title {
-        font-size: 1rem;
+        font-size: .9rem;
     }
 
     .expand_info {
         font-size: .9rem;
     }
-
     .description {
         margin-right: 0rem;
     }
@@ -168,7 +174,9 @@
     .exp-mobile {
         display: none;
     }
-
+    .expand_class{
+        margin-top: 2rem;
+    }
     .expand_class h4,
     p {
         font-size: .85rem;

@@ -87,8 +87,8 @@ input[type=number]::-webkit-inner-spin-button {
     .verify-enter{  
         width: 80%;
     }
-    .wrap{
-        width: 95% !important;
+    .verify_inner{
+        width: 95% !important; 
     }
     .verify_codes input{
         background: var(--litgray);

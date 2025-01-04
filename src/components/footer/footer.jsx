@@ -11,7 +11,7 @@ const Footer = () => {
             <div className="footer-wrap wrap">
                 <div className="footer-w1">
                     <Link className="footer-w1-logo">
-                        Survey Pro
+                        SurveyPro
                     </Link>
                     <ul className="footer-w1-list">
                         <li className="footer-w1-item">

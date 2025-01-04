@@ -1,33 +1,44 @@
-
-.survey_details{
+.survey-ans-details {
     margin-top: 1.5rem;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
 }
-.ans-back-title{
+
+.ans-back-title {
     gap: 4rem;
 }
-.ans-post-time, .ans-point{
+
+.ans-post-time,
+.ans-point {
     margin-top: 1rem;
 }
-.ans-post-time{
+
+.ans-post-time {
     font-size: .9rem;
 }
-.ans-point{
+
+.ans-point {
     text-align: right;
     font-size: 1.2rem;
 }
-.answer-ques-opt .ans-tick{
-margin-left: 1rem;
+
+.tick-ans {
+    margin-left: 1rem;
 }
-.answer-quest-fill input {
-    width: 50%;
+
+.fillin-ans {
+    width: 70%;
     border-bottom: 1px solid var(--l-600);
     background: var(--ltgray);
     padding: 0.5em;
 }
-.submit-div{
+
+.submit-div {
     justify-content: center;
 }
-.submit-ans-btn{
+
+.submit-ans-btn {
     margin: 2rem 0;
     width: 50%;
     display: block;
@@ -37,4 +48,83 @@ margin-left: 1rem;
     font-weight: bold;
     border-radius: 5px;
 
+}
+
+.ans-msg {
+    font-size: 1.2rem;
+    font-style: italic;
+    text-align: center;
+    margin: 4rem 0;
+}
+
+.question-answer {
+    margin-bottom: 1.2rem;
+}
+
+.ans-question {
+    margin-bottom: 1rem;
+}
+
+
+/* MEDIA QUERY */
+@media(max-width: 550px) {
+.fillsurvey_inner{
+    width: 92% !important;
+}
+    .ans-msg {
+        font-size: 1rem;
+        margin: 3rem 0;
+    }
+
+    .survey_title_ans {
+        font-size: .85rem;
+    }
+
+    .ans-back-title {
+        gap: 1.2rem;
+    }
+
+    .survey-ans-details {
+        margin-bottom: 2rem;
+    }
+
+    .survey-ans-details h4 {
+        font-size: .85rem;
+    }
+
+    .ans-post-time {
+        font-size: .75rem;
+    }
+
+    .ans-point {
+        font-size: 1rem;
+    }
+
+    .ans-question {
+        font-size: .9rem;
+        margin-bottom: .7rem;
+    }
+
+    .question-answer {
+        margin-bottom: 1rem;
+    }
+
+    .fillin-ans {
+        font-size: .9rem;
+    }
+    .fillin-ans {
+        width: 90%;
+    }
+}
+
+@media(max-width: 380px) {
+.ans-point-earn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+justify-content: space-between;
+}
+.ans-point {
+    margin-top: 0rem ;
+}
 }

@@ -106,7 +106,15 @@ const expandsurvey = () => {
           </div>
         </div>
         <div className="flex btn_div">
-        <button className="start-btn btn" onClick={() => navigate(`/answersurvey/${id}`)}>
+          <button className="start-btn btn" onClick={() => navigate(`/answersurvey/${id}`,
+            {
+              state: {
+                title: survey.title,
+                createdAt: survey.createdAt,
+                points: survey.point,
+              }
+            }
+          )}>
             Start survey
           </button>
         </div>
