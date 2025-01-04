@@ -16,6 +16,7 @@ const answerSurvey = () => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   const { title, createdAt, points } = location.state || {};
 
@@ -60,6 +61,8 @@ const answerSurvey = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true); // Set submitting state to true
+
     const answerArray = Object.entries(answers).map(([questionId, response]) => ({
       questionId,
       response,
@@ -83,16 +86,13 @@ const answerSurvey = () => {
       if (!response.ok) throw new Error(json.msg || "Failed to submit survey");
 
       toast.success("Survey submitted successfully!");
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(redirect("/dashboard"));
-        }, 1500);
-      });
+      setTimeout(() => navigate("/dashboard"), 1500);;
 
     } catch (error) {
       console.error("Error submitting survey:", error);
       toast.error("You have filled this survey already");
-
+    }finally {
+      setSubmitting(false); // Reset submitting state
     }
   };
 
@@ -131,6 +131,7 @@ const answerSurvey = () => {
                       className="tick-ans"
                       name={`question-${question._id}`}
                       value={option._id}
+                      required
                       onChange={(e) =>
                         handleAnswerChange(
                           question._id,
@@ -150,14 +151,17 @@ const answerSurvey = () => {
                   name={`question-${question._id}`}
                   placeholder="Your answer"
                   onChange={(e) => handleAnswerChange(question._id, e.target.value)}
-                  required={question.required}
+                  required
+                  
                 />
               )}
             </div>
           ))}
           <div className="submit-div flex">
-            <button type="submit" className="submit-ans-btn">
-              Submit
+            <button type="submit"
+             className="submit-ans-btn"
+             disabled={submitting}>
+              {submitting ? "Submitting..." : "Submit"}
             </button>
           </div>
         </Form>
