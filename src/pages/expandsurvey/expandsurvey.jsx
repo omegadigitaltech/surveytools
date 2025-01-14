@@ -92,7 +92,7 @@ const expandsurvey = () => {
           </div>
           <div className="activity_row center flex">
             <li className="">No. of participants left</li>
-            <p className="required_no"> <span className="participant_no"> {survey.max_participant - (survey.current_participants || 0)}</span>{" "} Left</p>
+            <p className="required_no"> <span className="participant_no"> {survey.max_participant - (survey.current_participants || 0)}</span>{" "}</p>
           </div>
         </div>
 

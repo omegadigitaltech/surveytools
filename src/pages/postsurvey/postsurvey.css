@@ -76,6 +76,15 @@ form {
 .custom-dropdown {
   position: relative;
   display: inline-block;
+  width: 50%;
+}
+.num_partp-input{
+  padding: 10px;
+  padding-right: 50px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: var(--litgray);
   width: 100%;
 }
 
@@ -94,9 +103,31 @@ form {
   font-size: var(--fs-md);
   font-family: var(--ff-body);
 }
+.choose-faculty{
+  margin: 2rem;
+   display: grid;
+   grid-template-columns: 1fr auto;
+}
+.choose-faculty input {
+  margin-right: .5rem;
+}
+.select-facult-msg{
+  text-align: center;
+  margin-top: 2rem;
+}
+.gender-area{
+  margin-bottom:2rem ;
+}
+.gender-input{
+  gap: 2rem;
+}
+.req-part-sec{
+  margin-top: 3rem;
+  width: 70%;
+}
 
 #range-dropdown {
-  width: 100%;
+  width: 50%;
   border-radius: 4px;
 }
 
@@ -114,7 +145,13 @@ form {
 }
 
 /* MEDIA QUERY */
-@media(max-width:385px) {
+@media(max-width:768px) {
+  .req-part-sec{
+    margin-top: 3rem;
+    width: 100%;
+  }
+}
+@media(max-width:450px) {
   .post-head h3 {
     font-size: 1rem;
   }
@@ -130,5 +167,12 @@ form {
 
   .custom-select {
     font-size: .85rem;
+  }
+  .choose-faculty{
+     grid-template-columns: auto;
+  }
+  #range-dropdown {
+    width: 100%;
+    border-radius: 4px;
   }
 }

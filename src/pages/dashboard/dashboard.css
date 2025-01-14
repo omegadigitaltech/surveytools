@@ -248,7 +248,7 @@ form ::placeholder {
         width: 1.2rem;
     }
 
-    form {
+   .dash_head form {
         width: 70%;
     }
 }
@@ -315,11 +315,14 @@ form ::placeholder {
         gap: .5rem;
     }
 
-    .survey_class h4,
+    .survey_class h4
     p {
         font-size: .7rem;
     }
-
+    .survey_class
+    p {
+        font-size: .7rem;
+    }
     .survey_details h4 {
         font-size: .8rem;
     }
