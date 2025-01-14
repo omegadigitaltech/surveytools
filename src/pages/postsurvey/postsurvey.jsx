@@ -11,7 +11,24 @@ const PostSurvey = () => {
   const [description, setDescription] = useState('');
   const [participants, setParticipants] = useState("");
   const [amount, setAmount] = useState(0);
+  const [participantType, setParticipantType] = useState("all_faculties");
+  const [selectedFaculties, setSelectedFaculties] = useState([]);
 
+  const faculties = [
+    "Arts",
+    "Agriculture",
+    "Administration",
+    "Medical Sciences",
+    "Social Sciences",
+    "Law",
+    "Technology",
+    "Sciences",
+    "Pharmacy",
+    "Education",
+    "EDM",
+  ];
+  
+  
   const handleParticipantsChange = (e) => {
     const value = e.target.value;
     setParticipants(value);
@@ -20,6 +37,22 @@ const PostSurvey = () => {
     setAmount(calculatedAmount);
   };
 
+  // Handle select dropdown change
+  const handleParticipantTypeChange = (e) => {
+    setParticipantType(e.target.value);
+    if (e.target.value === "all_faculties") {
+      setSelectedFaculties([]); // Reset faculties if "All Faculties" is selected
+    }
+  };
+
+  // Handle faculty checkbox toggle
+  const handleFacultyToggle = (faculty) => {
+    setSelectedFaculties((prev) =>
+      prev.includes(faculty)
+        ? prev.filter((f) => f !== faculty) // Remove if already selected
+        : [...prev, faculty] // Add if not selected
+    );
+  };
   return (
     <section className="postsurvey">
       <div className="postsurvey_wrap wrap">
@@ -71,6 +104,7 @@ const PostSurvey = () => {
                   value={participants}
                   onChange={handleParticipantsChange}
                   placeholder="Enter number of participants"
+                  min="1"
                   required
                 />
                 {/* <select
@@ -119,10 +153,17 @@ const PostSurvey = () => {
               <div className="gender-input flex">
 
                 <div>
-                  <input type="checkbox" /> Male
+                  <label htmlFor="male">
+                    <input id="male" type="checkbox" name="gender" value="male" /> Male
+                  </label>
+
+                  {/* <input name="gender" value="male" type="checkbox" /> Male */}
                 </div>
                 <div>
-                  <input type="checkbox" /> Female
+                  <label htmlFor="male">
+                    <input id="female" type="checkbox" name="gender" value="female" /> Female
+                  </label>
+
                 </div>
               </div>
 
@@ -148,38 +189,35 @@ const PostSurvey = () => {
               <select
                 name="preferred_participants"
                 id="range-dropdown"
-                // value={participantType}
-                // onChange={(e) => setParticipantType(e.target.value)}
+                value={participantType}
+                onChange={handleParticipantTypeChange}
                 className="custom-select"
               >
-                <option value="all_facilties">All Faculties</option>
-                <option value="">Select faculties</option>
-
+                <option value="all_faculties">All Faculties</option>
+                <option value="select_faculties">Select faculties</option>
               </select>
-              <div className="req-part-sec">
-                {/* If Select Faculty is selected These faculties will appear */}
-                <p className="select-facult-msg">Kindly choose required faculties</p>
-                <div className="choose-faculty">
-                  <p> <input value="" type="checkbox" />Arts</p>
-                  <p><input value="" type="checkbox" />Agriculture</p>
-                  <p><input value="" type="checkbox" />Administration</p>
-                  <p> <input value="" type="checkbox" />Medical Sciences</p>
-                  <p><input value="" type="checkbox" />Social sciences</p>
-                  <p><input value="" type="checkbox" />Law</p>
-                  <p><input value="" type="checkbox" />Technology</p>
-                  <p><input value="" type="checkbox" />Sciences</p>
-                  <p><input value="" type="checkbox" />Pharmacy</p>
-                  <p><input value="" type="checkbox" />Education</p>
-                  <p><input value="" type="checkbox" />EDM</p>
+
+              {participantType === "select_faculties" && (
+                <div className="req-part-sec">
+                  {/* If Select Faculty is selected These faculties will appear */}
+                  <p className="select-facult-msg">Kindly choose required faculties</p>
+                  <div className="choose-faculty">
+                    {faculties.map((faculty) => (
+                      <p key={faculty}>
+                        <input
+                          type="checkbox"
+                          value={faculty}
+                          checked={selectedFaculties.includes(faculty)}
+                          onChange={() => handleFacultyToggle(faculty)}
+                        />{" "}
+                        {faculty}
+                      </p>
+                    ))}
+
+                  </div>
                 </div>
-              </div>
-
+              )}
             </div>
-
-
-
-
-
             <div className="flex btn_div">
               <button
                 type="submit"
