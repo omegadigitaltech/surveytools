@@ -222,7 +222,9 @@ form ::placeholder {
     .survey_info {
         font-size: .8rem;
     }
-
+    .dashboard_sort {
+        display: none !important;
+    }
     .dashboard_sort h3 {
         gap: .5em;
         font-size: .8rem;

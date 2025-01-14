@@ -15,7 +15,7 @@ const Profile = () => {
                     <div className="profile-head flex">
                         <Link to="/dashboard"> <img src={backaro} className="backaro" /></Link>
                         <div className="">
-                            <h3>Form Page</h3>
+                            <h3>Profile</h3>
                         </div>
                     </div>
                     <div className="profile-body flex">
@@ -40,7 +40,7 @@ const Profile = () => {
                         </div>
 
                         <div className="profile-info">
-                            <h4>Public Profile</h4>
+                            <h4>My Profile</h4>
                             <hr />
                             <div className="profile-name-field">
                                 <h5>Name</h5>
@@ -67,17 +67,18 @@ const Profile = () => {
                                         {userInst}
                                     </div>
                                 </div>
-                                <div className="bio-box">
+                                {/* LATER WE WILL IMPLEMENT */}
+                                {/* <div className="bio-box">
                                     <h5>Bio</h5>
                                     <div className="bio-display">
 
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
-                            <div className="profilecard-btns mob-pro-btn flex ">
+                            {/* <div className="profilecard-btns mob-pro-btn flex ">
                                 <Link to="/settings" className="settings-btn"> Settings</Link>
                                 <Link to="/settings"  className="edit-profile">Edit Profile</Link>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

@@ -99,7 +99,7 @@ const Notifications = () => {
                   className="groupBy"
                 >
                   <option className="groupa" value="date">Group by; Date</option>
-                  <option value="type">Group by; Type</option>
+                  {/* <option value="type">Group by; Type</option> */}
                   <option value="time">Group by; Time</option>
                 </select>
               </div>
@@ -135,7 +135,7 @@ const Notifications = () => {
               </Link>
             ))
           ) : (
-            <p className="no-notifications">No notifications found...</p>
+            <p className="no-notifications">No notifications found for your search...</p>
           )}
         </div>
       </div>

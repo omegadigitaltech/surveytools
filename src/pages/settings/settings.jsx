@@ -9,7 +9,7 @@ const Settings = () => {
       <div className="wrap settingswrap">
         <div className="settings-inner flex">
           <div className="form-head">
-            <Link to="">
+            <Link to="/profile">
               <img src={backaro} className="settings-backaro backaro" alt="Back" />
             </Link>
           </div>

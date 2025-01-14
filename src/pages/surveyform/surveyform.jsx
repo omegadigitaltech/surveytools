@@ -36,8 +36,6 @@ const SurveyForm = () => {
     }
   };
 
-
-
   const [questions, setQuestions] = useState([
     {
       id: currentSurveyId,

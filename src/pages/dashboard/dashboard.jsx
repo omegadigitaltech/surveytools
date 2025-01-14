@@ -1,16 +1,18 @@
-import search from "../../assets/img/search.svg";
-import sort from "../../assets/img/sort.svg";
-import dept from "../../assets/img/dept.svg";
-import members from "../../assets/img/members.svg";
-import "./dashboard.css"
-import view from "../../assets/img/eye.svg"
-import nextaro from "../../assets/img/nextaro.svg"
 import { useEffect, useState } from "react";
 import { Form, Link } from "react-router-dom";
 import config from "../../config/config";
 import useAuthStore from "../../components/store/useAuthStore";
 import { toast } from "react-toastify";
 import { formatDistanceToNow, parseISO } from "date-fns";
+import search from "../../assets/img/search.svg";
+import sort from "../../assets/img/sort.svg";
+import dept from "../../assets/img/dept.svg";
+import members from "../../assets/img/members.svg";
+import view from "../../assets/img/eye.svg"
+import unview from "../../assets/img/uneye.svg"
+import nextaro from "../../assets/img/nextaro.svg"
+
+import "./dashboard.css"
 
 const dashboard = () => {
 
@@ -18,6 +20,7 @@ const dashboard = () => {
   const authToken = useAuthStore((state) => state.authToken);
   const surveys = useAuthStore((state) => state.surveys);
   const setSurveys = useAuthStore((state) => state.setSurveys);
+  const [showPoint, setShowPoint] = useState(false);
 
   useEffect(() => {
     const fetchSurveys = async () => {
@@ -59,6 +62,11 @@ const dashboard = () => {
     survey.title.toLowerCase().includes(searchKey.toLowerCase())
   );
 
+   const pointToggle = () => {
+      setShowPoint((prevState) => !prevState);
+    };
+    const iconPass = showPoint ? view : unview;
+
   return (
     <section className="dashboard">
       <div className="dashboard_inner wrap">
@@ -67,14 +75,21 @@ const dashboard = () => {
           <div className="points-head flex">
             <div className="points-label flex">
               Points Balance:
-              <img src={view} alt="View Points" />
+              <img src={iconPass} 
+              onClick={pointToggle}
+              alt="View Points" 
+              />
             </div>
             <div className="transactions-history">
               {/* <Link href="">Transactions History <img src={nextaro} alt="" /> </Link> */}
             </div>
           </div>
           <div>
-            <div className="points-value">0.00</div>
+            <div className="points-value"
+             
+            >
+               {showPoint ? "0.00" : "****"}
+            </div>
           </div>
         </div>
 

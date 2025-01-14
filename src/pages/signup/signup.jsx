@@ -15,6 +15,7 @@ const SignUp = () => {
   const setSignupEmail = useAuthStore((state) => state.setSignupEmail);
   // const actionData = useActionData();
   const [showPassword, setShowPassword] = useState(false);
+
   const handleToggle = () => {
     setShowPassword((prevState) => !prevState);
   };

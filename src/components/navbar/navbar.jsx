@@ -93,7 +93,6 @@ const Navbar = () => {
                 <img className="header-w3-icon" src={iconUser} alt="user" />
               </div>
               <span className="username">{userName}</span>
-
             </button>
             <button className="header-w3-link" onClick={showLogoutConfirmation}>
               <img className="header-w3-icon" src={iconLogOut} alt="logout" />
@@ -105,6 +104,12 @@ const Navbar = () => {
       {menuOpen && (
         <div className="menu">
           <ul className="menu-list">
+          <li>
+              <NavLink to="/profile" className="menu-item menu-username flex" onClick={closeMenu}>
+              <img className="header-w3-icon" src={iconUser} alt="user" />
+              {userName}
+              </NavLink>
+            </li>
             <li>
               <NavLink to="/dashboard" className="menu-item" onClick={closeMenu}>
                 Dashboard
@@ -115,16 +120,17 @@ const Navbar = () => {
                 Post a Survey
               </NavLink>
             </li>
-            <li>
+            {/* LATER, API NOT READY */}
+            {/* <li>
               <NavLink to="/withdraw" className="menu-item" onClick={closeMenu}>
                 Withdrawal
               </NavLink>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <NavLink to="/settings" className="menu-item" onClick={closeMenu}>
                 Settings
               </NavLink>
-            </li>
+            </li> */}
             <li>
               <NavLink to="" className="menu-item" onClick={() => { closeMenu }}>
                 Contact Us

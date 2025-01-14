@@ -16,10 +16,10 @@ const action = async ({ request }) => {
   const token = localStorage.getItem("token");
   const questions = {
     questionId: currentSurveyId,
-    questionType: "fill_in",
+    questionType: questionType,
     questionText: questionText,
     required: "",
-    options: "",
+    options: options,
   }
 
   const API_URL = `${config.API_URL}/surveys/${currentSurveyId}/questions`;
@@ -41,6 +41,10 @@ const action = async ({ request }) => {
 
   try {
    
+    if (!response.ok) {
+      throw new Error(errorMessage.message || "Failed to add questions");
+    }
+
     toast.success("Questions Added")
     return new Promise((resolve) => {
       setTimeout(() => {

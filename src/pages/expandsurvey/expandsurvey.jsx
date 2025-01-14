@@ -6,6 +6,7 @@ import useAuthStore from "../../components/store/useAuthStore";
 import backaro from "../../assets/img/backaro.svg";
 import dept from "../../assets/img/blu-dept.svg";
 import partps from "../../assets/img/partps.svg";
+import members from "../../assets/img/members.svg";
 
 import "./expandsurvey.css"
 
@@ -101,7 +102,7 @@ const expandsurvey = () => {
             <h4 className="department">Inst. of <span className="dept">{survey.institution || "N/A"}</span></h4>
           </div>
           <div className="participants flex">
-            <img src={partps} alt="" />
+            <img src={members} alt="" />
             <p> <span className="num_participant">{survey.current_participants || 0}</span> Participants</p>
           </div>
         </div>

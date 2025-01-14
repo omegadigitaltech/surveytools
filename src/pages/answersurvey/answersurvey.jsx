@@ -2,6 +2,7 @@ import { Link, Form, useParams, useNavigate, useLocation } from "react-router-do
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import useAuthStore from "../../components/store/useAuthStore";
+import Complete from "../../components/completed/complete";
 import config from "../../config/config";
 import backaro from "../../assets/img/backaro.svg";
 import "./answersurvey.css"
@@ -17,6 +18,8 @@ const answerSurvey = () => {
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [showComplete, setShowComplete] = useState(false); 
+  const [earnedPoints, setEarnedPoints] = useState(0);
 
   const { title, createdAt, points } = location.state || {};
 
@@ -34,6 +37,7 @@ const answerSurvey = () => {
         const response = await fetch(API_URL, options);
         const json = await response.json();
         if (!response.ok) throw new Error(json.msg || "Failed to fetch survey questions");
+
 
         console.log("API URL:", API_URL);
         console.log("Auth Token:", authToken);
@@ -83,23 +87,32 @@ const answerSurvey = () => {
       const response = await fetch(API_URL, options);
       const json = await response.json();
 
-      if (!response.ok) throw new Error(json.msg || "Failed to submit survey");
-
-      toast.success("Survey submitted successfully!");
-      setTimeout(() => navigate("/dashboard"), 1500);;
+      if (!response.ok) {
+        throw new Error(json.msg || "Failed to submit survey");
+      }
+      // throw new Error(json.msg || "Failed to submit survey");
+      setEarnedPoints(json.points || points); // Use points from location state
+      setShowComplete(true); 
 
     } catch (error) {
       console.error("Error submitting survey:", error);
-      toast.error("You have filled this survey already");
+      toast.error(error.message || "Error submitting survey!");
     }finally {
       setSubmitting(false); // Reset submitting state
     }
+  };
+  const handleDone = () => {
+    navigate("/dashboard"); // Redirect to dashboard
   };
 
   if (loading) return <p className="ans-msg">Loading survey questions...</p>;
   if (questions.length === 0) return <p className="ans-msg">Opps! No questions found here, check other surveys.</p>;
 
   return (
+<>
+{showComplete ? (
+        <Complete points={earnedPoints} onDone={handleDone} />
+      ) : (
     <section className="fillsurvey">
       <div className="fillsurvey_inner wrap">
         <div className="survey-ans-details flex">
@@ -131,7 +144,6 @@ const answerSurvey = () => {
                       className="tick-ans"
                       name={`question-${question._id}`}
                       value={option._id}
-                      required
                       onChange={(e) =>
                         handleAnswerChange(
                           question._id,
@@ -167,6 +179,8 @@ const answerSurvey = () => {
         </Form>
       </div>
     </section>
+    )}
+    </>
   )
 }
 export default answerSurvey;

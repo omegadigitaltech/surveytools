@@ -46,7 +46,7 @@ const PostSurvey = () => {
                 id="description"
                 cols="30"
                 rows="10"
-                placeholder="Write your survey..."
+                placeholder="Tell us about your survey..."
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
