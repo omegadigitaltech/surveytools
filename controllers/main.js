@@ -25,7 +25,7 @@ const createSurvey = async (req, res, next) => {
   session.startTransaction();
   
   try {
-    const {title, description, max_participant, point, duration, preferred_participants } = req.body;
+    const {title, description, no_of_participants, gender, preferred_participants } = req.body;
     const user = await User.findOne({id: req.userId});
     
     if(!user){
@@ -50,14 +50,15 @@ const createSurvey = async (req, res, next) => {
     }
   
     // First create the survey
+    const amount = no_of_participants * 50
     const survey = await Survey.create([{
       user_id: user._id,
       title,
       description,
-      point,
-      duration,
       preferred_participants,
-      max_participant
+      gender,
+      no_of_participants,
+      amount_to_be_paid: amount
     }], { session });
 
     // Then populate the user data

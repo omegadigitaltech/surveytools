@@ -68,22 +68,21 @@ const surveySchema = new Schema({
      type: String,
      required: [true, "Title field is required"]
     },
-    participants: {
+    no_of_participants: {
      type: Number,
      default: 0
     },
-    point: {
+    gender: {
      type: String,
-    },
-    duration:{
-     type: Number,
+     required: [true, "Gender is required"]
     },
     preferred_participants: {
      type: Array,
+     required: [true, "Preferred participants is required"]
     },
-    max_participant: {
+    amount_to_be_paid: {
      type: Number,
-     default: 0
+     required: [true, "Amount to be paid is required"]
     },
     description: { type: String, required: [true, "Description Field is required"]},
     submittedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Track users who submitted the survey
