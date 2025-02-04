@@ -2,7 +2,8 @@ const path = require('path')
 const {Survey, Option, Question, Answer} = require('../model/survey')
 const User = require('../model/user')
 const Payment = require('../model/payment')
-
+const jwt = require('jsonwebtoken')
+const jwtSecret = process.env.JWT_SECRET
 const mongoose = require('mongoose');
 const {calculateSentiment} = require('../middleware/helper')
 
@@ -735,7 +736,9 @@ const getPrice = async (req, res) => {
       const { surveyId } = req.body;
 
       const survey = await Survey.findById(surveyId)
-      if(survey.user_id.toString() !== userId){
+      const user = await User.findOne({ id: userId });
+
+      if (!survey.user_id.equals(user._id)) {
         return res.status(400).json({error: "No survey Found"})
       }
 
@@ -882,6 +885,5 @@ module.exports = {
   getUserSurveyData,
   publishSurvey,
   receivePaymentWebhook,
-  getPrice,
-  checkForpayment
+  getPrice
 }
