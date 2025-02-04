@@ -1,6 +1,8 @@
 const path = require('path')
 const {Survey, Option, Question, Answer} = require('../model/survey')
 const User = require('../model/user')
+const Payment = require('../model/payment')
+
 const mongoose = require('mongoose');
 const {calculateSentiment} = require('../middleware/helper')
 
@@ -50,7 +52,7 @@ const createSurvey = async (req, res, next) => {
     }
   
     // First create the survey
-    const amount = no_of_participants * 50
+    const amount = no_of_participants * 100
     const survey = await Survey.create([{
       user_id: user._id,
       title,
@@ -538,7 +540,6 @@ const publishSurvey = async (req, res, next) => {
     const { surveyId } = req.params;
     const survey = await Survey.findById(surveyId);
     const user = await User.findOne({ id: req.userId });
-
     if (!survey) {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
     }
@@ -547,6 +548,10 @@ const publishSurvey = async (req, res, next) => {
       return res.status(403).json({ status: "failure", code: 403, msg: 'User not authorized to publish this survey' });
     }
 
+    const payment = await Payment.findOne({surveyId})
+    if(!payment){
+      return res.status(400).json({ status: "failure", code: 400, msg: 'No payment found' });
+    }
 
     survey.published = true;
     survey.link = `https://${main_url}/surveys/${surveyId}/info`;
@@ -720,6 +725,139 @@ const createQuestion = async (req, res) => {
  
 }
 
+
+
+
+
+const getPrice = async (req, res) => {
+    try {
+      const { userId  } = req;
+      const { surveyId } = req.body;
+
+      const survey = await Survey.findById(surveyId)
+      if(survey.user_id.toString() !== userId){
+        return res.status(400).json({error: "No survey Found"})
+      }
+
+      const amount_to_be_paid = survey.amount_to_be_paid
+      
+      let responsePayload = {
+        price: amount_to_be_paid,
+        surveyId
+      };
+
+      // Generate a JWT to store this data temporarily
+      const token = jwt.sign(responsePayload, process.env.JWT_SECRET, {
+        expiresIn: "15m",
+      }); // Token expires in 15 minutes
+      return res.status(200).json({ ...responsePayload, token });
+    } catch (error) {
+      console.error("Error in get-price route:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
+// nearest future , can send those error to the frontend pricing
+const receivePaymentWebhook = async (req, res) => {
+    const DB_KEY = process.env.DB_KEY
+    try {
+      const { db_key } = req.query;
+      if (!db_key) {
+        return res.status(401).json({
+          status: 401,
+          success: false,
+        });
+      }
+      if (db_key != DB_KEY) {
+        return res.status(401).json({
+          status: 401,
+          success: false,
+          error: "check",
+        });
+      }
+
+      let id_ = req.body.data.reference;
+
+      //validate event
+      // const payload = JSON.stringify(req.body);
+
+      // const hash = crypto.createHmac('sha512', secretKey).update(payload).digest('hex');
+
+      // console.log(hash)
+      // console.log(req.headers['x-paystack-signature'])
+      //     if (hash == req.headers['x-paystack-signature']) {
+      // Retrieve the request's body
+      const event = req.body;
+      console.log(event);
+
+      // check if customer has been proccessed
+      // const check_customer = await Payment.find({ referenceNumber: id_ });
+
+      // if (check_customer.length > 0) {
+      //   console.log("true proccesed");
+      //   return res.status(400).json({
+      //     status: 400,
+      //     success: false,
+      //     message: "payment processed",
+      //   });;
+      // }
+
+      switch (event.event) {
+        case "charge.create":
+          // Handle successful payment event
+          break;
+
+        case "charge.success":
+          const dataToSend = {
+            email: event.data.customer.email,
+            token: event.data.metadata.custom_fields[0].value,
+            amount: event.data.amount,
+          };
+          const { email, token, amount } = dataToSend;
+
+          const user = await User.findOne({ email });
+          if (!user) {
+            return res.status(404).json({ error: "User not found" });
+          }
+          const userId = user.userId;
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+          if ( Number(amount) !== decoded.price) {
+            return res.status(400).json({ error: "Invalid plan or amount" });
+            // send notification
+          }
+
+          const newPayment = new Payment({
+            userId: userId,
+            referenceNumber: id_,
+            surveyId: decoded.surveyId,
+            amount,            
+            email,
+            datePaid: new Date()
+          });
+          await newPayment.save();
+
+          res.status(200).json({
+            message:
+              "Payment collected successfully and plan updated",
+          });
+
+          break;
+
+        default:
+          console.log("Unhandled event:", event);
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.name === "JsonWebTokenError") {
+        return res.status(400).json({ error: "Payment Processing timeout" });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+
+
 const testController = async (req, res) => {
 
     const survey =  await Survey
@@ -742,5 +880,8 @@ module.exports = {
   getSurveyQuestions,
   getAllSurveys,
   getUserSurveyData,
-  publishSurvey
+  publishSurvey,
+  receivePaymentWebhook,
+  getPrice,
+  checkForpayment
 }

@@ -5,7 +5,9 @@ const router = express.Router();
 const { start, home,updateAnswer, submitAnswers, createSurvey, 
     deleteQuestion, getSurveyInfo, getUserSurveyData, 
     checkUserFilledSurvey, checkSurveyMaxParticipants, addOrUpdateQuestion,
-  getSurveyAnalytics, getSurveyQuestions,  getAllSurveys, publishSurvey, testController
+  getSurveyAnalytics, getSurveyQuestions,  getAllSurveys, publishSurvey, testController,
+  receivePaymentWebhook,
+  getPrice
  } = require('../controllers/main')
 
 
@@ -25,6 +27,9 @@ router.get('/surveys',authMiddleware, getAllSurveys);
 router.get('/surveys/:surveyId/questions',authMiddleware, getSurveyQuestions);
 router.post('/surveys/:surveyId/publish',authMiddleware, publishSurvey);
 router.get('/surveys/:surveyId/analytics',authMiddleware, getSurveyAnalytics);
+
+router.post('/payment-webhook', receivePaymentWebhook)
+router.post('/get-price', authMiddleware, getPrice)
 
 module.exports = router;
 
