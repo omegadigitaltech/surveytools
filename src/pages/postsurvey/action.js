@@ -7,20 +7,16 @@ const action = async ({ request }) => {
   // Experiment
   const authToken = localStorage.getItem("token");
   console.log(authToken)
-  // const isLoggedIn = !!authToken;
-  // console.log("User logged in:", isLoggedIn);
-  console.log(document.cookie);
   // Expo
 
   const formData = await request.formData();
   const survey = {
     title: formData.get("title"),
     description: formData.get("description"),
-    max_participant: formData.get("max_participant"),
-    duration: formData.get("duration"),
+    no_of_participants: formData.get("participant_num"),
+    gender: formData.get("gender"),
     preferred_participants: formData.get("preferred_participants"),
-    point: formData.get("point"),
-    // department: "elect"
+    amount_to_be_paid: formData.get("amount"),
   }
 
   const API_URL = `${config.API_URL}/surveys`;

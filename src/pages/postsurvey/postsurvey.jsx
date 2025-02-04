@@ -10,24 +10,9 @@ const PostSurvey = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [participants, setParticipants] = useState("");
+  const [gender, setGender] = useState("all_genders");
+  const [preferredParticipants, setPreferredParticipants] = useState("all_faculties");
   const [amount, setAmount] = useState(0);
-  const [participantType, setParticipantType] = useState("all_faculties");
-  const [selectedFaculties, setSelectedFaculties] = useState([]);
-
-  const faculties = [
-    "Arts",
-    "Agriculture",
-    "Administration",
-    "Medical Sciences",
-    "Social Sciences",
-    "Law",
-    "Technology",
-    "Sciences",
-    "Pharmacy",
-    "Education",
-    "EDM",
-  ];
-  
   
   const handleParticipantsChange = (e) => {
     const value = e.target.value;
@@ -37,22 +22,8 @@ const PostSurvey = () => {
     setAmount(calculatedAmount);
   };
 
-  // Handle select dropdown change
-  const handleParticipantTypeChange = (e) => {
-    setParticipantType(e.target.value);
-    if (e.target.value === "all_faculties") {
-      setSelectedFaculties([]); // Reset faculties if "All Faculties" is selected
-    }
-  };
 
-  // Handle faculty checkbox toggle
-  const handleFacultyToggle = (faculty) => {
-    setSelectedFaculties((prev) =>
-      prev.includes(faculty)
-        ? prev.filter((f) => f !== faculty) // Remove if already selected
-        : [...prev, faculty] // Add if not selected
-    );
-  };
+  
   return (
     <section className="postsurvey">
       <div className="postsurvey_wrap wrap">
@@ -94,7 +65,7 @@ const PostSurvey = () => {
             <div className="participants-fields grid">
               <div className="postsurvey-field custom-dropdown">
                 <label className="required-label" htmlFor="range-dropdown">
-                  <h4>Number of Participants</h4>
+                  <h4>Preferred number of participants</h4>
                 </label>
                 <input
                   className="num_partp-input"
@@ -107,116 +78,59 @@ const PostSurvey = () => {
                   min="1"
                   required
                 />
-                {/* <select
-                name="max_participant"
-                  id="range-dropdown"
-                  value={selectRange}
-                  onChange={(e) => setSelectRange(e.target.value)}
-                  className="custom-select"
-                >
-                  <option value="100">0-100</option>
-                  <option value="200">0-200</option>
-                  <option value="300">0-300</option>
-                  <option value="400">0-400</option>
-                </select> */}
               </div>
               <div className="postsurvey-field custom-dropdown">
                 <label className="required-label" htmlFor="range-dropdown">
-                  <h4>Amount to be paid (₦)</h4>
+                  <h4>Est. amount to be paid (₦)</h4>
                 </label>
                 {/* Calculated amount to be paid */}
                 <p className="num_partp-input">
                   ₦ <span className="result">{amount}</span>
                 </p>
-
-                {/* <select
-                name="duration"
-                  id="range-dropdown"
-                  value={totalPoint}
-                  onChange={(e) => setTotalPoint(e.target.value)}
-                  className="custom-select"
-                >
-                  <option value="50">0-50 Points</option>
-                  <option value="100">0-100 Points</option>
-                  <option value="150">0-150 Points</option>
-                  <option value="200">0-200 Points</option>
-                </select> */}
-
               </div>
 
 
             </div>
             <div className="postsurvey-field gender-area custom-dropdown">
               <label className="required-label" htmlFor="range-dropdown">
-                <h4>Gender</h4>
+                <h4>preferred gender of participants</h4>
               </label>
-              <div className="gender-input flex">
-
-                <div>
-                  <label htmlFor="male">
-                    <input id="male" type="checkbox" name="gender" value="male" /> Male
-                  </label>
-
-                  {/* <input name="gender" value="male" type="checkbox" /> Male */}
-                </div>
-                <div>
-                  <label htmlFor="male">
-                    <input id="female" type="checkbox" name="gender" value="female" /> Female
-                  </label>
-
-                </div>
-              </div>
-
-              {/* <select
-                name="point"
-                  id="range-dropdown"
-                  value={participantPoint}
-                  onChange={(e) => setParticipantPoint(e.target.value)}
-                  className="custom-select"
-                >
-                  <option value="10">10 Points</option>
-                  <option value="20">20 Points</option>
-                  <option value="30">30 Points</option>
-                  <option value="40">40 Points</option>
-                </select> */}
-
+              <select  
+                 name="gender"
+                 id="range-dropdown"
+                 value={gender}
+                 onChange={(e) => setGender(e.target.value)}
+                 className="custom-select">
+              <option value="all_genders">All genders</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              </select>
             </div>
             <div className="postsurvey-field custom-dropdown">
 
               <label className="required-label" htmlFor="range-dropdown">
-                <h4>Required Participants</h4>
+                <h4>Preferred Participants</h4>
               </label>
               <select
                 name="preferred_participants"
                 id="range-dropdown"
-                value={participantType}
-                onChange={handleParticipantTypeChange}
+                value={preferredParticipants}
+                onChange={(e) => setPreferredParticipants(e.target.value)}
                 className="custom-select"
               >
                 <option value="all_faculties">All Faculties</option>
-                <option value="select_faculties">Select faculties</option>
+                <option value="arts">Arts</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Administration">Administration</option>
+                <option value="Education">Education</option>
+                <option value="EDM">EDM</option>
+                <option value="Law">Law</option>
+                <option value="Medical Sciences">Medical Sciences</option>
+                <option value="Social Sciences">Social Sciences</option>
+                <option value="Sciences">Sciences</option>
+                <option value="Technology">Technology</option>
+                <option value="Pharmacy">Pharmacy</option>
               </select>
-
-              {participantType === "select_faculties" && (
-                <div className="req-part-sec">
-                  {/* If Select Faculty is selected These faculties will appear */}
-                  <p className="select-facult-msg">Kindly choose required faculties</p>
-                  <div className="choose-faculty">
-                    {faculties.map((faculty) => (
-                      <p key={faculty}>
-                        <input
-                          type="checkbox"
-                          value={faculty}
-                          checked={selectedFaculties.includes(faculty)}
-                          onChange={() => handleFacultyToggle(faculty)}
-                        />{" "}
-                        {faculty}
-                      </p>
-                    ))}
-
-                  </div>
-                </div>
-              )}
             </div>
             <div className="flex btn_div">
               <button
