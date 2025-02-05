@@ -22,11 +22,12 @@ import verifyAction from "./pages/verify/action"
 import Dashboard from "./pages/dashboard/dashboard";
 import signInAction from "./pages/signin/action";
 import signUpAction from "./pages/signup/action";
-import postAction from "./pages/surveyform/action";
+import postAction from "./pages/surveyquestion/action";
 import surveyAction from "./pages/postsurvey/action"
 import ExpandSurvey from "./pages/expandsurvey/expandsurvey";
 import PostSurvey from "./pages/postsurvey/postsurvey";
-import SurveyForm from "./pages/surveyform/surveyform";
+import SurveyQuestion from "./pages/surveyquestion/surveyquestion";
+import Publish from "./pages/publish/publish"
 import Payment from "./pages/payment/payment";
 import Notifications from "./pages/notifications/notifications";
 import Withdraw from "./pages/withdraw/withdraw";
@@ -44,14 +45,14 @@ const router = createBrowserRouter(
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
         <Route path="postsurvey" element={<PostSurvey />} action={surveyAction}/>
-        <Route path="surveyform" element={<SurveyForm />} action={postAction}/>
+        <Route path="surveyquestion" element={<SurveyQuestion />} action={postAction}/>
+        <Route path="publish" element={<Publish />} />
         <Route path="payment" element={<Payment />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="profile" element={<Profile />} />
         <Route path="answersurvey/:id" element={<AnswerSurvey/>} />
         <Route path="settings" element={<Settings/>} />
-
         </Route>
       </Route>
 

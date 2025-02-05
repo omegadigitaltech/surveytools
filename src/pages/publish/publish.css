@@ -1,0 +1,26 @@
+
+.publish {
+    justify-content: center;
+    position: fixed;
+    top: 30%; 
+    left: 20%; 
+    transform: translate(-50%, -50%); 
+    margin-top: 0; 
+    z-index: 50;
+}
+
+.publish-box{
+    flex-direction:column;
+    border: 1px solid rgb(209, 209, 209);
+    max-width: 400px;
+    padding: 1.75rem;
+    border-radius: 1.5rem;
+    text-align: center;
+     background: #fff;
+}
+
+.publish-msg{
+    font-size:1.2rem ;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    }

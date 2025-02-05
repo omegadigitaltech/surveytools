@@ -1,56 +1,38 @@
 import { Link, Form, useActionData } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import "./surveyform.css";
+import "./surveyquestion.css";
 import backaro from "../../assets/img/backaro.svg";
 import del from "../../assets/img/del.svg";
 import add from "../../assets/img/add.svg";
 import dot from "../../assets/img/dot.svg";
 import option from "../../assets/img/option.svg";
 import copy from "../../assets/img/copy.svg";
-import Publish from "../../components/publishsurvey/publish";
 import useAuthStore from "../../components/store/useAuthStore";
-import { toast } from "react-toastify";
 
-const SurveyForm = () => {
+const SurveyQuestions = () => {
 
   const data = useActionData();
   console.log(data)
   const { currentSurveyId } = useAuthStore();
-
-  const [isPublishVisible, setIsPublishVisible] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
 
-  const handlePostSubmit = async (e) => {
-    e.preventDefault()
-    // Assume this function is triggered when the Post button is clicked
-    try {
-      setIsPosting(true);
-      toast.success("Survey posted successfully!", {
-        onClose: () => setIsPublishVisible(true),
-        autoClose: 1500, // Delay to show Publish component
-      }); // Show Publish component after success
-    } catch (error) {
-      console.error("Error posting questions:", error);
-    } finally {
-      setIsPosting(false); // Reset posting state
-    }
-  };
 
   const [questions, setQuestions] = useState([
     {
-      id: currentSurveyId,
-      text: "",
-      type: "Multiple Choice",
+      questionId: currentSurveyId,
+      questionText: "",
+      questionType: "multiple_choice",
+      required: false,
       options: [""],
     },
   ]);
 
   const addNewQuestion = (id) => {
     const newQuestion = {
-      questionId: id,
+      questionId: currentSurveyId,
       questionText: "",
-      questionType: "Multiple Choice",
-      required: "",
+      questionType: "multiple_choice",
+      required: false,
       options: [""],
     };
     setQuestions([...questions, newQuestion]);
@@ -155,8 +137,8 @@ const SurveyForm = () => {
                       }
                       className="choice-select"
                     >
-                      <option value="Multiple Choice" key="multiple">Multiple Choice</option>
-                      <option value="Single Choice" key="single">Single Choice</option>
+                      <option value="multiple_choice" key="multiple">Multiple Choice</option>
+                      <option value="fill_in" key="single">Fill in</option>
                     </select>
                   </div>
 
@@ -204,11 +186,10 @@ const SurveyForm = () => {
             </button>
           </Form>
         </div>
-        {/* Render Publish component conditionally */}
-        {isPublishVisible && <Publish id={currentSurveyId} />}
+       
       </div>
     </section>
   );
 };
 
-export default SurveyForm;
+export default SurveyQuestions;

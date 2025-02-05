@@ -48,7 +48,7 @@ const action = async ({ request }) => {
     toast.success("Questions Added")
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(null)
+        resolve((redirect("/publish")))
       }, 1500); 
     });
 

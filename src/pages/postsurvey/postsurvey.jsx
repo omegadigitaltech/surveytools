@@ -11,23 +11,22 @@ const PostSurvey = () => {
   const [description, setDescription] = useState('');
   const [participants, setParticipants] = useState("");
   const [gender, setGender] = useState("all_genders");
-  // const [preferredParticipants, setPreferredParticipants] = useState("all_faculties");
   const [amount, setAmount] = useState(0);
   const [preferredFaculty, setPreferredFaculty] = useState("all_faculties");
   const [preferredDepartment, setPreferredDepartment] = useState("");
   const [loading, setLoading] = useState(false);
 
-const handleSubmit = () => {
-  setLoading(true);
-};
+  const handleSubmit = () => {
+    setLoading(true);
+  };
 
-React.useEffect(() => {
-  if (data) {
-    setLoading(false);
-  }
-}, [data]);
+  React.useEffect(() => {
+    if (data) {
+      setLoading(false);
+    }
+  }, [data]);
 
-  
+
   const faculty_dept = [
     { faculty: "Administration", departments: ["Accounting", "Business Administration", "Local Government Studies", "Public Administration"] },
     { faculty: "Agriculture", departments: ["Agricultural Economics", "Animal Sciences", "Crop Production and Protection", "Family, Nutrition & Consumer Sciences", "Soil Science"] },
@@ -43,7 +42,7 @@ React.useEffect(() => {
     { faculty: "Clinical Sciences", departments: ["Anaesthesia", "Community Health", "Dermatology and Venerology", "Medicine", "Mental Health", "Obstetrics, Gynaecology, and Perinatology", "Ophthalmology", "Orthopaedics and Traumatology", "Paediatrics and Child Health", "Radiology", "Surgery"] },
     { faculty: "Dentistry", departments: ["Child Dental Health", "Oral and Maxillofacial Surgery", "Oral Pathology and Oral Medicine", "Preventive and Community Dentistry", "Restorative Dentistry"] }
   ];
-  
+
   const handleParticipantsChange = (e) => {
     const value = e.target.value;
     setParticipants(value);
@@ -56,7 +55,7 @@ React.useEffect(() => {
     setPreferredFaculty(e.target.value);
     setPreferredDepartment(""); // Reset department selection when faculty changes
   };
-  
+
   return (
     <section className="postsurvey">
       <div className="postsurvey_wrap wrap">
@@ -128,55 +127,55 @@ React.useEffect(() => {
               <label className="required-label" htmlFor="range-dropdown">
                 <h4>preferred gender of participants</h4>
               </label>
-              <select  
-                 name="gender"
-                 id="range-dropdown"
-                 className="custom-select">
-                 value={gender}
-                 onChange={(e) => setGender(e.target.value)}
-              <option value="all_genders">All genders</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
+              <select
+                name="gender"
+                id="range-dropdown"
+                className="custom-select">
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                <option value="all_genders">All genders</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
               </select>
             </div>
             <div className="postsurvey-field custom-dropdown">
               <label className="required-label" htmlFor="range-dropdown">
                 <h4>Preferred Participants</h4>
               </label>
-              <select  name="faculty" value={preferredFaculty} 
-               className="custom-select"
-               id="range-dropdown"
-              onChange={handleFacultyChange}>
+              <select name="faculty" value={preferredFaculty}
+                className="custom-select"
+                id="range-dropdown"
+                onChange={handleFacultyChange}>
                 <option value="all_faculties">All Faculties</option>
                 {faculty_dept.map((item) => (
                   <option key={item.faculty} value={item.faculty}>{item.faculty}</option>
                 ))}
               </select>
-           
+
             </div>
             {/* Where users can select department if they choose a particular faculty */}
             <div className="postsurvey-field custom-dropdown">
-            
-            {preferredFaculty !== "all_faculties" && (
-              <div className="postsurvey-field">
-                <label><h4>Preferred Department</h4></label>
-                <select name="department" value={preferredDepartment}
-                id="range-dropdown"
-                 className="custom-select"
-                 onChange={(e) => setPreferredDepartment(e.target.value)}>
-                  <option value="">Select Department</option>
-                  {faculty_dept.find(f => f.faculty === preferredFaculty)?.departments.map((dept) => (
-                    <option key={dept} value={dept}>{dept}</option>
-                  ))}
-                </select>
-              </div>
-            )}
+
+              {preferredFaculty !== "all_faculties" && (
+                <div className="postsurvey-field">
+                  <label><h4>Preferred Department</h4></label>
+                  <select name="department" value={preferredDepartment}
+                    id="range-dropdown"
+                    className="custom-select"
+                    onChange={(e) => setPreferredDepartment(e.target.value)}>
+                    <option value="">Select Department</option>
+                    {faculty_dept.find(f => f.faculty === preferredFaculty)?.departments.map((dept) => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
             <div className="flex btn_div">
-            <input type="hidden" name="amount" value={amount} />
-            <button type="submit" className="continue_survey btn" disabled={loading}>
-    {loading ? "Submitting..." : "Continue"}
-  </button>
+              <input type="hidden" name="amount" value={amount} />
+              <button type="submit" className="continue_survey btn" disabled={loading}>
+                {loading ? "Submitting..." : "Continue"}
+              </button>
             </div>
           </Form>
         </div>
