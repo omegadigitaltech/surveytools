@@ -1,26 +1,68 @@
-
 .publish {
     justify-content: center;
-    position: fixed;
-    top: 30%; 
-    left: 20%; 
-    transform: translate(-50%, -50%); 
-    margin-top: 0; 
-    z-index: 50;
+    margin: 2.5rem 0;
 }
 
-.publish-box{
-    flex-direction:column;
+.publish-box {
+    flex-direction: column;
     border: 1px solid rgb(209, 209, 209);
     max-width: 400px;
     padding: 1.75rem;
     border-radius: 1.5rem;
     text-align: center;
-     background: #fff;
+    background: #fff;
 }
 
-.publish-msg{
-    font-size:1.2rem ;
+.publish h2 {
+    font-size: 1.2rem;
+}
+
+.publish-msg {
+    font-size: 1rem;
     font-weight: 500;
-    margin-bottom: 1rem;
+    margin: 1rem 0;
+}
+
+/* MEDIA QUERY */
+@media(max-width: 350px) {
+    .publish h2 {
+        font-size: 1rem;
     }
+
+    .publish-msg {
+        font-size: .9rem;
+        font-weight: 500;
+        margin: 1rem 0;
+    }
+
+
+}
+
+@media(max-width: 250px) {
+    .publish h2 {
+        font-size: .9rem;
+    }
+
+    .publish-msg {
+        font-size: .85rem;
+        font-weight: 500;
+        margin: 1rem 0;
+    }
+
+    .spin-btn {
+        font-size: .8rem;
+        padding: 0.8em 2rem;
+
+    }
+}
+
+/* .publish-btn:hover {
+    background: linear-gradient(135deg, #0086bb, #255f8f);
+    transform: translateY(-2px);
+} */
+/* .publish-btn :disabled {
+    background: #255f8f;
+    cursor: not-allowed;
+    padding: 0.8em 3rem;
+    display: block;
+} */

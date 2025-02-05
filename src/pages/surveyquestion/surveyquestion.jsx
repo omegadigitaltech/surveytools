@@ -17,27 +17,27 @@ const SurveyQuestions = () => {
   const { currentSurveyId } = useAuthStore();
   const [isPosting, setIsPosting] = useState(false);
 
- const handlePostSubmit = async (e) => {
-  e.preventDefault();
-  setIsPosting(true);
+  const handlePostSubmit = async (e) => {
+    e.preventDefault();
+    setIsPosting(true);
 
-  const formData = new FormData(e.target);
-  try {
-    const response = await action({ formData });
-    if (response?.status === "success") {
-      setTimeout(() => {
-    setIsPosting(false);
+    const formData = new FormData(e.target);
+    try {
+      const response = await action({ formData });
+      if (response?.status === "success") {
+        setTimeout(() => {
+          setIsPosting(false);
           navigate("/publish");
-      }, 1500);
-    } else {
+        }, 1500);
+      } else {
+        setIsPosting(false);
+      }
+    } catch (error) {
+      console.error("Error posting questions:", error);
       setIsPosting(false);
-    }
-  } catch (error) {
-    console.error("Error posting questions:", error);
-    setIsPosting(false);
 
-  } 
-};
+    }
+  };
 
   const [questions, setQuestions] = useState([
     {
@@ -81,7 +81,7 @@ const SurveyQuestions = () => {
   const handleQuestionChange = (id, field, value) => {
     const updatedQuestions = questions.map((q) =>
       q.id === id ? { ...q, [field]: value, ...(field === "questionType" && value === "fill_in" ? { options: [] } : {}) } : q
-  );
+    );
     setQuestions(updatedQuestions);
   };
 
@@ -118,7 +118,7 @@ const SurveyQuestions = () => {
         </div>
 
         <div className="form-container">
-          <Form method="post" action="/surveyquestion"  onSubmit={handlePostSubmit}>
+          <Form method="post" action="/surveyquestion" onSubmit={handlePostSubmit}>
             {/* To pass id to action */}
             <input type="hidden" name="currentSurveyId" value={currentSurveyId} />
 
@@ -167,37 +167,37 @@ const SurveyQuestions = () => {
                     </select>
                   </div>
                   {question.questionType === "multiple_choice" && (
-                  <div className="options-list flex">
-                    <div className="option">
-                      {question.options.map((option, index) => (
-                        <div className="wrap-icon flex" key={index}>
-                          <input
-                            key={index}
-                            type="text"
-                            name="options"
-                            placeholder={`Option ${index + 1}`}
-                            value={option}
-                            onChange={(e) =>
-                              handleOptionChange(
-                                question.id,
-                                index,
-                                e.target.value
-                              )
-                            }
-                            className="option-input"
-                          />
-                        </div>
-                      ))}
-                    </div>
+                    <div className="options-list flex">
+                      <div className="option">
+                        {question.options.map((option, index) => (
+                          <div className="wrap-icon flex" key={index}>
+                            <input
+                              key={index}
+                              type="text"
+                              name="options"
+                              placeholder={`Option ${index + 1}`}
+                              value={option}
+                              onChange={(e) =>
+                                handleOptionChange(
+                                  question.id,
+                                  index,
+                                  e.target.value
+                                )
+                              }
+                              className="option-input"
+                            />
+                          </div>
+                        ))}
+                      </div>
 
-                    <button
-                      className="option-select flex"
-                      type="button"
-                      onClick={() => addOption(question.id)}
-                    >
-                      Add option
-                    </button>
-                  </div>
+                      <button
+                        className="option-select flex"
+                        type="button"
+                        onClick={() => addOption(question.id)}
+                      >
+                        Add option
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -208,13 +208,13 @@ const SurveyQuestions = () => {
             </button>
 
             <button type="submit" className="post-btn"
-            //  onClick={handlePostSubmit}
+              //  onClick={handlePostSubmit}
               disabled={isPosting}>
               {isPosting ? "Posting..." : "Post"}
             </button>
           </Form>
         </div>
-       
+
       </div>
     </section>
   );

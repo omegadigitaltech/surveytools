@@ -139,6 +139,51 @@ button {
     border-radius: 5px;
 }
 
+/* SPIN EFFECT */
+.spin-btn {
+    background: var(--base);
+    color: white;
+    padding: 0.8em 3rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+    min-width: 150px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid transparent;
+    border-top: 3px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* SPIN EFFECT */
+
 /* MEDIA QUERY */
 @media(max-width:550px) {
 .wrap{
@@ -148,5 +193,8 @@ button {
 @media(max-width:385px) {
 .btn {
     font-size: .85rem;
+}
+.spin-btn {
+    font-size: .9rem;
 }
 }
