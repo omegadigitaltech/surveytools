@@ -54,7 +54,7 @@ const action = async ({ request }) => {
     toast.success("Survey submitted successfully!");
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(redirect("/surveyform"));
+        resolve(redirect("/surveyquestion"));
       }, 1500);
     });
     // return { surveyID: json.survey._id }

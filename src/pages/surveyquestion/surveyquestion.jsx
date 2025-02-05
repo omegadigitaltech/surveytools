@@ -1,5 +1,6 @@
-import { Link, Form, useActionData } from "react-router-dom";
+import { Link, Form, useActionData, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import action from "./action";
 import "./surveyquestion.css";
 import backaro from "../../assets/img/backaro.svg";
 import del from "../../assets/img/del.svg";
@@ -10,15 +11,37 @@ import copy from "../../assets/img/copy.svg";
 import useAuthStore from "../../components/store/useAuthStore";
 
 const SurveyQuestions = () => {
-
+  const navigate = useNavigate();
   const data = useActionData();
   console.log(data)
   const { currentSurveyId } = useAuthStore();
   const [isPosting, setIsPosting] = useState(false);
 
+ const handlePostSubmit = async (e) => {
+  e.preventDefault();
+  setIsPosting(true);
+
+  const formData = new FormData(e.target);
+  try {
+    const response = await action({ formData });
+    if (response?.status === "success") {
+      setTimeout(() => {
+    setIsPosting(false);
+          navigate("/publish");
+      }, 1500);
+    } else {
+      setIsPosting(false);
+    }
+  } catch (error) {
+    console.error("Error posting questions:", error);
+    setIsPosting(false);
+
+  } 
+};
 
   const [questions, setQuestions] = useState([
     {
+      id: Date.now(), // Unique ID
       questionId: currentSurveyId,
       questionText: "",
       questionType: "multiple_choice",
@@ -29,6 +52,7 @@ const SurveyQuestions = () => {
 
   const addNewQuestion = (id) => {
     const newQuestion = {
+      id: Date.now(),
       questionId: currentSurveyId,
       questionText: "",
       questionType: "multiple_choice",
@@ -47,7 +71,8 @@ const SurveyQuestions = () => {
     if (questionToDuplicate) {
       const duplicatedQuestion = {
         ...questionToDuplicate,
-        id: questions.length + 1,
+        id: Date.now(),
+        // id: questions.length + 1,
       };
       setQuestions([...questions, duplicatedQuestion]);
     }
@@ -55,8 +80,8 @@ const SurveyQuestions = () => {
 
   const handleQuestionChange = (id, field, value) => {
     const updatedQuestions = questions.map((q) =>
-      q.id === id ? { ...q, [field]: value } : q
-    );
+      q.id === id ? { ...q, [field]: value, ...(field === "questionType" && value === "fill_in" ? { options: [] } : {}) } : q
+  );
     setQuestions(updatedQuestions);
   };
 
@@ -93,7 +118,7 @@ const SurveyQuestions = () => {
         </div>
 
         <div className="form-container">
-          <Form method="post" action="/surveyform">
+          <Form method="post" action="/surveyquestion"  onSubmit={handlePostSubmit}>
             {/* To pass id to action */}
             <input type="hidden" name="currentSurveyId" value={currentSurveyId} />
 
@@ -108,7 +133,7 @@ const SurveyQuestions = () => {
                     placeholder="Untitled Question"
                     value={question.text}
                     onChange={(e) =>
-                      handleQuestionChange(question.id, "text", e.target.value)
+                      handleQuestionChange(question.id, "questionText", e.target.value)
                     }
                   />
                   <img
@@ -123,7 +148,7 @@ const SurveyQuestions = () => {
                     alt="Delete"
                     onClick={() => deleteQuestion(question.id)}
                   />
-                  <img src={option} className="question-option" alt="Options" />
+                  {/* <img src={option} className="question-option" alt="Options" /> */}
                 </div>
 
                 <div className="choice-field custom-dropdown flex">
@@ -133,20 +158,21 @@ const SurveyQuestions = () => {
                       name="questionType"
                       value={question.type}
                       onChange={(e) =>
-                        handleQuestionChange(question.id, "type", e.target.value)
+                        handleQuestionChange(question.id, "questionType", e.target.value)
                       }
                       className="choice-select"
                     >
-                      <option value="multiple_choice" key="multiple">Multiple Choice</option>
-                      <option value="fill_in" key="single">Fill in</option>
+                      <option value="multiple_choice" >Multiple Choice</option>
+                      <option value="fill_in" >Fill in</option>
                     </select>
                   </div>
-
+                  {question.questionType === "multiple_choice" && (
                   <div className="options-list flex">
                     <div className="option">
                       {question.options.map((option, index) => (
                         <div className="wrap-icon flex" key={index}>
                           <input
+                            key={index}
                             type="text"
                             name="options"
                             placeholder={`Option ${index + 1}`}
@@ -172,6 +198,7 @@ const SurveyQuestions = () => {
                       Add option
                     </button>
                   </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -180,7 +207,8 @@ const SurveyQuestions = () => {
               Next Question <img src={add} alt="Add" />
             </button>
 
-            <button type="submit" className="post-btn" onClick={handlePostSubmit}
+            <button type="submit" className="post-btn"
+            //  onClick={handlePostSubmit}
               disabled={isPosting}>
               {isPosting ? "Posting..." : "Post"}
             </button>

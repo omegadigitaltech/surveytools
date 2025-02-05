@@ -9,10 +9,12 @@ import "./publish.css"
 
 const Publish = ({ id }) => {
     const [publish, setPublish] = useState(false);
+    const [isPublish, setIspublishing] = useState(false);
+    
     const authToken = localStorage.getItem("token");
 
     const handlePublish = async () => {
-        setPublish(true);
+        
         const API_URL = `${config.API_URL}/surveys/${id}/publish`;
         const publishFetch = await fetch(API_URL, {
             method: "POST",
@@ -26,7 +28,7 @@ const Publish = ({ id }) => {
                 toast.success("Survey published successfully!")
                 return new Promise((resolve) => {
                     setTimeout(() => {
-                        resolve(redirect("/surveyform"));
+                        resolve(redirect("/dashboard"));
                     }, 1500);
                 });
             }
@@ -49,8 +51,9 @@ const Publish = ({ id }) => {
                 {/* Include surveyId in form data */}
                 {/* <input type="hidden" name="surveyId" value="12345" /> Replace with actual ID */}
 
-                <button type="button" className="post-btn" onClick={() => handlePublish()}>
-                    Publish
+                <button type="button" className="post-btn" onClick={() => handlePublish()}
+                     disabled={isPublishing}>
+              {isPublishing ? "Publishing..." : "publish"}
                 </button>
                 {/* </Form> */}
             </div>
