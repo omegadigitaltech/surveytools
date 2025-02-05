@@ -1,0 +1,155 @@
+.pricing {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #f8f9fa;
+    margin-bottom: 4rem;
+}
+
+.pricing-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.pricing-container h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.pricing-container p {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.bill-period {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.bill-period button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: 1px solid var(--base);
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px;
+}
+
+.bill-period button.active {
+    background-color: var(--base);
+    color: white;
+}
+
+.price-plans {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.price-plan {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 280px;
+    text-align: left;
+}
+.price-plan:hover {
+    transform: translateY(20px);
+}
+.price-plan h3 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+.price-plan p{
+    font-size: .9rem;
+}
+.price-plan h4 {
+    font-size: 1rem;
+    color: var(--base);
+    margin-bottom: 10px;
+}
+.price-sign{
+    font-size: 1.5rem;
+}
+.price-plan ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 15px;
+    font-size: .9rem;
+}
+.price-feature{
+    margin-top: 1rem;
+}
+.price-tick{
+    gap: .5rem;
+}
+.price-plan ul li {
+    padding: 5px 0;
+}
+
+.price-plan button {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--base);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.price-plan.featured {
+    background-color: var(--base);
+    color: white;
+}
+
+.price-plan.featured h3,.price-plan.featured p, .price-plan.featured h4, .price-plan.featured ul li {
+    color: white;
+}
+
+.price-plan.featured button {
+    background-color: white;
+    color: var(--base);
+}
+
+@media(max-width:550px) {
+    .pricing-container h2 {
+        font-size: 1.1rem;
+    }
+    .pricing-container p {
+        font-size: .9rem;
+    }
+    .bill-period button {
+        padding: 7px 15px;
+        font-size: .9rem;
+    }
+    .price-plan {
+    width: 80%;
+    }
+}
+@media(max-width:380px) {
+    .price-plan {
+        width: 100%;
+        }
+        .pricing-container p {
+            font-size: .85rem;
+        }
+        .price-sign {
+            font-size: 1.2rem;
+        }
+        .price-plan h4 {
+            font-size: .9rem;
+        }
+        .price-plan ul {
+            font-size: .85rem;
+        }
+        .price-plan button {
+            padding: 10px;
+            font-size: .9rem;
+        }
+}

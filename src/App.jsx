@@ -28,6 +28,7 @@ import ExpandSurvey from "./pages/expandsurvey/expandsurvey";
 import PostSurvey from "./pages/postsurvey/postsurvey";
 import SurveyQuestion from "./pages/surveyquestion/surveyquestion";
 import Publish from "./pages/publish/publish"
+import Pricing from "./pages/pricing/pricing"
 import Payment from "./pages/payment/payment";
 import Notifications from "./pages/notifications/notifications";
 import Withdraw from "./pages/withdraw/withdraw";
@@ -48,6 +49,7 @@ const router = createBrowserRouter(
         <Route path="surveyquestion" element={<SurveyQuestion />} action={postAction}/>
         <Route path="publish" element={<Publish />} />
         <Route path="payment" element={<Payment />} />
+        <Route path="pricing" element={<Pricing />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="profile" element={<Profile />} />
