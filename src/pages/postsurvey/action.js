@@ -8,14 +8,22 @@ const action = async ({ request }) => {
   const authToken = localStorage.getItem("token");
   console.log(authToken)
   // Expo
-
   const formData = await request.formData();
+  
+  const faculty = formData.get("faculty");
+  const department = formData.get("department");
+  
+
+  const preferredParticipants = [];
+  if (faculty && faculty !== "all_faculties") preferredParticipants.push(faculty);
+  if (department && department !== "all_departments") preferredParticipants.push(department);
+  
   const survey = {
     title: formData.get("title"),
     description: formData.get("description"),
     no_of_participants: formData.get("participant_num"),
     gender: formData.get("gender"),
-    preferred_participants: formData.get("preferred_participants"),
+    preferred_participants: preferredParticipants,
     amount_to_be_paid: formData.get("amount"),
   }
 
