@@ -552,6 +552,26 @@ const publishSurvey = async (req, res, next) => {
       return res.status(400).json({ status: "failure", code: 400, msg: 'No payment found' });
     }
 
+    // Calculate expected payment amount
+    const BASE_RATE = 2000;
+    const QUESTION_RATE = 20;
+    const PARTICIPANT_RATE = 50;
+
+    const expectedAmount = BASE_RATE + 
+      (QUESTION_RATE * survey.questions.length) + 
+      (PARTICIPANT_RATE * survey.no_of_participants);
+
+    // Verify payment amount matches expected amount
+    if (payment.amount !== expectedAmount) {
+      return res.status(400).json({ 
+        status: "failure", 
+        code: 400, 
+        msg: 'Payment amount does not match expected amount.',
+        expected: expectedAmount,
+        received: payment.amount
+      });
+    }
+
     survey.published = true;
     survey.link = `https://${main_url}/surveys/${surveyId}/info`;
     await survey.save();
