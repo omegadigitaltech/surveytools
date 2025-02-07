@@ -14,6 +14,7 @@ const useAuthStore = create(
       isLogoutVisible: false,
       surveys: [],
       notifications: [],
+      hasPaid: false,
 
       // Action to set authentication data after successful login
       setAuthData: (token, email, name, inst) => {
@@ -36,7 +37,10 @@ const useAuthStore = create(
       // Actions for logout confirmation
       showLogoutConfirmation: () => set({ isLogoutVisible: true }),
       hideLogoutConfirmation: () => set({ isLogoutVisible: false }),
-
+     // check payment status
+     setHasPaid: (haspaid) => {
+      set({ hasPaid: haspaid})
+     },
       // Action to clear user data on logout
       logout: () => {
         set({ authToken: '', isAuthenticated: false, userEmail: '', userName: '', currentSurveyId: '' });

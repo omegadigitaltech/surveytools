@@ -27,7 +27,7 @@ const SurveyQuestions = () => {
       if (response?.status === "success") {
         setTimeout(() => {
           setIsPosting(false);
-          navigate("/publish");
+          navigate("/payment");
         }, 1500);
       } else {
         setIsPosting(false);

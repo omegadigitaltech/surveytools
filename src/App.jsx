@@ -28,8 +28,9 @@ import ExpandSurvey from "./pages/expandsurvey/expandsurvey";
 import PostSurvey from "./pages/postsurvey/postsurvey";
 import SurveyQuestion from "./pages/surveyquestion/surveyquestion";
 import Publish from "./pages/publish/publish"
+import Payment from "./components/payment/payment"
 import Pricing from "./pages/pricing/pricing"
-import Payment from "./pages/payment/payment";
+// import Payment from "./pages/payment/payment";
 import Notifications from "./pages/notifications/notifications";
 import Withdraw from "./pages/withdraw/withdraw";
 import Profile from "./pages/profile/profile";
