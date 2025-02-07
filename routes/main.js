@@ -1,4 +1,3 @@
-
 const {authMiddleware} = require('../middleware/auth')
 const express = require('express');
 const router = express.Router();
@@ -7,7 +6,9 @@ const { start, home,updateAnswer, submitAnswers, createSurvey,
     checkUserFilledSurvey, checkSurveyMaxParticipants, addOrUpdateQuestion,
   getSurveyAnalytics, getSurveyQuestions,  getAllSurveys, publishSurvey, testController,
   receivePaymentWebhook,
-  getPrice
+  getPrice,
+  mySurveys,
+  verifyPayment
  } = require('../controllers/main')
 
 
@@ -27,10 +28,11 @@ router.get('/surveys',authMiddleware, getAllSurveys);
 router.get('/surveys/:surveyId/questions',authMiddleware, getSurveyQuestions);
 router.post('/surveys/:surveyId/publish',authMiddleware, publishSurvey);
 router.get('/surveys/:surveyId/analytics',authMiddleware, getSurveyAnalytics);
+router.get('/surveys/:surveyId/verify-payment', authMiddleware, verifyPayment);
 
 router.post('/payment-webhook', receivePaymentWebhook)
 router.post('/get-price', authMiddleware, getPrice)
-
+router.get('/my-surveys', authMiddleware, mySurveys)
 module.exports = router;
 
 

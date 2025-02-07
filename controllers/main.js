@@ -53,15 +53,13 @@ const createSurvey = async (req, res, next) => {
     }
   
     // First create the survey
-    const amount = no_of_participants * 100
     const survey = await Survey.create([{
       user_id: user._id,
       title,
       description,
       preferred_participants,
       gender,
-      no_of_participants,
-      amount_to_be_paid: amount
+      no_of_participants
     }], { session });
 
     // Then populate the user data
@@ -732,22 +730,43 @@ const createQuestion = async (req, res) => {
 
 const getPrice = async (req, res) => {
     try {
-      const { userId  } = req;
-      const { surveyId } = req.body;
+        const { userId } = req;
+        const { surveyId } = req.body;
 
-      const survey = await Survey.findById(surveyId)
-      const user = await User.findOne({ id: userId });
+        const survey = await Survey.findById(surveyId);
+        const user = await User.findOne({ id: userId });
 
       if (!survey.user_id.equals(user._id)) {
         return res.status(400).json({error: "No survey Found"})
       }
 
-      const amount_to_be_paid = survey.amount_to_be_paid
-      
-      let responsePayload = {
-        price: amount_to_be_paid,
-        surveyId
-      };
+        // Constants
+        const BASE_RATE = 2000;
+        const QUESTION_RATE = 20;
+        const PARTICIPANT_RATE = 50;
+
+        // Calculate total price
+        const numQuestions = survey.questions.length;
+        const numParticipants = survey.no_of_participants;
+        
+        const amount_to_be_paid = BASE_RATE + 
+            (QUESTION_RATE * numQuestions) + 
+            (PARTICIPANT_RATE * numParticipants);
+
+        // Calculate points per user
+        const points_per_user = Math.ceil((QUESTION_RATE * numQuestions + PARTICIPANT_RATE * numParticipants) / numParticipants);
+
+        // Update survey with calculated values
+        await Survey.findByIdAndUpdate(surveyId, {
+            amount_to_be_paid: amount_to_be_paid,
+            point_per_user: points_per_user
+        });
+        
+        let responsePayload = {
+            price: amount_to_be_paid,
+            points_per_user: points_per_user,
+            surveyId
+        };
 
       // Generate a JWT to store this data temporarily
       const token = jwt.sign(responsePayload, process.env.JWT_SECRET, {
@@ -758,7 +777,7 @@ const getPrice = async (req, res) => {
       console.error("Error in get-price route:", error);
       res.status(500).json({ error: "Internal server error" });
     }
-  }
+};
 
 // nearest future , can send those error to the frontend pricing
 const receivePaymentWebhook = async (req, res) => {
@@ -859,12 +878,96 @@ const receivePaymentWebhook = async (req, res) => {
     }
   }
 
+const mySurveys = async (req, res) => {
+  const {userId} = req
+  const user =  await User.findOne({id: userId})
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+  const mySurveys = await Survey.find({user_id: user._id})
+
+  res.status(200).json({ 
+    status: "success", 
+    code: 200, 
+    mySurveys 
+  });
+  
+}
+
+
+
 
 
 const testController = async (req, res) => {
 
     const survey =  await Survey
 }
+
+const verifyPayment = async (req, res) => {
+    try {
+        const { surveyId } = req.params;
+        const { userId } = req;
+
+        const user = await User.findOne({ id: userId });
+        if (!user) {
+            return res.status(404).json({
+                status: "failure",
+                code: 404,
+                msg: "User not found"
+            });
+        }
+
+        const survey = await Survey.findById(surveyId);
+        if (!survey) {
+            return res.status(404).json({
+                status: "failure",
+                code: 404,
+                msg: "Survey not found"
+            });
+        }
+
+        // Check if user owns the survey
+        if (!survey.user_id.equals(user._id)) {
+            return res.status(403).json({
+                status: "failure",
+                code: 403,
+                msg: "Unauthorized access"
+            });
+        }
+
+        // Check if payment exists for this survey
+        const payment = await Payment.findOne({ surveyId });
+        
+        if (!payment) {
+            return res.status(200).json({
+                status: "success",
+                code: 200,
+                paid: false,
+                msg: "No payment found for this survey"
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            code: 200,
+            paid: true,
+            payment: {
+                amount: payment.amount,
+                datePaid: payment.datePaid,
+                referenceNumber: payment.referenceNumber
+            },
+            msg: "Payment verified successfully"
+        });
+
+    } catch (error) {
+        console.error("Error in verify-payment route:", error);
+        res.status(500).json({
+            status: "failure",
+            code: 500,
+            msg: "Internal server error"
+        });
+    }
+};
 
 module.exports = {
   start,
@@ -885,5 +988,7 @@ module.exports = {
   getUserSurveyData,
   publishSurvey,
   receivePaymentWebhook,
-  getPrice
+  getPrice,
+  mySurveys,
+  verifyPayment
 }

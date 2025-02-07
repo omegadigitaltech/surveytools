@@ -82,7 +82,9 @@ const surveySchema = new Schema({
     },
     amount_to_be_paid: {
      type: Number,
-     required: [true, "Amount to be paid is required"]
+    },
+    point_per_user: {
+      type:Number,
     },
     description: { type: String, required: [true, "Description Field is required"]},
     submittedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Track users who submitted the survey
