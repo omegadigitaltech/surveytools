@@ -859,12 +859,17 @@ const receivePaymentWebhook = async (req, res) => {
 
           const user = await User.findOne({ email });
           if (!user) {
+            console.log("User not found")
             return res.status(404).json({ error: "User not found" });
           }
           const userId = user.userId;
           const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          console.log(amount)
+          console.log(decoded.price)
 
-          if ( Number(amount) !== decoded.price) {
+          const amountInNaira = Number(amount) / 100; // Convert amount to naira
+          if ( amountInNaira !== decoded.price) {
+            console.log("Invalid plan or amount")
             return res.status(400).json({ error: "Invalid plan or amount" });
             // send notification
           }
