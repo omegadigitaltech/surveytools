@@ -959,9 +959,9 @@ const verifyPayment = async (req, res) => {
         const payment = await Payment.findOne({ surveyId });
         
         if (!payment) {
-            return res.status(200).json({
+            return res.status(400).json({
                 status: "success",
-                code: 200,
+                code: 400,
                 paid: false,
                 msg: "No payment found for this survey"
             });
