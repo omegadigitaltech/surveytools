@@ -17,10 +17,13 @@ import "./dashboard.css"
 const dashboard = () => {
 
   const [searchKey, setSearchKey] = useState("");
+  const [activeTab, setActiveTab] = useState("available");
   const authToken = useAuthStore((state) => state.authToken);
   const surveys = useAuthStore((state) => state.surveys);
   const setSurveys = useAuthStore((state) => state.setSurveys);
   const [showPoint, setShowPoint] = useState(false);
+  const [mySurveys, setMySurveys] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchSurveys = async () => {
@@ -57,6 +60,41 @@ const dashboard = () => {
     fetchSurveys();
 
   }, [authToken, setSurveys])
+
+  const fetchMySurveys = async () => {
+    setIsLoading(true);
+    const API_URL = `${config.API_URL}/my-surveys`;
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    };
+
+    try {
+      const response = await fetch(API_URL, options);
+      const json = await response.json();
+
+      if (!response.ok) {
+        throw new Error(json.message || "Failed to fetch my surveys");
+      }
+
+      setMySurveys(json.mySurveys);
+    } catch (error) {
+      toast.error(error.message || "Error fetching my surveys");
+      console.error("Error fetching my surveys:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    if (tab === "my-surveys") {
+      fetchMySurveys();
+    }
+  };
 
   const filteredSurveys = surveys.filter((survey) =>
     survey.title.toLowerCase().includes(searchKey.toLowerCase())
@@ -108,53 +146,116 @@ const dashboard = () => {
         </div>
         <div className="dashboard_surveys">
           <div className="survey_head flex">
-            <h3 className="active_head">Available Surveys</h3>
-            <h3>My Surveys</h3>
+            <h3 
+              className={`${activeTab === "available" ? "active_head" : ""}`}
+              onClick={() => handleTabClick("available")}
+            >
+              Available Surveys
+            </h3>
+            <h3 
+              className={`${activeTab === "my-surveys" ? "active_head" : ""}`}
+              onClick={() => handleTabClick("my-surveys")}
+            >
+              My Surveys
+            </h3>
           </div>
           <div className="survey_posts">
-            {/* Remove onclick; it's for checking the next page purpose */}
-            {filteredSurveys.length > 0 ? (
-              filteredSurveys.map((survey, index) => (
-                <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
-                  <div
-                    className={`survey_post ${index === 0 ? "first_post" : ""}`}
-                    key={survey._id}
-                  >
-                    <div className="post_time flex">
-                      <p className="posted">Posted {formatDistanceToNow(parseISO(survey.createdAt), { addSuffix: true }) || "N/A"}
-                      </p>
-                      <p className="duration">
-                        Duration: <b>{survey.duration || 0}</b> min
-                      </p>
-                    </div>
-                    <div className="survey_details flex">
-                      <h3 className="survey_title">{survey.title}</h3>
-                      <h4 className="point">{survey.point || 0} Pts</h4>
-                    </div>
-                    <p className="survey_info">
-                      {survey.description}
-                      <a href="">...see more</a>
-                    </p>
-                    <div className="survey_class flex">
-                      <div className="dept flex">
-                        <img src={dept} alt="" />
-                        <h4 className="department">
-                          Inst. of <span className="dept">{survey.user_id ? survey.user_id.instituition : "N/A"}</span>
-                        </h4>
-                      </div>
-                      <div className="participants flex">
-                        <img src={members} alt="" />
-                        <p>
-                          <span className="num_participant">{survey.max_participant || 0}</span>{" "}
-                          Participants
+            {activeTab === "available" ? (
+              filteredSurveys.length > 0 ? (
+                filteredSurveys.map((survey, index) => (
+                  <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
+                    <div
+                      className={`survey_post ${index === 0 ? "first_post" : ""}`}
+                      key={survey._id}
+                    >
+                      <div className="post_time flex">
+                        <p className="posted">Posted {formatDistanceToNow(parseISO(survey.createdAt), { addSuffix: true }) || "N/A"}
+                        </p>
+                        <p className="duration">
+                          Duration: <b>{survey.duration || 0}</b> min
                         </p>
                       </div>
+                      <div className="survey_details flex">
+                        <h3 className="survey_title">{survey.title}</h3>
+                        <h4 className="point">{survey.point || 0} Pts</h4>
+                      </div>
+                      <p className="survey_info">
+                        {survey.description}
+                        <a href="">...see more</a>
+                      </p>
+                      <div className="survey_class flex">
+                        <div className="dept flex">
+                          <img src={dept} alt="" />
+                          <h4 className="department">
+                            Inst. of <span className="dept">{survey.user_id ? survey.user_id.instituition : "N/A"}</span>
+                          </h4>
+                        </div>
+                        <div className="participants flex">
+                          <img src={members} alt="" />
+                          <p>
+                            <span className="num_participant">{survey.max_participant || 0}</span>{" "}
+                            Participants
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))
+                  </Link>
+                ))
+              ) : (
+                <p className="no_result">Opps! Survey not found..</p>
+              )
             ) : (
-              <p className="no_result">Opps! Survey not found..</p>
+              isLoading ? (
+                <div className="loader-container">
+                  <div className="loader"></div>
+                  <p>Loading your surveys...</p>
+                </div>
+              ) : (
+                mySurveys.length > 0 ? (
+                  mySurveys.map((survey, index) => (
+                    <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
+                      <div
+                        className={`survey_post ${index === 0 ? "first_post" : ""}`}
+                        key={survey._id}
+                      >
+                        <div className="post_time flex">
+                          <p className="posted">
+                            Posted {formatDistanceToNow(parseISO(survey.createdAt), { addSuffix: true }) || "N/A"}
+                          </p>
+                          <p className="duration">
+                            Duration: <b>{survey.duration || 0}</b> min
+                          </p>
+                        </div>
+                        <div className="survey_details flex">
+                          <h3 className="survey_title">{survey.title}</h3>
+                          <h4 className="point">{survey.point_per_user || 0} Pts</h4>
+                        </div>
+                        <p className="survey_info">
+                          {survey.description}
+                          <a href="">...see more</a>
+                        </p>
+                        <div className="survey_class flex">
+                          <div className="dept flex">
+                            <img src={dept} alt="" />
+                            <h4 className="department">
+                              Preferred: <span className="dept">{survey.preferred_participants.join(", ")}</span>
+                            </h4>
+                          </div>
+                          <div className="participants flex">
+                            <img src={members} alt="" />
+                            <p>
+                              <span className="num_participant">{survey.no_of_participants || 0}</span>{" "}
+                              Participants
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="no_result">You haven't created any surveys yet.</p>
+                )
+              )
             )}
           </div>
 

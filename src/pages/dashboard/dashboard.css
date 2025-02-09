@@ -345,3 +345,63 @@ form ::placeholder {
         font-size: 0.7rem;
     }
 }
+
+.survey_head h3 {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.survey_head h3:hover {
+  color: var(--primary);
+}
+
+.active_head {
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid var(--litgray);
+  border-bottom-color: var(--base);
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-container p {
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+@media(max-width: 512px) {
+  .loader {
+    width: 36px;
+    height: 36px;
+    border-width: 4px;
+  }
+  
+  .loader-container p {
+    font-size: 0.8rem;
+  }
+}

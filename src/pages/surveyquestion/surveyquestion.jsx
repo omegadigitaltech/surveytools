@@ -9,6 +9,7 @@ import dot from "../../assets/img/dot.svg";
 import option from "../../assets/img/option.svg";
 import copy from "../../assets/img/copy.svg";
 import useAuthStore from "../../components/store/useAuthStore";
+import PricingModal from "../../components/pricingmodal/pricingmodal";
 
 const SurveyQuestions = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const SurveyQuestions = () => {
   console.log(data)
   const { currentSurveyId } = useAuthStore();
   const [isPosting, setIsPosting] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
@@ -25,17 +27,14 @@ const SurveyQuestions = () => {
     try {
       const response = await action({ formData });
       if (response?.status === "success") {
-        setTimeout(() => {
-          setIsPosting(false);
-          navigate("/payment");
-        }, 1500);
+        setIsPosting(false);
+        setShowPricingModal(true);
       } else {
         setIsPosting(false);
       }
     } catch (error) {
       console.error("Error posting questions:", error);
       setIsPosting(false);
-
     }
   };
 
@@ -216,6 +215,10 @@ const SurveyQuestions = () => {
         </div>
 
       </div>
+
+      {showPricingModal && (
+        <PricingModal onClose={() => setShowPricingModal(false)} />
+      )}
     </section>
   );
 };

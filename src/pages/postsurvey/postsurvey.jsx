@@ -111,15 +111,15 @@ const PostSurvey = () => {
                   required
                 />
               </div>
-              <div className="postsurvey-field custom-dropdown">
+              {/* <div className="postsurvey-field custom-dropdown">
                 <label className="required-label" htmlFor="range-dropdown">
                   <h4>Est. amount to be paid (₦)</h4>
-                </label>
+                </label> */}
                 {/* Calculated amount to be paid */}
-                <p className="num_partp-input">
+                {/* <p className="num_partp-input">
                   ₦ <span className="result">{amount}</span>
                 </p>
-              </div>
+              </div> */}
 
 
             </div>
