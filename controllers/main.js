@@ -561,6 +561,8 @@ const publishSurvey = async (req, res, next) => {
       (QUESTION_RATE * survey.questions.length) + 
       (PARTICIPANT_RATE * survey.no_of_participants);
 
+      console.log(expectedAmount)
+      console.log(payment.amount)
     // Verify payment amount matches expected amount
     if (payment.amount !== expectedAmount) {
       return res.status(400).json({ 
