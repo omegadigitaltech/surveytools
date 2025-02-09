@@ -547,7 +547,7 @@ const publishSurvey = async (req, res, next) => {
       return res.status(403).json({ status: "failure", code: 403, msg: 'User not authorized to publish this survey' });
     }
 
-    const payment = await Payment.findOne({surveyId})
+    const payment = await Payment.findOne({ surveyId }).sort({ createdAt: -1 });
     if(!payment){
       return res.status(400).json({ status: "failure", code: 400, msg: 'No payment found' });
     }
