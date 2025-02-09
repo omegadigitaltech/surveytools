@@ -878,7 +878,7 @@ const receivePaymentWebhook = async (req, res) => {
             userId: userId,
             referenceNumber: id_,
             surveyId: decoded.surveyId,
-            amount,            
+            amountInNaira,            
             email,
             datePaid: new Date()
           });
