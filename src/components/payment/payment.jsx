@@ -66,7 +66,7 @@ const Payment = () => {
     console.log("Payment response:", reference);
     setIsProcessing(true);
     try {
-      const res = await fetch(`${config.API_URL}/verify-payment`, {
+      const res = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/verify-payment`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${authToken}`,
@@ -89,13 +89,25 @@ const Payment = () => {
     }
   };
 
-  const handlePaymentError = (error) => {
-    console.error("Payment failed:", error);
+  const handlePaymentError = () => {
+    console.error("Payment failed");
     toast.error("Payment failed. Please try again.");
   };
 
   const handlePaymentClose = () => {
     toast.info("Payment cancelled");
+  };
+
+  const onSuccess = (reference) => {
+    handlePaymentSuccess(reference);
+  };
+
+  const onError = () => {
+    handlePaymentError();
+  };
+
+  const onClose = () => {
+    handlePaymentClose();
   };
 
   const handlePayment = () => {
@@ -107,7 +119,14 @@ const Payment = () => {
       toast.error("Survey ID not found");
       return;
     }
-    initializePayment(handlePaymentSuccess, handlePaymentClose);
+    const config = {
+      ...paystackConfig,
+      onSuccess,
+      onClose,
+      onError,
+    };
+    
+    initializePayment(config);
   };
 
   return (
