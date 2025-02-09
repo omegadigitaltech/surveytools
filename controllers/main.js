@@ -963,7 +963,7 @@ const verifyPayment = async (req, res) => {
         }
 
         // Check if payment exists for this survey
-        const payment = await Payment.findOne({ surveyId });
+        const payment = await Payment.findOne({ surveyId }).sort({ createdAt: -1 });;
         
         if (!payment) {
             return res.status(400).json({
