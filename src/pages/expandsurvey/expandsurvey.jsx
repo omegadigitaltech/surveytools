@@ -67,7 +67,7 @@ const expandsurvey = () => {
         </div>
         <div className="survey_details expand_info flex">
           <h3 className="survey_title expand_title">{survey.title}</h3>
-          <h4 className="point">{survey.point || 0} points</h4>
+          <h4 className="point">{survey.point_per_user || 0} points</h4>
         </div>
         <div className="description">
           <h4>Description</h4>
@@ -84,15 +84,15 @@ const expandsurvey = () => {
           <h4>Activities on this survey</h4>
           <div className="activity_row center flex">
             <li className="">Total participant required</li>
-            <p className="required_no"> <span className="participant_no">{survey.max_participant}</span> <span className="exp-mobile">Participants</span> </p>
+            <p className="required_no"> <span className="participant_no">{survey.no_of_participants}</span> <span className="exp-mobile">Participants</span> </p>
           </div>
           <div className="activity_row center flex">
             <li className="">Participated</li>
-            <p className="required_no"><span className="participant_no">{survey.current_participants || 0}</span> <span className="exp-mobile">Participated</span> </p>
+            <p className="required_no"><span className="participant_no">{survey.participantCounts.filled || 0}</span> <span className="exp-mobile">Participated</span> </p>
           </div>
           <div className="activity_row center flex">
             <li className="">No. of participants left</li>
-            <p className="required_no"> <span className="participant_no"> {survey.max_participant - (survey.current_participants || 0)}</span>{" "}</p>
+            <p className="required_no"> <span className="participant_no"> {survey.participantCounts.remaining|| 0}</span>{" "}</p>
           </div>
         </div>
 
@@ -103,7 +103,7 @@ const expandsurvey = () => {
           </div>
           <div className="participants flex">
             <img src={members} alt="" />
-            <p> <span className="num_participant">{survey.current_participants || 0}</span> Participants</p>
+            <p> <span className="num_participant">{survey.participantCounts.filled  || 0}</span> Participants</p>
           </div>
         </div>
         <div className="flex btn_div">
@@ -112,7 +112,7 @@ const expandsurvey = () => {
               state: {
                 title: survey.title,
                 createdAt: survey.createdAt,
-                points: survey.point,
+                points: survey.point_per_user,
               }
             }
           )}>

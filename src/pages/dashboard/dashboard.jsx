@@ -177,7 +177,7 @@ const dashboard = () => {
                       </div>
                       <div className="survey_details flex">
                         <h3 className="survey_title">{survey.title}</h3>
-                        <h4 className="point">{survey.point || 0} Pts</h4>
+                        <h4 className="point">{survey.point_per_user || 0} Pts</h4>
                       </div>
                       <p className="survey_info">
                         {survey.description}
@@ -187,13 +187,13 @@ const dashboard = () => {
                         <div className="dept flex">
                           <img src={dept} alt="" />
                           <h4 className="department">
-                            Inst. of <span className="dept">{survey.user_id ? survey.user_id.instituition : "N/A"}</span>
+                            <span className="dept">{survey.user_id ? survey.user_id.instituition : "N/A"}</span>
                           </h4>
                         </div>
                         <div className="participants flex">
                           <img src={members} alt="" />
                           <p>
-                            <span className="num_participant">{survey.max_participant || 0}</span>{" "}
+                            <span className="num_participant">{survey.participantCounts?.filled || 0}</span>{" "}
                             Participants
                           </p>
                         </div>
