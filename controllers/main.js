@@ -492,8 +492,7 @@ const deleteQuestion = async (req, res, next) => {
 const getSurveyInfo = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
-    const survey = await Survey.findById(surveyId)
-      .select('title description participants preferred_participants no_of_participants point duration createdAt updatedAt submittedUsers');
+    const survey = await Survey.findById(surveyId);
 
     if (!survey) {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
