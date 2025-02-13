@@ -99,7 +99,7 @@ const expandsurvey = () => {
         <div className="expand_class flex">
           <div className="dept flex">
             <img src={dept} alt="" />
-            <h4 className="department">Inst. of <span className="dept">{survey.institution || "N/A"}</span></h4>
+            <h4 className="department"><span className="dept">{survey.institution || "N/A"}</span></h4>
           </div>
           <div className="participants flex">
             <img src={members} alt="" />

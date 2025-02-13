@@ -171,6 +171,39 @@
     cursor: pointer;
 }
 
+.button-group {
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 3rem;
+}
+
+.save-btn {
+    background-color: var(--wht);
+    border: 2px solid var(--base);
+    color: var(--base);
+    padding: 0.8em 3rem;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.save-btn:hover {
+    background-color: var(--litgray);
+    cursor: pointer;
+}
+
+.loading {
+    text-align: center;
+    margin: 2rem;
+    font-size: 1.2rem;
+    color: var(--gray);
+}
+
+.deleting-spinner {
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-left: 0.5rem;
+}
+
 /* MEDAI QUERY */
 @media(max-width:1050px) {}
 
