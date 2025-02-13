@@ -492,13 +492,30 @@ const deleteQuestion = async (req, res, next) => {
 const getSurveyInfo = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
-    const survey = await Survey.findById(surveyId).select('title description participants preferred_participants max_participant point duration createdAt updatedAt');
+    const survey = await Survey.findById(surveyId)
+      .select('title description participants preferred_participants no_of_participants point duration createdAt updatedAt submittedUsers');
 
     if (!survey) {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
     }
 
-    res.status(200).json({ status: "success", code: 200, survey });
+    const filledCount = survey.submittedUsers.length;
+    const remainingSpots = survey.no_of_participants - filledCount;
+
+    const surveyWithCounts = {
+      ...survey.toObject(),
+      participantCounts: {
+        filled: filledCount,
+        remaining: remainingSpots,
+        total: survey.no_of_participants
+      }
+    };
+
+    res.status(200).json({ 
+      status: "success", 
+      code: 200, 
+      survey: surveyWithCounts 
+    });
   } catch (error) {
     next(error);
   }
@@ -590,13 +607,27 @@ const getAllSurveys = async (req, res, next) => {
     const surveys = await Survey.find({published: true})
       .populate({
         path: 'user_id',
-        select: 'fullname email instituition pic_url' // Select only the fields you want to return
+        select: 'fullname email instituition pic_url'
       });
       
+    const surveysWithCounts = surveys.map(survey => {
+      const filledCount = survey.submittedUsers.length;
+      const remainingSpots = survey.no_of_participants - filledCount;
+      
+      return {
+        ...survey.toObject(),
+        participantCounts: {
+          filled: filledCount,
+          remaining: remainingSpots,
+          total: survey.no_of_participants
+        }
+      };
+    });
+
     res.status(200).json({ 
       status: "success", 
       code: 200, 
-      surveys 
+      surveys: surveysWithCounts 
     });
   } catch (error) {
     next(error);
@@ -906,20 +937,41 @@ const receivePaymentWebhook = async (req, res) => {
   }
 
 const mySurveys = async (req, res) => {
-  const {userId} = req
-  const user = await User.findOne({id: userId}).sort({createdAt: -1})
-  if (!user) {
-    return res.status(404).json({ error: "User not found" });
-  }
-  const mySurveys = await Survey.find({user_id: user._id})
+  const {userId} = req;
+  try {
+    const user = await User.findOne({id: userId}).sort({createdAt: -1});
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    const surveys = await Survey.find({user_id: user._id});
+    const surveysWithCounts = surveys.map(survey => {
+      const filledCount = survey.submittedUsers.length;
+      const remainingSpots = survey.no_of_participants - filledCount;
+      
+      return {
+        ...survey.toObject(),
+        participantCounts: {
+          filled: filledCount,
+          remaining: remainingSpots,
+          total: survey.no_of_participants
+        }
+      };
+    });
 
-  res.status(200).json({ 
-    status: "success", 
-    code: 200, 
-    mySurveys 
-  });
-  
-}
+    res.status(200).json({ 
+      status: "success", 
+      code: 200, 
+      mySurveys: surveysWithCounts 
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: "failure", 
+      code: 500, 
+      error: "Internal server error" 
+    });
+  }
+};
 
 
 
