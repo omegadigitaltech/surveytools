@@ -947,7 +947,7 @@ const receivePaymentWebhook = async (req, res) => {
 const mySurveys = async (req, res) => {
   const {userId} = req;
   try {
-    const user = await User.findOne({id: userId}).sort({createdAt: -1});
+    const user = await User.findOne({id: userId})
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
