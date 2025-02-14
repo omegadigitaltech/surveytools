@@ -294,7 +294,7 @@ const submitAnswers = async (req, res, next) => {
 
     await survey.save({ session });
 
-    user.pointBalance += survey.point
+    user.pointBalance += survey.point_per_user
     await user.save({ session })
 
     await session.commitTransaction();
