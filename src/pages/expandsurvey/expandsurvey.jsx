@@ -63,7 +63,7 @@ const expandsurvey = () => {
         },
       });
       const data = await response.json();
-      setUserDetails(data.user);
+      setUserDetails(data.data.user);
     };
 
     fetchUserDetails();

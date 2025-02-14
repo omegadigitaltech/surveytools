@@ -1,36 +1,71 @@
+.complete-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.95);
+  z-index: 1000;
+}
 
 .complete-box {
-    justify-content: center;
-    position: fixed;
-    top: 41%; 
-    left: 50%; 
-    transform: translate(-50%, -50%); 
-    margin-top: 0; 
-    z-index: 50;
+  background: white;
+  padding: 2.5rem 4rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
 }
 
-.complete-msg{
-    flex-direction:column;
-    border: 1px solid rgb(209, 209, 209);
-    max-width: 400px;
-    padding: 1.75rem;
-    border-radius: 1.5rem;
-    text-align: center;
-     background: #fff;
+.complete-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
 }
-.complete-msg img{
-width: 5rem;
-margin-bottom: 1.25rem;
+
+.points-text {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 2rem;
 }
-.success-msg{
-font-size:1.2rem ;
-font-weight: 500;
-margin-bottom: 1rem;
+
+.done-btn {
+  background-color: #26A69A;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem 3rem;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-weight: 500;
 }
-.thank-you{
-    font-size: 1rem;
-    font-weight: 400;
+
+.done-btn:hover {
+  background-color: #2196F3;
 }
-.post-btn{
-    margin-top: 2rem !important;
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .complete-box {
+    padding: 2rem;
+    width: 85%;
+  }
+
+  .complete-title {
+    font-size: 20px;
+  }
+
+  .points-text {
+    font-size: 16px;
+  }
+
+  .done-btn {
+    padding: 0.7rem 2.5rem;
+  }
 }

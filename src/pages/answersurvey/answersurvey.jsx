@@ -39,10 +39,10 @@ const answerSurvey = () => {
         if (!response.ok) throw new Error(json.msg || "Failed to fetch survey questions");
 
 
-        console.log("API URL:", API_URL);
-        console.log("Auth Token:", authToken);
-        console.log("Request Headers:", options.headers);
-        console.log("Response JSON:", json);
+        // console.log("API URL:", API_URL);
+        // console.log("Auth Token:", authToken);
+        // console.log("Request Headers:", options.headers);
+        // console.log("Response JSON:", json);
 
 
         // setSurvey(json.survey);
@@ -91,7 +91,7 @@ const answerSurvey = () => {
         throw new Error(json.msg || "Failed to submit survey");
       }
       // throw new Error(json.msg || "Failed to submit survey");
-      setEarnedPoints(json.points || points); // Use points from location state
+      setEarnedPoints(points); // Use points from location state
       setShowComplete(true); 
 
     } catch (error) {
@@ -140,16 +140,14 @@ const answerSurvey = () => {
                 question.options.map((option, optIndex) => (
                   <label key={optIndex} className="answer-ques-opt">
                     <input
-                      type="checkbox"
+                      type="radio"
                       className="tick-ans"
                       name={`question-${question._id}`}
-                      value={option._id}
+                      value={option.text}
                       onChange={(e) =>
                         handleAnswerChange(
                           question._id,
-                          e.target.checked
-                            ? [...(answers[question._id] || []), option._id]
-                            : (answers[question._id] || []).filter((opt) => opt !== option._id)
+                          e.target.value
                         )
                       }
                     />
