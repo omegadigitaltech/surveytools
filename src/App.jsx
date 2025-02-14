@@ -36,6 +36,7 @@ import Withdraw from "./pages/withdraw/withdraw";
 import Profile from "./pages/profile/profile";
 import AnswerSurvey from "./pages/answersurvey/answersurvey"
 import Settings from "./pages/settings/settings"
+import Insights from "./pages/insights/insights"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -56,6 +57,7 @@ const router = createBrowserRouter(
         <Route path="profile" element={<Profile />} />
         <Route path="answersurvey/:id" element={<AnswerSurvey/>} />
         <Route path="settings" element={<Settings/>} />
+        <Route path="insights/:id" element={<Insights />} />
         </Route>
       </Route>
 

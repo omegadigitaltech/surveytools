@@ -405,3 +405,25 @@ form ::placeholder {
     font-size: 0.8rem;
   }
 }
+
+.status-container {
+  gap: 1rem;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 0.2rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge.published {
+  background-color: #e6f4ea;
+  color: #1e7e34;
+}
+
+.status-badge.draft {
+  background-color: #fff3e0;
+  color: #f57c00;
+}

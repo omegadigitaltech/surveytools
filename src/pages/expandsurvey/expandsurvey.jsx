@@ -7,16 +7,19 @@ import backaro from "../../assets/img/backaro.svg";
 import dept from "../../assets/img/blu-dept.svg";
 import partps from "../../assets/img/partps.svg";
 import members from "../../assets/img/members.svg";
+import { toast } from "react-toastify";
 
 import "./expandsurvey.css"
 
 const expandsurvey = () => {
-  // Temporary navigate
+  // Move the hook to the component level
+  const setSurveyId = useAuthStore((state) => state.setSurveyId);
   const { id } = useParams();
   const navigate = useNavigate();
   const authToken = useAuthStore((state) => state.authToken);
   const [survey, setSurvey] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isOwnSurvey, setIsOwnSurvey] = useState(false);
 
   useEffect(() => {
     const fetchSurveyInfo = async () => {
@@ -36,6 +39,8 @@ const expandsurvey = () => {
         if (!response.ok)
           throw new Error(json.msg || "Failed to fectch survey details");
         setSurvey(json.survey);
+        // Check if the logged-in user is the creator of the survey
+        setIsOwnSurvey(json.survey.isCreator === true);
 
       } catch (error) {
         toast.error(error.msg || "Error fetching survey details")
@@ -56,6 +61,22 @@ const expandsurvey = () => {
   if (!survey) {
     return <p>Survey not found.</p>;
   }
+
+  const handleActionClick = () => {
+    if (!survey.published) {
+      // Set the current survey ID in the store before navigating
+      setSurveyId(id);
+      // Navigate to edit survey
+      navigate(`/surveyquestion`, { 
+        state: { surveyId: id }
+      });
+    } else {
+      // Pass the survey data to insights page
+      navigate(`/insights/${id}`, {
+        state: { surveyData: survey }
+      });
+    }
+  };
 
   return (
     <section className="expand">
@@ -107,18 +128,29 @@ const expandsurvey = () => {
           </div>
         </div>
         <div className="flex btn_div">
-          <button className="start-btn btn" onClick={() => navigate(`/answersurvey/${id}`,
-            {
-              state: {
-                title: survey.title,
-                createdAt: survey.createdAt,
-                points: survey.point_per_user,
-              }
-            }
-          )}>
-            Start survey
-          </button>
+          {isOwnSurvey ? (
+            <button 
+              className="start-btn btn"
+              onClick={handleActionClick}
+            >
+              {survey.published ? "View Insights" : "Edit Survey"}
+            </button>
+          ) : (
+            <button 
+              className="start-btn btn" 
+              onClick={() => navigate(`/answersurvey/${id}`, {
+                state: {
+                  title: survey.title,
+                  createdAt: survey.createdAt,
+                  points: survey.point_per_user,
+                }
+              })}
+            >
+              Start Survey
+            </button>
+          )}
         </div>
+        
 
       </div>
     </section>

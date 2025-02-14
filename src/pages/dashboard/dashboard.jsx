@@ -222,9 +222,14 @@ const dashboard = () => {
                           <p className="posted">
                             Posted {formatDistanceToNow(parseISO(survey.createdAt), { addSuffix: true }) || "N/A"}
                           </p>
-                          <p className="duration">
-                            Duration: <b>{survey.duration || 0}</b> min
-                          </p>
+                          <div className="status-container flex">
+                            <span className={`status-badge ${survey.published ? "published" : "draft"}`}>
+                              {survey.published ? "Published" : "Draft"}
+                            </span>
+                            <p className="duration">
+                              Duration: <b>{survey.duration || 0}</b> min
+                            </p>
+                          </div>
                         </div>
                         <div className="survey_details flex">
                           <h3 className="survey_title">{survey.title}</h3>
@@ -244,7 +249,7 @@ const dashboard = () => {
                           <div className="participants flex">
                             <img src={members} alt="" />
                             <p>
-                              <span className="num_participant">{survey.no_of_participants || 0}</span>{" "}
+                              <span className="num_participant">{survey.participantCounts?.filled || 0}</span>{" "}
                               Participants
                             </p>
                           </div>
