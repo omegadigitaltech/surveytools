@@ -96,3 +96,16 @@
     width: 100%;
   }
 }
+
+.auth-w4-input[type="select"] {
+  appearance: none;
+  background: url('../../assets/img/downaro.svg') no-repeat right center;
+  background-size: 15px;
+  background-position: right 15px center;
+  cursor: pointer;
+  padding-right: 40px;
+}
+
+.auth-w4-input option {
+  padding: 8px;
+}

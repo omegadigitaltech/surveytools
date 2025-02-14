@@ -9,12 +9,16 @@ import "../utils.css";
 import features from "../../assets/img/illustration-signup.svg";
 import iconHide from "../../assets/img/icon-eye-hide.svg";
 import iconShow from "../../assets/img/icon-eye-show.svg";
+import { faculty_dept } from "../../utils/constants/facultyData";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const setSignupEmail = useAuthStore((state) => state.setSignupEmail);
   // const actionData = useActionData();
   const [showPassword, setShowPassword] = useState(false);
+  const [faculty, setFaculty] = useState("");
+  const [department, setDepartment] = useState("");
+  const [gender, setGender] = useState("");
 
   const handleToggle = () => {
     setShowPassword((prevState) => !prevState);
@@ -22,6 +26,11 @@ const SignUp = () => {
   const iconPass = showPassword ? iconShow : iconHide;
   
   const [loading, setLoading] = useState(false);
+
+  const handleFacultyChange = (e) => {
+    setFaculty(e.target.value);
+    setDepartment(""); // Reset department when faculty changes
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,6 +112,67 @@ const SignUp = () => {
                 required
               />
             </div>
+            <div className="auth-w4-field auth-w4-full">
+              <label className="auth-w4-label" htmlFor="gender">
+                Gender
+              </label>
+              <select
+                className="auth-w4-input"
+                name="gender"
+                id="gender"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div className="auth-w4-field auth-w4-full">
+              <label className="auth-w4-label" htmlFor="faculty">
+                Faculty
+              </label>
+              <select
+                className="auth-w4-input"
+                name="faculty"
+                id="faculty"
+                value={faculty}
+                onChange={handleFacultyChange}
+                required
+              >
+                <option value="">Select Faculty</option>
+                {faculty_dept.map((item) => (
+                  <option key={item.faculty} value={item.faculty}>
+                    {item.faculty}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {faculty && (
+              <div className="auth-w4-field auth-w4-full">
+                <label className="auth-w4-label" htmlFor="department">
+                  Department
+                </label>
+                <select
+                  className="auth-w4-input"
+                  name="department"
+                  id="department"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  required
+                >
+                  <option value="">Select Department</option>
+                  {faculty_dept
+                    .find(f => f.faculty === faculty)
+                    ?.departments.map((dept) => (
+                      <option key={dept} value={dept}>
+                        {dept}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
             <div className="auth-w4-field auth-w4-full">
               <label className="auth-w4-label" htmlFor="password">
                 Password

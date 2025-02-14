@@ -15,8 +15,16 @@ const action = async ({ request }) => {
   
 
   const preferredParticipants = [];
-  if (faculty && faculty !== "all_faculties") preferredParticipants.push(faculty);
-  if (department && department !== "all_departments") preferredParticipants.push(department);
+  if (faculty === "all_faculties" || !faculty) {
+    preferredParticipants.push("All Faculties");
+  } else {
+    preferredParticipants.push(faculty);
+    if (department === "all_departments" || !department) {
+      preferredParticipants.push("All Departments");
+    } else if (department) {
+      preferredParticipants.push(department);
+    }
+  }
   
   const survey = {
     title: formData.get("title"),

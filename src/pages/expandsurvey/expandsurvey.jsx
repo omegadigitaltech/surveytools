@@ -2,12 +2,13 @@ import { Form, Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import config from "../../config/config";
 import useAuthStore from "../../components/store/useAuthStore";
+import { validateSurveyAccess } from "../../utils/helpers/surveyChecks";
+import { toast } from "react-toastify";
 
 import backaro from "../../assets/img/backaro.svg";
 import dept from "../../assets/img/blu-dept.svg";
 import partps from "../../assets/img/partps.svg";
 import members from "../../assets/img/members.svg";
-import { toast } from "react-toastify";
 
 import "./expandsurvey.css"
 
@@ -20,6 +21,7 @@ const expandsurvey = () => {
   const [survey, setSurvey] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isOwnSurvey, setIsOwnSurvey] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
 
   useEffect(() => {
     const fetchSurveyInfo = async () => {
@@ -51,6 +53,21 @@ const expandsurvey = () => {
     };
     fetchSurveyInfo();
   }, [id, authToken]);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      const API_URL = `${config.API_URL}/user/profile`;
+      const response = await fetch(API_URL, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      const data = await response.json();
+      setUserDetails(data.user);
+    };
+
+    fetchUserDetails();
+  }, [authToken]);
 
   // Show loading state while fetching
   if (loading) {
@@ -138,13 +155,20 @@ const expandsurvey = () => {
           ) : (
             <button 
               className="start-btn btn" 
-              onClick={() => navigate(`/answersurvey/${id}`, {
-                state: {
-                  title: survey.title,
-                  createdAt: survey.createdAt,
-                  points: survey.point_per_user,
+              onClick={async () => {
+                try {
+                  await validateSurveyAccess(survey, userDetails?.id, userDetails, authToken);
+                  navigate(`/answersurvey/${id}`, {
+                    state: {
+                      title: survey.title,
+                      createdAt: survey.createdAt,
+                      points: survey.point_per_user,
+                    }
+                  });
+                } catch (error) {
+                  toast.error(error.message);
                 }
-              })}
+              }}
             >
               Start Survey
             </button>

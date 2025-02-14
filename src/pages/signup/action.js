@@ -13,6 +13,9 @@ const action = async ({ formData }) => {
     instituition: formData.get("institution"),
     password: formData.get("password"),
     confirm_password: formData.get("confirm"),
+    faculty: formData.get("faculty"),
+    department: formData.get("department"),
+    gender: formData.get("gender"),
   };
   const API_URL = `${config.API_URL}/register`;
   const options = {
