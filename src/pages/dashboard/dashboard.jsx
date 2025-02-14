@@ -24,6 +24,8 @@ const dashboard = () => {
   const [showPoint, setShowPoint] = useState(false);
   const [mySurveys, setMySurveys] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [pointBalance, setPointBalance] = useState(null);
+  const [isLoadingPoints, setIsLoadingPoints] = useState(true);
 
   useEffect(() => {
     const fetchSurveys = async () => {
@@ -105,6 +107,32 @@ const dashboard = () => {
     };
     const iconPass = showPoint ? view : unview;
 
+  useEffect(() => {
+    const fetchPointBalance = async () => {
+      try {
+        const response = await fetch(`${config.API_URL}/user/points`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        const json = await response.json();
+        
+        if (response.ok) {
+          setPointBalance(json.data.points);
+        } else {
+          throw new Error(json.msg || "Failed to fetch points");
+        }
+      } catch (error) {
+        console.error("Error fetching points:", error);
+        toast.error("Error loading points balance");
+      } finally {
+        setIsLoadingPoints(false);
+      }
+    };
+
+    fetchPointBalance();
+  }, [authToken]);
+
   return (
     <section className="dashboard">
       <div className="dashboard_inner wrap">
@@ -123,10 +151,12 @@ const dashboard = () => {
             </div>
           </div>
           <div>
-            <div className="points-value"
-             
-            >
-               {showPoint ? "0.00" : "****"}
+            <div className="points-value">
+              {isLoadingPoints ? (
+                <div className="points-loader"></div>
+              ) : (
+                showPoint ? pointBalance?.toFixed(2) || "0.00" : "****"
+              )}
             </div>
           </div>
         </div>
