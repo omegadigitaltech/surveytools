@@ -413,6 +413,40 @@ const getUserProfile = async (req, res) => {
     }
 };
 
+const getUserPoints = async (req, res) => {
+    try {
+        const userId = req.userId;
+        
+        const user = await User.findOne({ id: userId })
+            .select('pointBalance'); // Only select the pointBalance field
+        
+        if (!user) {
+            return res.status(404).json({
+                status: "failure",
+                code: 404,
+                msg: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            status: "success",
+            code: 200,
+            msg: "User points retrieved successfully",
+            data: {
+                points: user.pointBalance
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching user points:', error);
+        res.status(500).json({
+            status: "failure",
+            code: 500,
+            msg: "Error retrieving user points",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     getVerification,
     verify,
@@ -424,5 +458,6 @@ module.exports = {
     googleLogin,
     facebookLogin,
     updateUser,
-    getUserProfile
+    getUserProfile,
+    getUserPoints
 }
