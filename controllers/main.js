@@ -492,7 +492,15 @@ const deleteQuestion = async (req, res, next) => {
 const getSurveyInfo = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
-    const survey = await Survey.findById(surveyId);
+    const { userId } = req;
+    
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      return res.status(404).json({ status: "failure", code: 404, msg: 'User not found' });
+    }
+
+    const survey = await Survey.findById(surveyId)
+      .populate('user_id', 'fullname email instituition pic_url')
 
     if (!survey) {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
@@ -507,7 +515,8 @@ const getSurveyInfo = async (req, res, next) => {
         filled: filledCount,
         remaining: remainingSpots,
         total: survey.no_of_participants
-      }
+      },
+      isCreator: survey.user_id._id.equals(user._id)
     };
 
     res.status(200).json({ 
