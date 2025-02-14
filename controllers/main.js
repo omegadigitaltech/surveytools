@@ -952,7 +952,7 @@ const mySurveys = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
     
-    const surveys = await Survey.find({user_id: user._id});
+    const surveys = await Survey.find({user_id: user._id}).sort({createdAt: -1});
     const surveysWithCounts = surveys.map(survey => {
       const filledCount = survey.submittedUsers.length;
       const remainingSpots = survey.no_of_participants - filledCount;
