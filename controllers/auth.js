@@ -379,6 +379,39 @@ const updateUser = async (req, res) => {
     })
 };
 
+const getUserProfile = async (req, res) => {
+    try {
+        const userId = req.userId;
+        
+        const user = await User.findOne({ id: userId })
+            .select('-password -code'); // Exclude sensitive fields
+        
+        if (!user) {
+            return res.status(404).json({
+                status: "failure",
+                code: 404,
+                msg: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            status: "success",
+            code: 200,
+            msg: "User profile retrieved successfully",
+            data: {
+                user: user
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        res.status(500).json({
+            status: "failure",
+            code: 500,
+            msg: "Error retrieving user profile",
+            error: error.message
+        });
+    }
+};
 
 module.exports = {
     getVerification,
@@ -390,5 +423,6 @@ module.exports = {
     isLoggedIn,
     googleLogin,
     facebookLogin,
-    updateUser
+    updateUser,
+    getUserProfile
 }
