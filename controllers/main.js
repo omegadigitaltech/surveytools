@@ -130,7 +130,7 @@ const updateAnswer = async (req, res, next) => {
       return res.status(400).json({ status: "failure", code: 400, msg: 'User has already submitted the survey' });
     }
 
-    if (survey.participants >= survey.max_participant) {
+    if (survey.participants >= survey.no_of_participants) {
       await session.abortTransaction();
       session.endSession();
       return res.status(400).json({ status: "failure", code: 400, msg: 'Survey has reached maximum participants' });
@@ -251,7 +251,7 @@ const submitAnswers = async (req, res, next) => {
       return res.status(400).json({ status: "failure", code: 400, msg: 'User has already submitted the survey' });
     }
 
-    if (survey.participants >= survey.max_participant) {
+    if (survey.participants >= survey.no_of_participants) {
       await session.abortTransaction();
       session.endSession();
       return res.status(400).json({ status: "failure", code: 400, msg: 'Survey has reached maximum participants' });
@@ -327,7 +327,7 @@ const submitAnswers = async (req, res, next) => {
           question.analytics.mostCommonResponse = null; // Fallback if there are no responses yet
         }
 
-        question.analytics.responseRate = `${((question.analytics.totalResponses / survey.max_participant) * 100).toFixed(2)}%`;
+        question.analytics.responseRate = `${((question.analytics.totalResponses / survey.no_of_participants) * 100).toFixed(2)}%`;
       }
     }
 
@@ -386,7 +386,7 @@ const checkSurveyMaxParticipants = async (req, res, next) => {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
     }
 
-    if (survey.participants >= survey.max_participant) {
+    if (survey.participants >= survey.no_of_participants) {
       return res.status(200).json({ status: "success", code: 200, maxReached: true });
     }
 
@@ -467,7 +467,7 @@ const addOrUpdateQuestion = async (req, res, next) => {
 const editSurveyInfo = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
-    const {title, description, max_participant, point, duration, preferred_participants } = req.body
+    const {title, description, no_of_participants, point_per_user, duration, preferred_participants } = req.body
 
     const user = await User.findOne({ id: req.userId });
 
@@ -485,8 +485,7 @@ const editSurveyInfo = async (req, res, next) => {
     }
 
     const survey = await Survey.findByIdAndUpdate(surveyId, 
-      {title, description, max_participant,
-         point, duration, preferred_participants 
+      {title, description, no_of_participants, point_per_user, duration, preferred_participants 
       }, { new: true, runValidators: true});
 
     res.status(200).json({ status: "success", code: 200, msg: 'Survey updated successfully', survey });
