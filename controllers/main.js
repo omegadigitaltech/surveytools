@@ -199,6 +199,48 @@ const submitAnswers = async (req, res, next) => {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
     }
 
+    // Check gender requirements
+    if (survey.gender !== 'all_genders' && user.gender !== survey.gender) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ 
+        status: "failure", 
+        code: 400, 
+        msg: `This survey is only open to ${survey.gender} participants` 
+      });
+    }
+
+    // Check preferred participants requirements
+    if (Array.isArray(survey.preferred_participants) && survey.preferred_participants.length > 0) {
+      const [faculty, department] = survey.preferred_participants;
+      
+      // Case 1: If faculty is not "all faculties", check faculty match
+      if (faculty.toLowerCase() !== 'all faculties') {
+        if (user.faculty.toLowerCase() !== faculty.toLowerCase()) {
+          await session.abortTransaction();
+          session.endSession();
+          return res.status(400).json({ 
+            status: "failure", 
+            code: 400, 
+            msg: `This survey is only open to participants from ${faculty} faculty` 
+          });
+        }
+        
+        // Case 2: If department is specified (not "all departments"), check department match
+        if (department && department.toLowerCase() !== 'all departments') {
+          if (user.department.toLowerCase() !== department.toLowerCase()) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ 
+              status: "failure", 
+              code: 400, 
+              msg: `This survey is only open to participants from ${department} department` 
+            });
+          }
+        }
+      }
+    }
+
     if (survey.published == false) {
       return res.status(400).json({ status: "failure", code: 400, msg: 'Survey has not been published' });
     }
