@@ -6,17 +6,27 @@ const { generateID_users, getVerification} = require('../middleware/helper');
 const {url}  = require('../middleware/helper')
 
 const postRegister = async (req,res) => {
+    const {
+        first_name, 
+        last_name, 
+        password, 
+        confirm_password, 
+        email, 
+        instituition,
+        department,
+        faculty,
+        gender
+    } = req.body
 
-    const {first_name, last_name, password, confirm_password, email, instituition} = req.body
-
-    // check for password
-    if(!password || !confirm_password || !first_name || !last_name){
+    // check for required fields
+    if(!password || !confirm_password || !first_name || !last_name || !department || !faculty || !gender){
         return res.status(400).json({
             status: "failure",
             code: 400,
-            msg: "You must fill in all neccassary details"
+            msg: "You must fill in all necessary details"
         })
     }
+
     // confirm password
     if(password != confirm_password ) {
         return res.status(400).json({
@@ -25,13 +35,14 @@ const postRegister = async (req,res) => {
             msg: "The passwords does not match"
         })
     }
-    //hash passwprd
+
+    //hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
     // generate unique ID
     var unique_id = await generateID_users(16)
 
-    // check if id isnt present
+    // check if id isn't present
     var check_uniqueId = await User.find({id: unique_id})
     while(check_uniqueId.length > 0){
         unique_id = await generateUniqueID_user()
@@ -57,6 +68,9 @@ const postRegister = async (req,res) => {
         fullname, 
         email, 
         instituition,
+        department,
+        faculty,
+        gender,
         password: hashedPassword,
     })
 
