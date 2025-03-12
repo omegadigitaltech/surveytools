@@ -3,347 +3,371 @@
 .survey_head,
 .survey_details,
 .survey_class {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .dashboard {
-    margin-bottom: 5rem;
-    margin-top: 1rem;
+  margin-bottom: 5rem;
+  margin-top: 1rem;
 }
 
 .points-board {
-    background-color: var(--base);
-    color: white;
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    font-size: 16px;
-    width: 80%;
-    margin: 20px auto;
-    flex-wrap: wrap;
+  background-color: var(--base);
+  color: white;
+  height: 12rem;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  width: 80%;
+  margin: 20px auto;
+  flex-wrap: wrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch  ;
+}
+.points-main,
+.points-side {
+    display: flex;
+    height: 100%;
+  flex-direction: column;
+  align-items: start;
+  justify-content: space-between;
 }
 
-.points-head {
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
 
+.points-head {
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .points-label {
-    font-size: 16px;
-    font-weight: bold;
-    gap: 1rem;
+  font-size: 16px;
+  font-weight: bold;
+  gap: 1rem;
 }
 
 .points-label img {
-    width: 1.8rem;
+  width: 1.8rem;
 }
 
 .points-value {
-    font-size: 36px;
-    font-weight: 500;
+  /* font-size: 36px; */
+  /* font-weight: 500; */
+  font-family: K2D;
+  font-weight: 700;
+  font-size: 110.7px;
+  line-height: 1;
+  letter-spacing: 0%;
 }
 
 .transactions-history a {
-    color: white;
-    font-size: 16px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
+  color: white;
+  font-size: 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
 }
 
 .transactions-history img {
-    width: .7rem;
-    margin-left: 1rem;
+  width: 0.7rem;
+  margin-left: 1rem;
+}
+.redeem-button {
+    background-color: white;
+    color: var(--base);
+    padding-inline: 2rem;
+    padding-block: .5rem;
+    border-radius: .25rem;
+    margin-top: auto;
 }
 
+
+
+
+
 .dash_head {
-    gap: 1rem;
-    justify-content: space-between;
+  gap: 1rem;
+  justify-content: space-between;
 }
 
 .classForm {
-    width: 100%;
-    max-width: 850px;
-    margin: 2em 0;
+  width: 100%;
+  max-width: 850px;
+  margin: 2em 0;
 }
 
 form ::placeholder {
-    color: #000;
+  color: #000;
 }
 
 .search {
-    width: 100%;
-    border-radius: 8px;
-    padding: 0 1em;
-    border: 1px solid rgb(201, 201, 201);
-    gap: 1rem;
-    flex-wrap: wrap;
+  width: 100%;
+  border-radius: 8px;
+  padding: 0 1em;
+  border: 1px solid rgb(201, 201, 201);
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .search input {
-    width: 80%;
-    display: block;
-    padding: 1em 0;
-    color: #000;
+  width: 80%;
+  display: block;
+  padding: 1em 0;
+  color: #000;
 }
 
-
 .search button {
-    cursor: pointer;
-    justify-content: center;
+  cursor: pointer;
+  justify-content: center;
 }
 
 .dashboard_sort {
-    gap: .5em;
-    font-size: .8rem;
-    /* width: 20%; */
+  gap: 0.5em;
+  font-size: 0.8rem;
+  /* width: 20%; */
 }
 
 .dashboard_sort img {
-    border-radius: .3rem;
-    padding: .5rem;
-    border: 1px solid var(--base);
+  border-radius: 0.3rem;
+  padding: 0.5rem;
+  border: 1px solid var(--base);
 }
 
 .survey_head {
-    gap: 1.5rem;
+  gap: 1.5rem;
 }
 
 .survey_head:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .survey_head .active_head {
-    border-bottom: 2.5px solid var(--base);
+  border-bottom: 2.5px solid var(--base);
 }
 
 .first_post {
-    background: rgb(211, 243, 240);
-    box-shadow: .4rem 0.4rem .4rem rgba(0, 0, 0, .1);
+  background: rgb(211, 243, 240);
+  box-shadow: 0.4rem 0.4rem 0.4rem rgba(0, 0, 0, 0.1);
 }
 
 .survey_post {
-    padding: 1rem;
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
-    border-radius: 1rem;
-    border: 1px solid #dddddd;
+  padding: 1rem;
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid #dddddd;
 }
 
 .survey_post:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .survey_posts a {
-    color: inherit;
-    text-decoration: none;
+  color: inherit;
+  text-decoration: none;
 }
 
 .post_time {
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    font-size: .7rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 0.7rem;
 }
 
 .post_time p {
-    font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 .survey_details {
-    justify-content: space-between;
-    margin-bottom: 2rem;
+  justify-content: space-between;
+  margin-bottom: 2rem;
 }
 
 .survey_info {
-    font-size: .96rem;
-    margin-bottom: 1.5rem;
+  font-size: 0.96rem;
+  margin-bottom: 1.5rem;
 }
 
 .survey_info::first-letter {
-    text-transform: uppercase;
+  text-transform: uppercase;
 }
 
 .survey_title {
-    text-transform: capitalize;
+  text-transform: capitalize;
 }
 
 .survey_info a {
-    margin-bottom: 1.5rem;
-    color: var(--base);
+  margin-bottom: 1.5rem;
+  color: var(--base);
 }
 
 .survey_class {
-    justify-content: space-between;
+  justify-content: space-between;
 }
 
 .department {
-    font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .survey_class img {
-    width: 1.5rem;
+  width: 1.5rem;
 }
 
 .dept,
 .participants {
-    gap: 1rem;
+  gap: 1rem;
 }
 
 .survey_class .dept,
 .participants {
-    color: var(--gray)
+  color: var(--gray);
 }
 
 .participants p {
-    margin-bottom: 0 !important;
-    font-size: .9rem;
+  margin-bottom: 0 !important;
+  font-size: 0.9rem;
 }
 
 .no_result {
-    margin: 3rem;
+  margin: 3rem;
 }
 
-@media(max-width:512px) {
-    .search {
-        gap: .5rem
-    }
+@media (max-width: 512px) {
+  .search {
+    gap: 0.5rem;
+  }
 
-    .search input {
-        padding: .7em 0;
-        font-size: .9rem;
-    }
+  .search input {
+    padding: 0.7em 0;
+    font-size: 0.9rem;
+  }
 
-    .dashboard_inner h3 {
-        font-size: .9rem;
-    }
+  .dashboard_inner h3 {
+    font-size: 0.9rem;
+  }
 
-    .survey_info {
-        font-size: .8rem;
-    }
-    .dashboard_sort {
-        display: none !important;
-    }
-    .dashboard_sort h3 {
-        gap: .5em;
-        font-size: .8rem;
-    }
+  .survey_info {
+    font-size: 0.8rem;
+  }
+  .dashboard_sort {
+    display: none !important;
+  }
+  .dashboard_sort h3 {
+    gap: 0.5em;
+    font-size: 0.8rem;
+  }
 
-    .dashboard_sort img {
-        padding: .4rem;
-        /* width: ; */
-    }
+  .dashboard_sort img {
+    padding: 0.4rem;
+    /* width: ; */
+  }
 
-    .survey_class h4 {
-        font-size: .8rem;
-    }
+  .survey_class h4 {
+    font-size: 0.8rem;
+  }
 
-    .num_participant {
-        font-size: .8rem;
+  .num_participant {
+    font-size: 0.8rem;
+  }
 
-    }
+  .survey_class img {
+    width: 1.2rem;
+  }
 
-    .survey_class img {
-        width: 1.2rem;
-    }
-
-   .dash_head form {
-        width: 100%;
-    }
+  .dash_head form {
+    width: 100%;
+  }
 }
 
-@media(max-width:385px) {
+@media (max-width: 385px) {
+  .dash_head {
+    flex-wrap: wrap;
+    gap: 0rem;
+  }
 
-    .dash_head {
-        flex-wrap: wrap;
-        gap: 0rem;
-    }
+  .points-board {
+    width: 90%;
+    padding: 20px;
+  }
 
-    .points-board {
-        width: 90%;
-        padding: 20px;
-    }
+  .points-head {
+    margin-bottom: 0.5rem;
+  }
 
-    .points-head {
-        margin-bottom: 0.5rem;
-    }
+  .points-label {
+    font-size: 12.5px;
+    font-weight: 500;
+    gap: 0.2rem;
+  }
 
-    .points-label {
-        font-size: 12.5px;
-        font-weight: 500;
-        gap: 0.2rem;
-    }
+  .points-label img {
+    width: 1.2rem;
+  }
 
-    .points-label img {
-        width: 1.2rem;
-    }
+  .points-value {
+    font-size: 25px;
+  }
 
-    .points-value {
-        font-size: 25px;
-    }
+  .dashboard_inner h3 {
+    font-size: 0.8rem;
+  }
 
-    .dashboard_inner h3 {
-        font-size: .8rem;
-    }
+  .dashboard_sort {
+    display: none !important;
+  }
 
-    .dashboard_sort {
-        display: none !important;
-    }
+  .classForm {
+    margin: 0.5em 0;
+  }
 
-    .classForm {
-        margin: .5em 0;
-    }
+  form {
+    margin: 1em 0;
+  }
 
-    form {
-        margin: 1em 0;
-    }
+  .survey_info {
+    font-size: 0.8rem;
+  }
 
-    .survey_info {
-        font-size: .8rem;
-    }
+  .dash_head {
+    margin-bottom: 1rem;
+  }
 
-    .dash_head {
-        margin-bottom: 1rem;
-    }
+  .post_time p {
+    font-size: 0.7rem;
+  }
 
-    .post_time p {
-        font-size: .7rem;
-    }
+  .survey_class {
+    gap: 0.5rem;
+  }
 
-    .survey_class {
-        gap: .5rem;
-    }
+  .survey_class h4 p {
+    font-size: 0.7rem;
+  }
+  .survey_class p {
+    font-size: 0.7rem;
+  }
+  .survey_details h4 {
+    font-size: 0.8rem;
+  }
 
-    .survey_class h4
-    p {
-        font-size: .7rem;
-    }
-    .survey_class
-    p {
-        font-size: .7rem;
-    }
-    .survey_details h4 {
-        font-size: .8rem;
-    }
+  .survey_class img {
+    width: 15px;
+  }
 
-    .survey_class img {
-        width: 15px
-    }
+  .search img {
+    width: 20px;
+  }
+  .activities .activity_row {
+    margin-bottom: 1rem !important;
+  }
+  .first_post {
+    box-shadow: 0.2rem 0.2rem 0.2rem rgba(0, 0, 0, 0.1);
+  }
 
-    .search img {
-        width: 20px;
-    }
-    .activities .activity_row {
-        margin-bottom: 1rem !important;
-    }
-    .first_post {
-        box-shadow: .2rem 0.2rem .2rem rgba(0, 0, 0, .1);
-    }
-
-    .participants p {
-        font-size: 0.7rem;
-    }
+  .participants p {
+    font-size: 0.7rem;
+  }
 }
 
 .survey_head h3 {
@@ -394,13 +418,13 @@ form ::placeholder {
   font-size: 0.9rem;
 }
 
-@media(max-width: 512px) {
+@media (max-width: 512px) {
   .loader {
     width: 36px;
     height: 36px;
     border-width: 4px;
   }
-  
+
   .loader-container p {
     font-size: 0.8rem;
   }
@@ -432,13 +456,17 @@ form ::placeholder {
   width: 20px;
   height: 20px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #26A69A;
+  border-top: 2px solid #26a69a;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
