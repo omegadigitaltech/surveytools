@@ -14,6 +14,9 @@ import nextaro from "../../assets/img/nextaro.svg";
 
 import "./dashboard.css";
 
+// components
+import RedeemModal from "./RedeemModal";
+
 const dashboard = () => {
   const [searchKey, setSearchKey] = useState("");
   const [activeTab, setActiveTab] = useState("available");
@@ -103,6 +106,10 @@ const dashboard = () => {
   };
   const iconPass = showPoint ? view : unview;
 
+  const openRedeemModal =() => {
+    
+  }
+
   useEffect(() => {
     const fetchPointBalance = async () => {
       try {
@@ -130,6 +137,7 @@ const dashboard = () => {
   }, [authToken]);
 
   return (
+    <>
     <section className="dashboard">
       <div className="dashboard_inner wrap">
         <div className="points-board ">
@@ -154,7 +162,7 @@ const dashboard = () => {
                 Transactions History <img src={nextaro} alt="" />{" "}
               </Link>
             </div>
-            <button className="redeem-button">Redeem</button>
+            <button className="redeem-button" type="button" onClick={openRedeemModal}>Redeem</button>
           </div>
         </div>
 
@@ -321,6 +329,8 @@ const dashboard = () => {
         </div>
       </div>
     </section>
+    <RedeemModal />
+    </>
   );
 };
 

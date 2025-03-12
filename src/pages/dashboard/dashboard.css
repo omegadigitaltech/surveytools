@@ -470,3 +470,110 @@ form ::placeholder {
     transform: rotate(360deg);
   }
 }
+
+
+/* Redeem Modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: .8rem;
+  padding: 1rem;
+  z-index: 999;
+  width: 50%;
+}
+.modal .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.content {
+  width: 100%;
+}
+.conversion-rate-wrapper {
+  margin-bottom: 3rem;
+}
+.conversion-rate-title {
+  font-weight: 500;
+}
+.converter {
+  width: 100%;
+}
+.converter > * {
+  width: 100%;
+}
+.converter > .title {
+  margin-bottom: .5rem;
+  font-weight: 600;
+}
+.converter input {
+  border: 1px solid #101010;
+  border-radius: .3rem;
+  padding: .7rem;
+  flex: 1;
+}
+.converter .input-wrapper {
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.converter .phone-input-wrapper {
+  gap: 1rem;
+}
+.button-main {
+  background-color: var(--base);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: .5rem;
+  cursor: pointer;
+  text-align: center;
+}
+.button-main.redeem-button {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+/* Redeem modal breakpoints */
+/* Extra Small Devices (Phones) */
+@media (max-width: 480px) {
+  /* Styles for small phones */
+}
+
+/* Small Devices (Phones) */
+@media (max-width: 767px) {
+  .modal {
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .converter .input-wrapper, .converter .phone-input-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .4rem;
+  }
+}
+
+/* Medium Devices (Tablets) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* Styles for tablets */
+}
+
+/* Large Devices (Laptops) */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  /* Styles for laptops */
+}
+
+/* Extra Large Devices (Desktops) */
+@media (min-width: 1281px) {
+  /* Styles for desktops */
+}
+
