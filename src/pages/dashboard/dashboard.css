@@ -24,17 +24,19 @@
   flex-wrap: wrap;
   display: flex;
   justify-content: space-between;
-  align-items: stretch  ;
+  align-items: stretch;
 }
 .points-main,
 .points-side {
-    display: flex;
-    height: 100%;
+  display: flex;
+  height: 100%;
   flex-direction: column;
-  align-items: start;
+  align-items: end;
   justify-content: space-between;
 }
-
+.points-main {
+  align-items: flex-start;;
+}
 
 .points-head {
   justify-content: space-between;
@@ -75,17 +77,13 @@
   margin-left: 1rem;
 }
 .redeem-button {
-    background-color: white;
-    color: var(--base);
-    padding-inline: 2rem;
-    padding-block: .5rem;
-    border-radius: .25rem;
-    margin-top: auto;
+  background-color: white;
+  color: var(--base);
+  padding-inline: 2rem;
+  padding-block: 0.5rem;
+  border-radius: 0.25rem;
+  margin-top: auto;
 }
-
-
-
-
 
 .dash_head {
   gap: 1rem;
@@ -250,6 +248,39 @@ form ::placeholder {
   .survey_info {
     font-size: 0.8rem;
   }
+  .points-board {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin: auto;
+    padding: 1rem;
+    width:100%;
+    height: auto;
+
+  }
+  .points-main, .points-side {
+    gap:3rem;
+  }
+  .points-main {
+    align-items: flex-start;
+  }
+  .points-side {
+  }
+  .points-value {
+    font-size: 25px;
+  }
+
+  .points-label {
+    gap: .1rem;
+    font-size: .8rem;
+  }
+  .transactions-history {
+    font-size: .8rem;
+    padding-top: .3rem;
+  }
+  .transactions-history img {
+    margin-left: .5rem; 
+  }
   .dashboard_sort {
     display: none !important;
   }
@@ -288,7 +319,7 @@ form ::placeholder {
 
   .points-board {
     width: 90%;
-    padding: 20px;
+    height: auto;
   }
 
   .points-head {
@@ -306,7 +337,7 @@ form ::placeholder {
   }
 
   .points-value {
-    font-size: 25px;
+    font-size: .8rem;
   }
 
   .dashboard_inner h3 {
@@ -471,7 +502,6 @@ form ::placeholder {
   }
 }
 
-
 /* Redeem Modal */
 .overlay {
   position: fixed;
@@ -485,7 +515,7 @@ form ::placeholder {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: white;
-  border-radius: .8rem;
+  border-radius: 0.8rem;
   padding: 1rem;
   z-index: 999;
   width: 50%;
@@ -512,13 +542,13 @@ form ::placeholder {
   width: 100%;
 }
 .converter > .title {
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
   font-weight: 600;
 }
 .converter input {
   border: 1px solid #101010;
-  border-radius: .3rem;
-  padding: .7rem;
+  border-radius: 0.3rem;
+  padding: 0.7rem;
   flex: 1;
 }
 .converter .input-wrapper {
@@ -533,12 +563,25 @@ form ::placeholder {
   color: white;
   border: none;
   padding: 1rem 2rem;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-align: center;
+}
+.button-tertiary {
+  background-color: transparent;
+  border: 1px solid var(--base);
+  color: black;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   text-align: center;
 }
 .button-main.redeem-button {
   margin-top: 2rem;
+  width: 100%;
+}
+.button-tertiary.cancel-button {
+  margin-top: 1rem;
   width: 100%;
 }
 
@@ -555,10 +598,11 @@ form ::placeholder {
     max-height: 90vh;
     overflow-y: auto;
   }
-  .converter .input-wrapper, .converter .phone-input-wrapper {
+  .converter .input-wrapper,
+  .converter .phone-input-wrapper {
     flex-direction: column;
     align-items: flex-start;
-    gap: .4rem;
+    gap: 0.4rem;
   }
 }
 
@@ -576,4 +620,3 @@ form ::placeholder {
 @media (min-width: 1281px) {
   /* Styles for desktops */
 }
-

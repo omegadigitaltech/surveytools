@@ -28,6 +28,7 @@ const dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [pointBalance, setPointBalance] = useState(null);
   const [isLoadingPoints, setIsLoadingPoints] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchSurveys = async () => {
@@ -106,8 +107,8 @@ const dashboard = () => {
   };
   const iconPass = showPoint ? view : unview;
 
-  const openRedeemModal =() => {
-    
+  const toggleRedeemModal =(val) => {
+    setModalOpen(val);
   }
 
   useEffect(() => {
@@ -162,7 +163,7 @@ const dashboard = () => {
                 Transactions History <img src={nextaro} alt="" />{" "}
               </Link>
             </div>
-            <button className="redeem-button" type="button" onClick={openRedeemModal}>Redeem</button>
+            <button className="redeem-button" type="button" onClick={() => toggleRedeemModal(true)}>Redeem</button>
           </div>
         </div>
 
@@ -329,7 +330,10 @@ const dashboard = () => {
         </div>
       </div>
     </section>
-    <RedeemModal />
+    {
+      modalOpen ? <RedeemModal toggleRedeemModal={toggleRedeemModal} /> : ""
+    }
+    
     </>
   );
 };
