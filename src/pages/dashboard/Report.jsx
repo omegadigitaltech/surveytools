@@ -19,7 +19,7 @@ export default function ConfirmDetails() {
           <img src="./green-check.svg" alt="green check icon"/>
         </div>
         <div className="content">
-          <div className="center">Your request has been sent and is being processed. You will receive a notification of your data top-up within 24hrs </div>
+          <div className="centered">Your request has been sent and is being processed. You will receive a notification of your data top-up within 24hrs </div>
           <button className="button-main redeem-button" onClick={closeAllModals}>Go to Dashboard</button>
         </div>
       </div> 

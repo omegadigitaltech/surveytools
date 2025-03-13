@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import Overlay from "./Overlay";
 import useModalStore from "../../store/useModalStore";
 
@@ -8,6 +8,7 @@ const RedeemModal = () => {
     setRedeemModalOpen(false);
     setConfirmModalOpen(true);
   };
+  const [servicesDpwnOpen, setServicesDpwnOpen] = useState(false)
   return (
     <>
       <Overlay />
@@ -32,10 +33,15 @@ const RedeemModal = () => {
               <div>=500mb</div>
             </div>
             <div className="phone-input-wrapper flex">
-              <div className="provider-logo flex">
+              <button type="button" className="provider-button flex" onClick={() => setServicesDpwnOpen(!servicesDpwnOpen)}>
+                {servicesDpwnOpen && <ul className="services-selector">
+                  <li>MTN</li>
+                  <li>GLO</li>
+                  <li>Airtel</li>
+                </ul>}
                 <img src="airtel logo.svg" alt="airtel logo" />
                 <img src="./chevron-down.svg" alt="chevron-down" />
-              </div>
+              </button>
               <input className="input-result" placeholder="Your phone number" />
             </div>
           </div>
