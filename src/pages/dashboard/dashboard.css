@@ -345,9 +345,15 @@ form ::placeholder {
   }
   .transactions-history {
     padding-top: 0;
+    
   }
   .transactions-history a{
     font-size: .8rem;
+    width: min-content;
+  }
+  .transactions-history img {
+    margin-left: .5rem;
+    width: .5rem;
   }
   .redeem-button {
     font-size: 0.8rem;
@@ -532,12 +538,29 @@ form ::placeholder {
   padding: 1rem;
   z-index: 999;
   width: 50%;
+  font-family: K2D;
 }
 .modal .top {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+}
+.modal.confirm-modal {
+  color: #3f3f3f;
+  width: 30%;
+}
+.modal.confirm-modal p {
+  font-weight: 400;
+}
+.modal.confirm-modal h2{
+  color: #101010;
+  font-size: 1.8rem;
+  margin-bottom: .5rem;
+}
+.modal.confirm-modal .title{
+  color: #101010;
+  font-size: 1.2rem;
 }
 .content {
   width: 100%;
@@ -571,6 +594,14 @@ form ::placeholder {
 .converter .phone-input-wrapper {
   gap: 1rem;
 }
+
+.confirm-modal .summary-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .5rem;
+}
+
 .button-main {
   background-color: var(--base);
   color: white;
@@ -611,6 +642,9 @@ form ::placeholder {
     max-height: 90vh;
     overflow-y: auto;
   }
+  .modal.confirm-modal {
+    width: 90%;
+  }
   .converter .input-wrapper,
   .converter .phone-input-wrapper {
     flex-direction: column;
@@ -625,7 +659,15 @@ form ::placeholder {
 
 /* Medium Devices (Tablets) */
 @media (min-width: 768px) and (max-width: 1024px) {
-  /* Styles for tablets */
+  .modal.confirm-modal {
+    width: 50%;
+  }
+  .modal.confirm-modal h2 {
+    font-size: 1.7rem;
+  }
+  .modal.confirm-modal .title {
+    font-size: 1.2rem;
+  }
 }
 
 /* Large Devices (Laptops) */

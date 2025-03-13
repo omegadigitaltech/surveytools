@@ -18,6 +18,7 @@ import "./dashboard.css";
 // components
 import RedeemModal from "./RedeemModal";
 import ConfirmDetails from "./ConfirmDetails";
+import Report from "./Report";
 
 const dashboard = () => {
   const [searchKey, setSearchKey] = useState("");
@@ -33,7 +34,7 @@ const dashboard = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   // zustand
-  const { redeemModalOpen, confirmModalOpen, setRedeemModalOpen } = useModalStore();
+  const { redeemModalOpen, confirmModalOpen, reportModalOpen, setRedeemModalOpen } = useModalStore();
 
   //  functions
   const fetchMySurveys = async () => {
@@ -346,6 +347,7 @@ const dashboard = () => {
       </section>
       {redeemModalOpen ? <RedeemModal /> : ""}
       {confirmModalOpen ? <ConfirmDetails /> : ""}
+      {reportModalOpen ? <Report /> : ""}
     </>
   );
 };
