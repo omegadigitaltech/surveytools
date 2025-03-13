@@ -1,7 +1,7 @@
 import { Form, Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import config from "../../config/config";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import { validateSurveyAccess } from "../../utils/helpers/surveyChecks";
 import { toast } from "react-toastify";
 

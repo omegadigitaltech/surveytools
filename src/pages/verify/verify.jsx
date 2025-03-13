@@ -1,6 +1,6 @@
 import { Form, useActionData, useNavigation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import { toast } from "react-toastify";
 import otp from "../../assets/img/otp.png";
 import "./verify.css";

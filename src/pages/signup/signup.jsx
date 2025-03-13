@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Link, useActionData, useNavigate, } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import action from "./action";
 import "./signup.css";
 import "../utils.css";

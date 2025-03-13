@@ -6,6 +6,7 @@ const initialUIState = {
   isLoading: false,
   userEmail: "",
   userName: "",
+  
 };
 
 const uiSlice = createSlice({
@@ -32,7 +33,7 @@ const uiSlice = createSlice({
       state.isAuthenticated = false;
       state.userEmail = "";
       state.userName = "";
-    }
+    },
   },
 });
 

@@ -1,7 +1,13 @@
 import React from "react";
 import Overlay from "./Overlay";
+import useModalStore from "../../store/useModalStore";
 
-const RedeemModal = ({ toggleRedeemModal }) => {
+const RedeemModal = () => {
+  const { setRedeemModalOpen, setConfirmModalOpen } = useModalStore();
+  const openConfirmModal = () => {
+    setRedeemModalOpen(false);
+    setConfirmModalOpen(true);
+  };
   return (
     <>
       <Overlay />
@@ -10,7 +16,7 @@ const RedeemModal = ({ toggleRedeemModal }) => {
           <h2>Redeem Your Points</h2>
           <img
             src="./close-filled.svg"
-            onClick={() => toggleRedeemModal(false)}
+            onClick={() => setRedeemModalOpen(false)}
             alt="close"
           />
         </div>
@@ -33,13 +39,14 @@ const RedeemModal = ({ toggleRedeemModal }) => {
               <input className="input-result" placeholder="Your phone number" />
             </div>
           </div>
-          <button className="button-main redeem-button">
+          <button
+            className="button-main redeem-button"
+            onClick={openConfirmModal}
+          >
             Redeem Data Reward
           </button>
         </div>
       </div>
-
-      
     </>
   );
 };

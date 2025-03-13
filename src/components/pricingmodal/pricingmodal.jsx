@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../../components/store/useAuthStore';
+import useAuthStore from '../../store/useAuthStore';
 import config from '../../config/config';
 import './pricingmodal.css';
 

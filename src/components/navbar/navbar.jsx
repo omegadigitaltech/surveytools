@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import iconBell from "../../assets/img/icon-bell.svg";
 import iconUser from "../../assets/img/icon-user.svg";
 import iconLogOut from "../../assets/img/icon-logout.svg";
-import useAuthStore from "../store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import "./navbar.css";
 
 const Navbar = () => {

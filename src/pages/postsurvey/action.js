@@ -1,7 +1,7 @@
 import config from "../../config/config";
 import { toast } from "react-toastify";
 import { redirect } from "react-router-dom";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 
 const action = async ({ request }) => {
   // Experiment

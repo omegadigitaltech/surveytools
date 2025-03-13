@@ -8,7 +8,7 @@ import add from "../../assets/img/add.svg";
 import dot from "../../assets/img/dot.svg";
 import option from "../../assets/img/option.svg";
 import copy from "../../assets/img/copy.svg";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import PricingModal from "../../components/pricingmodal/pricingmodal";
 import { toast } from "react-toastify";
 import config from "../../config/config";

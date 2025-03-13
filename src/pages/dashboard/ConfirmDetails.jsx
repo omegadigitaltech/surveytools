@@ -1,7 +1,9 @@
 import React from 'react'
 import Overlay from './Overlay'
+import useModalStore from '../../store/useModalStore'
 
 export default function ConfirmDetails() {
+  const {setConfirmModalOpen} = useModalStore()
   return (
     <>
     <Overlay/>
@@ -22,7 +24,7 @@ export default function ConfirmDetails() {
 
           </div>
           <button className="button-main redeem-button">Redeem Data Reward</button>
-          <button className="button-tertiary cancel-button">Cancel</button>
+          <button className="button-tertiary cancel-button" onClick={() => setConfirmModalOpen(false)}>Cancel</button>
         </div>
       </div> 
       </>
