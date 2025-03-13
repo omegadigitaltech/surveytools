@@ -281,6 +281,10 @@ form ::placeholder {
   .transactions-history img {
     margin-left: .5rem; 
   }
+  .redeem-button {
+    font-size: .9rem;
+    padding: .5rem 1rem;
+  }
   .dashboard_sort {
     display: none !important;
   }
@@ -339,7 +343,16 @@ form ::placeholder {
   .points-value {
     font-size: .8rem;
   }
-
+  .transactions-history {
+    padding-top: 0;
+  }
+  .transactions-history a{
+    font-size: .8rem;
+  }
+  .redeem-button {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+  }
   .dashboard_inner h3 {
     font-size: 0.8rem;
   }
@@ -603,6 +616,10 @@ form ::placeholder {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.4rem;
+  }
+  .button-main, .button-tertiary {
+    font-size: .9rem;
+    padding: .7rem 1rem;
   }
 }
 
