@@ -1,18 +1,54 @@
-import React, {useState} from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Overlay from "./Overlay";
 import useModalStore from "../../store/useModalStore";
+import useOutsideClick from "../../hooks/useOutsideClick";
 
+const serviceProviders = [
+  { name: "MTN", logo: "./MTN-logo.svg" },
+  { name: "GLO", logo: "./glo-logo.svg" },
+  { name: "AIRTEL", logo: "./airtel logo.svg" },
+];
 const RedeemModal = () => {
   const { setRedeemModalOpen, setConfirmModalOpen } = useModalStore();
   const openConfirmModal = () => {
     setRedeemModalOpen(false);
     setConfirmModalOpen(true);
   };
-  const [servicesDpwnOpen, setServicesDpwnOpen] = useState(false)
+  const [servicesDpwnOpen, setServicesDpwnOpen] = useState(false);
+  const [balance, setBalance] = useState(500);
+  const [balanceSufficient, setBalanceSufficient] = useState(true);
+  const [buttonActive, setButtonActive] = useState(false);
+  const [providerIndex, setProviderIndex] = useState(0);
+  // refs
+  const providersSelectorRef = useRef(null);
+  const phoneWrapperRef = useRef(null);
+  const modalRef = useRef(null)
+
+  // functions
+  useOutsideClick(phoneWrapperRef, () => setServicesDpwnOpen(false));
+  useOutsideClick(modalRef, () => setRedeemModalOpen(false));
+  const compareToBalance = (e) => {
+    if (balance >= e.target.value) {
+      setBalanceSufficient(true);
+    } else {
+      setBalanceSufficient(false);
+    }
+  };
+  const submitEligibility = (e) => {
+    const nigerianPhoneRegex = /^(?:\+234|0)?[789][01]\d{8}$/;
+    if (!balanceSufficient) return setButtonActive(false);
+    if (!nigerianPhoneRegex.test(e.target.value)) return setButtonActive(false);
+    else setButtonActive(true);
+  };
+  const changeProviderIndex = (value) => {
+    setProviderIndex(value);
+    setServicesDpwnOpen(false);
+  };
+
   return (
     <>
       <Overlay />
-      <div className="modal">
+      <div className="modal" ref={modalRef}>
         <div className="top">
           <h2>Redeem Your Points</h2>
           <img
@@ -29,24 +65,46 @@ const RedeemModal = () => {
           <div className="converter">
             <div className="title">Points to redeem</div>
             <div className="input-wrapper flex">
-              <input type="text" placeholder="100" />
+              <input
+                type="number"
+                className={`${!balanceSufficient ? "insufficient-points" : ""}`}
+                onChange={compareToBalance}
+                defaultValue={0.0}
+              />
               <div>=500mb</div>
             </div>
-            <div className="phone-input-wrapper flex">
-              <button type="button" className="provider-button flex" onClick={() => setServicesDpwnOpen(!servicesDpwnOpen)}>
-                {servicesDpwnOpen && <ul className="services-selector">
-                  <li>MTN</li>
-                  <li>GLO</li>
-                  <li>Airtel</li>
-                </ul>}
-                <img src="airtel logo.svg" alt="airtel logo" />
+            <div ref={phoneWrapperRef} className="phone-input-wrapper flex">
+              {servicesDpwnOpen && (
+                <ul ref={providersSelectorRef} className="services-selector">
+                  <li onClick={() => changeProviderIndex(0)}>MTN</li>
+                  <li onClick={() => changeProviderIndex(1)}>GLO</li>
+                  <li onClick={() => changeProviderIndex(2)}>Airtel</li>
+                </ul>
+              )}
+              <button
+                type="button"
+                className="provider-button flex"
+                onClick={() => setServicesDpwnOpen(!servicesDpwnOpen)}
+              >
+                <img
+                  src={serviceProviders[providerIndex].logo}
+                  alt={`${serviceProviders[providerIndex].name} logo`}
+                  className="provider-logo-image"
+                />
                 <img src="./chevron-down.svg" alt="chevron-down" />
               </button>
-              <input className="input-result" placeholder="Your phone number" />
+              <input
+                className="phone-number-input"
+                type="number"
+                onChange={submitEligibility}
+                placeholder="Your phone number"
+              />
             </div>
           </div>
           <button
-            className="button-main redeem-button"
+            className={`button-main redeem-button ${
+              !buttonActive ? "inactive" : ""
+            }`}
             onClick={openConfirmModal}
           >
             Redeem Data Reward

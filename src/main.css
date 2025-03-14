@@ -1,201 +1,206 @@
 @import "https://fonts.googleapis.com/css2?family=Inter:wght@500&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap";
-@import url('https://fonts.googleapis.com/css2?family=K2D:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=K2D:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap");
 
 :root {
-    --ff-body: "Montserrat", sans-serif;
-    --ff-text: "Inter", sans-serif;
+  --ff-body: "Montserrat", sans-serif;
+  --ff-text: "Inter", sans-serif;
 
-    --fs-3xl: 1.500rem;
-    --fs-2xl: 1.500rem;
-    --fs-xl: 1.375rem;
-    --fs-lg: 1.125rem;
-    --fs-md: 0.925rem;
-    --fs-sm: 0.875rem;
+  --fs-3xl: 1.5rem;
+  --fs-2xl: 1.5rem;
+  --fs-xl: 1.375rem;
+  --fs-lg: 1.125rem;
+  --fs-md: 0.925rem;
+  --fs-sm: 0.875rem;
 
-    --brand-h: 188;
-    --brand-s: 69%;
-    --brand-l: 36%;
+  --brand-h: 188;
+  --brand-s: 69%;
+  --brand-l: 36%;
 
-    --base: hsl(var(--brand-h) var(--brand-s) var(--brand-l));
-    --text-dark: hsl(var(--brand-h) var(--brand-s) 10%);
-    --text-lite: hsl(var(--brand-h) 15% 95%);
-    --text-gray: hsl(var(--brand-h) 10% 50%);
-    --surface-dark-100: hsl(var(--brand-h) 10% 10%);
-    --surface-dark-200: hsl(var(--brand-h) 10% 15%);
-    --surface-dark-300: hsl(var(--brand-h) 5% 20%);
-    --surface-dark-400: hsl(var(--brand-h) 5% 25%);
-    --surface-lite-100: hsl(var(--brand-h) 10% 99%);
-    --surface-lite-200: hsl(var(--brand-h) 15% 99%);
-    --surface-lite-300: hsl(var(--brand-h) 15% 95%);
-    --surface-lite-400: hsl(var(--brand-h) 20% 95%);
-    --shadow: hsl(var(--brand-h) 50% 50%);
-    --border: hsl(var(--brand-h) 12% 89%);
+  --base: hsl(var(--brand-h) var(--brand-s) var(--brand-l));
+  --text-dark: hsl(var(--brand-h) var(--brand-s) 10%);
+  --text-lite: hsl(var(--brand-h) 15% 95%);
+  --text-gray: hsl(var(--brand-h) 10% 50%);
+  --surface-dark-100: hsl(var(--brand-h) 10% 10%);
+  --surface-dark-200: hsl(var(--brand-h) 10% 15%);
+  --surface-dark-300: hsl(var(--brand-h) 5% 20%);
+  --surface-dark-400: hsl(var(--brand-h) 5% 25%);
+  --surface-lite-100: hsl(var(--brand-h) 10% 99%);
+  --surface-lite-200: hsl(var(--brand-h) 15% 99%);
+  --surface-lite-300: hsl(var(--brand-h) 15% 95%);
+  --surface-lite-400: hsl(var(--brand-h) 20% 95%);
+  --shadow: hsl(var(--brand-h) 50% 50%);
+  --border: hsl(var(--brand-h) 12% 89%);
 
-    --color: #1c8a9b;
-    --d-A50: #197c8c;
-    --d-100: #166e7c;
-    --d-200: #14616d;
-    --d-300: #11535d;
-    --d-400: #0e454e;
-    --d-500: #0b373e;
-    --d-600: #08292e;
-    --d-700: #061c1f;
-    --d-800: #030e0f;
-    --d-900: #000000;
+  --color: #1c8a9b;
+  --d-A50: #197c8c;
+  --d-100: #166e7c;
+  --d-200: #14616d;
+  --d-300: #11535d;
+  --d-400: #0e454e;
+  --d-500: #0b373e;
+  --d-600: #08292e;
+  --d-700: #061c1f;
+  --d-800: #030e0f;
+  --d-900: #000000;
 
-    --l-A50: #3396a5;
-    --l-100: #49a1af;
-    --l-200: #60adb9;
-    --l-300: #77b9c3;
-    --l-400: #8ec5cd;
-    --l-500: #a4d0d7;
-    --l-600: #bbdce1;
-    --l-700: #d2e8eb;
-    --l-800: #e8f3f5;
-    --l-900: #ffffff;
+  --l-A50: #3396a5;
+  --l-100: #49a1af;
+  --l-200: #60adb9;
+  --l-300: #77b9c3;
+  --l-400: #8ec5cd;
+  --l-500: #a4d0d7;
+  --l-600: #bbdce1;
+  --l-700: #d2e8eb;
+  --l-800: #e8f3f5;
+  --l-900: #ffffff;
 
-    --mb-xl: 3em;
-    --mb-lg: 1.5em;
-    --mb-md: 1em;
-    --mb-sm: 0.5em;
-    --mb-xs: 0.3em;
+  --mb-xl: 3em;
+  --mb-lg: 1.5em;
+  --mb-md: 1em;
+  --mb-sm: 0.5em;
+  --mb-xs: 0.3em;
 
-    --bp-lg: 1044px;
-    --bp-md: 768px;
-    --bp-sm: 512px;
-    --bp-xs: 384px;
+  --bp-lg: 1044px;
+  --bp-md: 768px;
+  --bp-sm: 512px;
+  --bp-xs: 384px;
 
-    /* Color */
-    --wht: #fff;
-    --blk: #000;
-    --gray: #777777;
-    --litgray: #f1f1f1;
-    --ltgray: #E7E7E73D;
-    --green: rgb(53, 143, 53);
-    --border: 0.5px solid rgb(167, 167, 167);
+  /* Color */
+  --wht: #fff;
+  --blk: #000;
+  --gray: #777777;
+  --litgray: #f1f1f1;
+  --ltgray: #e7e7e73d;
+  --green: rgb(53, 143, 53);
+  --border: 0.5px solid rgb(167, 167, 167);
 }
 
 *,
 *::before,
 *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-size: var(--fs-md);
-    font-family: var(--ff-body);
+  font-size: var(--fs-md);
+  font-family: var(--ff-body);
 }
 
 a {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 ul {
-    list-style: none;
+  list-style: none;
 }
 
 img {
-    display: block;
-    max-width: 100%;
+  display: block;
+  max-width: 100%;
 }
 
 input,
 button {
-    font: inherit;
-    border: none;
-    outline-style: none;
-    background-color: transparent;
+  font: inherit;
+  border: none;
+  outline-style: none;
+  background-color: transparent;
 }
 
 img,
 button {
-    user-select: none;
+  user-select: none;
 }
-
+input.insufficient-points {
+  border-color: red;
+}
+button.inactive {
+  opacity: 0.5;
+}
 .wrap {
-    width: 80%;
-    margin: 0 auto;
-    max-width: 1200px;
+  width: 80%;
+  margin: 0 auto;
+  max-width: 1200px;
 }
 
 .flex {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .grid {
-    display: grid;
+  display: grid;
 }
 
 .btn {
-    margin: 4rem 0;
-    width: 80%;
-    display: block;
-    background-color: var(--base);
-    padding: 0.8em;
-    color: #fff;
-    font-weight: bold;
-    border-radius: 5px;
+  margin: 4rem 0;
+  width: 80%;
+  display: block;
+  background-color: var(--base);
+  padding: 0.8em;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 5px;
 }
 
 /* SPIN EFFECT */
 .spin-btn {
-    background: var(--base);
-    color: white;
-    padding: 0.8em 3rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s;
-    min-width: 150px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+  background: var(--base);
+  color: white;
+  padding: 0.8em 3rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+  min-width: 150px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
 .spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid transparent;
-    border-top: 3px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid transparent;
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 /* SPIN EFFECT */
 
 /* MEDIA QUERY */
-@media(max-width:550px) {
-.wrap{
+@media (max-width: 550px) {
+  .wrap {
     width: 95%;
+  }
 }
-}
-@media(max-width:385px) {
-.btn {
-    font-size: .85rem;
-}
-.spin-btn {
-    font-size: .9rem;
-}
+@media (max-width: 385px) {
+  .btn {
+    font-size: 0.85rem;
+  }
+  .spin-btn {
+    font-size: 0.9rem;
+  }
 }

@@ -12,6 +12,7 @@ import view from "../../assets/img/eye.svg";
 import unview from "../../assets/img/uneye.svg";
 import nextaro from "../../assets/img/nextaro.svg";
 import useModalStore from "../../store/useModalStore";
+import useOutsideClick from "../../hooks/useOutsideClick"
 
 import "./dashboard.css";
 

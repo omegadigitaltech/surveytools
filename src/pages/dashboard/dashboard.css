@@ -81,21 +81,7 @@
 } 
 
 
-.provider-button {
-  position: relative;
-}
-.services-selector {
-  position:absolute;
-  top: 130%;
-  left: 0;
-  background: white;
-  padding: .5rem;
-  border-radius: .3rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: .5rem;
-}
+
 .redeem-button {
   background-color: white;
   color: var(--base);
@@ -611,9 +597,42 @@ form ::placeholder {
   gap: 1rem;
   margin-bottom: 2rem;
 }
+
 .converter .phone-input-wrapper {
   gap: 1rem;
+  position: relative;
 }
+.converter .provider-logo-image {
+  height: 2rem;
+}
+
+.provider-button {
+  position: relative;
+}
+.services-selector {
+  position:absolute;
+  z-index: 999;
+  top: 100%;
+  left: 0;
+  background: white;
+  padding: .5rem 0;
+  border-radius: .3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: .5rem;
+}
+.services-selector > li {
+  cursor: pointer;
+  transition: 300ms;
+  width: 100%;
+  text-align: start;
+  padding: .5rem .5rem;
+}
+.services-selector > li:hover {
+  background-color: #e1e0e0;
+}
+
 
 .confirm-modal .summary-content {
   display: flex;
