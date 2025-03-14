@@ -9,13 +9,12 @@ const serviceProviders = [
   { name: "AIRTEL", logo: "./airtel logo.svg" },
 ];
 const RedeemModal = () => {
-  const { setRedeemModalOpen, setConfirmModalOpen } = useModalStore();
+  const { setRedeemModalOpen, setConfirmModalOpe, balance, setBalance } = useModalStore();
   const openConfirmModal = () => {
     setRedeemModalOpen(false);
     setConfirmModalOpen(true);
   };
   const [servicesDpwnOpen, setServicesDpwnOpen] = useState(false);
-  const [balance, setBalance] = useState(500);
   const [balanceSufficient, setBalanceSufficient] = useState(true);
   const [buttonActive, setButtonActive] = useState(false);
   const [providerIndex, setProviderIndex] = useState(0);
