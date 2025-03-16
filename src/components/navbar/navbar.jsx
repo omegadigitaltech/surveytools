@@ -37,8 +37,7 @@ const Navbar = () => {
           </button>
 
           <NavLink className="header-w1-logo" to="/">
-            SURVEYPRO
-            <div className="header-w1-circ" aria-hidden></div>
+            <span>Survey</span><span>Tools</span>
           </NavLink>
         </div>
         <div className="header-w2">

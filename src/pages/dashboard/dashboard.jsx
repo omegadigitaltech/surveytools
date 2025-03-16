@@ -80,7 +80,7 @@ const dashboard = () => {
   const pointToggle = () => {
     setShowPoint((prevState) => !prevState);
   };
-  const iconPass = showPoint ? view : unview;
+  const iconPass = showPoint ? unview : view;
 
 
   // useEffect's
