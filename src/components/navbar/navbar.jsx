@@ -37,7 +37,7 @@ const Navbar = () => {
           </button>
 
           <NavLink className="header-w1-logo" to="/">
-            <span>Survey</span><span>Tools</span>
+            <span className="survey">Survey</span><span className="tools">Tools</span>
           </NavLink>
         </div>
         <div className="header-w2">

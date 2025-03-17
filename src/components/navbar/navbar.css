@@ -84,10 +84,15 @@
 
 .header-w1-logo {
     color: var(--text-dark);
-    font-weight: 700;
+    font-weight: 800;
     font-size: var(--fs-lg);
 }
-
+span.survey {
+    color: #2095D3;
+}
+span.tools {
+    color: #14FE19;
+}
 .header-w1-circ {
     --len: 5px;
     width: var(--len);
