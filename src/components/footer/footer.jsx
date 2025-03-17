@@ -11,7 +11,7 @@ const Footer = () => {
             <div className="footer-wrap wrap">
                 <div className="footer-w1">
                     <Link className="footer-w1-logo">
-                        SurveyPro
+                        SurveyTools
                     </Link>
                     <ul className="footer-w1-list">
                         <li className="footer-w1-item">
@@ -43,7 +43,7 @@ const Footer = () => {
                 </div>
                 <div className="footer-w2 flex">
                     <div className="footer-w2-copy">
-                        SurveyPro &copy; 2024
+                        SurveyTools &copy; 2024
                     </div>
                     <div className="footer-w2-list">
                         <Link className="footer-w2-link">
