@@ -2,7 +2,7 @@ import { Form, Link } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import { formatDistanceToNow, parseISO } from "date-fns";
 import config from "../../config/config";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 
 import clock from "../../assets/img/clock.svg";
 import filter from "../../assets/img/filter.svg";

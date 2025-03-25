@@ -1,7 +1,7 @@
 import { Link, Form, useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import Complete from "../../components/completed/complete";
 import config from "../../config/config";
 import backaro from "../../assets/img/backaro.svg";

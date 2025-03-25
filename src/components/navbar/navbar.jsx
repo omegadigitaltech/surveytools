@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import iconBell from "../../assets/img/icon-bell.svg";
 import iconUser from "../../assets/img/icon-user.svg";
 import iconLogOut from "../../assets/img/icon-logout.svg";
-import useAuthStore from "../store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import "./navbar.css";
 
 const Navbar = () => {
@@ -37,8 +37,7 @@ const Navbar = () => {
           </button>
 
           <NavLink className="header-w1-logo" to="/">
-            SURVEYPRO
-            <div className="header-w1-circ" aria-hidden></div>
+            <span className="survey">Survey</span><span className="tools">Tools</span>
           </NavLink>
         </div>
         <div className="header-w2">

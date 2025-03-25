@@ -1,6 +1,6 @@
 import React from "react"
 import "./logout.css"
-import useAuthStore from "../store/useAuthStore"
+import useAuthStore from "../../store/useAuthStore"
 
 const Logout = () => {
     const { hideLogoutConfirmation, logout } = useAuthStore();

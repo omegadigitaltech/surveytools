@@ -2,7 +2,7 @@ import { Form, Link, useNavigate, useActionData } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 // import { useDispatch } from "react-redux";
 // import { uiSliceAction } from "../../components/store/uiSlice";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import action from "./action";
 import "./signin.css";
 import "../utils.css";
