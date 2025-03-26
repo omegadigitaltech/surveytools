@@ -2,7 +2,7 @@ import { Link, Form } from "react-router-dom";
 import backaro from "../../assets/img/backaro.svg";
 import "./profile.css"
 import data from "../../utils/content/data";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import user from "../../assets/img/user.png"
 
 const Profile = () => {

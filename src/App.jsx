@@ -9,9 +9,9 @@ import "react-toastify/dist/ReactToastify.css";
 
 import HomeLayout from "./layout/home/home";
 import AuthLayout from "./layout/auth/auth";
-import StoreProvider from "./components/store/StoreProvider";
+import StoreProvider from "./store/StoreProvider";
 import ProtectRoute from "./components/protectroute/protectroute"
-import useAuthStore from "./components/store/useAuthStore";
+import useAuthStore from "./store/useAuthStore.js";
 import Logout from "./components/logout/logout";
 
 import Home from "./pages/home/home";

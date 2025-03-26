@@ -1,6 +1,6 @@
 import config from "../../config/config";
 import { toast } from "react-toastify";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import { redirect } from "react-router-dom";
 
 const action = async ({ request, formData }) => {

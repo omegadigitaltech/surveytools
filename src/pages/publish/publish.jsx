@@ -2,7 +2,7 @@ import "./publish.css"
 import config from "../../config/config"
 import { Form, useNavigate } from "react-router-dom"
 import { useState } from "react"
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import { redirect } from "react-router-dom";
 
 import { toast } from "react-toastify";

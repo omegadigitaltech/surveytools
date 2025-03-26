@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { toast } from "react-toastify";
 import config from "../../config/config";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import backaro from "../../assets/img/backaro.svg";
 import "./insights.css";
 

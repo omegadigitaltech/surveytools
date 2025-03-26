@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { usePaystackPayment } from "react-paystack";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import useAuthStore from "../../components/store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
 import config from "../../config/config";
 import './payment.css'
 
