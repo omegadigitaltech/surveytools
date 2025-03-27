@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken')
 const jwtSecret = process.env.JWT_SECRET
 const mongoose = require('mongoose');
 const {calculateSentiment} = require('../middleware/helper')
+const { uploadQuestionnaire } = require('./questionnaireUpload');
 
 const main_url = "localhost:5000"
 
@@ -1118,5 +1119,6 @@ module.exports = {
   receivePaymentWebhook,
   getPrice,
   mySurveys,
-  verifyPayment
+  verifyPayment,
+  uploadQuestionnaire
 }

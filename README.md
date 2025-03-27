@@ -372,3 +372,70 @@ If there was any other error with the server, you will get the below error
         code: 500,
         msg: "An error Occured"
     }
+
+# Survey System API
+
+This API provides endpoints for creating and managing surveys, questions, and participant responses.
+
+## AI-Powered Questionnaire Upload
+
+This system includes an AI-powered feature that allows survey creators to upload questionnaire documents (PDF, DOCX, DOC, TXT) and automatically extract questions into their survey.
+
+### How It Works
+
+1. First, create a survey using the `/surveys` endpoint.
+2. Then, upload a questionnaire document using the `/surveys/:surveyId/upload-questionnaire` endpoint.
+3. The system will use Google's Gemini AI to analyze the document and extract questions.
+4. Extracted questions will be automatically added to your survey.
+
+### Supported Question Types
+
+The AI can identify and extract these question types:
+
+- **Multiple Choice Questions** (`multiple_choice`): Questions with specific answer options
+- **Rating Questions** (`five_point`): Scale questions with ratings from 1 to 5
+- **Open-Ended Questions** (`fill_in`): Questions that require text responses
+
+### API Usage
+
+To upload a questionnaire document:
+
+```
+POST /surveys/:surveyId/upload-questionnaire
+Content-Type: multipart/form-data
+
+file: [Your questionnaire document file]
+```
+
+#### Response
+
+```json
+{
+  "status": "success",
+  "code": 200,
+  "msg": "5 questions successfully added to survey from uploaded document",
+  "survey": { ... }
+}
+```
+
+### Technical Details
+
+- Maximum file size: 5MB
+- Supported file types: PDF, DOCX, DOC, TXT
+- PDF and TXT files are sent directly to the Gemini AI for better analysis
+- For other formats, extracted text is sent to the AI
+
+## Environment Setup
+
+Ensure you have the following environment variables set:
+
+```
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+## Dependencies
+
+- @google/generative-ai: For AI-powered question extraction
+- multer: For file uploads
+- pdf-parse: For PDF text extraction
+- docx-parser: For DOCX text extraction

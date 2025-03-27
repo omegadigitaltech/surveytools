@@ -10,6 +10,8 @@ const nodemailer = require('nodemailer')
 const otpGenerator = require('otp-generator');
 const cookieParser = require('cookie-parser')
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const User = require('./model/user')
 
@@ -18,6 +20,7 @@ const authRouter = require('./routes/auth')
 const mainRouter = require('./routes/main')
 const redemptionRouter = require('./routes/redemption')
 const errorHandlerMiddleware = require('./middleware/error-handler')
+const uploadErrorHandler = require('./middleware/errorHandler')
 const notFoundMiddleware = require('./middleware/not-found')
 
 const app = express();
@@ -59,13 +62,20 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 app.use('/', mainRouter)
 app.use('/', authRouter)
 app.use('/', redemptionRouter)
 
 
-// //error handler
+// Use the new error handler for file uploads
+app.use(uploadErrorHandler);
+// Use the original error handler for other errors
 app.use(errorHandlerMiddleware);
 app.use(notFoundMiddleware);
 

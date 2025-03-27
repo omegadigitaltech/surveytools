@@ -1,6 +1,7 @@
 const {authMiddleware} = require('../middleware/auth')
 const express = require('express');
 const router = express.Router();
+const upload = require('../middleware/upload');
 const { start, home,updateAnswer, submitAnswers, createSurvey, 
     deleteQuestion, getSurveyInfo, getUserSurveyData, 
     checkUserFilledSurvey, checkSurveyMaxParticipants, addOrUpdateQuestion,
@@ -8,7 +9,8 @@ const { start, home,updateAnswer, submitAnswers, createSurvey,
   receivePaymentWebhook,
   getPrice,
   mySurveys,
-  verifyPayment
+  verifyPayment,
+  uploadQuestionnaire
  } = require('../controllers/main')
 
 
@@ -29,6 +31,9 @@ router.get('/surveys/:surveyId/questions',authMiddleware, getSurveyQuestions);
 router.post('/surveys/:surveyId/publish',authMiddleware, publishSurvey);
 router.get('/surveys/:surveyId/analytics',authMiddleware, getSurveyAnalytics);
 router.get('/surveys/:surveyId/verify-payment', authMiddleware, verifyPayment);
+
+// Questionnaire document upload endpoint - now takes surveyId in the URL
+router.post('/surveys/:surveyId/upload-questionnaire', authMiddleware, upload.single('document'), uploadQuestionnaire);
 
 router.post('/payment-webhook', receivePaymentWebhook)
 router.post('/get-price', authMiddleware, getPrice)
