@@ -12,7 +12,7 @@ export default function ConfirmDetails() {
   return (
     <>
     <Overlay/>
-    <div className="modal confirm-modal">
+    <div className="modal confirm-modal overlay-active">
         <div className="">
           <h2>Confirm Details</h2>
           <p>Double-Check your details before proceeding</p>

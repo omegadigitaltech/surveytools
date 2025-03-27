@@ -12,7 +12,7 @@ import view from "../../assets/img/eye.svg";
 import unview from "../../assets/img/uneye.svg";
 import nextaro from "../../assets/img/nextaro.svg";
 import useModalStore from "../../store/useModalStore";
-import useOutsideClick from "../../hooks/useOutsideClick"
+import useOutsideClick from "../../hooks/useOutsideClick";
 
 import "./dashboard.css";
 
@@ -35,7 +35,14 @@ const dashboard = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   // zustand
-  const { redeemModalOpen, confirmModalOpen, reportModalOpen, setRedeemModalOpen, openModalAnimate, setOpenModalAnimate } = useModalStore();
+  const {
+    redeemModalOpen,
+    confirmModalOpen,
+    reportModalOpen,
+    setRedeemModalOpen,
+    openModalAnimate,
+    setOpenModalAnimate,
+  } = useModalStore();
 
   //  functions
   const fetchMySurveys = async () => {
@@ -81,7 +88,6 @@ const dashboard = () => {
     setShowPoint((prevState) => !prevState);
   };
   const iconPass = showPoint ? unview : view;
-
 
   // useEffect's
   useEffect(() => {
@@ -144,14 +150,17 @@ const dashboard = () => {
   }, [authToken]);
 
   useEffect(() => {
-    if(true) {
-      setOpenModalAnimate(true)
+    if (redeemModalOpen === true) {
+      setOpenModalAnimate(true);
     }
-  }, [redeemModalOpen])
+    if (redeemModalOpen === false) {
+      setOpenModalAnimate(false);
+    }
+  }, [redeemModalOpen]);
 
   const handleModalOpen = () => {
-    setRedeemModalOpen(true)
-  }
+    setRedeemModalOpen(true);
+  };
 
   return (
     <>
@@ -265,13 +274,13 @@ const dashboard = () => {
                             </h4>
                           </div>
                           <div className="participants flex">
-                            <img src={members} alt="" />
-                            <p>
-                              <span className="num_participant">
-                                {survey.participantCounts?.filled || 0}
-                              </span>{" "}
-                              Participants
-                            </p>
+                            <div>
+                              <img src={members} alt="" />
+                            </div>
+                            <span className="num_participant">
+                              {survey.participantCounts?.filled || 0}
+                            </span>
+                            <p> Participants</p>
                           </div>
                         </div>
                       </div>

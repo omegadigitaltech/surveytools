@@ -71,8 +71,11 @@
   --gray: #777777;
   --litgray: #f1f1f1;
   --ltgray: #e7e7e73d;
-  --green: rgb(53, 143, 53);
   --border: 0.5px solid rgb(167, 167, 167);
+  --primary: #2095D3;
+  --secondary-blue: #35C6F4;
+  --lemon: #14FE19;
+  --green: #196332;
 }
 
 *,
