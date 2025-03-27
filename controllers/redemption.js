@@ -42,7 +42,7 @@ const redeemAirtime = async (req, res) => {
     await req.startTransaction();
     
     const { amount, network, phoneNumber } = req.body;
-    const userId = req.user.userId;
+    const userId = req.userId;
 
     // Validate request
     if (!amount || !network || !phoneNumber) {
@@ -187,7 +187,7 @@ const redeemData = async (req, res) => {
     await req.startTransaction();
     
     const { planId, network, phoneNumber } = req.body;
-    const userId = req.user.userId;
+    const userId = req.userId;
 
     // Validate request
     if (!planId || !network || !phoneNumber) {
@@ -354,7 +354,8 @@ const redeemData = async (req, res) => {
 // Get user's redemption history
 const getRedemptionHistory = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.userId;
+    console.log(userId)
     
     const history = await RedemptionHistory.find({ userId })
       .sort({ createdAt: -1 });
