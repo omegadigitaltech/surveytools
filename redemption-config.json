@@ -1,0 +1,291 @@
+{
+  "redemptionConfiguration": {
+    "version": "1.0.0",
+    "description": "Configuration for points redemption system",
+    "conversionRates": {
+      "airtime": {
+        "description": "Points to airtime conversion rate",
+        "networks": {
+          "1": {
+            "name": "MTN",
+            "pointsToNaira": 1,
+            "minPoints": 100,
+            "maxPoints": 10000
+          },
+          "2": {
+            "name": "Airtel",
+            "pointsToNaira": 1,
+            "minPoints": 100,
+            "maxPoints": 10000
+          },
+          "3": {
+            "name": "9Mobile",
+            "pointsToNaira": 1,
+            "minPoints": 100,
+            "maxPoints": 10000
+          },
+          "4": {
+            "name": "Glo",
+            "pointsToNaira": 1,
+            "minPoints": 100,
+            "maxPoints": 10000
+          }
+        }
+      },
+      "data": {
+        "description": "Points to data plan conversion - based on actual data plan prices",
+        "networks": {
+          "1": {
+            "name": "MTN",
+            "pointsToNaira": 1,
+            "minPoints": 100,
+            "samplePlans": [
+              {
+                "planid": "51",
+                "name": "1GB SME (1 Month)",
+                "price": 880,
+                "planSize": "1 GB",
+                "pointsRequired": 880
+              },
+              {
+                "planid": "50",
+                "name": "2GB SME (1 Month)",
+                "price": 1760,
+                "planSize": "2 GB",
+                "pointsRequired": 1760
+              },
+              {
+                "planid": "230",
+                "name": "3GB SME (1 Month)",
+                "price": 2640,
+                "planSize": "3 GB",
+                "pointsRequired": 2640
+              },
+              {
+                "planid": "354",
+                "name": "5GB SME (1 Month)",
+                "price": 4400,
+                "planSize": "5 GB",
+                "pointsRequired": 4400
+              },
+              {
+                "planid": "150",
+                "name": "10GB SME (1 Month)",
+                "price": 8800,
+                "planSize": "10 GB",
+                "pointsRequired": 8800
+              }
+            ]
+          },
+          "2": {
+            "name": "Airtel",
+            "pointsToNaira": 1,
+            "minPoints": 100,
+            "samplePlans": [
+              {
+                "planid": "216",
+                "name": "100MB - Airtel CG",
+                "price": 75,
+                "planSize": "100 MB",
+                "pointsRequired": 75
+              },
+              {
+                "planid": "217",
+                "name": "300MB - Airtel CG",
+                "price": 200,
+                "planSize": "300 MB",
+                "pointsRequired": 200
+              },
+              {
+                "planid": "212",
+                "name": "500MB - Airtel CG",
+                "price": 360,
+                "planSize": "500 MB",
+                "pointsRequired": 360
+              },
+              {
+                "planid": "213",
+                "name": "1GB - Airtel CG (1 Month)",
+                "price": 625,
+                "planSize": "1 GB",
+                "pointsRequired": 625
+              },
+              {
+                "planid": "214",
+                "name": "2GB - Airtel CG (1 Month)",
+                "price": 1250,
+                "planSize": "2 GB",
+                "pointsRequired": 1250
+              },
+              {
+                "planid": "215",
+                "name": "5 GB - Airtel CG (1 Month)",
+                "price": 3125,
+                "planSize": "5 GB",
+                "pointsRequired": 3125
+              },
+              {
+                "planid": "231",
+                "name": "10 GB - Airtel CG (1 Month)",
+                "price": 6250,
+                "planSize": "10 GB",
+                "pointsRequired": 6250
+              }
+            ]
+          },
+          "3": {
+            "name": "9Mobile",
+            "pointsToNaira": 1,
+            "minPoints": 100,
+            "samplePlans": [
+              {
+                "planid": "275",
+                "name": "500 MB - 9MOBILE CG (1 Month)",
+                "price": 80,
+                "planSize": "500 MB",
+                "pointsRequired": 80
+              },
+              {
+                "planid": "272",
+                "name": "1 GB - 9MOBILE CG (1 Month)",
+                "price": 145,
+                "planSize": "1 GB",
+                "pointsRequired": 145
+              },
+              {
+                "planid": "273",
+                "name": "1.5 GB - 9MOBILE CG (1 Month)",
+                "price": 215,
+                "planSize": "1.5 GB",
+                "pointsRequired": 215
+              },
+              {
+                "planid": "274",
+                "name": "2 GB - 9MOBILE CG (1 Month)",
+                "price": 290,
+                "planSize": "2 GB",
+                "pointsRequired": 290
+              },
+              {
+                "planid": "276",
+                "name": "2.5 GB - 9MOBILE CG (1 Month)",
+                "price": 350,
+                "planSize": "2.5 GB",
+                "pointsRequired": 350
+              },
+              {
+                "planid": "277",
+                "name": "3 GB - 9MOBILE CG (1 Month)",
+                "price": 435,
+                "planSize": "3 GB",
+                "pointsRequired": 435
+              },
+              {
+                "planid": "280",
+                "name": "10 GB - 9MOBILE CG (1 Month)",
+                "price": 1450,
+                "planSize": "10 GB",
+                "pointsRequired": 1450
+              }
+            ]
+          },
+          "4": {
+            "name": "Glo",
+            "pointsToNaira": 1,
+            "minPoints": 100,
+            "samplePlans": [
+              {
+                "planid": "258",
+                "name": "500 MB - GLO CG (1 Month)",
+                "price": 235,
+                "planSize": "500 MB",
+                "pointsRequired": 235
+              },
+              {
+                "planid": "261",
+                "name": "1 GB - GLO CG (1 Month)",
+                "price": 470,
+                "planSize": "1 GB",
+                "pointsRequired": 470
+              },
+              {
+                "planid": "37",
+                "name": "1.8 GB - GLO Gifting (1 Month)",
+                "price": 460,
+                "planSize": "1.8 GB",
+                "pointsRequired": 460
+              },
+              {
+                "planid": "262",
+                "name": "2 GB - GLO CG (1 Month)",
+                "price": 940,
+                "planSize": "2 GB",
+                "pointsRequired": 940
+              },
+              {
+                "planid": "263",
+                "name": "3 GB - GLO CG (1 Month)",
+                "price": 1410,
+                "planSize": "3 GB",
+                "pointsRequired": 1410
+              },
+              {
+                "planid": "32",
+                "name": "3.9 GB - GLO Gifting (1 Month)",
+                "price": 920,
+                "planSize": "3.9 GB",
+                "pointsRequired": 920
+              },
+              {
+                "planid": "264",
+                "name": "5 GB - GLO CG (1 Month)",
+                "price": 2350,
+                "planSize": "5 GB",
+                "pointsRequired": 2350
+              },
+              {
+                "planid": "265",
+                "name": "10 GB - GLO CG (1 Month)",
+                "price": 4700,
+                "planSize": "10 GB",
+                "pointsRequired": 4700
+              }
+            ]
+          }
+        }
+      }
+    },
+    "apiIntegration": {
+      "airtimeAPI": {
+        "description": "API details for airtime purchase",
+        "provider": "cardri.ng",
+        "endpointTemplate": "https://api.cardri.ng/api/topup/",
+        "requiredParams": ["network", "phoneNumber", "amount"]
+      },
+      "dataAPI": {
+        "description": "API details for data bundle purchase",
+        "provider": "cardri.ng",
+        "endpointTemplate": "https://api.cardri.ng/api/data/",
+        "requiredParams": ["network", "phoneNumber", "planId"]
+      }
+    },
+    "redemptionFlow": {
+      "description": "Process flow for points redemption",
+      "steps": [
+        "Validate user has sufficient points",
+        "Verify minimum points requirement is met",
+        "Deduct points from user's balance",
+        "Create redemption history record with status 'pending'",
+        "Make API call to purchase airtime/data",
+        "Update redemption status to 'successful' or 'failed'",
+        "Return confirmation to user"
+      ]
+    },
+    "supportedNetworks": [
+      {"id": "1", "name": "MTN", "codes": ["01", "0703", "0706", "0803", "0806", "0810", "0813", "0814", "0816", "0903", "0906", "0913", "0916", "0926"]},
+      {"id": "2", "name": "Airtel", "codes": ["02", "0701", "0708", "0802", "0808", "0812", "0901", "0902", "0904", "0907", "0912"]},
+      {"id": "3", "name": "9Mobile", "codes": ["03", "0809", "0817", "0818", "0908", "0909"]},
+      {"id": "4", "name": "Glo", "codes": ["04", "0705", "0805", "0807", "0811", "0815", "0905", "0915"]}
+    ]
+  }
+} 

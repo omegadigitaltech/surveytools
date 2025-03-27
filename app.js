@@ -16,6 +16,7 @@ const User = require('./model/user')
 
 const authRouter = require('./routes/auth')
 const mainRouter = require('./routes/main')
+const redemptionRouter = require('./routes/redemption')
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const notFoundMiddleware = require('./middleware/not-found')
 
@@ -61,6 +62,7 @@ app.use(passport.session())
 
 app.use('/', mainRouter)
 app.use('/', authRouter)
+app.use('/', redemptionRouter)
 
 
 // //error handler
