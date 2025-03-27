@@ -448,3 +448,116 @@ GEMINI_API_KEY=your_gemini_api_key
 - multer: For file uploads
 - pdf-parse: For PDF text extraction
 - docx-parser: For DOCX text extraction
+
+## Bulk Add or Update Questions
+
+This API provides an endpoint to add or update multiple questions at once for a survey.
+
+### API Usage
+
+To add or update multiple questions in a survey:
+
+```
+POST /surveys/:surveyId/bulk-questions
+Content-Type: application/json
+
+{
+  "questions": [
+    {
+      "questionText": "What is your age?",
+      "questionType": "multiple_choice",
+      "required": true,
+      "options": ["Under 18", "18-24", "25-34", "35-44", "45+"]
+    },
+    {
+      "questionId": "existing_question_id",  // Include this only for updating existing questions
+      "questionText": "How would you rate our service?",
+      "questionType": "five_point",
+      "required": true
+    },
+    {
+      "questionText": "Any additional comments?",
+      "questionType": "fill_in",
+      "required": false
+    }
+  ]
+}
+```
+
+#### Response
+
+```json
+{
+  "status": "success",
+  "code": 200,
+  "msg": "Questions processed: 2 added, 1 updated, 0 failed",
+  "results": {
+    "added": 2,
+    "updated": 1,
+    "failed": 0,
+    "details": [
+      {
+        "questionId": "67e58f1b4747ecfdf9198635",
+        "question": "What is your age?",
+        "status": "added"
+      },
+      {
+        "questionId": "67e58f1b4747ecfdf9198636",
+        "question": "Any additional comments?",
+        "status": "added"
+      },
+      {
+        "questionId": "67e58adb4747ecfdf9198632",
+        "question": "How would you rate our service?",
+        "status": "updated"
+      }
+    ]
+  },
+  "survey": {
+    "_id": "67e58adb4747ecfdf9198631",
+    "title": "Customer Satisfaction Survey",
+    "questionsCount": 3
+  }
+}
+```
+
+### Input Format
+
+Each question in the `questions` array should include:
+
+- `questionId` (optional): Include only when updating an existing question
+- `questionText` (required): The text of the question
+- `questionType` (required): One of `multiple_choice`, `five_point`, or `fill_in`
+- `required` (optional): Boolean indicating if the question is required (defaults to false)
+- `options` (required for multiple_choice): Array of option text strings
+
+### Question Types
+
+- `multiple_choice`: Questions with specific answer options (requires at least 2 options)
+- `five_point`: Scale questions with ratings from 1 to 5
+- `fill_in`: Open-ended questions that require text responses
+
+### Error Handling
+
+The API will continue processing questions even if some fail. Failed questions will be reported in the response:
+
+```json
+{
+  "status": "success",
+  "code": 200,
+  "msg": "Questions processed: 2 added, 0 updated, 1 failed",
+  "results": {
+    "added": 2,
+    "updated": 0,
+    "failed": 1,
+    "details": [
+      // Successfully processed questions...
+      {
+        "question": "Invalid question",
+        "status": "failed",
+        "reason": "Multiple choice questions must have at least 2 options"
+      }
+    ]
+  }
+}
+```

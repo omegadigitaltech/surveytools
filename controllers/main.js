@@ -464,6 +464,201 @@ const addOrUpdateQuestion = async (req, res, next) => {
   }
 };
 
+// Add or update multiple questions at once
+const bulkAddOrUpdateQuestions = async (req, res, next) => {
+  try {
+    const { surveyId } = req.params;
+    const { questions } = req.body;
+    console.log(questions)
+    
+    // Validate input
+    if (!Array.isArray(questions) || questions.length === 0) {
+      return res.status(400).json({ 
+        status: "failure", 
+        code: 400, 
+        msg: 'Questions must be provided as a non-empty array' 
+      });
+    }
+    
+    // Get user
+    const user = await User.findOne({ id: req.userId });
+    if (!user) {
+      return res.status(404).json({ 
+        status: "failure", 
+        code: 404, 
+        msg: "User Not Found" 
+      });
+    }
+    
+    // Find the survey
+    const survey = await Survey.findById(surveyId);
+    if (!survey) {
+      return res.status(404).json({ 
+        status: "failure", 
+        code: 404, 
+        msg: 'Survey not found' 
+      });
+    }
+    
+    // Check user authorization
+    if (!survey.user_id.equals(user._id)) {
+      return res.status(403).json({ 
+        status: "failure", 
+        code: 403, 
+        msg: 'User not authorized to modify this survey' 
+      });
+    }
+    
+    // Cannot add questions to a published survey
+    if (survey.published) {
+      return res.status(400).json({ 
+        status: "failure", 
+        code: 400, 
+        msg: "Cannot add questions to a published survey" 
+      });
+    }
+    
+    // Process each question
+    const results = {
+      added: 0,
+      updated: 0,
+      failed: 0,
+      details: []
+    };
+    
+    let modifiedQuestionsCount = 0;
+    
+    for (const question of questions) {
+      try {
+        // Extract question data
+        const { questionId, questionText, questionType, required, options } = question;
+        
+        // Validate required fields
+        if (!questionText || !questionType) {
+          results.failed++;
+          results.details.push({
+            question: questionText || 'Unknown question',
+            status: 'failed',
+            reason: 'Question text and type are required'
+          });
+          continue;
+        }
+        
+        // Validate question type
+        const validQuestionTypes = ['multiple_choice', 'five_point', 'fill_in'];
+        if (!validQuestionTypes.includes(questionType)) {
+          results.failed++;
+          results.details.push({
+            question: questionText,
+            status: 'failed',
+            reason: `Invalid question type: ${questionType}. Must be one of: ${validQuestionTypes.join(', ')}`
+          });
+          continue;
+        }
+        
+        // Validate options for multiple choice questions
+        if (questionType === 'multiple_choice' && (!options || !Array.isArray(options) || options.length < 2)) {
+          results.failed++;
+          results.details.push({
+            question: questionText,
+            status: 'failed',
+            reason: 'Multiple choice questions must have at least 2 options'
+          });
+          continue;
+        }
+        
+        // Format options for multiple-choice questions
+        let formattedOptions = [];
+        if (questionType === 'multiple_choice' && Array.isArray(options)) {
+          formattedOptions = options.map(option => ({
+            text: option // Convert each option string to an object with `text` property
+          }));
+        }
+        
+        // Find existing question or create new one
+        const existingQuestion = questionId ? survey.questions.find(q => q._id.toString() === questionId) : null;
+        
+        if (existingQuestion) {
+          // Update existing question
+          existingQuestion.questionText = questionText;
+          existingQuestion.questionType = questionType;
+          existingQuestion.required = required !== undefined ? required : existingQuestion.required;
+          existingQuestion.options = questionType === 'multiple_choice' ? formattedOptions : [];
+          
+          results.updated++;
+          results.details.push({
+            questionId: existingQuestion._id.toString(),
+            question: questionText,
+            status: 'updated'
+          });
+          
+          modifiedQuestionsCount++;
+        } else {
+          // Add new question
+          const newQuestion = {
+            questionText,
+            questionType,
+            required: required !== undefined ? required : false,
+            options: questionType === 'multiple_choice' ? formattedOptions : [],
+            analytics: {
+              totalResponses: 0,
+              averageRating: 0,
+              responseRate: '0%',
+              distribution: new Map(),
+              mostCommonResponse: null,
+              sentimentAnalysis: null
+            }
+          };
+          
+          survey.questions.push(newQuestion);
+          
+          // Get the ID of the newly added question (last element in the array)
+          const addedQuestionId = survey.questions[survey.questions.length - 1]._id.toString();
+          
+          results.added++;
+          results.details.push({
+            questionId: addedQuestionId,
+            question: questionText,
+            status: 'added'
+          });
+          
+          modifiedQuestionsCount++;
+        }
+      } catch (questionError) {
+        console.error('Error processing question:', questionError);
+        results.failed++;
+        results.details.push({
+          question: question.questionText || 'Unknown question',
+          status: 'failed',
+          reason: questionError.message
+        });
+      }
+    }
+    
+    // Only save if any questions were modified
+    if (modifiedQuestionsCount > 0) {
+      // Update survey timestamp
+      survey.updatedAt = new Date();
+      await survey.save();
+    }
+    
+    res.status(200).json({ 
+      status: "success", 
+      code: 200, 
+      msg: `Questions processed: ${results.added} added, ${results.updated} updated, ${results.failed} failed`,
+      results,
+      survey: {
+        _id: survey._id,
+        title: survey.title,
+        questionsCount: survey.questions.length
+      }
+    });
+  } catch (error) {
+    console.error('Error in bulkAddOrUpdateQuestions:', error);
+    next(error);
+  }
+};
+
 // Edit survey information
 const editSurveyInfo = async (req, res, next) => {
   try {
@@ -1120,5 +1315,6 @@ module.exports = {
   getPrice,
   mySurveys,
   verifyPayment,
-  uploadQuestionnaire
+  uploadQuestionnaire,
+  bulkAddOrUpdateQuestions
 }

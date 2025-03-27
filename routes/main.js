@@ -10,7 +10,8 @@ const { start, home,updateAnswer, submitAnswers, createSurvey,
   getPrice,
   mySurveys,
   verifyPayment,
-  uploadQuestionnaire
+  uploadQuestionnaire,
+  bulkAddOrUpdateQuestions
  } = require('../controllers/main')
 
 
@@ -21,6 +22,7 @@ router.post('/surveys/:surveyId/submit',authMiddleware, submitAnswers);
 // Survey-related endpoints
 router.post('/surveys', authMiddleware, createSurvey);
 router.post('/surveys/:surveyId/questions', authMiddleware, addOrUpdateQuestion);
+router.post('/surveys/:surveyId/bulk-questions', authMiddleware, bulkAddOrUpdateQuestions);
 router.delete('/surveys/:surveyId/questions/:questionId', authMiddleware, deleteQuestion);
 router.get('/surveys/:surveyId/info',authMiddleware, getSurveyInfo);
 router.get('/surveys/:surveyId/user-data', authMiddleware, getUserSurveyData);

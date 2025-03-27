@@ -152,7 +152,8 @@ const uploadQuestionnaire = async (req, res, next) => {
         survey: {
           _id: survey._id,
           title: survey.title,
-          questionsCount: survey.questions.length
+          questionsCount: survey.questions.length,
+          questions: survey.questions
         }
       });
     } catch (processingError) {
