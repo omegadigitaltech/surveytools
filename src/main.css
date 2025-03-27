@@ -15,6 +15,10 @@
   --ltgray: #e7e7e73d;
   --green: rgb(53, 143, 53);
   --border: 0.5px solid rgb(167, 167, 167);
+  --primary: #2095D3;
+  --secondary-blue: #35C6F4;
+  --lemon: #14FE19;
+  --green: #196332;
 
   /* Font-Sizes */
   --fs-3xl: 1.5rem;
@@ -79,11 +83,6 @@
   --l-800: #e8f3f5;
   --l-900: #ffffff; */
 
-  /* Custom Variables */
-  --primary: #2095D3;
-  --secondary-blue: #35C6F4;
-  --lemon: #14FE19;
-  --green: #196332;
 }
 
 *,
