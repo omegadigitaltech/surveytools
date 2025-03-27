@@ -35,7 +35,7 @@ const dashboard = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   // zustand
-  const { redeemModalOpen, confirmModalOpen, reportModalOpen, setRedeemModalOpen } = useModalStore();
+  const { redeemModalOpen, confirmModalOpen, reportModalOpen, setRedeemModalOpen, openModalAnimate, setOpenModalAnimate } = useModalStore();
 
   //  functions
   const fetchMySurveys = async () => {
@@ -143,6 +143,16 @@ const dashboard = () => {
     fetchPointBalance();
   }, [authToken]);
 
+  useEffect(() => {
+    if(true) {
+      setOpenModalAnimate(true)
+    }
+  }, [redeemModalOpen])
+
+  const handleModalOpen = () => {
+    setRedeemModalOpen(true)
+  }
+
   return (
     <>
       <section className="dashboard">
@@ -172,7 +182,7 @@ const dashboard = () => {
               <button
                 className="redeem-button"
                 type="button"
-                onClick={() => setRedeemModalOpen(true)}
+                onClick={handleModalOpen}
               >
                 Redeem
               </button>

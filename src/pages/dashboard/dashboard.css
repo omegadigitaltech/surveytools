@@ -330,7 +330,6 @@ form ::placeholder {
   }
 
   .points-board {
-    width: 90%;
     height: auto;
   }
 
@@ -533,8 +532,12 @@ form ::placeholder {
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgb(0, 0, 0);
   z-index: 99;
+  transition: background-color 2s ease-out;
+}
+.overlay.overlay-active {
+  background-color:rgba(0, 0, 0, 0.9);
 }
 .modal {
   position: absolute;
@@ -682,9 +685,6 @@ form ::placeholder {
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
-  }
-  .modal.confirm-modal {
-    width: 90%;
   }
   .converter .input-wrapper,
   .converter .phone-input-wrapper {
