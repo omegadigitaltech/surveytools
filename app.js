@@ -68,13 +68,19 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+// Create temp_files directory if it doesn't exist
+const tempFilesDir = path.join(__dirname, 'temp_files');
+if (!fs.existsSync(tempFilesDir)) {
+  fs.mkdirSync(tempFilesDir, { recursive: true });
+}
+
 app.use('/', mainRouter)
 app.use('/', authRouter)
 app.use('/', redemptionRouter)
 
 
 // Use the new error handler for file uploads
-app.use(uploadErrorHandler);
+// app.use(uploadErrorHandler);
 // Use the original error handler for other errors
 app.use(errorHandlerMiddleware);
 app.use(notFoundMiddleware);

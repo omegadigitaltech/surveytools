@@ -1,4 +1,7 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenerativeAI, FileManager } = require('@google/generative-ai');
+const { GoogleAIFileManager } = require('@google/generative-ai/server');
+const fs = require('fs');
+const path = require('path');
 
 // Check if Gemini API key is configured
 if (!process.env.GEMINI_API_KEY) {
@@ -7,14 +10,52 @@ if (!process.env.GEMINI_API_KEY) {
 
 // Initialize the Generative AI API with your API key
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY);
+
+/**
+ * Upload a file to Gemini API
+ * @param {Buffer} buffer - File buffer
+ * @param {string} mimeType - File MIME type
+ * @returns {Promise<Object>} - Upload result
+ */
+async function uploadFile(buffer, mimeType) {
+  try {        
+    const tempDir = './temp_files';
+    
+    // Create temp directory if it doesn't exist
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+    
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const displayName = `document_${timestamp}`;
+    const filePath = path.join(tempDir, displayName);
+    
+    // Write buffer to file
+    fs.writeFileSync(filePath, buffer, 'binary');
+    
+    // Upload file using FileManager
+    const result = await fileManager.uploadFile(filePath, {
+      mimeType: mimeType,
+      displayName: displayName,
+    });
+
+    // Clean up temporary file
+    fs.unlinkSync(filePath);
+  
+    return result;
+  } catch (error) {
+    console.error('File upload error:', error);
+    throw error;
+  }
+}
 
 /**
  * Processes questionnaire text using Gemini API to extract structured questions
  * @param {Object} documentData - Object containing document text and file information
- * @param {string} surveyTitle - Optional title for the survey
  * @returns {Promise<Object>} - Structured question data
  */
-async function processQuestionnaire(documentData, surveyTitle = '') {
+async function processQuestionnaire(documentData) {
   try {
     // Use Gemini-1.5-flash model
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
@@ -45,20 +86,36 @@ Extract only the questions from the document, and format them according to the s
 `;
 
     let result;
-    // Check if the file is in a format that Gemini can process directly
-    if (documentData.fileType === 'pdf' || documentData.fileType === 'txt') {
-      // For supported file types, send both the file and text
-      const fileData = documentData.base64File;
+    
+    // Get file buffer and determine MIME type
+    const fileBuffer = Buffer.from(documentData.base64File.split('base64,')[1], 'base64');
+    const mimeType = documentData.base64File.substring(
+      documentData.base64File.indexOf(':') + 1, 
+      documentData.base64File.indexOf(';')
+    );
+    
+    // Upload file to Gemini API
+    console.log(`Uploading file to Gemini API (${mimeType})...`);
+    const uploadResult = await uploadFile(fileBuffer, mimeType);
+    console.log(`File uploaded successfully: ${uploadResult.file.uri}`);
+    
+    // Use FileManager approach for all file types
+    try {
+      console.log('Generating content with uploaded file...');
+      // Create content parts with file reference and prompt
+      result = await model.generateContent([
+        {
+          fileData: {
+            fileUri: uploadResult.file.uri,
+            mimeType: uploadResult.file.mimeType,
+          },
+        },
+        textPrompt,
+      ]);
+    } catch (fileProcessingError) {
+      console.error('Error using file directly, falling back to text-only analysis:', fileProcessingError);
       
-      const parts = [
-        { text: textPrompt },
-        { fileData: { mimeType: `application/${documentData.fileType}`, data: fileData.split('base64,')[1] } },
-        { text: "Please extract only the questions from this document and format them according to the structure specified above." }
-      ];
-      
-      result = await model.generateContent({ contents: [{ role: "user", parts }] });
-    } else {
-      // For other file types, just send the extracted text
+      // Fallback to text-only approach if file processing fails
       const prompt = `${textPrompt}
 
 Here's the document text:
@@ -66,20 +123,48 @@ ${documentData.text}`;
       
       result = await model.generateContent(prompt);
     }
-
+    
     const response = await result.response;
     const text = response.text();
+    console.log(`Received response text length: ${text.length} characters`);
 
     // Extract JSON from the response (it might be wrapped in markdown code blocks)
-    const jsonStart = text.indexOf('{');
-    const jsonEnd = text.lastIndexOf('}');
+    let jsonString = text;
     
-    if (jsonStart === -1 || jsonEnd === -1) {
-      throw new Error('Failed to extract valid JSON from AI response');
+    // If the response contains a code block, extract just the JSON part
+    if (text.includes('```json')) {
+      const jsonStartMarker = text.indexOf('```json');
+      const contentStart = text.indexOf('\n', jsonStartMarker) + 1;
+      const contentEnd = text.indexOf('```', contentStart);
+      
+      if (contentStart !== -1 && contentEnd !== -1) {
+        jsonString = text.substring(contentStart, contentEnd).trim();
+      }
+    } else if (text.includes('```')) {
+      const jsonStartMarker = text.indexOf('```');
+      const contentStart = text.indexOf('\n', jsonStartMarker) + 1;
+      const contentEnd = text.indexOf('```', contentStart);
+      
+      if (contentStart !== -1 && contentEnd !== -1) {
+        jsonString = text.substring(contentStart, contentEnd).trim();
+      }
+    } else {
+      // Try to find JSON object notation directly
+      const jsonStart = text.indexOf('{');
+      const jsonEnd = text.lastIndexOf('}');
+      
+      if (jsonStart !== -1 && jsonEnd !== -1) {
+        jsonString = text.substring(jsonStart, jsonEnd + 1);
+      }
     }
     
-    const jsonString = text.substring(jsonStart, jsonEnd + 1);
-    return JSON.parse(jsonString);
+    try {
+      return JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error('Failed to parse JSON response:', parseError);
+      console.log('Response text:', text);
+      throw new Error('Failed to extract valid JSON from AI response');
+    }
   } catch (error) {
     console.error('Error processing questionnaire with Gemini:', error);
     throw error;

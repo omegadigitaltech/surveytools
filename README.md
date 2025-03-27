@@ -385,8 +385,11 @@ This system includes an AI-powered feature that allows survey creators to upload
 
 1. First, create a survey using the `/surveys` endpoint.
 2. Then, upload a questionnaire document using the `/surveys/:surveyId/upload-questionnaire` endpoint.
-3. The system will use Google's Gemini AI to analyze the document and extract questions.
-4. Extracted questions will be automatically added to your survey.
+3. The system will:
+   - Process the uploaded document
+   - Use Google's FileManager API to securely upload the document to Gemini
+   - Use Gemini AI to analyze the document and extract questions
+   - Automatically add extracted questions to your survey
 
 ### Supported Question Types
 
@@ -414,7 +417,11 @@ file: [Your questionnaire document file]
   "status": "success",
   "code": 200,
   "msg": "5 questions successfully added to survey from uploaded document",
-  "survey": { ... }
+  "survey": {
+    "_id": "survey123",
+    "title": "Your Survey Title",
+    "questionsCount": 10
+  }
 }
 ```
 
@@ -422,8 +429,8 @@ file: [Your questionnaire document file]
 
 - Maximum file size: 5MB
 - Supported file types: PDF, DOCX, DOC, TXT
-- PDF and TXT files are sent directly to the Gemini AI for better analysis
-- For other formats, extracted text is sent to the AI
+- Document files are securely processed using Gemini's FileManager API
+- The system uses a fallback mechanism to text-based analysis if file processing fails
 
 ## Environment Setup
 
@@ -433,9 +440,11 @@ Ensure you have the following environment variables set:
 GEMINI_API_KEY=your_gemini_api_key
 ```
 
+**Important:** Your Gemini API key must have the `fileManager.files` scope enabled to process document files properly.
+
 ## Dependencies
 
-- @google/generative-ai: For AI-powered question extraction
+- @google/generative-ai: For AI-powered question extraction and file handling
 - multer: For file uploads
 - pdf-parse: For PDF text extraction
 - docx-parser: For DOCX text extraction
