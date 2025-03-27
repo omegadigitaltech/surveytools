@@ -13,7 +13,7 @@ export default function ConfirmDetails() {
   return (
     <>
     <Overlay/>
-    <div className="modal confirm-modal">
+    <div className="modal confirm-modal overlay-active">
         <div className="top">
           <h2>Request Sent</h2>
           <img src="./green-check.svg" alt="green check icon"/>

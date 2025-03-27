@@ -11,7 +11,7 @@
     content: "";
     width: 80%;
     height: 100%;
-    background-color: var(--base);
+    background-color: var(--primary);
     background-image: url("../../assets/img/home-blob.svg");
     background-size: contain;
     background-position: bottom right;
@@ -40,7 +40,7 @@
 }
 
 .home-text {
-    color: var(--text-lite);
+    color: white;
     grid-area: 1 / -1;
 }
 
@@ -55,8 +55,9 @@
 .home-link {
     padding: 0.8em 1.5em;
     border-radius: 30px;
-    background-color: var(--surface-lite-100);
+    background-color: var(--secondary-blue);
     color: var(--text-dark);
+    font-weight: 600;
 }
 
 

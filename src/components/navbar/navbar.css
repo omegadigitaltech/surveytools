@@ -85,13 +85,13 @@
 .header-w1-logo {
     color: var(--text-dark);
     font-weight: 800;
-    font-size: var(--fs-lg);
+    font-size: 1.8rem;
 }
 span.survey {
-    color: #2095D3;
+    color: var(--primary);
 }
 span.tools {
-    color: #14FE19;
+    color: var(--green);
 }
 .header-w1-circ {
     --len: 5px;
@@ -231,7 +231,7 @@ button:hover {
     }
 
     .menu-item:hover {
-        background-color: var(--base);
+        background-color: var(--primary);
         color: #fff;
     }
 
@@ -283,7 +283,7 @@ button:hover {
 
 @media (min-width: 768px) {
     .header-w1-logo {
-        font-size: var(--fs-xl);
+        font-size: 2.2rem;
     }
 
     .header-w2-list {
@@ -334,7 +334,7 @@ button:hover {
 
 @media (max-width: 385px) {
     .header-w1-logo {
-        font-size: 1rem;
+        font-size: 1.5rem;
     }
 
     .header-w3-bell,
