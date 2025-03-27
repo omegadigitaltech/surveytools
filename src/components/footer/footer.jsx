@@ -43,21 +43,21 @@ const Footer = () => {
                 </div>
                 <div className="footer-w2 flex">
                     <div className="footer-w2-copy">
-                        SurveyTools &copy; 2024
+                        SurveyTools &copy; 2025
                     </div>
                     <div className="footer-w2-list">
-                        <Link className="footer-w2-link">
+                        <a href=" https://www.linkedin.com/company/surveyproapp/" className="footer-w2-link">
                             <img className="footer-w2-icon" src={iconLk} alt="" />
-                        </Link>
-                        <Link className="footer-w2-link">
+                        </a>
+                        <a href=" https://x.com/SurveyTools_App?s=09" className="footer-w2-link">
                             <img className="footer-w2-icon tw-x" src={iconX} alt="" />
-                        </Link>
-                        <Link className="footer-w2-link">
+                        </a>
+                        <a href="" className="footer-w2-link">
                             <img className="footer-w2-icon" src={iconFb} alt="" />
-                        </Link>
-                        <Link className="footer-w2-link">
+                        </a>
+                        <a href="https://www.instagram.com/surveytools_?igsh=c2trNGRtMTZ6MjU1" className="footer-w2-link">
                             <img className="footer-w2-icon" src={iconIg} alt="" />
-                        </Link>
+                        </a>
                     </div>
                 </div>
             </div>

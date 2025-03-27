@@ -5,6 +5,18 @@
   --ff-body: "Montserrat", sans-serif;
   --ff-text: "Inter", sans-serif;
 
+  /* Colors */
+  --base: #1D8C9C;
+  --btns: #149BBA;
+  --wht: #fff;
+  --blk: #000;
+  --gray: #777777;
+  --litgray: #f1f1f1;
+  --ltgray: #e7e7e73d;
+  --green: rgb(53, 143, 53);
+  --border: 0.5px solid rgb(167, 167, 167);
+
+  /* Font-Sizes */
   --fs-3xl: 1.5rem;
   --fs-2xl: 1.5rem;
   --fs-xl: 1.375rem;
@@ -12,6 +24,19 @@
   --fs-md: 0.925rem;
   --fs-sm: 0.875rem;
 
+    /* Margin */
+    --mb-xl: 3em;
+    --mb-lg: 1.5em;
+    --mb-md: 1em;
+    --mb-sm: 0.5em;
+    --mb-xs: 0.3em;
+  
+    --bp-lg: 1044px;
+    --bp-md: 768px;
+    --bp-sm: 512px;
+    --bp-xs: 384px;
+  
+/* 
   --brand-h: 188;
   --brand-s: 69%;
   --brand-l: 36%;
@@ -52,27 +77,9 @@
   --l-600: #bbdce1;
   --l-700: #d2e8eb;
   --l-800: #e8f3f5;
-  --l-900: #ffffff;
+  --l-900: #ffffff; */
 
-  --mb-xl: 3em;
-  --mb-lg: 1.5em;
-  --mb-md: 1em;
-  --mb-sm: 0.5em;
-  --mb-xs: 0.3em;
-
-  --bp-lg: 1044px;
-  --bp-md: 768px;
-  --bp-sm: 512px;
-  --bp-xs: 384px;
-
-  /* Color */
-  --wht: #fff;
-  --blk: #000;
-  --gray: #777777;
-  --litgray: #f1f1f1;
-  --ltgray: #e7e7e73d;
-  --green: rgb(53, 143, 53);
-  --border: 0.5px solid rgb(167, 167, 167);
+  
 }
 
 *,

@@ -8,7 +8,7 @@
 }
 
 .footer-w1-logo {
-    color: var(--text-lite);
+    color: var(--wht);
     text-transform: uppercase;
     display: block;
     margin-bottom: 2rem;
@@ -20,7 +20,7 @@
 }
 
 .footer-w1-link {
-    color: var(--text-lite);
+    color: var(--wht);
 }
 
 .footer-w2 {
@@ -33,7 +33,7 @@
 }
 
 .footer-w2-copy {
-    color: var(--text-lite);
+    color: var(--wht);
 }
 
 .footer-w2-list {
