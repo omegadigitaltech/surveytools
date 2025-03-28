@@ -9,7 +9,7 @@ const serviceProviders = [
   { name: "AIRTEL", logo: "./airtel logo.svg" },
 ];
 const RedeemModal = () => {
-  const { setRedeemModalOpen, setConfirmModalOpe, balance, setBalance } = useModalStore();
+  const { setRedeemModalOpen, setConfirmModalOpe, balance, setBalance, openModalAnimate } = useModalStore();
   const openConfirmModal = () => {
     setRedeemModalOpen(false);
     setConfirmModalOpen(true);
@@ -47,7 +47,7 @@ const RedeemModal = () => {
   return (
     <>
       <Overlay />
-      <div className="modal" ref={modalRef}>
+      <div className={`modal ${openModalAnimate ? 'modal-active' : ''}`} ref={modalRef}>
         <div className="top">
           <h2>Redeem Your Points</h2>
           <img
