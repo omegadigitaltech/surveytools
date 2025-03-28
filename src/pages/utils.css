@@ -96,8 +96,12 @@
     .signup-image {
         display: flex;
         align-items: center;
-        /* justify-content: end; */
-        /* margin-left: 3em; */
         transform: scale(0.8);
+    }
+}
+@media(max-width: 585px){
+    .signin-icon,
+    .signup-icon{
+        width: 17px;
     }
 }

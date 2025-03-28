@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import iconFb from "../../assets/img/icon-fb.svg";
 import iconLk from "../../assets/img/icon-lk.svg";
-import iconX from "../../assets/img/icon-x.png";
+import iconX from "../../assets/img/icon-x.svg";
 import iconIg from "../../assets/img/icon-ig.svg";
 import "./footer.css";
 
@@ -56,7 +56,7 @@ const Footer = () => {
                             <img className="footer-w2-icon" src={iconFb} alt="" />
                         </a>
                         <a href="https://www.instagram.com/surveytools_?igsh=c2trNGRtMTZ6MjU1" className="footer-w2-link">
-                            <img className="footer-w2-icon" src={iconIg} alt="" />
+                            <img className="footer-w2-icon icon-ig" src={iconIg} alt="" />
                         </a>
                     </div>
                 </div>

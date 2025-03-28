@@ -1,7 +1,5 @@
 import { Form, Link, useNavigate, useActionData } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-// import { useDispatch } from "react-redux";
-// import { uiSliceAction } from "../../components/store/uiSlice";
 import useAuthStore from "../../store/useAuthStore";
 import action from "./action";
 import "./signin.css";
@@ -67,9 +65,9 @@ const SignIn = () => {
             </div>
           </div>
           <div className="auth-w5-third">
-            <label className="auth-w5-block" htmlFor="remember">
+            {/* <label className="auth-w5-block" htmlFor="remember">
               <input className="auth-w5-check" type="checkbox" name="checkbox" /> Remember me
-            </label>
+            </label> */}
             <Link className="auth-w5-reset">Forgot password?</Link>
           </div>
           
@@ -81,12 +79,15 @@ const SignIn = () => {
 
         <div className="auth-w3">
           <div className="auth-w3-line">Or login with</div>
-          <div className="auth-w3-list">
-            <Link className="auth-w3-link" to=""><img className="auth-w3-icon" src={iconFB} alt="Facebook Login" /></Link>
-            <Link className="auth-w3-link" to=""><img className="auth-w3-icon" src={iconGL} alt="Google Login" /></Link>
+          <div className="google-div">
+              <button className=" signin-google">
+            <img className="auth-w3-icon" src={iconGL} alt="Google Login" />
+            Continue with Google
+          </button>
           </div>
+        
         </div>
-        <div className="auth-w5-">
+        <div className="auth-w5- no-acct">
           Don't have an account?&nbsp;
           <Link className="auth-w5-" to="/signup">Sign up</Link>
         </div>

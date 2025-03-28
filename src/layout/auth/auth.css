@@ -1,11 +1,6 @@
 .auth {
     padding: 3em 0;
 }
-/* 
-.auth-wrap {
-    max-width: 576px !important;
-} */
-
 .auth-w1-lead {
     color: var(--cl-lead);
     text-transform: uppercase;
@@ -70,4 +65,14 @@
 .auth-w3-icon {
     width: 22px;
     aspect-ratio: 1;
+}
+
+/* MEDIA QUERY */
+@media(max-width: 585px){
+    .auth-wrap{
+        width: 90% !important;
+    }
+    .auth-w3-icon {
+        width: 18px;
+    }
 }

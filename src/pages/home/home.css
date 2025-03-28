@@ -40,7 +40,7 @@
 }
 
 .home-text {
-    color: var(--text-lite);
+    color: var(--wht);
     grid-area: 1 / -1;
 }
 
@@ -55,8 +55,8 @@
 .home-link {
     padding: 0.8em 1.5em;
     border-radius: 30px;
-    background-color: var(--surface-lite-100);
-    color: var(--text-dark);
+    background-color: var(--wht);
+    color: var(--blk);
 }
 
 

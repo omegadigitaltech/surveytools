@@ -52,7 +52,9 @@
     align-items: center;
     justify-content: center;
 }
-
+.icon-ig{
+    width: 20px;
+}
 .tw-x{
     width: 1.2rem;
 }
