@@ -85,7 +85,8 @@
 .header-w1-logo {
     color: var(--text-dark);
     font-weight: 800;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    text-transform: uppercase;
 }
 span.survey {
     color: var(--primary);
@@ -173,7 +174,9 @@ button:hover {
     .header-w1-menu {
         display: flex;
     }
-
+    .header-w1-logo {
+        font-size: 1.2rem;
+    }
     .header-w2 {
         position: absolute;
         top: 5rem;
@@ -282,9 +285,6 @@ button:hover {
 }
 
 @media (min-width: 768px) {
-    .header-w1-logo {
-        font-size: 2.2rem;
-    }
 
     .header-w2-list {
         width: 100%;
@@ -334,7 +334,7 @@ button:hover {
 
 @media (max-width: 385px) {
     .header-w1-logo {
-        font-size: 1.5rem;
+        font-size: 1rem;
     }
 
     .header-w3-bell,
