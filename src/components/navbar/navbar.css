@@ -48,7 +48,7 @@
     --len: 0.12rem;
     width: 100%;
     height: var(--len);
-    background-color: var(--surface-dark-400);
+    background-color: var(--blk);
     border-radius: var(--len);
     transition: transform 500ms, width 100ms;
 }
@@ -91,7 +91,7 @@ span.survey {
     color: var(--primary);
 }
 span.tools {
-    color: var(--green);
+    color: var(--lemon);
 }
 .header-w1-circ {
     --len: 5px;
@@ -121,7 +121,7 @@ span.tools {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--surface-lite-100);
+    /* background-color: var(--surface-lite-100); */
 }
 
 .header-w3-bell {
@@ -249,7 +249,7 @@ button:hover {
         --len: 0.12rem;
         width: 100%;
         height: var(--len);
-        background-color: var(--surface-dark-400);
+        background-color: var(--blk);
         border-radius: var(--len);
         transition: transform 0.3s ease, width 0.3s ease;
     }

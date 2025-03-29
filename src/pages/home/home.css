@@ -55,7 +55,7 @@
 .home-link {
     padding: 0.8em 1.5em;
     border-radius: 30px;
-    background-color: var(--secondary-blue);
+    background-color: var(--wht);
     color: var(--text-dark);
     font-weight: 600;
 }

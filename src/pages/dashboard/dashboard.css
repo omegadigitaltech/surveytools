@@ -277,8 +277,8 @@ form ::placeholder {
   .points-main {
     align-items: flex-start;
   }
-  .points-side {
-  }
+  /* .points-side {
+  } */
   .points-value {
     margin-top: 0;
     font-size: 25px;

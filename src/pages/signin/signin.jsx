@@ -22,16 +22,16 @@ const SignIn = () => {
 
   // Stop loading spinner when actionData updates
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
-  
+    e.preventDefault();
+
     setLoading(true);
-  
+
     // Create FormData from the event target (the form element)
     const formData = new FormData(e.target);
-  
+
     // Run the login action
     const response = await action({ formData });
-  
+
     // Check if login was successful and set auth data in Zustand store
     if (response?.status === "success") {
       setAuthData(response.token, response.userEmail, response.userName, response.userInst);
@@ -46,13 +46,13 @@ const SignIn = () => {
       setLoading(false);
     }
   };
-  
+
 
   return (
     <div className="auth-w5 flex">
       <div className="form-col">
-
-        <Form className="auth-w5-form" method="post" action="/signin"  onSubmit={handleSubmit} >
+    
+        <Form className="auth-w5-form" method="post" action="/signin" onSubmit={handleSubmit} >
           <div className="auth-w5-field">
             <label className="auth-w5-label" htmlFor="email">Email</label>
             <input className="auth-w5-input" type="text" name="email" id="email" required />
@@ -70,7 +70,7 @@ const SignIn = () => {
             </label> */}
             <Link className="auth-w5-reset">Forgot password?</Link>
           </div>
-          
+
           {/* Show spinner if loading, otherwise show Sign In button */}
           <button className="auth-w5-btn" type="submit" disabled={loading}>
             {loading ? "Loading..." : "Sign in"}
@@ -80,12 +80,12 @@ const SignIn = () => {
         <div className="auth-w3">
           <div className="auth-w3-line">Or login with</div>
           <div className="google-div">
-              <button className=" signin-google">
-            <img className="auth-w3-icon" src={iconGL} alt="Google Login" />
-            Continue with Google
-          </button>
+            <button className=" signin-google">
+              <img className="auth-w3-icon" src={iconGL} alt="Google Login" />
+              Continue with Google
+            </button>
           </div>
-        
+
         </div>
         <div className="auth-w5- no-acct">
           Don't have an account?&nbsp;
