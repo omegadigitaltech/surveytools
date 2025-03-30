@@ -5,14 +5,14 @@ import "./surveyquestion.css";
 import backaro from "../../assets/img/backaro.svg";
 import del from "../../assets/img/del.svg";
 import add from "../../assets/img/add.svg";
+import plus from "../../assets/img/icon-add.svg"
 import dot from "../../assets/img/dot.svg";
-import option from "../../assets/img/option.svg";
 import copy from "../../assets/img/copy.svg";
 import useAuthStore from "../../store/useAuthStore";
 import PricingModal from "../../components/pricingmodal/pricingmodal";
 import { toast } from "react-toastify";
 import config from "../../config/config";
-
+import axios from "axios";
 
 const SurveyQuestions = () => {
   const navigate = useNavigate();
@@ -22,7 +22,8 @@ const SurveyQuestions = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
   const authToken = useAuthStore((state) => state.authToken);
-
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   // Add loading state
   const [isLoading, setIsLoading] = useState(true);
 
@@ -263,6 +264,75 @@ const SurveyQuestions = () => {
     setQuestions(updatedQuestions);
   };
 
+// Question Upload Function
+const handleFileUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (file.type !== "application/pdf") {
+    toast.error("Please upload a PDF file");
+    return;
+  }
+  const formData = new FormData();
+  formData.append("questionnaire", file);
+
+  try {
+    setIsUploading(true);
+    setUploadProgress(30);
+    
+    // Used Axios for the upload tracking
+    const response = await axios.post(
+      `${config.API_URL}/surveys/${currentSurveyId}/upload-questionnaire`,
+      formData,
+      {
+        headers: {
+          "Authorization": `Bearer ${authToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percentCompleted);
+        },
+      }
+    );
+
+    if (response.data.status === "success") {
+      toast.success(response.data.msg);
+      // Refresh questions after successful upload
+      const newQuestionsResponse = await axios.get(
+        `${config.API_URL}/surveys/${currentSurveyId}/questions`,
+        {
+          headers: {
+            "Authorization": `Bearer ${authToken}`,
+          },
+        }
+      );
+      
+      const formattedQuestions = newQuestionsResponse.data.questions.map(q => ({
+        id: Date.now() + Math.random(),
+        questionId: q._id,
+        questionText: q.questionText,
+        questionType: q.questionType,
+        required: q.required,
+        options: q.options.map(opt => opt.text),
+      }));
+      
+      setQuestions(formattedQuestions);
+    }
+  } catch (error) {
+    console.error("File upload failed:", error);
+    toast.error(error.response?.data?.message || "Failed to upload PDF");
+  } finally {
+    setIsUploading(false);
+    setUploadProgress(0);
+    e.target.value = ""; // Reset file input
+  }
+};
+
+
+
   return (
     <section className="form-page">
       <div className="wrap">
@@ -280,6 +350,29 @@ const SurveyQuestions = () => {
         ) : (
           <div className="form-container">
             <Form method="post" action="/surveyquestion" onSubmit={handlePostSubmit}>
+         
+            {/* Upload File Questions */}
+            <div className="Q-file-upload">
+                <label className="flex Q-upload">
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileUpload}
+                    style={{ display: "none" }}
+                    disabled={isUploading}
+                  />
+                  <img src={plus} alt="" />
+                  {isUploading ? (
+                    `Uploading... ${uploadProgress}%`
+                  ) : (
+                    "Upload Questions PDF"
+                  )}
+                </label>
+                <p className="upload-note">
+                  Upload a PDF file to automatically populate questions
+                </p>
+              </div>
+
               {/* To pass id to action */}
               <input type="hidden" name="currentSurveyId" value={currentSurveyId} />
 

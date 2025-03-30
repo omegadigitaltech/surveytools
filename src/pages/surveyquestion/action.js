@@ -11,7 +11,6 @@ const action = async ({ request, formData }) => {
   
   const token = localStorage.getItem("token");
   const currentSurveyId = formData.get("currentSurveyId");
-console.log(currentSurveyId)
   const questions = [];
   formData.forEach((value, key) => {
     if (key === "questionText") {
