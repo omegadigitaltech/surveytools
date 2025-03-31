@@ -84,16 +84,30 @@ const SurveyQuestions = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      for (const question of questions) {
-        const questionData = {
+      // Prepare bulk payload
+      const bulkPayload = {
+        questions: questions.map(question => ({
           questionId: question.questionId || "",
           questionText: question.questionText,
           questionType: question.questionType,
           required: question.required,
           options: question.questionType === "multiple_choice" 
-            ? question.options
+            ? question.options.map(text => ({ text })) 
             : undefined
-        };
+        }))
+      };
+
+    // try {
+    //   for (const question of questions) {
+    //     const questionData = {
+    //       questionId: question.questionId || "",
+    //       questionText: question.questionText,
+    //       questionType: question.questionType,
+    //       required: question.required,
+    //       options: question.questionType === "multiple_choice" 
+    //         ? question.options
+    //         : undefined
+    //     };
         //bulk endpoint here
         const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`, {
           method: "POST",
@@ -101,7 +115,7 @@ const SurveyQuestions = () => {
             "Authorization": `Bearer ${authToken}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(questionData),
+          body: JSON.stringify(bulkPayload),
         });
 
         const data = await response.json();
@@ -109,16 +123,26 @@ const SurveyQuestions = () => {
         if (!response.ok) {
           throw new Error(data.message || "Failed to save question");
         }
-
+ // Update question IDs from response
         setQuestions(prevQuestions => 
-          prevQuestions.map(q => 
-            q.id === question.id 
-              ? { ...q, questionId: data.survey.questions.find(sq => sq.questionText === q.questionText)?._id || q.questionId }
-              : q
-          )
+          prevQuestions.map(q => {
+            const serverQuestion = data.results.details.find(
+              sq => sq.question === q.questionText
+            );
+            return serverQuestion?.questionId 
+              ? { ...q, questionId: serverQuestion.questionId }
+              : q;
+          })
         );
-      }
-      toast.success("Questions saved successfully!");
+      //     prevQuestions.map(q => 
+      //       q.id === question.id 
+      //         ? { ...q, questionId: data.survey.questions.find(sq => sq.questionText === q.questionText)?._id || q.questionId }
+      //         : q
+      //     )
+      //   );
+      // }
+      toast.success(data.msg || "Questions saved successfully!");
+      console.log(data.msg)
     } catch (error) {
       console.error("Error saving questions:", error);
       toast.error(error.message || "Error saving questions");
@@ -132,46 +156,51 @@ const SurveyQuestions = () => {
     setIsPosting(true);
 
     try {
-      // First save/update all questions like in handleSave
-      for (const question of questions) {
-        const questionData = {
-          questionId: question.questionId || "",
-          questionText: question.questionText,
-          questionType: question.questionType,
-          required: question.required,
-          options: question.questionType === "multiple_choice" 
-            ? question.options
-            : undefined
-        };
-        // here
-        const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(questionData),
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to save question");
-        }
-
-        // Update questions with new IDs
-        setQuestions(prevQuestions => 
-          prevQuestions.map(q => 
-            q.id === question.id 
-              ? { ...q, questionId: data.survey.questions.find(sq => sq.questionText === q.questionText)?._id || q.questionId }
-              : q
-          )
-        );
-      }
-
-      // After all questions are saved, show the pricing modal
+      await handleSave(); // Reuse bulk save logic
+      // console.log(data.msg)
       setShowPricingModal(true);
-    } catch (error) {
+
+      // First save/update all questions like in handleSave
+    //   for (const question of questions) {
+    //     const questionData = {
+    //       questionId: question.questionId || "",
+    //       questionText: question.questionText,
+    //       questionType: question.questionType,
+    //       required: question.required,
+    //       options: question.questionType === "multiple_choice" 
+    //         ? question.options
+    //         : undefined
+    //     };
+    //     // here
+    //     const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`, {
+    //       method: "POST",
+    //       headers: {
+    //         "Authorization": `Bearer ${authToken}`,
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify(questionData),
+    //     });
+
+    //     const data = await response.json();
+        
+    //     if (!response.ok) {
+    //       throw new Error(data.message || "Failed to save question");
+    //     }
+
+    //     // Update questions with new IDs
+    //     setQuestions(prevQuestions => 
+    //       prevQuestions.map(q => 
+    //         q.id === question.id 
+    //           ? { ...q, questionId: data.survey.questions.find(sq => sq.questionText === q.questionText)?._id || q.questionId }
+    //           : q
+    //       )
+    //     );
+    //   }
+
+    //   // After all questions are saved, show the pricing modal
+    //   setShowPricingModal(true);
+    //
+   } catch (error) {
       console.error("Error posting questions:", error);
       toast.error("Error saving questions");
     } finally {
