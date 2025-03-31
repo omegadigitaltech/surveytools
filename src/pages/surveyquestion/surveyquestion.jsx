@@ -94,8 +94,8 @@ const SurveyQuestions = () => {
             ? question.options
             : undefined
         };
-
-        const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/questions`, {
+        //bulk endpoint here
+        const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${authToken}`,
@@ -143,8 +143,8 @@ const SurveyQuestions = () => {
             ? question.options
             : undefined
         };
-
-        const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/questions`, {
+        // here
+        const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${authToken}`,
@@ -198,6 +198,7 @@ const SurveyQuestions = () => {
       
       if (questionToDelete.questionId) {
         const response = await fetch(
+        // here
           `${config.API_URL}/surveys/${currentSurveyId}/questions/${questionToDelete.questionId}`, 
           {
             method: "DELETE",
@@ -301,6 +302,7 @@ const handleFileUpload = async (e) => {
     if (response.data.status === "success") {
       toast.success(response.data.msg);
       // Refresh questions after successful upload
+        // here
       const newQuestionsResponse = await axios.get(
         `${config.API_URL}/surveys/${currentSurveyId}/questions`,
         {

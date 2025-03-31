@@ -24,6 +24,37 @@ const action = async ({ request, formData }) => {
     }
   });
 
+  try {
+    for (const question of questions) {
+      // Here
+      const API_URL = `${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`;
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Allow-Control-Allow-Origin": "*",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(question),
+      };
+
+      const response = await fetch(API_URL, options);
+      const json = await response.json();
+      console.log(json)
+      if (!response.ok) {
+        throw new Error(json.message || "Failed to add question");
+      }
+    }
+
+  toast.success("Questions Added Successfully");
+  return { status: "success" };
+
+} catch (error) {
+  toast.error("Error adding questions");
+  console.error("Omo:", error);
+}
+return null;
+
   // const questionType = formData.get("questionType");
   // const questionText = formData.get("questionText");
   // const options = formData.getAll("options");
@@ -72,37 +103,6 @@ const action = async ({ request, formData }) => {
   //   console.error("Caught error:", error);
   // }
   // return null;
-
-
-  try {
-      for (const question of questions) {
-        const API_URL = `${config.API_URL}/surveys/${currentSurveyId}/questions`;
-        const options = {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Allow-Control-Allow-Origin": "*",
-            "Authorization": `Bearer ${token}`,
-          },
-          body: JSON.stringify(question),
-        };
-  
-        const response = await fetch(API_URL, options);
-        const json = await response.json();
-        console.log(json)
-        if (!response.ok) {
-          throw new Error(json.message || "Failed to add question");
-        }
-      }
-
-    toast.success("Questions Added Successfully");
-    return { status: "success" };
-
-  } catch (error) {
-    toast.error("Error adding questions");
-    console.error("Omo:", error);
-  }
-  return null;
 };
 
 export default action;
