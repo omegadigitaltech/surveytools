@@ -274,7 +274,7 @@ const handleFileUpload = async (e) => {
     return;
   }
   const formData = new FormData();
-  formData.append("questionnaire", file);
+  formData.append("document", file);
 
   try {
     setIsUploading(true);
@@ -357,6 +357,7 @@ const handleFileUpload = async (e) => {
                   <input
                     type="file"
                     accept=".pdf"
+                    name="document"
                     onChange={handleFileUpload}
                     style={{ display: "none" }}
                     disabled={isUploading}
