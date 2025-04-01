@@ -24,12 +24,10 @@ const SurveyQuestions = () => {
   const authToken = useAuthStore((state) => state.authToken);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  // Add loading state
   const [isLoading, setIsLoading] = useState(true);
 
   // Add new state for delete loading
   const [isDeletingId, setIsDeletingId] = useState(null);
-
   const [questions, setQuestions] = useState([
     {
       id: Date.now(),
@@ -85,30 +83,27 @@ const SurveyQuestions = () => {
     setIsSaving(true);
     try {
       // Prepare bulk payload
-      const bulkPayload = {
-        questions: questions.map(question => ({
-          questionId: question.questionId || "",
-          questionText: question.questionText,
-          questionType: question.questionType,
-          required: question.required,
-          options: question.questionType === "multiple_choice" 
-            ? question.options.map(text => ({ text })) 
-            : undefined
-        }))
-      };
+      const validTypes = ["multiple_choice", "five_point", "fill_in"];
 
-    // try {
-    //   for (const question of questions) {
-    //     const questionData = {
-    //       questionId: question.questionId || "",
-    //       questionText: question.questionText,
-    //       questionType: question.questionType,
-    //       required: question.required,
-    //       options: question.questionType === "multiple_choice" 
-    //         ? question.options
-    //         : undefined
-    //     };
+      const bulkPayload = {
+      questions: questions.map((question) => ({
+     questionId: question.questionId || "", // Keep existing ID or empty for new
+     questionText: question.questionText.trim(), // Trim whitespace
+     questionType: question.questionType,
+     required: Boolean(question.required),
+     // Conditional options handling
+     options: 
+      question.questionType === "multiple_choice"
+        ? question.options
+        .map(opt =>  typeof opt === 'string' ? opt.trim() : opt.text.trim() )// Handle new/existing options
+        // }))
+        .filter(text => text !== "") // Remove empty options
+        : undefined // Exclude options for non-multiple_choice questions
+   }))
+  };
         //bulk endpoint here
+        // console.log("Payload:", JSON.stringify(bulkPayload, null, 2));
+
         const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`, {
           method: "POST",
           headers: {
@@ -121,9 +116,10 @@ const SurveyQuestions = () => {
         const data = await response.json();
         
         if (!response.ok) {
-          throw new Error(data.message || "Failed to save question");
+          console.error("Error response:", data);
+          throw new Error("Failed to save question" || data.msg  );
         }
- // Update question IDs from response
+    // Update question IDs from response
         setQuestions(prevQuestions => 
           prevQuestions.map(q => {
             const serverQuestion = data.results.details.find(
@@ -134,18 +130,12 @@ const SurveyQuestions = () => {
               : q;
           })
         );
-      //     prevQuestions.map(q => 
-      //       q.id === question.id 
-      //         ? { ...q, questionId: data.survey.questions.find(sq => sq.questionText === q.questionText)?._id || q.questionId }
-      //         : q
-      //     )
-      //   );
-      // }
-      toast.success(data.msg || "Questions saved successfully!");
-      console.log(data.msg)
+      
+      toast.success("Questions saved successfully!" || data.msg);
+      // console.log(data.msg)
     } catch (error) {
-      console.error("Error saving questions:", error);
-      toast.error(error.message || "Error saving questions");
+      // console.error("Error saving questions:", error);
+      toast.error("Faill to save questions");
     } finally {
       setIsSaving(false);
     }
@@ -160,46 +150,6 @@ const SurveyQuestions = () => {
       // console.log(data.msg)
       setShowPricingModal(true);
 
-      // First save/update all questions like in handleSave
-    //   for (const question of questions) {
-    //     const questionData = {
-    //       questionId: question.questionId || "",
-    //       questionText: question.questionText,
-    //       questionType: question.questionType,
-    //       required: question.required,
-    //       options: question.questionType === "multiple_choice" 
-    //         ? question.options
-    //         : undefined
-    //     };
-    //     // here
-    //     const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`, {
-    //       method: "POST",
-    //       headers: {
-    //         "Authorization": `Bearer ${authToken}`,
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: JSON.stringify(questionData),
-    //     });
-
-    //     const data = await response.json();
-        
-    //     if (!response.ok) {
-    //       throw new Error(data.message || "Failed to save question");
-    //     }
-
-    //     // Update questions with new IDs
-    //     setQuestions(prevQuestions => 
-    //       prevQuestions.map(q => 
-    //         q.id === question.id 
-    //           ? { ...q, questionId: data.survey.questions.find(sq => sq.questionText === q.questionText)?._id || q.questionId }
-    //           : q
-    //       )
-    //     );
-    //   }
-
-    //   // After all questions are saved, show the pricing modal
-    //   setShowPricingModal(true);
-    //
    } catch (error) {
       console.error("Error posting questions:", error);
       toast.error("Error saving questions");
@@ -362,8 +312,6 @@ const handleFileUpload = async (e) => {
   }
 };
 
-
-
   return (
     <section className="form-page">
       <div className="wrap">
@@ -453,6 +401,7 @@ const handleFileUpload = async (e) => {
                       >
                         <option value="multiple_choice">Multiple Choice</option>
                         <option value="fill_in">Fill in</option>
+                        <option value="five_point">Five Point</option>
                       </select>
                     </div>
                     {question.questionType === "multiple_choice" && (

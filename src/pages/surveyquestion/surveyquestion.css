@@ -156,10 +156,13 @@
 .next-question img {
     width: 1.1rem;
 }
-.Q-upload-btn{
-margin-bottom: .8rem;
+
+.Q-upload-btn {
+    margin-bottom: .8rem;
 }
-.post-btn, .Q-upload{
+
+.post-btn,
+.Q-upload {
     display: block;
     background-color: var(--base);
     padding: 0.8em 3rem;
@@ -167,22 +170,24 @@ margin-bottom: .8rem;
     font-weight: bold;
     border-radius: 5px;
 }
+
 /* Add to surveyquestion.css */
 .Q-file-upload label {
-  cursor: pointer;
-  padding: 12px 20px;
-  transition: background 0.3s ease;
+    cursor: pointer;
+    padding: 12px 20px;
+    transition: background 0.3s ease;
 }
 
 .Q-file-upload label:hover {
-  background: var(--secondary-blue);
+    background: var(--secondary-blue);
 }
 
 .upload-note {
-  font-size: 0.8rem;
-  color: #666;
-  margin-top: 8px;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 8px;
 }
+
 .post-btn:hover {
     cursor: pointer;
 }

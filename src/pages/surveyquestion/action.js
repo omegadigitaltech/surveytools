@@ -4,9 +4,6 @@ import useAuthStore from "../../store/useAuthStore";
 import { redirect } from "react-router-dom";
 
 const action = async ({ request }) => {
-  // if (!formData && request) {
-  //   formData = await request.formData();
-  // }
 
   const formData = await request.formData();
   const token = localStorage.getItem("token");
@@ -34,43 +31,7 @@ const action = async ({ request }) => {
     questions.push(currentQuestion);
   }
 
-  //     questions.push({
-  //       questionId: currentSurveyId,
-  //       questionText: value,
-  //       questionType: formData.get("questionType"),
-  //       required: true,
-  //       options: formData.getAll("options").filter((opt) => opt !== ""),
-  //     });
-  //   }
-  // });
-
   try {
-    // for (const question of questions) {
-    //   // Here
-    //   const API_URL = `${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`;
-    //   const options = {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       "Allow-Control-Allow-Origin": "*",
-    //       "Authorization": `Bearer ${token}`,
-    //     },
-    //     body: JSON.stringify(question),
-    //   };
-
-    //   const response = await fetch(API_URL, options);
-
-    const response = await fetch(
-      `${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({ questions }),
-      }
-    );
 
       const json = await response.json();
       console.log(json)

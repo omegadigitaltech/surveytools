@@ -3,7 +3,6 @@
 }
 .auth-w1-lead {
     color: var(--cl-lead);
-    text-transform: uppercase;
     margin-bottom: var(--mb-md);
 }
 

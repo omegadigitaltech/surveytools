@@ -86,7 +86,6 @@
     color: var(--text-dark);
     font-weight: 800;
     font-size: 1.6rem;
-    text-transform: uppercase;
 }
 span.survey {
     color: var(--primary);

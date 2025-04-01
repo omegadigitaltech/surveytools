@@ -18,7 +18,7 @@ const answerSurvey = () => {
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [showComplete, setShowComplete] = useState(false); 
+  const [showComplete, setShowComplete] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
 
   const { title, createdAt, points } = location.state || {};
@@ -37,15 +37,6 @@ const answerSurvey = () => {
         const response = await fetch(API_URL, options);
         const json = await response.json();
         if (!response.ok) throw new Error(json.msg || "Failed to fetch survey questions");
-
-
-        // console.log("API URL:", API_URL);
-        // console.log("Auth Token:", authToken);
-        // console.log("Request Headers:", options.headers);
-        // console.log("Response JSON:", json);
-
-
-        // setSurvey(json.survey);
         setQuestions(json.questions || []);
       } catch (error) {
         console.error("Error:", error);
@@ -92,12 +83,12 @@ const answerSurvey = () => {
       }
       // throw new Error(json.msg || "Failed to submit survey");
       setEarnedPoints(points); // Use points from location state
-      setShowComplete(true); 
+      setShowComplete(true);
 
     } catch (error) {
       console.error("Error submitting survey:", error);
       toast.error(error.message || "Error submitting survey!");
-    }finally {
+    } finally {
       setSubmitting(false); // Reset submitting state
     }
   };
@@ -109,75 +100,75 @@ const answerSurvey = () => {
   if (questions.length === 0) return <p className="ans-msg">Opps! No questions found here, check other surveys.</p>;
 
   return (
-<>
-{showComplete ? (
+    <>
+      {showComplete ? (
         <Complete points={earnedPoints} onDone={handleDone} />
       ) : (
-    <section className="fillsurvey">
-      <div className="fillsurvey_inner wrap">
-        <div className="survey-ans-details flex">
-          <div className="flex ans-back-title">
-            <Link to={`/expandsurvey/${id}`}> <img src={backaro} className="backaro" /></Link>
-            <div>
-              <h3 className="survey_title_ans">{title || "Survey"}</h3>
-              <p className="ans-post-time">
-                Posted <span>{createdAt ? new Date(createdAt).toLocaleString() : "--"}</span>
-              </p>
+        <section className="fillsurvey">
+          <div className="fillsurvey_inner wrap">
+            <div className="survey-ans-details flex">
+              <div className="flex ans-back-title">
+                <Link to={`/expandsurvey/${id}`}> <img src={backaro} className="backaro" /></Link>
+                <div>
+                  <h3 className="survey_title_ans">{title || "Survey"}</h3>
+                  <p className="ans-post-time">
+                    Posted <span>{createdAt ? new Date(createdAt).toLocaleString() : "--"}</span>
+                  </p>
+                </div>
+              </div>
+              <div className="ans-point-earn flex">
+                <h4 className="">Points to Earn</h4>
+                <h5 className="ans-point">{points || "--"}</h5>
+              </div>
             </div>
-          </div>
-          <div className="ans-point-earn">
-            <h4 className="">Points to Earn</h4>
-            <h5 className="ans-point">{points || "--"}</h5>
-          </div>
-        </div>
-        <Form onSubmit={handleSubmit} className="ans-form">
-          {questions.map((question, index) => (
-            <div key={question._id} className="question-answer">
-              <p className="ans-question">
-                <span>{index + 1}.</span> {question.questionText}
-              </p>
-              {question.questionType === "multiple_choice" ? (
-                question.options.map((option, optIndex) => (
-                  <label key={optIndex} className="answer-ques-opt">
+            <Form onSubmit={handleSubmit} className="ans-form">
+              {questions.map((question, index) => (
+                <div key={question._id} className="question-answer">
+                  <p className="ans-question">
+                    <span>{index + 1}.</span> {question.questionText}
+                  </p>
+                  {question.questionType === "multiple_choice" ? (
+                    question.options.map((option, optIndex) => (
+                      <label key={optIndex} className="answer-ques-opt">
+                        <input
+                          type="radio"
+                          className="tick-ans"
+                          name={`question-${question._id}`}
+                          value={option.text}
+                          onChange={(e) =>
+                            handleAnswerChange(
+                              question._id,
+                              e.target.value
+                            )
+                          }
+                        />
+                        {option.text}
+                      </label>
+                    ))
+                  ) : (
                     <input
-                      type="radio"
-                      className="tick-ans"
+                      className="fillin-ans"
+                      type="text"
                       name={`question-${question._id}`}
-                      value={option.text}
-                      onChange={(e) =>
-                        handleAnswerChange(
-                          question._id,
-                          e.target.value
-                        )
-                      }
+                      placeholder="Your answer"
+                      onChange={(e) => handleAnswerChange(question._id, e.target.value)}
+                      required
+
                     />
-                    {option.text}
-                  </label>
-                ))
-              ) : (
-                <input
-                  className="fillin-ans"
-                  type="text"
-                  name={`question-${question._id}`}
-                  placeholder="Your answer"
-                  onChange={(e) => handleAnswerChange(question._id, e.target.value)}
-                  required
-                  
-                />
-              )}
-            </div>
-          ))}
-          <div className="submit-div flex">
-            <button type="submit"
-             className="submit-ans-btn"
-             disabled={submitting}>
-              {submitting ? "Submitting..." : "Submit"}
-            </button>
+                  )}
+                </div>
+              ))}
+              <div className="submit-div flex">
+                <button type="submit"
+                  className="submit-ans-btn"
+                  disabled={submitting}>
+                  {submitting ? "Submitting..." : "Submit"}
+                </button>
+              </div>
+            </Form>
           </div>
-        </Form>
-      </div>
-    </section>
-    )}
+        </section>
+      )}
     </>
   )
 }
