@@ -35,7 +35,7 @@
   justify-content: space-between;
 }
 .points-main {
-  align-items: flex-start;;
+  align-items: flex-start;
 }
 
 .points-head {
@@ -538,7 +538,7 @@ form ::placeholder {
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, .5);
   z-index: 99;
   transition: background-color .5s ease-out;
 }
@@ -549,7 +549,7 @@ form ::placeholder {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(.8);
+  transform: translate(-50%, -50%);
   background-color: white;
   border-radius: 0.8rem;
   padding: 1rem;
@@ -557,9 +557,13 @@ form ::placeholder {
   width: 50%;
   font-family: K2D;
   transition: transform .5s ease-out ;
+
 }
+.modal h2 {
+  font-size: 1.8rem;
+}
+
 .modal-active {
-  transform: translate(-50%, -50%) scale(1);
 }
 .modal .top {
   display: flex;
@@ -576,7 +580,6 @@ form ::placeholder {
 }
 .modal.confirm-modal h2{
   color: #101010;
-  font-size: 1.8rem;
   margin-bottom: .5rem;
 }
 .modal.confirm-modal .title{
@@ -587,7 +590,7 @@ form ::placeholder {
   width: 100%;
 }
 .conversion-rate-wrapper {
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
 }
 .conversion-rate-title {
   font-weight: 500;
@@ -624,7 +627,7 @@ form ::placeholder {
 .provider-button {
   position: relative;
 }
-.services-selector {
+.modal-selector {
   position:absolute;
   z-index: 999;
   top: 100%;
@@ -637,15 +640,18 @@ form ::placeholder {
   align-items: stretch;
   gap: .5rem;
 }
-.services-selector > li {
+.modal-selector > li {
   cursor: pointer;
   transition: 300ms;
   width: 100%;
   text-align: start;
   padding: .5rem .5rem;
 }
-.services-selector > li:hover {
+.modal-selector > li:hover {
   background-color: #e1e0e0;
+}
+.plans-selector > li {
+  width: max-content;
 }
 
 
