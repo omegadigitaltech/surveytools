@@ -20,6 +20,7 @@ import "./dashboard.css";
 import RedeemModal from "./RedeemModal";
 import ConfirmDetails from "./ConfirmDetails";
 import Report from "./Report";
+import useAppStore from "../../store/useAppStore";
 
 const dashboard = () => {
   const [searchKey, setSearchKey] = useState("");
@@ -30,7 +31,6 @@ const dashboard = () => {
   const [showPoint, setShowPoint] = useState(false);
   const [mySurveys, setMySurveys] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [pointBalance, setPointBalance] = useState(null);
   const [isLoadingPoints, setIsLoadingPoints] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -43,6 +43,7 @@ const dashboard = () => {
     openModalAnimate,
     setOpenModalAnimate,
   } = useModalStore();
+  const { pointBalance, setPointBalance } = useAppStore();
 
   //  functions
   const fetchMySurveys = async () => {
