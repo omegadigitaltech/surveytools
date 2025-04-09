@@ -13,7 +13,8 @@
 
 .auth-w5-input {
     width: 100%;
-    border: 1px solid var(--l-600);
+    border: 1px solid var(--blue-border);
+    border-radius: 5px;
     background: var(--ltgray);
     padding: 0.5em;
 }
@@ -68,6 +69,7 @@
 }
 .auth-w5 a{
     color: var(--base);
+    font-weight: 500;
 }
 .signin-google{
        border: 1px solid #cccccc;

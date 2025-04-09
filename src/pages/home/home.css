@@ -36,7 +36,8 @@
     display: grid;
     max-width: 384px;
     margin-bottom: var(--mb-sm);
-    font-size: var(--fs-lg);
+    font-size: var(--fs-2xl);
+    font-weight: 700;
 }
 
 .home-text {
@@ -54,7 +55,7 @@
 
 .home-link {
     padding: 0.8em 1.5em;
-    border-radius: 30px;
+    border-radius: 7px;
     background-color: var(--wht);
     color: var(--text-dark);
     font-weight: 600;
@@ -64,15 +65,17 @@
 @media (max-width: 512px) {
     .home-title {
         max-width: 256px;
+        font-weight: 600;
+        font-size: var(--fs-lg);
+    }
+    .home-link{
+    padding: 0.6em 1.5em;
+    font-size: var(--fs-sm);
     }
 }
 
 @media (min-width: 768px) {
     .home::after {
         width: 60%;
-    }
-
-    .home-title {
-        font-size: var(--fs-xl);
     }
 }
