@@ -126,7 +126,7 @@ const redeemAirtime = async (req, res) => {
       );
 
       // Check API response
-      if (airtimeResponse.data && airtimeResponse.data.success) {
+      if (airtimeResponse.data && airtimeResponse.data.status) {
         // Update redemption status to successful within transaction
         await RedemptionHistory.findByIdAndUpdate(
           redemption[0]._id,
