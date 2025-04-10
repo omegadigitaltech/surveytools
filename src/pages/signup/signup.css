@@ -20,8 +20,9 @@
 
 .auth-w4-input {
   width: 100%;
-  border: 1px solid var(--l-600);
+  border: 1px solid var(--blue-border);
   background: var(--ltgray);
+  border-radius: 5px;
   padding: 0.5em;
 }
 
@@ -85,7 +86,7 @@
 
 .auth-w4 a {
   color: var(--base);
-  font-weight: bold;
+  font-weight: 500;
 }
 .form-col {
   width: 50%;

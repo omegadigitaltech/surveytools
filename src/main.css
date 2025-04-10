@@ -10,7 +10,9 @@
   /* --base: #1D8C9C; */
   --base: #2095D3;
   --btns: #149BBA;
+  --blue-border: #bfe9f3;
   --wht: #fff;
+  --fade: #e6e6e6;
   --blk: #000;
   --gray: #777777;
   --litgray: #f1f1f1;
@@ -117,6 +119,13 @@ button.inactive {
   border-radius: 5px;
 }
 
+.fw-5h{
+font-weight: 500;
+}
+.fw-6h{
+  font-weight: 600;
+  }
+  
 /* SPIN EFFECT */
 .spin-btn {
   background: var(--base);

@@ -320,9 +320,7 @@ button:hover {
     .header-w3 .username {
         display: none;
     }
-    /* .menu .menu-username{
-       align-items:flex-start ;
-    } */
+
     .menu .menu-username img {
         width: 1.2rem;
     }
@@ -332,10 +330,6 @@ button:hover {
 }
 
 @media (max-width: 385px) {
-    .header-w1-logo {
-        font-size: 1rem;
-    }
-
     .header-w3-bell,
     .header-w3-chip img {
         width: 1.2rem;
@@ -347,5 +341,10 @@ button:hover {
 
     .username {
         display: none;
+    }
+}
+@media (max-width: 255px) {
+    .header-w1-logo {
+        font-size: 1rem;
     }
 }

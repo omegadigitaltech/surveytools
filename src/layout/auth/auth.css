@@ -4,6 +4,8 @@
 .auth-w1-lead {
     color: var(--cl-lead);
     margin-bottom: var(--mb-md);
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
 .auth-w1-circ {
@@ -72,6 +74,9 @@
         width: 90% !important;
     }
     .auth-w3-icon {
-        width: 18px;
+        width: 20px;
+    }
+    .auth-w1-lead {
+        font-size: 1.3rem;
     }
 }
