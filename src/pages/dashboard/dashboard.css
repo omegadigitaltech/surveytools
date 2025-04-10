@@ -375,7 +375,7 @@ width: 50%;
   }
 
   .points-label {
-    font-size: 12.5px;
+    font-size: .725rem;
     font-weight: 500;
     gap: 0.2rem;
   }
@@ -385,15 +385,15 @@ width: 50%;
   }
 
   .points-value {
-    font-size: .8rem;
+    font-size: 1.1rem;
   }
   .transactions-history {
     padding-top: 0;
     
   }
   .transactions-history a{
-    font-size: .8rem;
-    width: min-content;
+    font-size: .725rem;
+    /* width: min-content; */
   }
   .transactions-history img {
     margin-left: .5rem;
