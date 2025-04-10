@@ -189,9 +189,11 @@ form ::placeholder {
   justify-content: space-between;
   margin-bottom: 2rem;
 }
-
+.survey_details .point{
+font-weight: 500;
+}
 .survey_info {
-  font-size: 0.96rem;
+  font-size: 0.9rem;
   margin-bottom: 1.5rem;
 }
 
@@ -201,6 +203,8 @@ form ::placeholder {
 
 .survey_title {
   text-transform: capitalize;
+  font-weight: 600;
+  width: 85%;
 }
 
 .survey_info a {
@@ -216,9 +220,12 @@ form ::placeholder {
   justify-content: space-between;
   gap: 0;
 }
-
+.survey_class .dept{
+width: 50%;
+}
 .department {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .survey_class img {
@@ -237,13 +244,28 @@ form ::placeholder {
 
 .participants p {
   margin-bottom: 0 !important;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .no_result {
   margin: 3rem;
 }
 
+
+.survey_head h3 {
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-weight: 600;
+}
+
+.survey_head h3:hover {
+  color: var(--primary);
+}
+
+.active_head {
+  color: var(--blk);
+  border-bottom: 2px solid var(--primary);
+}
 @media (max-width: 512px) {
   .search {
     gap: 0.5rem;
@@ -278,8 +300,7 @@ form ::placeholder {
   .points-main {
     align-items: flex-start;
   }
-  /* .points-side {
-  } */
+ 
   .points-value {
     margin-top: 0;
     font-size: 25px;
@@ -328,6 +349,15 @@ form ::placeholder {
   .dash_head form {
     width: 100%;
   }
+  .dept, .participants {
+    gap: 0.5rem;
+}
+.survey_class .dept{
+  font-size: .65rem;
+}
+.participants p {
+  font-size: 0.65rem;
+}
 }
 
 @media (max-width: 385px) {
@@ -433,21 +463,7 @@ form ::placeholder {
     font-size: 0.7rem;
   }
 }
-
-.survey_head h3 {
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.survey_head h3:hover {
-  color: var(--primary);
-}
-
-.active_head {
-  color: var(--blk);
-  border-bottom: 2px solid var(--primary);
-}
-
+/* LOADER */
 .loader-container {
   display: flex;
   flex-direction: column;
@@ -456,7 +472,6 @@ form ::placeholder {
   padding: 2rem;
   gap: 1rem;
 }
-
 .loader {
   width: 48px;
   height: 48px;
@@ -712,6 +727,12 @@ form ::placeholder {
   .button-main, .button-tertiary {
     font-size: .9rem;
     padding: .7rem 1rem;
+  }
+  .survey_title {
+    width: 100%;
+  }
+  .survey_details .point{
+    margin-top: .8rem;
   }
 }
 

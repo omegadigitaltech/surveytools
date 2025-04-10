@@ -24,7 +24,7 @@
     z-index: 1001;
 }
 
-p {
+.logout p {
     font-size: 1rem;
     font-weight: 500;
     margin-bottom: 1.5rem;

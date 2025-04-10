@@ -119,6 +119,13 @@ button.inactive {
   border-radius: 5px;
 }
 
+.fw-5h{
+font-weight: 500;
+}
+.fw-6h{
+  font-weight: 600;
+  }
+  
 /* SPIN EFFECT */
 .spin-btn {
   background: var(--base);
