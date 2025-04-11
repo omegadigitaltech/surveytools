@@ -5,6 +5,7 @@ import useAuthStore from "../../store/useAuthStore";
 import useOutsideClick from "../../hooks/useOutsideClick";
 import axios from "axios";
 import useAppStore from "../../store/useAppStore";
+import { ColorRing } from "react-loader-spinner";
 
 const serviceProviders = [
   { name: "MTN", logo: "./MTN-logo.svg" },
@@ -19,20 +20,27 @@ const RedeemModal = () => {
   const {
     setRedeemModalOpen,
     setConfirmModalOpen,
-    balance,
-    setBalance,
     openModalAnimate,
+    redeemModalState,
+    setRedeemModalState,
   } = useModalStore();
-  const { pointBalance } = useAppStore;
+  const {
+    pointBalance,
+    phoneNumber,
+    setPhoneNumber,
+    selectedPlan,
+    setSelectedPlan,
+    selectedPlanPrice,
+    setSelectedPlanPrice,
+    providerIndex,
+    setProviderIndex,
+  } = useAppStore();
   const { authToken } = useAuthStore();
   const [servicesDpwnOpen, setServicesDpwnOpen] = useState(false);
   const [plansDpwnOpen, setPlansDpwnOpen] = useState(false);
   const [balanceSufficient, setBalanceSufficient] = useState(true);
   const [buttonActive, setButtonActive] = useState(false);
-  const [providerIndex, setProviderIndex] = useState(0);
   const [dataPlans, setDataPlans] = useState([]);
-  const [selectedPlan, setSelectedPlan] = useState("");
-  const [selectedPlanPrice, setSelectedPlanPrice] = useState("");
 
   // refs
   const providersSelectorRef = useRef(null);
@@ -41,21 +49,19 @@ const RedeemModal = () => {
   const modalRef = useRef(null);
 
   // functions
-  useOutsideClick(phoneWrapperRef, () => setServicesDpwnOpen(false));
-  useOutsideClick(plansSelector, () => setPlansDpwnOpen(false));
-  useOutsideClick(modalRef, () => setRedeemModalOpen(false));
-  const compareToBalance = (e) => {
-    if (balance >= e.target.value) {
-      setBalanceSufficient(true);
-    } else {
-      setBalanceSufficient(false);
-    }
-  };
+
   const submitEligibility = (e) => {
+    if(redeemModalState) {
+
+    }else {}
     const nigerianPhoneRegex = /^(?:\+234|0)?[789][01]\d{8}$/;
-    if (!balanceSufficient) return setButtonActive(false);
+    // NB: Uncomment when you are done.
+    // if (!balanceSufficient) return setButtonActive(false);
     if (!nigerianPhoneRegex.test(e.target.value)) return setButtonActive(false);
-    else setButtonActive(true);
+    else {
+      setPhoneNumber(e.target.value);
+      setButtonActive(true);
+    }
   };
   const changeProviderIndex = (value) => {
     setProviderIndex(value);
@@ -73,6 +79,7 @@ const RedeemModal = () => {
 
   // async functions
   const getDataPlans = async () => {
+    setDataPlans("loading");
     try {
       const response = await axios.get(`${apiUrl}/redemption/plans`, {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -90,7 +97,7 @@ const RedeemModal = () => {
 
   // hooks
   useMemo(() => {
-    if (selectedPlan.price) {
+    if (selectedPlan?.price) {
       setSelectedPlanPrice(selectedPlan.price);
     }
   }, [selectedPlan]);
@@ -99,9 +106,26 @@ const RedeemModal = () => {
       getDataPlans();
     }
   }, [plansDpwnOpen, providerIndex]);
+
   useMemo(() => {
     setSelectedPlan("");
   }, [providerIndex]);
+  useOutsideClick(phoneWrapperRef, () => setServicesDpwnOpen(false));
+  useOutsideClick(plansSelector, () => setPlansDpwnOpen(false));
+  useOutsideClick(modalRef, () => setRedeemModalOpen(false));
+  useEffect(() => {
+    if (pointBalance >= selectedPlanPrice) {
+      setBalanceSufficient(true);
+    } else {
+      setBalanceSufficient(false);
+    }
+  }, [pointBalance, selectedPlanPrice]);
+
+  // NB: uncomment
+  // useMemo(() => {
+  //   if (balanceSufficient) setButtonActive(true);
+  //   else setButtonActive(false);
+  // }, [balanceSufficient]);
   return (
     <>
       <Overlay />
@@ -156,66 +180,119 @@ const RedeemModal = () => {
                 <span>{pointBalance ? pointBalance : "0.00"}</span>
               </div>
             </div>
-            <div
-              ref={phoneWrapperRef}
-              className="phone-input-wrapper flex mb-4"
-            >
-              {servicesDpwnOpen && (
-                <ul
-                  ref={providersSelectorRef}
-                  className="modal-selector shadow-md"
-                >
-                  <li onClick={() => changeProviderIndex(0)}>MTN</li>
-                  <li onClick={() => changeProviderIndex(1)}>Airtel</li>
-                  <li onClick={() => changeProviderIndex(2)}>9mobile</li>
-                  <li onClick={() => changeProviderIndex(3)}>GLO</li>
-                </ul>
-              )}
-              <button
-                type="button"
-                className="provider-button flex"
-                onClick={() => setServicesDpwnOpen(!servicesDpwnOpen)}
+
+            <div className="modal-state-selector flex mb-4">
+              <div
+                onClick={() => setRedeemModalState("data")}
+                className={`p-2 cursor-pointer bg-gray-200 ${
+                  redeemModalState == "data" ? "border-b" : ""
+                }`}
               >
-                <img
-                  src={serviceProviders[providerIndex].logo}
-                  alt={`${serviceProviders[providerIndex].name} logo`}
-                  className="provider-logo-image"
-                />
-                <img src="./chevron-down.svg" alt="chevron-down" />
-              </button>
-              <div className="relative ml-4" ref={plansSelector}>
-                {plansDpwnOpen ? (
-                  <ul className="modal-selector plans-selector absolute top-0 left-0 bg-white shadow-md max-h-[10rem] overflow-y-auto">
-                    {dataPlans && dataPlans.length ? (
-                      <>
-                        {dataPlans.map((plan, id) => (
-                          <li
-                            onClick={() => selectPlan(plan)}
-                            key={id}
-                            className=""
-                          >
-                            {plan.name}
-                          </li>
-                        ))}
-                      </>
-                    ) : (
-                      <></>
-                    )}
+                Data
+              </div>
+              <div
+                onClick={() => setRedeemModalState("airtime")}
+                className={`p-2 cursor-pointer bg-gray-200 ${
+                  redeemModalState == "airtime" ? "border-b" : ""
+                }`}
+              >
+                Airtime
+              </div>
+            </div>
+
+            {/* Input for amount you want to buy */}
+            {redeemModalState === "data" ? (
+              <div
+                ref={phoneWrapperRef}
+                className="phone-input-wrapper flex mb-4"
+              >
+                {servicesDpwnOpen && (
+                  <ul
+                    ref={providersSelectorRef}
+                    className="modal-selector shadow-md"
+                  >
+                    <li onClick={() => changeProviderIndex(0)}>MTN</li>
+                    <li onClick={() => changeProviderIndex(1)}>Airtel</li>
+                    <li onClick={() => changeProviderIndex(2)}>9mobile</li>
+                    <li onClick={() => changeProviderIndex(3)}>GLO</li>
                   </ul>
-                ) : (
-                  <></>
                 )}
                 <button
                   type="button"
-                  className="cursor-pointer provider-button flex bg-gray-200 px-4 py-2"
-                  onClick={() => setPlansDpwnOpen(!plansDpwnOpen)}
+                  className="provider-button flex"
+                  onClick={() => setServicesDpwnOpen(!servicesDpwnOpen)}
                 >
-                  {selectedPlan === ""
-                    ? "Select a data plan"
-                    : selectedPlan.name}
+                  <img
+                    src={serviceProviders[providerIndex].logo}
+                    alt={`${serviceProviders[providerIndex].name} logo`}
+                    className="provider-logo-image"
+                  />
+                  <img src="./chevron-down.svg" alt="chevron-down" />
                 </button>
+                <div className="relative ml-4" ref={plansSelector}>
+                  {plansDpwnOpen ? (
+                    <ul
+                      className={`modal-selector plans-selector absolute top-0 left-0 bg-white shadow-md max-h-[10rem] overflow-y-auto ${
+                        dataPlans === "loading"
+                          ? "w-full flex justify-center"
+                          : ""
+                      } `}
+                    >
+                      {dataPlans === "loading" ? (
+                        <ColorRing
+                          visible={true}
+                          height="30"
+                          width="30"
+                          ariaLabel="color-ring-loading"
+                          wrapperStyle={{}}
+                          wrapperClass="color-ring-wrapper"
+                          colors={["gray", "gray", "gray", "gray", "gray"]}
+                        />
+                      ) : (
+                        <>
+                          {dataPlans && dataPlans.length ? (
+                            <>
+                              {dataPlans.map((plan, id) => (
+                                <li
+                                  onClick={() => selectPlan(plan)}
+                                  key={id}
+                                  className=""
+                                >
+                                  {plan.name}
+                                </li>
+                              ))}
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                        </>
+                      )}
+                    </ul>
+                  ) : (
+                    <></>
+                  )}
+                  <button
+                    type="button"
+                    className="cursor-pointer provider-button flex bg-gray-200 px-4 py-2"
+                    onClick={() => setPlansDpwnOpen(!plansDpwnOpen)}
+                  >
+                    {selectedPlan === ""
+                      ? "Select a data plan"
+                      : selectedPlan.name}
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="airtime-amount mb-4">
+                <input
+                  className="phone-number-input"
+                  type="number"
+                  onChange={submitEligibility}
+                  placeholder="Amount. Minimum = #100"
+                />
+              </div>
+            )}
+
             {selectedPlan.price ? (
               <div className="mb-4">Price: {selectedPlanPrice}</div>
             ) : (
