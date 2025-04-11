@@ -4,6 +4,7 @@
 
 .post-head h3 {
   margin: 0 auto;
+  font-weight: 600;
 }
 
 form {
@@ -71,6 +72,7 @@ form {
 
 .postsurvey-field h4 {
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .custom-dropdown {
@@ -159,7 +161,9 @@ form {
   .postsurvey_div h4 {
     font-size: .85rem;
   }
-
+  .postsurvey-field h4 {
+    font-weight: 500;
+}
   .participants-fields {
     display: flex !important;
     flex-wrap: wrap;

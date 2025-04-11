@@ -45,10 +45,11 @@ export default function ConfirmDetails() {
           phoneNumber,
         },
         {
-          headers: { 
+          headers: {
             'Access-Control-Allow-Origin': "*",
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}` },
+            Authorization: `Bearer ${authToken}`
+          },
         }
       );
       if (response && response.data) {
@@ -65,7 +66,7 @@ export default function ConfirmDetails() {
       <div className="modal confirm-modal overlay-active">
         <div className="mb-8">
           <h2>Confirm Details</h2>
-          <div className="">Double-Check your details before proceeding</div>
+          <div className="check-txt">Double-Check your details before proceeding</div>
         </div>
         <div className="content">
           <div className="converter">

@@ -141,7 +141,7 @@ const Dashboard = () => {
         }
       } catch (error) {
         console.error("Error fetching points:", error);
-        toast.error("Error loading points balance");
+        // toast.error("Error loading points balance");
       } finally {
         setIsLoadingPoints(false);
       }
@@ -237,9 +237,8 @@ const Dashboard = () => {
                   filteredSurveys.map((survey, index) => (
                     <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
                       <div
-                        className={`survey_post ${
-                          index === 0 ? "first_post" : ""
-                        }`}
+                        className={`survey_post ${index === 0 ? "first_post" : ""
+                          }`}
                         key={survey._id}
                       >
                         <div className="post_time flex">
@@ -249,15 +248,18 @@ const Dashboard = () => {
                               addSuffix: true,
                             }) || "N/A"}
                           </p>
-                          <p className="duration">
+                          {/* <p className="duration">
                             Duration: <b>{survey.duration || 0}</b> min
-                          </p>
+                          </p> */}
+                          <h4 className="user-point">
+                          Point:  {survey.point_per_user || 0} 
+                          </h4>
                         </div>
                         <div className="survey_details flex">
                           <h3 className="survey_title">{survey.title}</h3>
-                          <h4 className="point">
+                          {/* <h4 className="point">
                             {survey.point_per_user || 0} Pts
-                          </h4>
+                          </h4> */}
                         </div>
                         <p className="survey_info">
                           {survey.description}
@@ -299,9 +301,8 @@ const Dashboard = () => {
                 mySurveys.map((survey, index) => (
                   <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
                     <div
-                      className={`survey_post ${
-                        index === 0 ? "first_post" : ""
-                      }`}
+                      className={`survey_post ${index === 0 ? "first_post" : ""
+                        }`}
                       key={survey._id}
                     >
                       <div className="post_time flex">
@@ -313,9 +314,8 @@ const Dashboard = () => {
                         </p>
                         <div className="status-container flex">
                           <span
-                            className={`status-badge ${
-                              survey.published ? "published" : "draft"
-                            }`}
+                            className={`status-badge ${survey.published ? "published" : "draft"
+                              }`}
                           >
                             {survey.published ? "Published" : "Draft"}
                           </span>

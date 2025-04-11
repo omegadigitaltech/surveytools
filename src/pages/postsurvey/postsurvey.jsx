@@ -108,7 +108,6 @@ const PostSurvey = () => {
                 </p>
               </div> */}
 
-
             </div>
             <div className="postsurvey-field gender-area custom-dropdown">
               <label className="required-label" htmlFor="range-dropdown">

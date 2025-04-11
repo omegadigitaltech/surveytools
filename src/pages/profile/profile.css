@@ -5,6 +5,8 @@
 .profile-head {
     gap: 3rem;
     margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
 }
 
 .profile-body {
@@ -68,6 +70,7 @@
 .profile-info h4 {
     font-size: 1.3rem;
     margin-bottom: 1.5rem;
+    font-weight: 500;
 }
 
 .profile-info h5 {
@@ -80,6 +83,7 @@
 
 .profile-name-field h5 {
     margin-bottom: 1rem;
+    font-weight: 500;
 }
 
 .info-display {
@@ -174,6 +178,9 @@
     }
     .userImage-div img {
         border: 0.25px solid var(--base);
+    }
+    .profile-name-field p {
+        padding-right: 0rem;
     }
 }
 @media(max-width: 385px) {

@@ -51,9 +51,9 @@ const RedeemModal = () => {
   // functions
 
   const submitEligibility = (e) => {
-    if(redeemModalState) {
+    if (redeemModalState) {
 
-    }else {}
+    } else { }
     const nigerianPhoneRegex = /^(?:\+234|0)?[789][01]\d{8}$/;
     // NB: Uncomment when you are done.
     // if (!balanceSufficient) return setButtonActive(false);
@@ -184,17 +184,15 @@ const RedeemModal = () => {
             <div className="modal-state-selector flex mb-4">
               <div
                 onClick={() => setRedeemModalState("data")}
-                className={`p-2 cursor-pointer bg-gray-200 ${
-                  redeemModalState == "data" ? "border-b" : ""
-                }`}
+                className={`p-2 px-4 cursor-pointer bg-gray-200 ${redeemModalState == "data" ? "border-b" : ""
+                  }`}
               >
                 Data
               </div>
               <div
                 onClick={() => setRedeemModalState("airtime")}
-                className={`p-2 cursor-pointer bg-gray-200 ${
-                  redeemModalState == "airtime" ? "border-b" : ""
-                }`}
+                className={`p-2 px-4 cursor-pointer bg-gray-200 ${redeemModalState == "airtime" ? "border-b" : ""
+                  }`}
               >
                 Airtime
               </div>
@@ -232,11 +230,10 @@ const RedeemModal = () => {
                 <div className="relative ml-4" ref={plansSelector}>
                   {plansDpwnOpen ? (
                     <ul
-                      className={`modal-selector plans-selector absolute top-0 left-0 bg-white shadow-md max-h-[10rem] overflow-y-auto ${
-                        dataPlans === "loading"
+                      className={`modal-selector plans-selector absolute top-0 left-0 bg-white shadow-md max-h-[10rem] overflow-y-auto ${dataPlans === "loading"
                           ? "w-full flex justify-center"
                           : ""
-                      } `}
+                        } `}
                     >
                       {dataPlans === "loading" ? (
                         <ColorRing
@@ -277,7 +274,7 @@ const RedeemModal = () => {
                     onClick={() => setPlansDpwnOpen(!plansDpwnOpen)}
                   >
                     {selectedPlan === ""
-                      ? "Select a data plan"
+                      ? "Select data plan"
                       : selectedPlan.name}
                   </button>
                 </div>
@@ -288,7 +285,7 @@ const RedeemModal = () => {
                   className="phone-number-input"
                   type="number"
                   onChange={submitEligibility}
-                  placeholder="Amount. Minimum = #100"
+                  placeholder="Amount. Min = #100"
                 />
               </div>
             )}
@@ -308,9 +305,8 @@ const RedeemModal = () => {
             </div>
           </div>
           <button
-            className={`button-main redeem-button ${
-              !buttonActive ? "inactive" : ""
-            }`}
+            className={`button-main redeem-button ${!buttonActive ? "inactive" : ""
+              }`}
             onClick={openConfirmModal}
           >
             Redeem Data Reward
