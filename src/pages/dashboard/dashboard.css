@@ -118,7 +118,8 @@ form ::placeholder {
   width: 80%;
   display: block;
   padding: 1em 0;
-  color: #000;
+  color: #000; 
+  outline: none;
 }
 .search ::placeholder{
   color: var(--gray);
@@ -266,7 +267,7 @@ width: 50%;
   color: var(--blk);
   border-bottom: 2px solid var(--primary);
 }
-@media (max-width: 512px) {
+@media (max-width: 660px) {
   .search {
     gap: 0.5rem;
   }

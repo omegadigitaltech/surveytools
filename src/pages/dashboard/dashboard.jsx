@@ -22,7 +22,7 @@ import ConfirmDetails from "./ConfirmDetails";
 import Report from "./Report";
 import useAppStore from "../../store/useAppStore";
 
-const dashboard = () => {
+const Dashboard = () => {
   const [searchKey, setSearchKey] = useState("");
   const [activeTab, setActiveTab] = useState("available");
   const authToken = useAuthStore((state) => state.authToken);
@@ -88,7 +88,7 @@ const dashboard = () => {
   const pointToggle = () => {
     setShowPoint((prevState) => !prevState);
   };
-  const iconPass = showPoint ? unview : view;
+  const iconPass = showPoint ? view : unview;
 
   // useEffect's
   useEffect(() => {
@@ -185,9 +185,9 @@ const dashboard = () => {
             </div>
             <div className="points-side">
               <div className="transactions-history">
-                <Link href="">
+                {/* <Link href="">
                   Transactions History <img src={nextaro} alt="" />{" "}
-                </Link>
+                </Link> */}
               </div>
               <button
                 className="redeem-button"
@@ -373,4 +373,4 @@ const dashboard = () => {
   );
 };
 
-export default dashboard;
+export default Dashboard;
