@@ -252,7 +252,7 @@ const Dashboard = () => {
                             Duration: <b>{survey.duration || 0}</b> min
                           </p> */}
                           <h4 className="user-point">
-                          Point:  {survey.point_per_user || 0} 
+                            Point:  {survey.point_per_user || 0}
                           </h4>
                         </div>
                         <div className="survey_details flex">

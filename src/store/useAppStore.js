@@ -6,12 +6,14 @@ const useAppStore = create((set) => ({
   selectedPlan: "",
   selectedPlanPrice: 0,
   providerIndex: 0,
+  airtimeAmount: 0,
 
   setPointBalance: (value) => set(() => ({ pointBalance: value })),
   setPhoneNumber: (value) => set(() => ({ phoneNumber: value })),
   setSelectedPlan: (value) => set(() => ({ selectedPlan: value })),
   setSelectedPlanPrice: (value) => set(() => ({ selectedPlanPrice: value })),
   setProviderIndex: (value) => set(() => ({ providerIndex: value })),
+  setAirtimeAmount: (amount) => set({ airtimeAmount: amount }),
 }));
 
 export default useAppStore;
