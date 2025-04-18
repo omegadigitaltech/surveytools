@@ -11,18 +11,21 @@ const Navbar = () => {
   const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-
   const toggleMenu = () => setMenuOpen((prev) => !prev);
   const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
+     // Add padding when navbar mounts
+  document.body.classList.add('has-navbar');
     const handleScroll = () => closeMenu();
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
+       // Remove padding when navbar unmounts
+    document.body.classList.remove('has-navbar');
     };
   }, []);
+
   return (
     <header className={`header${isAuthenticated ? " header-logged" : ""}`}>
       <div className="header-wrap wrap">

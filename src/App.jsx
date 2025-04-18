@@ -4,9 +4,11 @@ import {
   RouterProvider,
   Route,
 } from "react-router-dom";
+import { useEffect } from 'react';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import Preloader from './components/Preloader/Preloader.jsx';
 import HomeLayout from "./layout/home/home";
 import AuthLayout from "./layout/auth/auth";
 import StoreProvider from "./store/StoreProvider";
@@ -72,8 +74,16 @@ const router = createBrowserRouter(
 
 const App = () => {
   const { isLogoutVisible } = useAuthStore();
+  useEffect(() => {
+    if (!localStorage.getItem('visited')) {
+      document.body.classList.add('preload-active');
+    } else {
+      document.body.classList.remove('preload-active');
+    }
+  }, []);
   return (
     <>
+    <Preloader />
       <StoreProvider>
         <RouterProvider router={router} />{" "}
         <ToastContainer position="top-right" />

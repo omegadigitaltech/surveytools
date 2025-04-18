@@ -47,7 +47,8 @@ const Profile = () => {
                                 <div className="name-display info-display">
                                     {userName}
                                 </div>
-                                <p>Ensure to use your real name based on your bank account to help make withdrawal easier and faster</p>
+                                {/* LATER */}
+                                {/* <p>Ensure to use your real name based on your bank account to help make withdrawal easier and faster</p> */}
                               {/* LATER */}
                                 {/* <div className="agesex flex">
                                     <div className="age-box ">
