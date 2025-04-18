@@ -328,6 +328,14 @@ const RedeemModal = () => {
               // selectedPlan.price ? (
               <div className="mb-4">Price: {selectedPlanPrice}</div>
             ) : null}
+            {/* INSUFFICIENT MESSAGE */}
+              {(!balanceSufficient || (redeemModalState === "airtime" && selectedPlanPrice < 100)) && (
+             <div className="text-red-500 mb-4 font-medium">
+                {redeemModalState === "airtime" && selectedPlanPrice < 100
+                  ? "Minimum airtime amount is ₦100."
+                : `Insufficient points${selectedPlanPrice ? ` for ₦${selectedPlanPrice}` : ""}.`}
+            </div>
+          )}
             <div>
               <input
                 className="phone-number-input"

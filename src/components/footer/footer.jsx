@@ -19,11 +19,11 @@ const Footer = () => {
                                 About Us
                             </Link>
                         </li>
-                        <li className="footer-w1-item">
+                        {/* <li className="footer-w1-item">
                             <Link className="footer-w1-link">
                                 Privacy Policy
                             </Link>
-                        </li>
+                        </li> */}
                         <li className="footer-w1-item">
                             <Link className="footer-w1-link">
                                 Help & Support
@@ -34,11 +34,11 @@ const Footer = () => {
                                 Feedback
                             </Link>
                         </li>
-                        <li className="footer-w1-item">
+                        {/* <li className="footer-w1-item">
                             <Link className="footer-w1-link">
                                 Terms of Service
                             </Link>
-                        </li>
+                        </li> */}
                     </ul>
                 </div>
                 <div className="footer-w2 flex">

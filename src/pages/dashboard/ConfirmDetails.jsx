@@ -105,7 +105,9 @@ export default function ConfirmDetails() {
           },
         }
       );
+      console.log("API returned:", response.data);
       if (response.data.success) {
+        console.log("Opening report modal…");
         // Update points balance
         useAppStore.setState({
           pointBalance: pointBalance - selectedPlanPrice
