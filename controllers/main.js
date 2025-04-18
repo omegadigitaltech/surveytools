@@ -7,6 +7,7 @@ const jwtSecret = process.env.JWT_SECRET
 const mongoose = require('mongoose');
 const {calculateSentiment} = require('../middleware/helper')
 const { uploadQuestionnaire } = require('./questionnaireUpload');
+const { createCsvString, formatSurveyDataForCsv } = require('../utils/exportService');
 
 const main_url = "localhost:5000"
 
@@ -1293,6 +1294,67 @@ const verifyPayment = async (req, res) => {
     }
 };
 
+// Add this new controller function after the getSurveyAnalytics function
+const exportSurveyData = async (req, res, next) => {
+  try {
+    const { surveyId } = req.params;
+    const { format = 'csv' } = req.query; // Default format is CSV, can be extended later
+    
+    // First find the current user
+    const user = await User.findOne({ id: req.userId });
+    if (!user) {
+      return res.status(404).json({ status: "failure", code: 404, msg: 'User not found' });
+    }
+
+    // Get the survey with all related data
+    const survey = await Survey.findById(surveyId)
+      .populate({
+        path: 'user_id',
+        select: 'fullname email instituition'
+      });
+
+    if (!survey) {
+      return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
+    }
+
+    // Security check: Only the survey creator can export data
+    if (!survey.user_id._id.equals(user._id)) {
+      return res.status(403).json({ status: "failure", code: 403, msg: 'You are not authorized to export this survey data' });
+    }
+
+    if (format === 'csv') {
+      // Process the survey data for CSV format
+      const formattedData = formatSurveyDataForCsv(survey);
+      
+      // Generate CSV strings for each section
+      const surveyInfoCsv = createCsvString([formattedData.surveyInfo]);
+      const questionResponsesCsv = createCsvString(formattedData.questionResponses);
+      const individualResponsesCsv = createCsvString(formattedData.individualResponses);
+      
+      // Combine all sections with section headers
+      const fullCsvContent = [
+        '# SURVEY INFORMATION',
+        surveyInfoCsv,
+        '\n# QUESTION ANALYTICS',
+        questionResponsesCsv,
+        '\n# INDIVIDUAL RESPONSES',
+        individualResponsesCsv
+      ].join('\n\n');
+      
+      // Set headers for file download
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="${survey.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_export_${Date.now()}.csv"`);
+      
+      // Send the CSV content
+      return res.status(200).send(fullCsvContent);
+    } else {
+      return res.status(400).json({ status: "failure", code: 400, msg: `Unsupported export format: ${format}` });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   start,
   home, 
@@ -1316,5 +1378,6 @@ module.exports = {
   mySurveys,
   verifyPayment,
   uploadQuestionnaire,
-  bulkAddOrUpdateQuestions
+  bulkAddOrUpdateQuestions,
+  exportSurveyData
 }

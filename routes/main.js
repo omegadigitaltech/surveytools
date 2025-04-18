@@ -11,7 +11,8 @@ const { start, home,updateAnswer, submitAnswers, createSurvey,
   mySurveys,
   verifyPayment,
   uploadQuestionnaire,
-  bulkAddOrUpdateQuestions
+  bulkAddOrUpdateQuestions,
+  exportSurveyData
  } = require('../controllers/main')
 
 
@@ -33,6 +34,7 @@ router.get('/surveys/:surveyId/questions',authMiddleware, getSurveyQuestions);
 router.post('/surveys/:surveyId/publish',authMiddleware, publishSurvey);
 router.get('/surveys/:surveyId/analytics',authMiddleware, getSurveyAnalytics);
 router.get('/surveys/:surveyId/verify-payment', authMiddleware, verifyPayment);
+router.get('/surveys/:surveyId/export', authMiddleware, exportSurveyData);
 
 // Questionnaire document upload endpoint - now takes surveyId in the URL
 router.post('/surveys/:surveyId/upload-questionnaire', authMiddleware, upload.single('document'), uploadQuestionnaire);
