@@ -13,7 +13,6 @@ const useModalStore = create((set) => ({
   setBalance: (value) => set(() => ({ balance: value })),
   setOpenModalAnimate: (value) => set(() => ({ openModalAnimate: value })),
   setRedeemModalState: (value) => set(() => ({ redeemModalState: value })),
-
 }));
 
 export default useModalStore;

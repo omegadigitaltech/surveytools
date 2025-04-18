@@ -2,7 +2,7 @@ import React from 'react'
 import Overlay from './Overlay'
 import useModalStore from '../../store/useModalStore'
 
-export default function ConfirmDetails() {
+export default function Report() {
   const { setRedeemModalOpen, setConfirmModalOpen, setReportModalOpen } = useModalStore()
 
   const closeAllModals = () => {
