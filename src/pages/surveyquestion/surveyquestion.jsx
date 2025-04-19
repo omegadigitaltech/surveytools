@@ -86,7 +86,7 @@ const SurveyQuestions = () => {
       const validTypes = ["multiple_choice", "five_point", "fill_in"];
 
       const bulkPayload = {
-      questions: questions.map((question) => ({
+     questions: questions.map((question) => ({
      questionId: question.questionId || "", // Keep existing ID or empty for new
      questionText: question.questionText.trim(), // Trim whitespace
      questionType: question.questionType,
@@ -101,9 +101,7 @@ const SurveyQuestions = () => {
         : undefined // Exclude options for non-multiple_choice questions
    }))
   };
-        //bulk endpoint here
-        // console.log("Payload:", JSON.stringify(bulkPayload, null, 2));
-
+       
         const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`, {
           method: "POST",
           headers: {
@@ -132,9 +130,7 @@ const SurveyQuestions = () => {
         );
       
       toast.success("Questions saved successfully!" || data.msg);
-      // console.log(data.msg)
     } catch (error) {
-      // console.error("Error saving questions:", error);
       toast.error("Faill to save questions");
     } finally {
       setIsSaving(false);
@@ -147,11 +143,9 @@ const SurveyQuestions = () => {
 
     try {
       await handleSave(); // Reuse bulk save logic
-      // console.log(data.msg)
       setShowPricingModal(true);
 
    } catch (error) {
-      console.error("Error posting questions:", error);
       toast.error("Error saving questions");
     } finally {
       setIsPosting(false);
@@ -197,7 +191,6 @@ const SurveyQuestions = () => {
       setQuestions(questions.filter((question) => question.id !== id));
       toast.success("Question deleted successfully");
     } catch (error) {
-      console.error("Error deleting question:", error);
       toast.error(error.message || "Error deleting question");
     } finally {
       setIsDeletingId(null); // Clear loading state

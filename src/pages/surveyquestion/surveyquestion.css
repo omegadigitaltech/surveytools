@@ -157,6 +157,10 @@
     width: 1.1rem;
 }
 
+/* Add to surveyquestion.css */
+.Q-file-upload{
+    margin-bottom: 1.5rem;
+}
 .Q-upload-btn {
     margin-bottom: .8rem;
 }
@@ -171,7 +175,6 @@
     border-radius: 5px;
 }
 
-/* Add to surveyquestion.css */
 .Q-file-upload label {
     cursor: pointer;
     padding: 12px 20px;

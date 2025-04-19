@@ -145,6 +145,24 @@ const answerSurvey = () => {
                         {option.text}
                       </label>
                     ))
+                    ) : question.questionType === "five_point" ? (
+                      <div className="five-point-group">
+                         {[1,2,3,4,5].map((n) => (
+                          <label key={n} className="answer-ques-opt">
+                            <input
+                              type="radio"
+                              className="tick-ans"
+                              name={`question-${question._id}`}
+                              value={n}
+                              onChange={(e) =>
+                                handleAnswerChange(question._id, Number(e.target.value))
+                              }
+                              required={question.required}
+                            />
+                            {n}
+                          </label>
+                         ))}
+                          </div>
                   ) : (
                     <input
                       className="fillin-ans"
