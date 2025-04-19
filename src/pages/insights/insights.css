@@ -59,7 +59,8 @@ margin-right: 2rem;
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+ }
+ /*
 .export-section{
 justify-content: center;
 }
@@ -70,7 +71,7 @@ justify-content: center;
   color: #fff;
   font-weight: bold;
   border-radius: 5px;
-}
+} */
 .questions-analysis {
   display: grid;
   gap: 1rem;

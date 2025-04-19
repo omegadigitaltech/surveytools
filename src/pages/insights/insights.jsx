@@ -10,21 +10,21 @@ import useAuthStore from "../../store/useAuthStore";
 import backaro from "../../assets/img/backaro.svg";
 import "./insights.css";
 
-async function downloadSurveyExport(id, token, filename = "survey_export.csv") {
-  const res = await fetch(`${config.API_URL}/surveys/${id}/export`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error("Export failed");
-  const blob = await res.blob();
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.URL.revokeObjectURL(url);
-}
+// async function downloadSurveyExport(id, token, filename = "survey_export.csv") {
+//   const res = await fetch(`${config.API_URL}/surveys/${id}/export`, {
+//     headers: { Authorization: `Bearer ${token}` }
+//   });
+//   if (!res.ok) throw new Error("Export failed");
+//   const blob = await res.blob();
+//   const url = window.URL.createObjectURL(blob);
+//   const a = document.createElement("a");
+//   a.href = url;
+//   a.download = filename;
+//   document.body.appendChild(a);
+//   a.click();
+//   a.remove();
+//   window.URL.revokeObjectURL(url);
+// }
 
 const Insights = () => {
   const { id } = useParams();
@@ -68,21 +68,21 @@ const Insights = () => {
     { name: 'Remaining', value: surveyData.participantCounts.remaining }
   ];
 
-  const handleDownloadExport = () => {
-    const safeTitle = surveyData.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/(^_|_$)/g, "");
+  // const handleDownloadExport = () => {
+  //   const safeTitle = surveyData.title
+  //     .toLowerCase()
+  //     .replace(/[^a-z0-9]+/g, "_")
+  //     .replace(/(^_|_$)/g, "");
 
-    downloadSurveyExport(
-      id,
-      authToken,
-      `${safeTitle || "survey"}_export.csv`
-    ).catch(err => {
-      console.error(err);
-      toast.error("Failed to download survey.");
-    });
-  };
+  //   downloadSurveyExport(
+  //     id,
+  //     authToken,
+  //     `${safeTitle || "survey"}_export.csv`
+  //   ).catch(err => {
+  //     console.error(err);
+  //     toast.error("Failed to download survey.");
+  //   });
+  // };
 
   return (
     <section className="insights">
@@ -136,7 +136,7 @@ const Insights = () => {
           </div>
 
           {/* — Download button — */}
-          <div className="export-section flex">
+          {/* <div className="export-section flex">
             <button
               type="button"
               className="export-btn"
@@ -144,7 +144,7 @@ const Insights = () => {
             >
               Download Survey Data (CSV)
             </button>
-          </div>
+          </div> */}
 
           {/* Questions Analysis */}
           <div className="questions-analysis">
