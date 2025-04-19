@@ -13,9 +13,12 @@
   gap: 1rem;
   margin-bottom: 2rem;
 }
-
+.insights-header img{
+/* width: 1.1rem; */
+margin-right: 2rem;
+}
 .insights-header h2 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   color: var(--primary);
 }
 
@@ -23,7 +26,9 @@
   display: grid;
   gap: 2rem;
 }
-
+.insights-grid h3{
+  font-weight: 500;
+}
 .overview-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -55,7 +60,17 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-
+.export-section{
+justify-content: center;
+}
+.export-section  button{ 
+  display: block;
+  background-color: var(--base);
+  padding: 0.8em 3rem;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 5px;
+}
 .questions-analysis {
   display: grid;
   gap: 1rem;

@@ -1,14 +1,30 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
-import { 
-  PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, 
-  CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+import {
+  PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
+  CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { toast } from "react-toastify";
 import config from "../../config/config";
 import useAuthStore from "../../store/useAuthStore";
 import backaro from "../../assets/img/backaro.svg";
 import "./insights.css";
+
+async function downloadSurveyExport(id, token, filename = "survey_export.csv") {
+  const res = await fetch(`${config.API_URL}/surveys/${id}/export`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error("Export failed");
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
 
 const Insights = () => {
   const { id } = useParams();
@@ -28,11 +44,11 @@ const Insights = () => {
           },
         });
         const data = await response.json();
-        
+
         if (!response.ok) {
           throw new Error(data.message || "Failed to fetch insights");
         }
-        
+
         setSurveyData(data.survey);
       } catch (error) {
         toast.error(error.message || "Error fetching insights");
@@ -51,6 +67,22 @@ const Insights = () => {
     { name: 'Completed', value: surveyData.participantCounts.filled },
     { name: 'Remaining', value: surveyData.participantCounts.remaining }
   ];
+
+  const handleDownloadExport = () => {
+    const safeTitle = surveyData.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/(^_|_$)/g, "");
+
+    downloadSurveyExport(
+      id,
+      authToken,
+      `${safeTitle || "survey"}_export.csv`
+    ).catch(err => {
+      console.error(err);
+      toast.error("Failed to download survey.");
+    });
+  };
 
   return (
     <section className="insights">
@@ -101,6 +133,17 @@ const Insights = () => {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+
+          {/* — Download button — */}
+          <div className="export-section flex">
+            <button
+              type="button"
+              className="export-btn"
+              onClick={handleDownloadExport}
+            >
+              Download Survey Data (CSV)
+            </button>
           </div>
 
           {/* Questions Analysis */}
