@@ -8,29 +8,15 @@ import { toast } from "react-toastify";
 import config from "../../config/config";
 import useAuthStore from "../../store/useAuthStore";
 import backaro from "../../assets/img/backaro.svg";
+import downloadIcon from "../../assets/img/download.svg";
 import "./insights.css";
-
-// async function downloadSurveyExport(id, token, filename = "survey_export.csv") {
-//   const res = await fetch(`${config.API_URL}/surveys/${id}/export`, {
-//     headers: { Authorization: `Bearer ${token}` }
-//   });
-//   if (!res.ok) throw new Error("Export failed");
-//   const blob = await res.blob();
-//   const url = window.URL.createObjectURL(blob);
-//   const a = document.createElement("a");
-//   a.href = url;
-//   a.download = filename;
-//   document.body.appendChild(a);
-//   a.click();
-//   a.remove();
-//   window.URL.revokeObjectURL(url);
-// }
 
 const Insights = () => {
   const { id } = useParams();
   const location = useLocation();
   const [surveyData, setSurveyData] = useState(location.state?.surveyData);
   const [loading, setLoading] = useState(!surveyData);
+  const [exporting, setExporting] = useState(false);
   const authToken = useAuthStore((state) => state.authToken);
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
@@ -60,6 +46,37 @@ const Insights = () => {
     fetchSurveyInsights();
   }, [id, authToken]);
 
+  const exportToCSV = async () => {
+    try {
+      setExporting(true);
+      const response = await fetch(`${config.API_URL}/surveys/${id}/export`, {
+        headers: {
+          "Authorization": `Bearer ${authToken}`,
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to export data");
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `${surveyData.title}-export.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success("Survey data exported successfully");
+    } catch (error) {
+      toast.error(error.message || "Error exporting survey data");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) return <div className="loading">Loading insights...</div>;
   if (!surveyData) return <div className="error">Failed to load survey data</div>;
 
@@ -67,22 +84,6 @@ const Insights = () => {
     { name: 'Completed', value: surveyData.participantCounts.filled },
     { name: 'Remaining', value: surveyData.participantCounts.remaining }
   ];
-
-  // const handleDownloadExport = () => {
-  //   const safeTitle = surveyData.title
-  //     .toLowerCase()
-  //     .replace(/[^a-z0-9]+/g, "_")
-  //     .replace(/(^_|_$)/g, "");
-
-  //   downloadSurveyExport(
-  //     id,
-  //     authToken,
-  //     `${safeTitle || "survey"}_export.csv`
-  //   ).catch(err => {
-  //     console.error(err);
-  //     toast.error("Failed to download survey.");
-  //   });
-  // };
 
   return (
     <section className="insights">
@@ -92,6 +93,14 @@ const Insights = () => {
             <img src={backaro} className="backaro" alt="Back" />
           </Link>
           <h2>{surveyData.title} - Insights</h2>
+          <button 
+            className="export-button" 
+            onClick={exportToCSV} 
+            disabled={exporting}
+          >
+            <img src={downloadIcon} alt="" className="download-icon" />
+            {exporting ? "Exporting..." : "Export to CSV"}
+          </button>
         </div>
 
         <div className="insights-grid">
@@ -134,17 +143,6 @@ const Insights = () => {
               </PieChart>
             </ResponsiveContainer>
           </div>
-
-          {/* — Download button — */}
-          {/* <div className="export-section flex">
-            <button
-              type="button"
-              className="export-btn"
-              onClick={handleDownloadExport}
-            >
-              Download Survey Data (CSV)
-            </button>
-          </div> */}
 
           {/* Questions Analysis */}
           <div className="questions-analysis">
