@@ -17,6 +17,36 @@
 .insights-header h2 {
   font-size: 1.5rem;
   color: var(--primary);
+  margin-right: auto;
+}
+
+.export-button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.download-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.export-button:hover {
+  background-color: var(--primary-dark, #0056b3);
+}
+
+.export-button:disabled {
+  background-color: var(--gray-light, #ccc);
+  cursor: not-allowed;
 }
 
 .insights-grid {
