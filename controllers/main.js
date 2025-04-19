@@ -310,7 +310,10 @@ const submitAnswers = async (req, res, next) => {
 
         if (question.questionType === 'multiple_choice' || question.questionType === 'five_point') {
           
-          question.analytics.distribution.set(answer.response, (question.analytics.distribution.get(answer.response) || 0) + 1);
+          // Convert the response to a string before using it as a Map key
+          const responseKey = String(answer.response);
+          question.analytics.distribution.set(responseKey, (question.analytics.distribution.get(responseKey) || 0) + 1);
+          
           if (question.questionType === 'five_point') {
             question.analytics.averageRating = (question.analytics.averageRating * (question.analytics.totalResponses - 1) + parseInt(answer.response)) / question.analytics.totalResponses;
           }
