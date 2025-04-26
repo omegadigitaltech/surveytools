@@ -1301,8 +1301,8 @@ const verifyPayment = async (req, res) => {
 const exportSurveyData = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
-    const { format = 'csv' } = req.query; // Default format is CSV, can be extended later
-    
+    const { format = 'csv', style = 'google' } = req.query; // Default format is CSV in Google style
+
     // First find the current user
     const user = await User.findOne({ id: req.userId });
     if (!user) {
@@ -1325,31 +1325,49 @@ const exportSurveyData = async (req, res, next) => {
       return res.status(403).json({ status: "failure", code: 403, msg: 'You are not authorized to export this survey data' });
     }
 
+    // Get user information for all respondents to include email
+    const respondentUserIds = survey.submittedUsers.map(userId => userId);
+    const respondents = await User.find({ _id: { $in: respondentUserIds } })
+      .select('_id email fullname');
+
+    // Create a map of user IDs to user data for quick lookup
+    const userMap = new Map();
+    respondents.forEach(respondent => {
+      userMap.set(respondent._id.toString(), respondent);
+    });
+
     if (format === 'csv') {
-      // Process the survey data for CSV format
-      const formattedData = formatSurveyDataForCsv(survey);
+      // Process the survey data for CSV format with user emails
+      const formattedData = formatSurveyDataForCsv(survey, userMap);
       
-      // Generate CSV strings for each section
-      const surveyInfoCsv = createCsvString([formattedData.surveyInfo]);
-      const questionResponsesCsv = createCsvString(formattedData.questionResponses);
-      const individualResponsesCsv = createCsvString(formattedData.individualResponses);
+      let csvContent;
       
-      // Combine all sections with section headers
-      const fullCsvContent = [
-        '# SURVEY INFORMATION',
-        surveyInfoCsv,
-        '\n# QUESTION ANALYTICS',
-        questionResponsesCsv,
-        '\n# INDIVIDUAL RESPONSES',
-        individualResponsesCsv
-      ].join('\n\n');
+      if (style === 'google') {
+        // Use Google Forms style CSV (questions as columns, respondents as rows)
+        csvContent = createCsvString(formattedData.googleStyleData);
+      } else {
+        // Use the original format with sections
+        const surveyInfoCsv = createCsvString([formattedData.surveyInfo]);
+        const questionResponsesCsv = createCsvString(formattedData.questionResponses);
+        const individualResponsesCsv = createCsvString(formattedData.individualResponses);
+        
+        // Combine all sections with section headers
+        csvContent = [
+          '# SURVEY INFORMATION',
+          surveyInfoCsv,
+          '\n# QUESTION ANALYTICS',
+          questionResponsesCsv,
+          '\n# INDIVIDUAL RESPONSES',
+          individualResponsesCsv
+        ].join('\n\n');
+      }
       
       // Set headers for file download
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', `attachment; filename="${survey.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_export_${Date.now()}.csv"`);
       
       // Send the CSV content
-      return res.status(200).send(fullCsvContent);
+      return res.status(200).send(csvContent);
     } else {
       return res.status(400).json({ status: "failure", code: 400, msg: `Unsupported export format: ${format}` });
     }
