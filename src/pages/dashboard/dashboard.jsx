@@ -56,11 +56,10 @@ const Dashboard = () => {
         Authorization: `Bearer ${authToken}`,
       },
     };
-
     try {
       const response = await fetch(API_URL, options);
       const json = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(json.message || "Failed to fetch my surveys");
       }
