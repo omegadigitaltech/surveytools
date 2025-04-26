@@ -62,15 +62,10 @@ const formatSurveyDataForGoogleStyleCsv = (survey, userMap = new Map()) => {
     question.answers.forEach(answer => {
       const respondentId = answer.userId.toString();
       if (!respondentsMap.has(respondentId)) {
-        // Get user email from userMap if available
-        const userEmail = userMap.get(respondentId)?.email || '';
-        
         respondentsMap.set(respondentId, {
           userId: respondentId,
-          fullname: answer.fullname,
-          email: userEmail,
           responses: {},
-          timestamp: formatTimestamp(new Date()) // Format timestamp to match Google Forms
+          timestamp: formatTimestamp(new Date())
         });
         respondentIds.push(respondentId);
       }
@@ -81,7 +76,7 @@ const formatSurveyDataForGoogleStyleCsv = (survey, userMap = new Map()) => {
   });
   
   // Create the Google-style CSV structure
-  const headers = ['Timestamp', 'Username', 'Email:'];
+  const headers = ['Timestamp'];
   const questions = [];
   
   // Add all questions to the headers
@@ -98,9 +93,7 @@ const formatSurveyDataForGoogleStyleCsv = (survey, userMap = new Map()) => {
   const rows = respondentIds.map(id => {
     const respondent = respondentsMap.get(id);
     const row = {
-      'Timestamp': respondent.timestamp,
-      'Username': respondent.fullname,
-      'Email:': respondent.email
+      'Timestamp': respondent.timestamp
     };
     
     // Add responses for each question
@@ -184,7 +177,6 @@ const formatSurveyDataForCsv = (survey, userMap = new Map()) => {
     } else if (question.questionType === 'fill_in') {
       // For fill_in questions, we just list all the responses
       analytics.responses = question.answers.map(answer => ({
-        respondent: answer.fullname,
         response: answer.response
       }));
     }
@@ -198,16 +190,10 @@ const formatSurveyDataForCsv = (survey, userMap = new Map()) => {
   if (survey.submittedUsers.length > 0) {
     survey.questions.forEach(question => {
       question.answers.forEach(answer => {
-        // Get user email from userMap if available
-        const userEmail = userMap.get(answer.userId.toString())?.email || '';
-        
         individualResponses.push({
           questionId: question._id.toString(),
           questionText: question.questionText,
           questionType: question.questionType,
-          respondentId: answer.userId.toString(),
-          respondentName: answer.fullname,
-          respondentEmail: userEmail,
           response: answer.response
         });
       });
