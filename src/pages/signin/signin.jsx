@@ -76,8 +76,8 @@ const SignIn = () => {
             {loading ? "Loading..." : "Sign in"}
           </button>
         </Form>
-
-        <div className="auth-w3">
+           {/*GOOGLE LATER */}
+        {/* <div className="auth-w3">
           <div className="auth-w3-line">Or login with</div>
           <div className="google-div">
             <button className=" signin-google">
@@ -85,8 +85,7 @@ const SignIn = () => {
               Continue with Google
             </button>
           </div>
-
-        </div>
+        </div> */}
         <div className="auth-w5- no-acct">
           Don't have an account?&nbsp;
           <Link className="auth-w5-" to="/signup">Sign up</Link>
