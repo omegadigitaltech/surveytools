@@ -14,25 +14,25 @@ const Footer = () => {
                         SurveyTools
                     </Link>
                     <ul className="footer-w1-list">
-                        <li className="footer-w1-item">
+                        {/* <li className="footer-w1-item">
                             <Link className="footer-w1-link">
                                 About Us
                             </Link>
-                        </li>
+                        </li> */}
                         {/* <li className="footer-w1-item">
                             <Link className="footer-w1-link">
                                 Privacy Policy
                             </Link>
                         </li> */}
                         <li className="footer-w1-item">
-                            <Link className="footer-w1-link">
+                            <a  href="mailto:omegadigitaltechnologies@gmail.com" className="footer-w1-link">
                                 Help & Support
-                            </Link>
+                            </a>
                         </li>
                         <li className="footer-w1-item">
-                            <Link className="footer-w1-link">
+                            <a href="mailto:omegadigitaltechnologies@gmail.com" className="footer-w1-link">
                                 Feedback
-                            </Link>
+                            </a>
                         </li>
                         {/* <li className="footer-w1-item">
                             <Link className="footer-w1-link">

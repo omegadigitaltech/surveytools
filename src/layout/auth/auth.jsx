@@ -6,9 +6,7 @@ const Auth = () => {
         <section className="auth">
             <div className="auth-wrap wrap">
                 <h1 className="auth-w1-lead">
-            <span className="survey">Survey</span><span className="tools">Tools</span>
-                    
-                    <span className="auth-w1-circ" aria-hidden></span>
+            <span className="survey">Survey</span><span className="tools">Tools</span> <span className="survey">Beta</span>
                 </h1>
                 <Outlet />
             </div>

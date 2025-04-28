@@ -40,7 +40,7 @@ const Navbar = () => {
           </button>
 
           <NavLink className="header-w1-logo" to="/">
-            <span className="survey">Survey</span><span className="tools">Tools</span>
+            <span className="survey">Survey</span><span className="tools">Tools</span> <span className="survey">Beta</span>
           </NavLink>
         </div>
         <div className="header-w2">
