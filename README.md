@@ -326,4 +326,56 @@ If there was any other error with the server, you will get the below error
         code: 500,
         msg: "An error Occured"
     }
->>>>>>> parent of 729f953 (fix gmail login route)
+
+## Deployment
+
+This project uses GitHub Actions to automatically deploy to a VPS using Docker.
+
+### Prerequisites
+
+1. A VPS with Docker installed
+2. A Docker Hub account
+3. SSH access to your VPS
+
+### Setting up GitHub Secrets
+
+To enable automated deployments, you need to set up the following secrets in your GitHub repository:
+
+1. Go to your GitHub repository
+2. Navigate to Settings > Secrets and variables > Actions
+3. Add the following secrets:
+
+- `DOCKER_USERNAME`: Your Docker Hub username
+- `DOCKER_PASSWORD`: Your Docker Hub password or access token
+- `VPS_HOST`: The IP address or hostname of your VPS
+- `VPS_USERNAME`: The SSH username for your VPS
+- `VPS_SSH_KEY`: Your private SSH key for accessing the VPS (content of your `id_rsa` file)
+
+### How Deployment Works
+
+When you push to the main branch:
+
+1. GitHub Actions builds a Docker image of your application
+2. The image is pushed to Docker Hub
+3. GitHub Actions connects to your VPS via SSH
+4. The VPS pulls the latest Docker image
+5. The application is deployed in a Docker container
+
+### Manual Deployment
+
+If you need to deploy manually, you can run these commands on your VPS:
+
+```bash
+# Pull the latest image
+docker pull your-dockerhub-username/surveypro:latest
+
+# Stop and remove the current container if it exists
+docker stop surveypro-container
+docker rm surveypro-container
+
+# Run the new container
+docker run -d --name surveypro-container \
+  -p 80:80 \
+  --restart unless-stopped \
+  your-dockerhub-username/surveypro:latest
+```
