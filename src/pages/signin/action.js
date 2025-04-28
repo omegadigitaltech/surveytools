@@ -29,20 +29,20 @@ const action = async ({ formData }) => {
     toast.success(json.msg);
     console.log("Login response:", json);
 
-    // Store token in localStorage/sessionStorage for future requests
- const token = json.token;
-  if (token) {
-    localStorage.setItem("token", token);
-  }
-console.log(token)
-return {
-  status: "success",
-  token,
-  userEmail: json.data.user.email,
-  userName: json.data.user.fullname,
-  userVerified: json.data.user.verified,
-  userInst: json.data.user.instituition,
-};
+    // Store only the token in localStorage
+    const token = json.token;
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+    
+    return {
+      status: "success",
+      token,
+      userEmail: json.data.user.email,
+      userName: json.data.user.fullname,
+      userVerified: json.data.user.verified,
+      userInst: json.data.user.instituition,
+    };
   } catch (err) {
     toast.error("An error occurred. Please try again.");
     return { status: "error", message: "An error occurred. Please try again." };

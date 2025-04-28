@@ -49,6 +49,14 @@ const useAuthStore = create(
     {
       name: 'auth-storage',
       getStorage: () => localStorage,
+      // Only store the essential authentication data in localStorage
+      partialize: (state) => ({ 
+        authToken: state.authToken,
+        isAuthenticated: state.isAuthenticated,
+        userEmail: state.userEmail,
+        userName: state.userName,
+        userInst: state.userInst
+      })
     }
   )
 );
