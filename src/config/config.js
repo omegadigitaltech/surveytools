@@ -2,7 +2,7 @@ const config = {
   // API_URL: "https://nasty-marrissa-surveypro-991645a4.koyeb.app",
   // API_URL: "https://prospective-colette-surveypro-ee1a3b96.staging.koyeb.app"
   // API_URL: 'https://surveypro.onrender.com',
-  API_URL: `https://api.surveyprotools.com/`,
+  API_URL: `https://api.surveyprotools.com`,
   // pk_test_183d72c028ee376920f193555ea93ce89f2718d5
   // pk_live_e89e0ba144eaaa2dffdc6a6b117281ac5b67731c
   PAYSTACK_PUBLIC_KEY: `pk_test_183d72c028ee376920f193555ea93ce89f2718d5`
