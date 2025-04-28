@@ -84,6 +84,7 @@ app.use('/', redemptionRouter)
 // Use the original error handler for other errors
 app.use(errorHandlerMiddleware);
 app.use(notFoundMiddleware);
+console.log(process.env.MONGODB_URI)
 
 
 const port = process.env.PORT || 5000;
