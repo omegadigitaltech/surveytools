@@ -45,7 +45,7 @@ jobs:
             
             # Run the new container
             docker run -d --name surveytools-frontend \
-              -p 80:80 \
+              -p 3000:3000 \
               --restart unless-stopped \
               ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:latest
               
