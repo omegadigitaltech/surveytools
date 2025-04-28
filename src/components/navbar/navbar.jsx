@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import iconBell from "../../assets/img/icon-bell.svg";
 import iconUser from "../../assets/img/icon-user.svg";
 import iconLogOut from "../../assets/img/icon-logout.svg";
@@ -15,14 +15,14 @@ const Navbar = () => {
   const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
-     // Add padding when navbar mounts
-  document.body.classList.add('has-navbar');
+    // Add padding when navbar mounts
+    document.body.classList.add("has-navbar");
     const handleScroll = () => closeMenu();
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
-       // Remove padding when navbar unmounts
-    document.body.classList.remove('has-navbar');
+      // Remove padding when navbar unmounts
+      document.body.classList.remove("has-navbar");
     };
   }, []);
 
@@ -40,7 +40,11 @@ const Navbar = () => {
           </button>
 
           <NavLink className="header-w1-logo" to="/">
-            <span className="survey">Survey</span><span className="tools">Tools</span> <span className="survey">Beta</span>
+            <span className="survey">Survey</span>
+            <span className="tools">Tools</span>{" "}
+            <span className="watermark subscript text-[.6rem] font-medium text-black/90">
+              BETA
+            </span>
           </NavLink>
         </div>
         <div className="header-w2">
@@ -87,10 +91,16 @@ const Navbar = () => {
         </div>
         {isAuthenticated && (
           <div className="header-w3 show">
-            <button className="header-w3-bell" onClick={() => navigate('/notifications')}>
+            <button
+              className="header-w3-bell"
+              onClick={() => navigate("/notifications")}
+            >
               <img className="header-w3-icon" src={iconBell} alt="bell" />
             </button>
-            <button className="header-w3-chip" onClick={() => navigate('/profile')}>
+            <button
+              className="header-w3-chip"
+              onClick={() => navigate("/profile")}
+            >
               <div className="header-w3-user">
                 <img className="header-w3-icon" src={iconUser} alt="user" />
               </div>
@@ -106,19 +116,31 @@ const Navbar = () => {
       {menuOpen && (
         <div className="menu">
           <ul className="menu-list">
-          <li>
-              <NavLink to="/profile" className="menu-item menu-username flex" onClick={closeMenu}>
-              <img className="header-w3-icon" src={iconUser} alt="user" />
-              {userName}
+            <li>
+              <NavLink
+                to="/profile"
+                className="menu-item menu-username flex"
+                onClick={closeMenu}
+              >
+                <img className="header-w3-icon" src={iconUser} alt="user" />
+                {userName}
               </NavLink>
             </li>
             <li>
-              <NavLink to="/dashboard" className="menu-item" onClick={closeMenu}>
+              <NavLink
+                to="/dashboard"
+                className="menu-item"
+                onClick={closeMenu}
+              >
                 Dashboard
               </NavLink>
             </li>
             <li>
-              <NavLink to="/postsurvey" className="menu-item" onClick={closeMenu}>
+              <NavLink
+                to="/postsurvey"
+                className="menu-item"
+                onClick={closeMenu}
+              >
                 Post a Survey
               </NavLink>
             </li>
@@ -134,7 +156,13 @@ const Navbar = () => {
               </NavLink>
             </li> */}
             <li>
-              <NavLink to="" className="menu-item" onClick={() => { closeMenu }}>
+              <NavLink
+                to=""
+                className="menu-item"
+                onClick={() => {
+                  closeMenu;
+                }}
+              >
                 Contact Us
               </NavLink>
             </li>
@@ -147,7 +175,7 @@ const Navbar = () => {
         </div>
       )}
     </header>
-  )
-}
+  );
+};
 
 export default Navbar;
