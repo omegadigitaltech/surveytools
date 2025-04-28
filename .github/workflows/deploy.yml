@@ -34,7 +34,7 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
           script: |
             # Pull the latest image
             docker pull ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:latest
