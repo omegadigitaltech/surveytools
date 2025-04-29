@@ -1,0 +1,17 @@
+.modal.referral-modal {
+    @apply static transform-none;
+}
+
+.modal.referral-modal a {
+    color: #2095D3;
+    font-weight: 600;
+}
+.modal.referral-modal a:hover {
+    color: rgba(32, 148, 211, 0.644);
+}
+@media (max-width: 660px) {
+    .modal.referral-modal h2 {
+        font-size: 1.4rem;
+    }
+
+}

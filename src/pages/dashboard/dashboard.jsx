@@ -21,6 +21,7 @@ import RedeemModal from "./RedeemModal";
 import ConfirmDetails from "./ConfirmDetails";
 import Report from "./Report";
 import useAppStore from "../../store/useAppStore";
+import ContestModal from "../../components/ContestModal";
 
 const Dashboard = () => {
   const [searchKey, setSearchKey] = useState("");
@@ -59,7 +60,7 @@ const Dashboard = () => {
     try {
       const response = await fetch(API_URL, options);
       const json = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(json.message || "Failed to fetch my surveys");
       }
@@ -164,6 +165,7 @@ const Dashboard = () => {
 
   return (
     <>
+      <ContestModal />
       <section className="dashboard">
         <div className="dashboard_inner wrap">
           <div className="points-board ">
@@ -236,8 +238,9 @@ const Dashboard = () => {
                   filteredSurveys.map((survey, index) => (
                     <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
                       <div
-                        className={`survey_post ${index === 0 ? "first_post" : ""
-                          }`}
+                        className={`survey_post ${
+                          index === 0 ? "first_post" : ""
+                        }`}
                         key={survey._id}
                       >
                         <div className="post_time flex">
@@ -251,7 +254,7 @@ const Dashboard = () => {
                             Duration: <b>{survey.duration || 0}</b> min
                           </p> */}
                           <h4 className="user-point">
-                            Point:  {survey.point_per_user || 0}
+                            Point: {survey.point_per_user || 0}
                           </h4>
                         </div>
                         <div className="survey_details flex">
@@ -300,8 +303,9 @@ const Dashboard = () => {
                 mySurveys.map((survey, index) => (
                   <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
                     <div
-                      className={`survey_post ${index === 0 ? "first_post" : ""
-                        }`}
+                      className={`survey_post ${
+                        index === 0 ? "first_post" : ""
+                      }`}
                       key={survey._id}
                     >
                       <div className="post_time flex">
@@ -313,8 +317,9 @@ const Dashboard = () => {
                         </p>
                         <div className="status-container flex">
                           <span
-                            className={`status-badge ${survey.published ? "published" : "draft"
-                              }`}
+                            className={`status-badge ${
+                              survey.published ? "published" : "draft"
+                            }`}
                           >
                             {survey.published ? "Published" : "Draft"}
                           </span>
