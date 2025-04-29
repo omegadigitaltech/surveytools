@@ -29,7 +29,7 @@ const Footer = () => {
                         </li> */}
             <li className="footer-w1-item">
               <a
-                href="mailto:omegadigitaltechnologies@gmail.com"
+                href="mailto:help.surveytools@gmail.com"
                 className="footer-w1-link"
               >
                 Help & Support
@@ -37,7 +37,7 @@ const Footer = () => {
             </li>
             <li className="footer-w1-item">
               <a
-                href="mailto:omegadigitaltechnologies@gmail.com"
+                href="mailto:help.surveytools@gmail.com"
                 className="footer-w1-link"
               >
                 Feedback
