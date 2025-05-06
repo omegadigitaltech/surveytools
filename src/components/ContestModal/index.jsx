@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Overlay from "../../pages/dashboard/Overlay";
 import useAppStore from "../../store/useAppStore";
+import useOutsideClick from "../../hooks/useOutsideClick";
 import "./style.css";
 
 const ContestModal = () => {
   const { contestModalOpen, setContestModalOpen } = useAppStore();
   const [contestParentOpen, setContestParentOpen] = useState(true);
+
+  const contestModal = useRef(null);
+
+  useOutsideClick(contestModal, () => setContestModalOpen(false));
 
   useEffect(() => {
     if (contestModalOpen) {
@@ -52,6 +57,7 @@ const ContestModal = () => {
           <AnimatePresence>
             {contestModalOpen && (
               <motion.div
+                ref={contestModal}
                 initial={{ opacity: 0, scale: 0.9, y: 50 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 50 }}
