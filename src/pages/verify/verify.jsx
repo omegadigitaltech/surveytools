@@ -94,6 +94,7 @@ const Verify = () => {
             <div className="v_info">
               <h3>Fill in the box below with the code</h3>
               <p>Check the verification code sent to {signupEmail}</p>
+              <p>Can't find the mail? Please check the spam folder.</p>
             </div>
             <img src={otp} alt="OTP Illustration" />
           </div>
