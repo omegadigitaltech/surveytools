@@ -2,7 +2,7 @@ export const faculty_dept = [
     { faculty: "Administration", departments: ["Accounting", "Business Administration", "Local Government Studies", "Public Administration"] },
     { faculty: "Agriculture", departments: ["Agricultural Economics", "Animal Sciences", "Crop Production and Protection", "Family, Nutrition & Consumer Sciences", "Soil Science"] },
     { faculty: "Arts", departments: ["Dramatic Arts", "English", "Foreign Languages", "History", "Linguistics and African Languages", "Music", "Philosophy", "Religious Studies"] },
-    { faculty: "Education", departments: ["Adult Education and Lifelong Learning", "Educational Foundations and Counselling", "Educational Management", "Educational Technology", "Physical and Health Education", "Special Education and Curriculum Studies"] },
+    { faculty: "Education", departments: ["Adult Education and Lifelong Learning", "Educational Foundations and Counselling", "Educational Management", "Educational Technology", "Physical and Health Education", "Special Education and Curriculum Studies", "Arts and Social science Education"] },
     { faculty: "EDM", departments: ["Architecture", "Building", "Estate Management", "Fine and Applied Arts", "Quantity Surveying", "Urban and Regional Planning"] },
     { faculty: "Law", departments: ["Business Law", "International Law", "Jurisprudence and Private Law", "Public Law"] },
     { faculty: "Pharmacy", departments: ["Clinical Pharmacy and Pharmacy Administration", "Pharmaceutical Chemistry", "Pharmaceutics", "Pharmacognosy", "Pharmacology"] },
