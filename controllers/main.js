@@ -819,9 +819,9 @@ const publishSurvey = async (req, res, next) => {
     }
 
     // Calculate expected payment amount
-    const BASE_RATE = 2000;
-    const QUESTION_RATE = 20;
-    const PARTICIPANT_RATE = 50;
+    const BASE_RATE = 500;
+    const QUESTION_RATE = 10;
+    const PARTICIPANT_RATE = 40;
 
     const expectedAmount = BASE_RATE + 
       (QUESTION_RATE * survey.questions.length) + 
@@ -1043,9 +1043,9 @@ const getPrice = async (req, res) => {
       }
 
         // Constants
-        const BASE_RATE = 2000;
-        const QUESTION_RATE = 20;
-        const PARTICIPANT_RATE = 50;
+        const BASE_RATE = 500;
+        const QUESTION_RATE = 10;
+        const PARTICIPANT_RATE = 40;
 
         // Calculate total price
         const numQuestions = survey.questions.length;
