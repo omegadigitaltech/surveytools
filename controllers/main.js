@@ -1264,7 +1264,7 @@ const verifyPayment = async (req, res) => {
         }
 
         // Check if payment exists for this survey
-        const payment = await Payment.findOne({ surveyId }).sort({ createdAt: -1 });;
+        const payment = await Payment.findOne({ surveyId }).sort({ createdAt: -1 });
         
         if (!payment) {
             return res.status(400).json({
@@ -1275,16 +1275,42 @@ const verifyPayment = async (req, res) => {
             });
         }
 
+        // Calculate expected payment amount
+        const BASE_RATE = 500;
+        const QUESTION_RATE = 10;
+        const PARTICIPANT_RATE = 40;
+
+        const numQuestions = survey.questions.length;
+        const numParticipants = survey.no_of_participants;
+        
+        const expectedAmount = BASE_RATE + 
+            (QUESTION_RATE * numQuestions) + 
+            (PARTICIPANT_RATE * numParticipants);
+
+        // Check if the payment amount matches the expected amount
+        const isCorrectPayment = payment.amount === expectedAmount;
+        if (!isCorrectPayment) {
+          return res.status(400).json({
+            status: "failure",
+            code: 400,
+            msg: "Payment amount does not match expected price"
+          });
+        }
+
         return res.status(200).json({
             status: "success",
             code: 200,
             paid: true,
+            correctPayment: isCorrectPayment,
+            expectedAmount: expectedAmount,
             payment: {
                 amount: payment.amount,
                 datePaid: payment.datePaid,
                 referenceNumber: payment.referenceNumber
             },
-            msg: "Payment verified successfully"
+            msg: isCorrectPayment 
+                ? "Payment verified successfully" 
+                : "Payment found but amount does not match expected price"
         });
 
     } catch (error) {
