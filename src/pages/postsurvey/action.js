@@ -6,14 +6,12 @@ import useAuthStore from "../../store/useAuthStore";
 const action = async ({ request }) => {
   // Experiment
   const authToken = localStorage.getItem("token");
-  console.log(authToken)
   // Expo
   const formData = await request.formData();
   
   const faculty = formData.get("faculty");
   const department = formData.get("department");
   
-
   const preferredParticipants = [];
   if (faculty === "all_faculties" || !faculty) {
     preferredParticipants.push("All Faculties");
@@ -25,6 +23,8 @@ const action = async ({ request }) => {
       preferredParticipants.push(department);
     }
   }
+  const inclusionCriteria = formData.getAll("inclusion_criteria");
+  const exclusionCriteria = formData.getAll("exclusion_criteria");
   
   const survey = {
     title: formData.get("title"),
@@ -33,6 +33,8 @@ const action = async ({ request }) => {
     gender: formData.get("gender"),
     preferred_participants: preferredParticipants,
     amount_to_be_paid: formData.get("amount"),
+    inclusion_criteria: inclusionCriteria,
+    exclusion_criteria: exclusionCriteria,
   }
 
   const API_URL = `${config.API_URL}/surveys`;
@@ -48,8 +50,6 @@ const action = async ({ request }) => {
 
   const response = await fetch(API_URL, options);
   const json = await response.json();
-
-  console.log(json)
 
   try {
     if (!response.ok) {
@@ -70,7 +70,6 @@ const action = async ({ request }) => {
   } catch (error) {
     toast.error("Error submitting survey");
     console.error("Caught error:", error);
-    console.log(json.msg)
     return null;
   }
 

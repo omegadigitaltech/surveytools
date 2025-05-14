@@ -190,7 +190,9 @@
     color: #666;
     margin-top: 8px;
 }
-
+.upload-caution {
+color: red;
+}
 .post-btn:hover {
     cursor: pointer;
 }
@@ -254,7 +256,9 @@
     .copy-icon {
         width: 1.3rem;
     }
-
+    .upload-caution {
+        font-size: .9rem;
+    }
     .delete-icon {
         width: .8rem;
     }

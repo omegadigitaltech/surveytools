@@ -213,7 +213,7 @@ const PostSurvey = () => {
                   id=""
                   value={incText}
                       onChange={e => setIncText(e.target.value)}
-                  placeholder="Input inclusion criteria"
+                  placeholder="e.g Must should be 18 years and above"
                 />
                    <button className="flex" onClick={addInclusion}><svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#000000"><path d="M444-444H240v-72h204v-204h72v204h204v72H516v204h-72v-204Z"/></svg> Add criteria</button>
                 </div>
@@ -239,7 +239,7 @@ const PostSurvey = () => {
                   id=""
                   value={excText}
                   onChange={e => setExcText(e.target.value)}
-                  placeholder="Input exclusion criteria"
+                  placeholder="e.g Newly admitted student"
                 />
               <button className="flex" onClick={addExclusion}><svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#000000"><path d="M444-444H240v-72h204v-204h72v204h204v72H516v204h-72v-204Z"/></svg>Add criteria</button>
                 </div>

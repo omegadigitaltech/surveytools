@@ -344,6 +344,7 @@ const handleFileUpload = async (e) => {
                 <p className="upload-note">
                   Upload a PDF file to automatically populate questions
                 </p>
+                <p className="upload-caution">Ensure to check & edit uploaded questions before posting!</p>
               </div>
 
               {/* To pass id to action */}
