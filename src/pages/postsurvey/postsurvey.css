@@ -146,12 +146,37 @@ form {
   outline: none;
 }
 
+.crit-box input{
+width: 75%;
+}
+ .crit-box{
+gap: 3rem;
+flex-wrap: wrap;
+} 
+.crit-box button{
+  border-radius: .2rem;
+  padding: .6rem  .5rem;
+  background:var(--litgray) ;
+}
+.added-criteria{
+  margin: 1rem;
+}
+.added-criteria ul{
+list-style: circle;
+}
+
 /* MEDIA QUERY */
 @media(max-width:768px) {
   .req-part-sec{
     margin-top: 3rem;
     width: 100%;
   }
+  .crit-box input{
+    width: 100%;
+    }
+     .crit-box{
+    gap: 1rem;
+    } 
 }
 @media(max-width:450px) {
   .post-head h3 {

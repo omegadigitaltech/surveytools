@@ -18,6 +18,12 @@ const PostSurvey = () => {
   const [preferredDepartment, setPreferredDepartment] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [hasAdditional, setHasAdditional] = useState(false);
+  const [incText, setIncText] = useState("");
+  const [excText, setExcText] = useState("");
+  const [inclusions, setInclusions] = useState([]);
+  const [exclusions, setExclusions] = useState([]);
+
   const handleSubmit = () => {
     setLoading(true);
   };
@@ -43,6 +49,26 @@ const PostSurvey = () => {
     setPreferredDepartment(""); // Reset department selection when faculty changes
   };
 
+    // Criteria handlers
+    const handleAdditionalChange = (e) => {
+      setHasAdditional(e.target.value === 'yes');
+    };
+  
+    const addInclusion = (e) => {
+      e.preventDefault();
+      if (incText.trim()) {
+        setInclusions(prev => [...prev, incText.trim()]);
+        setIncText("");
+      }
+    };
+  
+    const addExclusion = (e) => {
+      e.preventDefault();
+      if (excText.trim()) {
+        setExclusions(prev => [...prev, excText.trim()]);
+        setExcText("");
+      }
+    };
   return (
     <section className="postsurvey">
       <div className="postsurvey_wrap wrap">
@@ -111,7 +137,7 @@ const PostSurvey = () => {
             </div>
             <div className="postsurvey-field gender-area custom-dropdown">
               <label className="required-label" htmlFor="range-dropdown">
-                <h4>preferred gender of participants</h4>
+                <h4>Preferred gender of participants</h4>
               </label>
               <select
                 name="gender"
@@ -137,11 +163,9 @@ const PostSurvey = () => {
                   <option key={item.faculty} value={item.faculty}>{item.faculty}</option>
                 ))}
               </select>
-
             </div>
             {/* Where users can select department if they choose a particular faculty */}
             <div className="postsurvey-field custom-dropdown">
-
               {preferredFaculty !== "all_faculties" && (
                 <div className="postsurvey-field">
                   <label><h4>Preferred Department</h4></label>
@@ -157,6 +181,99 @@ const PostSurvey = () => {
                 </div>
               )}
             </div>
+            {/* Additional Criteria */}
+            <div className=" postsurvey-field custom-dropdown">
+              <label className="required-label" htmlFor="range-dropdown">
+                <h4>Do you have additional criteria for eligible participants?</h4>
+              </label>
+              <select
+                name="add_criteria"
+                id="range-dropdown"
+                className="custom-select"
+                  value={hasAdditional ? 'yes' : 'no'}
+                onChange={handleAdditionalChange}
+                  >
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            {/* If user clicks Yes for criteria */}
+            {hasAdditional && (
+            <div class="yes-criteria">
+              {/* Inclusion Criteria */}
+              <div className="postsurvey-field">
+                <label className="required-label" htmlFor="range-dropdown">
+                  <h4>Inclusion Criteria</h4>
+                </label>
+                <div className="flex crit-box">
+                   <input
+                  className="num_partp-input"
+                  type="text"
+                  name="inclusion_criteria"
+                  id=""
+                  value={incText}
+                      onChange={e => setIncText(e.target.value)}
+                  placeholder="Input inclusion criteria"
+                />
+                   <button className="flex" onClick={addInclusion}><svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#000000"><path d="M444-444H240v-72h204v-204h72v204h204v72H516v204h-72v-204Z"/></svg> Add criteria</button>
+                </div>
+               {/* Display added criteria here */}
+               <div className="added-criteria">
+                <ul>
+                {inclusions.map((crit, i) => (
+                        <li key={i} >{crit} </li> 
+                      ))}
+                </ul>
+               </div>
+              </div>
+              {/* Exclusion Criteria */}
+                 <div className="postsurvey-field ">
+                <label className="required-label" htmlFor="range-dropdown">
+                  <h4>Exclusion criteria</h4>
+                </label>
+                <div className="flex crit-box">
+                <input
+                  className="num_partp-input"
+                  type="text"
+                  name="exclusion_criteria"
+                  id=""
+                  value={excText}
+                  onChange={e => setExcText(e.target.value)}
+                  placeholder="Input exclusion criteria"
+                />
+              <button className="flex" onClick={addExclusion}><svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#000000"><path d="M444-444H240v-72h204v-204h72v204h204v72H516v204h-72v-204Z"/></svg>Add criteria</button>
+                </div>
+                {/* Display added criteria here */}
+               <div className="added-criteria">
+                <ul>
+                {exclusions.map((crit, i) => (
+                        <li key={i} >{crit} </li>
+                      ))}
+                </ul>
+               </div>
+              </div>             
+            {/* </div> */}
+
+ {/* Hidden inputs for submission */}
+ {inclusions.map((crit, i) => (
+  <input
+    type="hidden"
+    name="inclusion_criteria"
+    value={crit}
+    key={`inc-${i}`}
+  />
+))}
+{exclusions.map((crit, i) => (
+  <input
+    type="hidden"
+    name="exclusion_criteria"
+    value={crit}
+    key={`exc-${i}`}
+  />
+))}
+</div>
+)}
+
             <div className="flex btn_div">
               <input type="hidden" name="amount" value={amount} />
               <button type="submit" className="continue_survey btn" disabled={loading}>
