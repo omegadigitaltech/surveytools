@@ -12,6 +12,7 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const redis = require('redis');
 
 const User = require('./model/user')
 
@@ -74,6 +75,56 @@ if (!fs.existsSync(tempFilesDir)) {
   fs.mkdirSync(tempFilesDir, { recursive: true });
 }
 
+// Check Redis connection
+const checkRedisConnection = async () => {
+  try {
+    const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+    console.log(`Attempting to connect to Redis at ${REDIS_URL}`);
+    
+    const client = redis.createClient({
+      url: REDIS_URL,
+      socket: {
+        reconnectStrategy: (retries) => {
+          // Stop retrying after 3 attempts during startup check
+          if (retries >= 3) {
+            console.warn('Redis connection failed after 3 attempts');
+            return false; // stop retrying
+          }
+          return Math.min(retries * 1000, 3000); // wait up to 3 seconds
+        }
+      }
+    });
+    
+    client.on('error', (err) => {
+      console.error('Redis connection error:', err);
+      console.warn('Email notification queue will not work without Redis!');
+      console.warn('The application will still function, but new survey notifications will not be sent');
+    });
+    
+    // Set a timeout for the connection attempt
+    const timeout = setTimeout(() => {
+      console.warn('Redis connection timed out');
+      try {
+        client.disconnect();
+      } catch (e) {
+        // Ignore disconnect errors
+      }
+    }, 5000);
+    
+    await client.connect();
+    clearTimeout(timeout);
+    
+    console.log('✅ Redis connected successfully');
+    await client.disconnect();
+    return true;
+  } catch (error) {
+    console.error('Redis connection error:', error);
+    console.warn('Email notification queue will not work without Redis!');
+    console.warn('The application will still function, but new survey notifications will not be sent');
+    return false;
+  }
+};
+
 app.use('/', mainRouter)
 app.use('/', authRouter)
 app.use('/', redemptionRouter)
@@ -91,5 +142,7 @@ const port = process.env.PORT || 5000;
 app.listen(port, async () => {
   //connect DB
   await connectDB();
+  // Check Redis connection for queue service
+  await checkRedisConnection();
   console.log(`Server is running on port ${port}\n\nhttp://localhost:${port}`);
 });

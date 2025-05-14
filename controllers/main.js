@@ -8,8 +8,9 @@ const mongoose = require('mongoose');
 const {calculateSentiment} = require('../middleware/helper')
 const { uploadQuestionnaire } = require('./questionnaireUpload');
 const { createCsvString, formatSurveyDataForCsv } = require('../utils/exportService');
+const { addEmailToQueue } = require('../utils/queueService');
 
-const main_url = "localhost:5000"
+const main_url = process.env.FRONTEND_URL
 
 const start = async (req, res) => {
   const filePath = path.join(__dirname, '../index.html');
@@ -827,8 +828,6 @@ const publishSurvey = async (req, res, next) => {
       (QUESTION_RATE * survey.questions.length) + 
       (PARTICIPANT_RATE * survey.no_of_participants);
 
-      console.log(expectedAmount)
-      console.log(payment.amount)
     // Verify payment amount matches expected amount
     if (payment.amount !== expectedAmount) {
       return res.status(400).json({ 
@@ -841,8 +840,44 @@ const publishSurvey = async (req, res, next) => {
     }
 
     survey.published = true;
-    survey.link = `https://${main_url}/surveys/${surveyId}/info`;
+    survey.link = `https://${main_url}/expandsurvey/${surveyId}`;
     await survey.save();
+
+    // Get the populated survey to include in the notification
+    const populatedSurvey = await Survey.findById(surveyId).populate({
+      path: 'user_id',
+      select: 'fullname email instituition'
+    });
+
+    try {
+      // Add email notification job to the queue
+      // Create a properly structured survey object with user details
+      const surveyForQueue = {
+        ...populatedSurvey.toObject(),
+        user_id: {
+          _id: populatedSurvey.user_id._id,
+          fullname: populatedSurvey.user_id.fullname,
+          email: populatedSurvey.user_id.email,
+          instituition: populatedSurvey.user_id.instituition
+        }
+      };
+      
+      console.log("User data for queue:", surveyForQueue.user_id);
+      
+      const result = await addEmailToQueue('survey-published', { 
+        survey: surveyForQueue
+      });
+      
+      if (result && result.status === 'error') {
+        console.warn('Email notification queue not available, but survey was published successfully');
+      } else {
+        console.log('Email notification job added to queue');
+      }
+    } catch (queueError) {
+      // Log the error but don't fail the publish operation
+      console.error('Failed to queue email notifications:', queueError);
+      console.warn('Survey published successfully, but email notifications may not be sent');
+    }
 
     res.status(200).json({ status: "success", code: 200, msg: 'Survey published', link: survey.link });
   } catch (error) {
