@@ -39,6 +39,7 @@ import Profile from "./pages/profile/profile";
 import AnswerSurvey from "./pages/answersurvey/answersurvey"
 import Settings from "./pages/settings/settings"
 import Insights from "./pages/insights/insights"
+import VerifyPayment from "./pages/verify-payment/verify-payment"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -54,6 +55,7 @@ const router = createBrowserRouter(
         <Route path="publish" element={<Publish />} />
         <Route path="payment" element={<Payment />} />
         <Route path="pricing" element={<Pricing />} />
+        <Route path="verify-payment" element={<VerifyPayment />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="profile" element={<Profile />} />

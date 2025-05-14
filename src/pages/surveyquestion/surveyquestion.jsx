@@ -13,11 +13,12 @@ import PricingModal from "../../components/pricingmodal/pricingmodal";
 import { toast } from "react-toastify";
 import config from "../../config/config";
 import axios from "axios";
+import verifyPayment from "../../utils/helpers/verifyPayment";
 
 const SurveyQuestions = () => {
   const navigate = useNavigate();
   const data = useActionData();
-  const { currentSurveyId } = useAuthStore();
+  const { currentSurveyId, hasPaid, setHasPaid } = useAuthStore();
   const [isPosting, setIsPosting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
@@ -25,6 +26,7 @@ const SurveyQuestions = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
 
   // Add new state for delete loading
   const [isDeletingId, setIsDeletingId] = useState(null);
@@ -140,15 +142,28 @@ const SurveyQuestions = () => {
   const handlePostSubmit = async (e) => {
     e.preventDefault();
     setIsPosting(true);
+    setIsCheckingPayment(true);
 
     try {
       await handleSave(); // Reuse bulk save logic
-      setShowPricingModal(true);
-
+      
+      // Check payment status before showing pricing modal
+      const isPaid = await verifyPayment(currentSurveyId, authToken);
+      setHasPaid(isPaid);
+      
+      if (isPaid) {
+        // If payment verified, navigate directly to publish page
+        toast.success("Payment already verified!");
+        navigate("/publish");
+      } else {
+        // If not paid, show pricing modal
+        setShowPricingModal(true);
+      }
    } catch (error) {
       toast.error("Error saving questions");
     } finally {
       setIsPosting(false);
+      setIsCheckingPayment(false);
     }
   };
 

@@ -46,34 +46,31 @@ const action = async ({ request }) => {
     },
   };
 
-  const response = await fetch(API_URL, options);
-  const json = await response.json();
-
-  console.log(json)
-
   try {
-    if (!response.ok) {
-      throw new Error("Failed to submit survey");
+    const response = await fetch(API_URL, options);
+    const json = await response.json();
+    
+    console.log(json);
+    
+    if (response.ok) {
+      toast.success("Survey created successfully!");
+      const surveyId = json.data.survey._id;
+      
+      // Store survey ID in Zustand store
+      const { setSurveyId } = useAuthStore.getState();
+      setSurveyId(surveyId);
+      
+      // First go to verify-payment to check if the user has already paid
+      return redirect('/verify-payment');
+    } else {
+      toast.error(json.msg || "Failed to create survey");
+      return null;
     }
-    // Store to Zustand
-    const { setSurveyId } = useAuthStore.getState();
-    setSurveyId(json.survey._id);
-
-    toast.success("Survey submitted successfully!");
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(redirect("/surveyquestion"));
-      }, 1500);
-    });
-    // return { surveyID: json.survey._id }
-
   } catch (error) {
-    toast.error("Error submitting survey");
-    console.error("Caught error:", error);
-    console.log(json.msg)
+    console.error("Error creating survey:", error);
+    toast.error("An error occurred. Please try again.");
     return null;
   }
-
 };
 
 export default action;
