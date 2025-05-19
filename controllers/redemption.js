@@ -198,7 +198,7 @@ const redeemAirtime = async (req, res) => {
       );
 
       // Check API response
-      if (airtimeResponse.data && airtimeResponse.status == 200) {
+      if (airtimeResponse.data && airtimeResponse.status == 200 && airtimeResponse.data.status != false) {
         // Update redemption status to successful within transaction
         await RedemptionHistory.findByIdAndUpdate(
           redemption[0]._id,
@@ -361,7 +361,7 @@ const redeemData = async (req, res) => {
       );
 
       // Check API response
-      if (dataResponse.data && dataResponse.status == 200) {
+      if (dataResponse.data && dataResponse.status == 200 && dataResponse.data.status != false) {
         // Update redemption status to successful within transaction
         await RedemptionHistory.findByIdAndUpdate(
           redemption[0]._id,
