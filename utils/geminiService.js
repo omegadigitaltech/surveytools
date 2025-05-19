@@ -65,7 +65,8 @@ async function processQuestionnaire(documentData) {
 You are a research assistant tasked with converting a questionnaire document into structured JSON format.
 
 Analyze the following document and extract all questions, organizing them by type:
-- For multiple choice questions, extract the question text, identify it as "multiple_choice", and list all available options.
+- For multiple choice questions (select one option only), extract the question text, identify it as "multiple_choice", and list all available options.
+- For multiple selection questions (select multiple options), extract the question text, identify it as "multiple_selection", and list all available options.
 - For scale/rating questions (1-5), identify them as "five_point".
 - For open-ended questions, identify them as "fill_in".
 - Determine if each question is required or optional based on context clues.
@@ -75,14 +76,19 @@ The JSON output should match this structure:
   "questions": [
     {
       "questionText": "The full text of the question",
-      "questionType": "multiple_choice | five_point | fill_in",
+      "questionType": "multiple_choice | multiple_selection | five_point | fill_in",
       "required": true | false,
-      "options": ["Option 1", "Option 2", "Option 3"] // Only for multiple_choice questions
+      "options": ["Option 1", "Option 2", "Option 3"] // Only for multiple_choice and multiple_selection questions
     }
   ]
 }
 
 Extract only the questions from the document, and format them according to the structure above.
+Look for context clues to distinguish between single-choice (multiple_choice) and multi-selection (multiple_selection) questions:
+- Words like "select all that apply", "check all appropriate", "select multiple" suggest multiple_selection
+- Words like "choose one", "select only one", "best option" suggest multiple_choice
+
+IMPORTANT: Use your initiative to figure out what type of questions they are, the above is just for guide.
 `;
 
     let result;

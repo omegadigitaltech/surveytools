@@ -117,10 +117,11 @@ const uploadQuestionnaire = async (req, res, next) => {
             required: question.required || false
           };
           
-          // Add options for multiple-choice questions
-          if (question.questionType === 'multiple_choice' && Array.isArray(question.options)) {
+          // Add options for multiple-choice or multiple-selection questions
+          if ((question.questionType === 'multiple_choice' || question.questionType === 'multiple_selection') && 
+              Array.isArray(question.options)) {
             questionData.options = question.options.map(opt => ({ text: opt }));
-            console.log(`Added ${question.options.length} options to multiple choice question`);
+            console.log(`Added ${question.options.length} options to ${question.questionType} question`);
           }
           
           survey.questions.push(questionData);

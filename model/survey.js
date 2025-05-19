@@ -1,4 +1,3 @@
-
 // preferredparticpants
 // frontend layer for dept check// checkSurveyPublished
 // test for correct sturture and avoidance of server error or stopage
@@ -11,7 +10,11 @@ const { Schema } = mongoose;
 const answerSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   fullname: { type: String, required: [true, "Username is required"] },
-  response: { type: String, required: [true, "Response field is required"] }
+  response: { 
+    type: Schema.Types.Mixed, 
+    required: [true, "Response field is required"],
+    // Can be either a string (for single responses) or an array of strings (for multiple_selection)
+  }
 });
 
 // Define the schema for survey options
@@ -23,20 +26,20 @@ const optionSchema = new Schema({
 const questionSchema = new Schema({
   questionText: { type: String, required: [true, "Question Text is required"] },
   questionType: { type: String, required: [true, "Question Type is required"], enum: {
-    values: ['multiple_choice', 'five_point', 'fill_in'],
-    message: 'Question type must be either "multiple_choice", "five_point", or "fill_in"'
+    values: ['multiple_choice', 'five_point', 'fill_in', 'multiple_selection'],
+    message: 'Question type must be either "multiple_choice", "five_point", "fill_in", or "multiple_selection"'
   }},
   required: { type: Boolean, default: false },
   options: {
-    type:[optionSchema], // Only for multiple_choice questions
+    type:[optionSchema], // Only for multiple_choice and multiple_selection questions
     validate: {
       validator: function(options) {
-        if (this.questionType === 'multiple_choice') {
+        if (this.questionType === 'multiple_choice' || this.questionType === 'multiple_selection') {
           return options && options.length > 0;
         }
         return true;
       },
-      message: 'Options are required for multiple_choice questions'
+      message: 'Options are required for multiple_choice and multiple_selection questions'
     }
   },
   answers: [answerSchema], // Reference answer documents

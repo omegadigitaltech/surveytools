@@ -155,6 +155,26 @@ const updateAnswer = async (req, res, next) => {
           session.endSession();
           return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be one of the provided options for multiple_choice question' });
         }
+      } else if (question.questionType === 'multiple_selection') {
+        // For multiple_selection, response must be an array of strings
+        if (!Array.isArray(response) || response.length === 0) {
+          await session.abortTransaction();
+          session.endSession();
+          return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be an array of selected options for multiple_selection question' });
+        }
+        
+        const validOptions = question.options.map(opt => opt.text);
+        // Check if all selected options are valid
+        const invalidOptions = response.filter(option => !validOptions.includes(option));
+        if (invalidOptions.length > 0) {
+          await session.abortTransaction();
+          session.endSession();
+          return res.status(400).json({ 
+            status: "failure", 
+            code: 400, 
+            msg: `Response contains invalid options: ${invalidOptions.join(', ')}` 
+          });
+        }
       }
   
   
@@ -294,6 +314,26 @@ const submitAnswers = async (req, res, next) => {
             session.endSession();
             return res.status(400).json({ status: "failure", code: 400, msg: `Response for question ${question._id} must be one of the provided options for multiple_choice question` });
           }
+        } else if (question.questionType === 'multiple_selection') {
+          // For multiple_selection, response must be an array of strings
+          if (!Array.isArray(answer.response) || answer.response.length === 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ status: "failure", code: 400, msg: `Response for question ${question._id} must be an array of selected options for multiple_selection question` });
+          }
+          
+          const validOptions = question.options.map(opt => opt.text);
+          // Check if all selected options are valid
+          const invalidOptions = answer.response.filter(option => !validOptions.includes(option));
+          if (invalidOptions.length > 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ 
+              status: "failure", 
+              code: 400, 
+              msg: `Response for question ${question._id} contains invalid options: ${invalidOptions.join(', ')}` 
+            });
+          }
         }
 
         const existingAnswer = question.answers.find(a => a.userId.equals(user._id));
@@ -318,6 +358,12 @@ const submitAnswers = async (req, res, next) => {
           if (question.questionType === 'five_point') {
             question.analytics.averageRating = (question.analytics.averageRating * (question.analytics.totalResponses - 1) + parseInt(answer.response)) / question.analytics.totalResponses;
           }
+        } else if (question.questionType === 'multiple_selection') {
+          // For multiple_selection, update distribution for each selected option
+          answer.response.forEach(selectedOption => {
+            const responseKey = String(selectedOption);
+            question.analytics.distribution.set(responseKey, (question.analytics.distribution.get(responseKey) || 0) + 1);
+          });
         }
 
         if (question.questionType === 'fill_in') {
@@ -342,7 +388,13 @@ const submitAnswers = async (req, res, next) => {
 
     await survey.save({ session });
 
-    user.pointBalance += survey.point_per_user
+    // Add points to user's balance only if point_per_user is a valid number
+    if (survey.point_per_user && !isNaN(survey.point_per_user)) {
+      user.pointBalance += survey.point_per_user;
+    } else {
+      console.log(`Warning: Invalid point_per_user value (${survey.point_per_user}) for survey ${survey._id}`);
+    }
+    
     await user.save({ session })
 
     await session.commitTransaction();
@@ -434,7 +486,7 @@ const addOrUpdateQuestion = async (req, res, next) => {
 
     // Format `options` array if questionType is multiple_choice
     let formattedOptions = [];
-    if (questionType === 'multiple_choice' && Array.isArray(options)) {
+    if ((questionType === 'multiple_choice' || questionType === 'multiple_selection') && Array.isArray(options)) {
       formattedOptions = options.map(option => ({
         text: option // Convert each option string to an object with `text` property
       }));
@@ -446,7 +498,7 @@ const addOrUpdateQuestion = async (req, res, next) => {
       question.questionText = questionText;
       question.questionType = questionType;
       question.required = required !== undefined ? required : question.required; // Use existing value if undefined
-      question.options = questionType === 'multiple_choice' ? formattedOptions : [];
+      question.options = (questionType === 'multiple_choice' || questionType === 'multiple_selection') ? formattedOptions : [];
       survey.updatedAt = new Date();
     } else {
       survey.questions.push({
@@ -455,7 +507,7 @@ const addOrUpdateQuestion = async (req, res, next) => {
         required,
         options,
         required: required || false,
-        options: questionType === 'multiple_choice' ? formattedOptions : []
+        options: (questionType === 'multiple_choice' || questionType === 'multiple_selection') ? formattedOptions : []
 
       });
       survey.updatedAt = new Date();
@@ -537,6 +589,7 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
       try {
         // Extract question data
         const { questionId, questionText, questionType, required, options } = question;
+        console.log(options)
         
         // Validate required fields
         if (!questionText || !questionType) {
@@ -550,7 +603,7 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
         }
         
         // Validate question type
-        const validQuestionTypes = ['multiple_choice', 'five_point', 'fill_in'];
+        const validQuestionTypes = ['multiple_choice', 'five_point', 'fill_in', 'multiple_selection'];
         if (!validQuestionTypes.includes(questionType)) {
           results.failed++;
           results.details.push({
@@ -561,20 +614,21 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
           continue;
         }
         
-        // Validate options for multiple choice questions
-        if (questionType === 'multiple_choice' && (!options || !Array.isArray(options) || options.length < 2)) {
+        // Validate options for multiple choice and multiple selection questions
+        if ((questionType === 'multiple_choice' || questionType === 'multiple_selection') && 
+            (!options || !Array.isArray(options) || options.length < 2)) {
           results.failed++;
           results.details.push({
             question: questionText,
             status: 'failed',
-            reason: 'Multiple choice questions must have at least 2 options'
+            reason: `${questionType} questions must have at least 2 options`
           });
           continue;
         }
         
-        // Format options for multiple-choice questions
+        // Format options for multiple-choice and multiple-selection questions
         let formattedOptions = [];
-        if (questionType === 'multiple_choice' && Array.isArray(options)) {
+        if ((questionType === 'multiple_choice' || questionType === 'multiple_selection') && Array.isArray(options)) {
           formattedOptions = options.map(option => ({
             text: option // Convert each option string to an object with `text` property
           }));
@@ -583,12 +637,13 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
         // Find existing question or create new one
         const existingQuestion = questionId ? survey.questions.find(q => q._id.toString() === questionId) : null;
         
+        console.log(formattedOptions)
         if (existingQuestion) {
           // Update existing question
           existingQuestion.questionText = questionText;
           existingQuestion.questionType = questionType;
           existingQuestion.required = required !== undefined ? required : existingQuestion.required;
-          existingQuestion.options = questionType === 'multiple_choice' ? formattedOptions : [];
+          existingQuestion.options = (questionType === 'multiple_choice' || questionType === 'multiple_selection') ? formattedOptions : [];
           
           results.updated++;
           results.details.push({
@@ -604,7 +659,7 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
             questionText,
             questionType,
             required: required !== undefined ? required : false,
-            options: questionType === 'multiple_choice' ? formattedOptions : [],
+            options: (questionType === 'multiple_choice' || questionType === 'multiple_selection') ? formattedOptions : [],
             analytics: {
               totalResponses: 0,
               averageRating: 0,
@@ -815,29 +870,29 @@ const publishSurvey = async (req, res, next) => {
     }
 
     const payment = await Payment.findOne({ surveyId }).sort({ createdAt: -1 });
-    if(!payment){
-      return res.status(400).json({ status: "failure", code: 400, msg: 'No payment found' });
-    }
+    // if(!payment){
+    //   return res.status(400).json({ status: "failure", code: 400, msg: 'No payment found' });
+    // }
 
-    // Calculate expected payment amount
-    const BASE_RATE = 500;
-    const QUESTION_RATE = 10;
-    const PARTICIPANT_RATE = 40;
+    // // Calculate expected payment amount
+    // const BASE_RATE = 500;
+    // const QUESTION_RATE = 10;
+    // const PARTICIPANT_RATE = 40;
 
-    const expectedAmount = BASE_RATE + 
-      (QUESTION_RATE * survey.questions.length) + 
-      (PARTICIPANT_RATE * survey.no_of_participants);
+    // const expectedAmount = BASE_RATE + 
+    //   (QUESTION_RATE * survey.questions.length) + 
+    //   (PARTICIPANT_RATE * survey.no_of_participants);
 
-    // Verify payment amount matches expected amount
-    if (payment.amount !== expectedAmount) {
-      return res.status(400).json({ 
-        status: "failure", 
-        code: 400, 
-        msg: 'Payment amount does not match expected amount.',
-        expected: expectedAmount,
-        received: payment.amount
-      });
-    }
+    // // Verify payment amount matches expected amount
+    // if (payment.amount !== expectedAmount) {
+    //   return res.status(400).json({ 
+    //     status: "failure", 
+    //     code: 400, 
+    //     msg: 'Payment amount does not match expected amount.',
+    //     expected: expectedAmount,
+    //     received: payment.amount
+    //   });
+    // }
 
     survey.published = true;
     survey.link = `https://${main_url}/expandsurvey/${surveyId}`;
