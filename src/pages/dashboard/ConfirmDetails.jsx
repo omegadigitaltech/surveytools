@@ -132,7 +132,7 @@ export default function ConfirmDetails() {
       }
     } catch (err) {
       console.error("Redemption error:", err.response?.data);
-      toast.error("Error: An error occurred. Try a different plan or try again later");
+      toast.error("Error: An error occurred. Try a different plan or try again later" || err.response?.data?.message);
     } finally {
       setIsProcessing(false);
     }
