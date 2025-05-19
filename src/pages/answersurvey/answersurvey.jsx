@@ -60,8 +60,41 @@ const answerSurvey = () => {
     }));
   };
 
+  const handleMultipleSelectionChange = (questionId, optionValue, isChecked) => {
+    setAnswers((prevAnswers) => {
+      // Get the current array of selected options or initialize empty array
+      const currentSelections = Array.isArray(prevAnswers[questionId]) 
+        ? [...prevAnswers[questionId]] 
+        : [];
+      
+      // Add or remove the option based on checkbox state
+      if (isChecked) {
+        return {
+          ...prevAnswers,
+          [questionId]: [...currentSelections, optionValue]
+        };
+      } else {
+        return {
+          ...prevAnswers,
+          [questionId]: currentSelections.filter(option => option !== optionValue)
+        };
+      }
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate required multiple selection questions
+    const missingRequiredSelections = questions
+      .filter(q => q.questionType === "multiple_selection" && q.required)
+      .some(q => !answers[q._id] || !Array.isArray(answers[q._id]) || answers[q._id].length === 0);
+    
+    if (missingRequiredSelections) {
+      toast.error("Please select at least one option for all required multiple selection questions");
+      return;
+    }
+    
     setSubmitting(true); // Set submitting state to true
 
     const answerArray = Object.entries(answers).map(
@@ -156,6 +189,26 @@ const answerSurvey = () => {
                           value={option.text}
                           onChange={(e) =>
                             handleAnswerChange(question._id, e.target.value)
+                          }
+                          required={question.required}
+                        />
+                        {option.text}
+                      </label>
+                    ))
+                  ) : question.questionType === "multiple_selection" ? (
+                    question.options.map((option, optIndex) => (
+                      <label key={optIndex} className="answer-ques-opt">
+                        <input
+                          type="checkbox"
+                          className="tick-ans"
+                          name={`question-${question._id}-option-${optIndex}`}
+                          value={option.text}
+                          onChange={(e) =>
+                            handleMultipleSelectionChange(
+                              question._id, 
+                              e.target.value, 
+                              e.target.checked
+                            )
                           }
                         />
                         {option.text}

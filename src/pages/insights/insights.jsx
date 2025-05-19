@@ -303,6 +303,8 @@ const Insights = () => {
                 ? 'Multiple Choice' 
                 : currentQuestion.questionType === 'five_point' 
                   ? 'Five Point Scale' 
+                : currentQuestion.questionType === 'multiple_selection'
+                  ? 'Multiple Selection'
                   : 'Fill in'}</div>
               
               <div className="question-stats">
@@ -341,7 +343,7 @@ const Insights = () => {
                         tick={{ fontSize: 12 }}
                       />
                       <YAxis />
-                      <Tooltip formatter={(value, name) => [`${value} (${name === 'responses' ? '' : '%'})`, name === 'responses' ? 'Responses' : 'Percentage']} />
+                      <Tooltip formatter={(value, name) => [`${value} (${name === 'responses' ? '' : '%'})`, name === 'responses' ? 'Responses' : 'Percentage (%)']} />
                       <Bar dataKey="responses" fill="#8884d8" name="Responses" />
                       <Bar dataKey="percentage" fill="#82ca9d" name="Percentage (%)" />
                     </BarChart>
@@ -366,6 +368,49 @@ const Insights = () => {
                       <XAxis dataKey="point" />
                       <YAxis />
                       <Tooltip formatter={(value, name) => [`${value} (${name === 'responses' ? '' : '%'})`, name === 'responses' ? 'Responses' : 'Percentage']} />
+                      <Bar dataKey="responses" fill="#8884d8" name="Responses" />
+                      <Bar dataKey="percentage" fill="#82ca9d" name="Percentage (%)" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+
+              {currentQuestion.questionType === 'multiple_selection' && (
+                <div className="response-distribution">
+                  <h4>Response Distribution (Multiple Selection)</h4>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart 
+                      data={currentQuestion.options.map(opt => ({
+                        option: opt.text,
+                        responses: currentQuestion.answers?.reduce((count, answer) => {
+                          // If response is an array (multiple selection)
+                          if (Array.isArray(answer.response)) {
+                            return count + (answer.response.includes(opt.text) ? 1 : 0);
+                          }
+                          // Fallback in case response is stored as string
+                          return count + (answer.response === opt.text ? 1 : 0);
+                        }, 0) || 0,
+                        percentage: surveyData.participantCounts.filled 
+                          ? ((currentQuestion.answers?.reduce((count, answer) => {
+                              if (Array.isArray(answer.response)) {
+                                return count + (answer.response.includes(opt.text) ? 1 : 0);
+                              }
+                              return count + (answer.response === opt.text ? 1 : 0);
+                            }, 0) || 0) / surveyData.participantCounts.filled * 100).toFixed(1)
+                          : 0
+                      }))}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="option" 
+                        angle={-45} 
+                        textAnchor="end"
+                        height={60}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <YAxis />
+                      <Tooltip formatter={(value, name) => [`${value} (${name === 'responses' ? '' : '%'})`, name === 'responses' ? 'Responses' : 'Percentage (%)']} />
                       <Bar dataKey="responses" fill="#8884d8" name="Responses" />
                       <Bar dataKey="percentage" fill="#82ca9d" name="Percentage (%)" />
                     </BarChart>
@@ -450,7 +495,9 @@ const Insights = () => {
                               <p className="answer-text">
                                 {question.questionType === 'five_point' 
                                   ? `${answer.response} / 5` 
-                                  : answer.response}
+                                  : question.questionType === 'multiple_selection' && Array.isArray(answer.response)
+                                    ? answer.response.join(', ')
+                                    : answer.response}
                               </p>
                             ) : (
                               <p className="no-answer">No answer provided</p>

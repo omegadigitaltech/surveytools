@@ -26,7 +26,26 @@ gap: 3rem;
 }
 .tick-ans {
     margin-left: 1rem;
-    margin-right: .2rem;
+    margin-right: 10px;
+    height: 18px;
+    width: 18px;
+    accent-color: #0587FF;
+}
+
+/* Multiple selection checkboxes specific styling */
+input[type="checkbox"].tick-ans {
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+input[type="checkbox"].tick-ans:checked {
+    background-color: #0587FF;
+    border-color: #0587FF;
+}
+
+/* Hover effect for options */
+.answer-ques-opt:hover {
+    background-color: rgba(5, 135, 255, 0.05);
 }
 
 .fillin-ans {

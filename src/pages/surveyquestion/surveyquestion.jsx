@@ -85,7 +85,7 @@ const SurveyQuestions = () => {
     setIsSaving(true);
     try {
       // Prepare bulk payload
-      const validTypes = ["multiple_choice", "five_point", "fill_in"];
+      const validTypes = ["multiple_choice", "five_point", "fill_in", "multiple_selection"];
 
       const bulkPayload = {
      questions: questions.map((question) => ({
@@ -95,7 +95,7 @@ const SurveyQuestions = () => {
      required: Boolean(question.required),
      // Conditional options handling
      options: 
-      question.questionType === "multiple_choice"
+      (question.questionType === "multiple_choice" || question.questionType === "multiple_selection")
         ? question.options
         .map(opt =>  typeof opt === 'string' ? opt.trim() : opt.text.trim() )// Handle new/existing options
         // }))
@@ -226,7 +226,11 @@ const SurveyQuestions = () => {
 
   const handleQuestionChange = (id, field, value) => {
     const updatedQuestions = questions.map((q) =>
-      q.id === id ? { ...q, [field]: value, ...(field === "questionType" && value === "fill_in" ? { options: [] } : {}) } : q
+      q.id === id ? { 
+        ...q, 
+        [field]: value, 
+        ...(field === "questionType" && (value === "fill_in" || value === "five_point") ? { options: [] } : {})
+      } : q
     );
     setQuestions(updatedQuestions);
   };
@@ -408,11 +412,12 @@ const handleFileUpload = async (e) => {
                         className="choice-select"
                       >
                         <option value="multiple_choice">Multiple Choice</option>
+                        <option value="multiple_selection">Multiple Selection</option>
                         <option value="fill_in">Fill in</option>
                         <option value="five_point">Five Point</option>
                       </select>
                     </div>
-                    {question.questionType === "multiple_choice" && (
+                    {(question.questionType === "multiple_choice" || question.questionType === "multiple_selection") && (
                       <div className="options-list flex">
                         <div className="option">
                           {question.options.map((option, index) => (
