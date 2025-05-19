@@ -62,9 +62,21 @@ export default function ConfirmDetails() {
         toast.error("Insufficient points balance");
         return;
       }
-      const formattedPhone = phoneNumber.startsWith("+234")
-        ? phoneNumber.slice(1)// Remove +234 prefix if present
-        : phoneNumber.replace(/^0/, "234"); // Convert 0... to 234...
+      
+      // Format phone number according to the new requirements
+      let formattedPhone;
+      if (phoneNumber.startsWith("+234")) {
+        // If starts with +234, replace with 0
+        formattedPhone = "0" + phoneNumber.slice(4);
+      } else if (phoneNumber.startsWith("0")) {
+        // If starts with 0, keep as is
+        formattedPhone = phoneNumber;
+      } else {
+        // Any other format is invalid
+        toast.error("Phone number must start with +234 or 0");
+        setIsProcessing(false);
+        return;
+      }
 
       const payload = redeemModalState === "data"
         ? {
