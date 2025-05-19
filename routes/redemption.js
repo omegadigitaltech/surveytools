@@ -3,14 +3,14 @@ const router = express.Router();
 const { authMiddleware } = require('../middleware/auth');
 const { withTransaction, transactionHandler } = require('../middleware/transaction');
 const {
-  getDataPlans,
+  getDataPlansHandler,
   redeemAirtime,
   redeemData,
   getRedemptionHistory
 } = require('../controllers/redemption');
 
 // Get all available data plans
-router.get('/redemption/plans', authMiddleware, getDataPlans);
+router.get('/redemption/plans', authMiddleware, getDataPlansHandler);
 
 // Redeem points for airtime - apply transaction middleware
 router.post('/redemption/airtime', authMiddleware, withTransaction, redeemAirtime);
