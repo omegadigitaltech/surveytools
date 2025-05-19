@@ -352,7 +352,9 @@ const submitAnswers = async (req, res, next) => {
         if (question.questionType === 'multiple_choice' || question.questionType === 'five_point') {
           
           // Convert the response to a string before using it as a Map key
-          const responseKey = String(answer.response);
+          const responseKey = String(answer.response)
+            .replace(/\./g, '_') // Replace dots with underscores
+            .replace(/\$/g, '_'); // Replace $ with underscores
           question.analytics.distribution.set(responseKey, (question.analytics.distribution.get(responseKey) || 0) + 1);
           
           if (question.questionType === 'five_point') {
@@ -361,7 +363,9 @@ const submitAnswers = async (req, res, next) => {
         } else if (question.questionType === 'multiple_selection') {
           // For multiple_selection, update distribution for each selected option
           answer.response.forEach(selectedOption => {
-            const responseKey = String(selectedOption);
+            const responseKey = String(selectedOption)
+              .replace(/\./g, '_') // Replace dots with underscores
+              .replace(/\$/g, '_'); // Replace $ with underscores
             question.analytics.distribution.set(responseKey, (question.analytics.distribution.get(responseKey) || 0) + 1);
           });
         }
