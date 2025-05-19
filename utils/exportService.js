@@ -4,8 +4,11 @@ const createCsvString = (data) => {
   // Extract headers from the first object
   const headers = Object.keys(data[0]);
   
-  // Create CSV header row
-  const headerRow = headers.join(',');
+  // Create CSV header row with proper quoting for headers containing commas
+  const headerRow = headers.map(header => {
+    // Always quote headers to be safe, especially if they contain commas
+    return `"${header.replace(/"/g, '""')}"`; 
+  }).join(',');
   
   // Create data rows
   const rows = data.map(item => {
@@ -70,8 +73,15 @@ const formatSurveyDataForGoogleStyleCsv = (survey, userMap = new Map()) => {
         respondentIds.push(respondentId);
       }
       
-      // Store the response for this question
-      respondentsMap.get(respondentId).responses[question._id.toString()] = answer.response;
+      // Store the response for this question, handling multiple_selection specially
+      let responseValue = answer.response;
+      
+      // If this is a multiple_selection question with array response, join with semicolons
+      if (question.questionType === 'multiple_selection' && Array.isArray(responseValue)) {
+        responseValue = responseValue.join('; ');
+      }
+      
+      respondentsMap.get(respondentId).responses[question._id.toString()] = responseValue;
     });
   });
   
@@ -158,7 +168,36 @@ const formatSurveyDataForCsv = (survey, userMap = new Map()) => {
         }
       });
       analytics.mostCommonResponse = mostCommon;
+    } else if (question.questionType === 'multiple_selection') {
+      // Create a distribution map for each option
+      const distribution = {};
+      question.options.forEach(option => {
+        distribution[option.text] = 0;
+      });
       
+      // Count selections for each option
+      question.answers.forEach(answer => {
+        if (Array.isArray(answer.response)) {
+          answer.response.forEach(selected => {
+            if (distribution[selected] !== undefined) {
+              distribution[selected]++;
+            }
+          });
+        }
+      });
+      
+      analytics.distribution = distribution;
+      
+      // Find most common selected option
+      let maxCount = 0;
+      let mostCommon = null;
+      Object.entries(distribution).forEach(([option, count]) => {
+        if (count > maxCount) {
+          maxCount = count;
+          mostCommon = option;
+        }
+      });
+      analytics.mostCommonResponse = mostCommon;
     } else if (question.questionType === 'five_point') {
       // Calculate average rating
       let sum = 0;
