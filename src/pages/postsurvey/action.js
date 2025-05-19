@@ -54,7 +54,7 @@ const action = async ({ request }) => {
     
     if (response.ok) {
       toast.success("Survey created successfully!");
-      const surveyId = json.data.survey._id;
+      const surveyId = json.survey._id;
       
       // Store survey ID in Zustand store
       const { setSurveyId } = useAuthStore.getState();
