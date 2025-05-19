@@ -151,8 +151,16 @@ const formatSurveyDataForCsv = (survey, userMap = new Map()) => {
       
       // Count responses for each option
       question.answers.forEach(answer => {
-        if (distribution[answer.response] !== undefined) {
-          distribution[answer.response]++;
+        if (answer.response) {
+          // The stored keys might have dots replaced with underscores, 
+          // but we want to display the original option text
+          const originalOptionText = question.options.find(opt => 
+            opt.text.replace(/\./g, '_').replace(/\$/g, '_') === answer.response.replace(/\./g, '_').replace(/\$/g, '_')
+          )?.text || answer.response;
+          
+          if (distribution[originalOptionText] !== undefined) {
+            distribution[originalOptionText]++;
+          }
         }
       });
       
@@ -179,8 +187,13 @@ const formatSurveyDataForCsv = (survey, userMap = new Map()) => {
       question.answers.forEach(answer => {
         if (Array.isArray(answer.response)) {
           answer.response.forEach(selected => {
-            if (distribution[selected] !== undefined) {
-              distribution[selected]++;
+            // Find the original option text that matches the sanitized key
+            const originalOptionText = question.options.find(opt => 
+              opt.text.replace(/\./g, '_').replace(/\$/g, '_') === selected.replace(/\./g, '_').replace(/\$/g, '_')
+            )?.text || selected;
+            
+            if (distribution[originalOptionText] !== undefined) {
+              distribution[originalOptionText]++;
             }
           });
         }
