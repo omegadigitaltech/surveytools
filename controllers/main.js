@@ -870,29 +870,29 @@ const publishSurvey = async (req, res, next) => {
     }
 
     const payment = await Payment.findOne({ surveyId }).sort({ createdAt: -1 });
-    // if(!payment){
-    //   return res.status(400).json({ status: "failure", code: 400, msg: 'No payment found' });
-    // }
+    if(!payment){
+      return res.status(400).json({ status: "failure", code: 400, msg: 'No payment found' });
+    }
 
-    // // Calculate expected payment amount
-    // const BASE_RATE = 500;
-    // const QUESTION_RATE = 10;
-    // const PARTICIPANT_RATE = 40;
+    // Calculate expected payment amount
+    const BASE_RATE = 500;
+    const QUESTION_RATE = 10;
+    const PARTICIPANT_RATE = 40;
 
-    // const expectedAmount = BASE_RATE + 
-    //   (QUESTION_RATE * survey.questions.length) + 
-    //   (PARTICIPANT_RATE * survey.no_of_participants);
+    const expectedAmount = BASE_RATE + 
+      (QUESTION_RATE * survey.questions.length) + 
+      (PARTICIPANT_RATE * survey.no_of_participants);
 
-    // // Verify payment amount matches expected amount
-    // if (payment.amount !== expectedAmount) {
-    //   return res.status(400).json({ 
-    //     status: "failure", 
-    //     code: 400, 
-    //     msg: 'Payment amount does not match expected amount.',
-    //     expected: expectedAmount,
-    //     received: payment.amount
-    //   });
-    // }
+    // Verify payment amount matches expected amount
+    if (payment.amount !== expectedAmount) {
+      return res.status(400).json({ 
+        status: "failure", 
+        code: 400, 
+        msg: 'Payment amount does not match expected amount.',
+        expected: expectedAmount,
+        received: payment.amount
+      });
+    }
 
     survey.published = true;
     survey.link = `https://${main_url}/expandsurvey/${surveyId}`;
