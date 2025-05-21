@@ -97,8 +97,8 @@ export default function ConfirmDetails() {
         return;
       }
       if (redeemModalState === "airtime") {
-        if (selectedPlanPrice < 50) {
-          toast.error("Minimum airtime amount is ₦50");
+        if (selectedPlanPrice < 100) {
+          toast.error("Minimum airtime amount is 100");
           return;
         }
       }
