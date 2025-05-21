@@ -125,11 +125,11 @@ const redeemAirtime = async (req, res) => {
     }
 
     // Minimum amount validation
-    if (amount < 100) {
+    if (amount < 50) {
       await req.abortTransaction();
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: "Minimum airtime amount is ₦100"
+        message: "Minimum airtime amount is ₦50"
       });
     }
 
