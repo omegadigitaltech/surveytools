@@ -9,7 +9,7 @@ export const faculty_dept = [
     { faculty: "Science", departments: ["Biochemistry", "Botany", "Chemistry", "Geology", "Mathematics", "Microbiology", "Physics", "Zoology"] },
     { faculty: "Social Sciences", departments: ["Demography and Social Statistics", "Economics", "Geography", "Political Science", "Psychology", "Sociology and Anthropology"] },
     { faculty: "Technology", departments: ["Agricultural and Environmental Engineering", "Chemical Engineering", "Civil Engineering", "Computer Science and Engineering", "Electronic and Electrical Engineering", "Food Science and Technology", "Materials Science and Engineering", "Mechanical Engineering"] },
-    { faculty: "Basic Medical Sciences", departments: ["Anatomy and Cell Biology", "Chemical Pathology", "Haematology and Immunology", "Medical Microbiology and Parasitology", "Medical Rehabilitation", "Morbid Anatomy and Forensic Medicine", "Nursing Science", "Physiological Sciences"] },
+    { faculty: "Basic Medical Sciences", departments: ["Anatomy and Cell Biology", "Chemical Pathology", "Haematology and Immunology", "Human Nutrition and Dietetics", "Medical Microbiology and Parasitology", "Medical Rehabilitation", "Morbid Anatomy and Forensic Medicine", "Nursing Science", "Physiological Sciences"] },
     { faculty: "Clinical Sciences", departments: ["Anaesthesia", "Community Health", "Dermatology and Venerology", "Medicine", "Mental Health", "Obstetrics, Gynaecology, and Perinatology", "Ophthalmology", "Orthopaedics and Traumatology", "Paediatrics and Child Health", "Radiology", "Surgery"] },
     { faculty: "Dentistry", departments: ["Child Dental Health", "Oral and Maxillofacial Surgery", "Oral Pathology and Oral Medicine", "Preventive and Community Dentistry", "Restorative Dentistry"] }
 ];
