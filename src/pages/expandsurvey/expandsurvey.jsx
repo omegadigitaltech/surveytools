@@ -120,7 +120,7 @@ const expandsurvey = () => {
     setIsUnpublishing(true);
     try {
       const response = await fetch(`${config.API_URL}/surveys/${id}/unpublish`, {
-        method: "PUT",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
