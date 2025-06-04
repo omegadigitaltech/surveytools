@@ -115,6 +115,14 @@
     flex-wrap: wrap;
 }
 
+.published-buttons-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
 .edit-btn, .insights-btn {
     flex: 1;
     min-width: 120px;
@@ -147,6 +155,28 @@
     border-color: #0471d9;
 }
 
+.unpublish-btn {
+    padding: 0.8em 1.5em;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #dc3545;
+    color: white;
+    border: 2px solid #dc3545;
+    min-width: 160px;
+}
+
+.unpublish-btn:hover:not(:disabled) {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
+.unpublish-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 @media (max-width: 512px) {
     .expand_inner .backaro{
         margin: 1.4rem 0;
@@ -164,7 +194,17 @@
         gap: 0.8rem;
     }
 
+    .published-buttons-container {
+        gap: 0.8rem;
+    }
+
     .edit-btn, .insights-btn {
+        min-width: 100%;
+        padding: 0.7em 1em;
+        font-size: 0.9rem;
+    }
+
+    .unpublish-btn {
         min-width: 100%;
         padding: 0.7em 1em;
         font-size: 0.9rem;
@@ -237,8 +277,19 @@
         width: 100%;
     }
 
+    .published-buttons-container {
+        gap: 0.6rem;
+        width: 100%;
+    }
+
     .edit-btn, .insights-btn {
         font-size: 0.85rem;
         padding: 0.6em 0.8em;
+    }
+
+    .unpublish-btn {
+        font-size: 0.85rem;
+        padding: 0.6em 0.8em;
+        min-width: 100%;
     }
 }

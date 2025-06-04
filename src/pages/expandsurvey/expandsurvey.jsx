@@ -22,6 +22,7 @@ const expandsurvey = () => {
   const [loading, setLoading] = useState(true);
   const [isOwnSurvey, setIsOwnSurvey] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
+  const [isUnpublishing, setIsUnpublishing] = useState(false);
 
   useEffect(() => {
     const fetchSurveyInfo = async () => {
@@ -111,6 +112,38 @@ const expandsurvey = () => {
     });
   };
 
+  const handleUnpublishClick = async () => {
+    if (!window.confirm("Are you sure you want to unpublish this survey? This will stop accepting new responses.")) {
+      return;
+    }
+
+    setIsUnpublishing(true);
+    try {
+      const response = await fetch(`${config.API_URL}/surveys/${id}/unpublish`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || "Failed to unpublish survey");
+      }
+
+      // Update the survey state to reflect unpublished status
+      setSurvey(prev => ({ ...prev, published: false }));
+      toast.success("Survey unpublished successfully!");
+    } catch (error) {
+      console.error("Error unpublishing survey:", error);
+      toast.error(error.message || "Error unpublishing survey");
+    } finally {
+      setIsUnpublishing(false);
+    }
+  };
+
   return (
     <section className="expand">
       <div className="expand_inner wrap">
@@ -164,18 +197,27 @@ const expandsurvey = () => {
           {isOwnSurvey ? (
             <>
               {survey.published ? (
-                <div className="published-buttons flex">
+                <div className="published-buttons-container">
+                  <div className="published-buttons flex">
+                    <button 
+                      className="edit-btn btn"
+                      onClick={handleEditClick}
+                    >
+                      Edit Survey
+                    </button>
+                    <button 
+                      className="insights-btn btn"
+                      onClick={handleInsightsClick}
+                    >
+                      View Insights
+                    </button>
+                  </div>
                   <button 
-                    className="edit-btn btn"
-                    onClick={handleEditClick}
+                    className="unpublish-btn btn"
+                    onClick={handleUnpublishClick}
+                    disabled={isUnpublishing}
                   >
-                    Edit Survey
-                  </button>
-                  <button 
-                    className="insights-btn btn"
-                    onClick={handleInsightsClick}
-                  >
-                    View Insights
+                    {isUnpublishing ? "Unpublishing..." : "Unpublish Survey"}
                   </button>
                 </div>
               ) : (
