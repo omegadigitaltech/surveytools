@@ -95,6 +95,22 @@ const expandsurvey = () => {
     }
   };
 
+  const handleEditClick = () => {
+    // Set the current survey ID in the store before navigating
+    setSurveyId(id);
+    // Navigate to edit survey
+    navigate(`/surveyquestion`, { 
+      state: { surveyId: id }
+    });
+  };
+
+  const handleInsightsClick = () => {
+    // Pass the survey data to insights page
+    navigate(`/insights/${id}`, {
+      state: { surveyData: survey }
+    });
+  };
+
   return (
     <section className="expand">
       <div className="expand_inner wrap">
@@ -146,12 +162,31 @@ const expandsurvey = () => {
         </div>
         <div className="flex btn_div">
           {isOwnSurvey ? (
-            <button 
-              className="start-btn btn"
-              onClick={handleActionClick}
-            >
-              {survey.published ? "View Insights" : "Edit Survey"}
-            </button>
+            <>
+              {survey.published ? (
+                <div className="published-buttons flex">
+                  <button 
+                    className="edit-btn btn"
+                    onClick={handleEditClick}
+                  >
+                    Edit Survey
+                  </button>
+                  <button 
+                    className="insights-btn btn"
+                    onClick={handleInsightsClick}
+                  >
+                    View Insights
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  className="start-btn btn"
+                  onClick={handleActionClick}
+                >
+                  Edit Survey
+                </button>
+              )}
+            </>
           ) : (
             <button 
               className="start-btn btn" 

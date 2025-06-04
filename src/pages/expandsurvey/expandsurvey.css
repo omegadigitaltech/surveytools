@@ -109,6 +109,44 @@
     cursor: pointer;
 }
 
+.published-buttons {
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.edit-btn, .insights-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.8em 1.2em;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.edit-btn {
+    background-color: #f8f9fa;
+    color: #0587FF;
+    border: 2px solid #0587FF;
+}
+
+.edit-btn:hover {
+    background-color: #0587FF;
+    color: white;
+}
+
+.insights-btn {
+    background-color: #0587FF;
+    color: white;
+    border: 2px solid #0587FF;
+}
+
+.insights-btn:hover {
+    background-color: #0471d9;
+    border-color: #0471d9;
+}
+
 @media (max-width: 512px) {
     .expand_inner .backaro{
         margin: 1.4rem 0;
@@ -119,6 +157,17 @@
 
     .expand_class img {
         width: 1.2rem;
+    }
+
+    .published-buttons {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .edit-btn, .insights-btn {
+        min-width: 100%;
+        padding: 0.7em 1em;
+        font-size: 0.9rem;
     }
 }
 
@@ -180,5 +229,16 @@
     .expand_class h4,
     p {
         font-size: .85rem;
+    }
+
+    .published-buttons {
+        flex-direction: column;
+        gap: 0.6rem;
+        width: 100%;
+    }
+
+    .edit-btn, .insights-btn {
+        font-size: 0.85rem;
+        padding: 0.6em 0.8em;
     }
 }
