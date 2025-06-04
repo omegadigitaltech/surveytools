@@ -103,6 +103,8 @@
 
 .btn_div {
     justify-content: center;
+    margin-top: 2rem;
+    animation: fadeInUp 0.6s ease-out;
 }
 
 .start-btn:hover {
@@ -110,9 +112,11 @@
 }
 
 .published-buttons {
-    gap: 1rem;
+    gap: 1.2rem;
     justify-content: center;
     flex-wrap: wrap;
+    width: 100%;
+    max-width: 500px;
 }
 
 .published-buttons-container {
@@ -120,61 +124,152 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 1.2rem;
+    padding: 1rem;
+    animation: fadeInUp 0.6s ease-out;
+    background: rgba(248, 249, 250, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin: 0 0.5rem;
 }
 
 .edit-btn, .insights-btn {
     flex: 1;
-    min-width: 120px;
-    padding: 0.8em 1.2em;
-    border-radius: 5px;
+    min-width: 140px;
+    max-width: 200px;
+    padding: 0.9em 1.5em;
+    border-radius: 8px;
     font-weight: 600;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: none;
+    position: relative;
+    overflow: hidden;
 }
 
 .edit-btn {
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     color: #0587FF;
     border: 2px solid #0587FF;
 }
 
 .edit-btn:hover {
-    background-color: #0587FF;
+    background: linear-gradient(135deg, #0587FF 0%, #0471d9 100%);
     color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(5, 135, 255, 0.3);
 }
 
 .insights-btn {
-    background-color: #0587FF;
+    background: linear-gradient(135deg, #0587FF 0%, #0471d9 100%);
     color: white;
     border: 2px solid #0587FF;
 }
 
 .insights-btn:hover {
-    background-color: #0471d9;
-    border-color: #0471d9;
+    background: linear-gradient(135deg, #0471d9 0%, #0356b8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(5, 135, 255, 0.4);
 }
 
 .unpublish-btn {
-    padding: 0.8em 1.5em;
-    border-radius: 5px;
+    animation: fadeInUp 0.6s ease-out 0.3s both;
+    padding: 0.9em 2em;
+    border-radius: 8px;
     font-weight: 600;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    background-color: #dc3545;
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
     color: white;
     border: 2px solid #dc3545;
-    min-width: 160px;
+    min-width: 180px;
+    max-width: 300px;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+    position: relative;
+    overflow: hidden;
 }
 
 .unpublish-btn:hover:not(:disabled) {
-    background-color: #c82333;
-    border-color: #c82333;
+    background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
 }
 
 .unpublish-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+}
+
+.start-btn {
+    padding: 0.9em 2em;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #0587FF 0%, #0471d9 100%);
+    color: white;
+    border: 2px solid #0587FF;
+    min-width: 160px;
+    box-shadow: 0 2px 8px rgba(5, 135, 255, 0.2);
+}
+
+.start-btn:hover {
+    background: linear-gradient(135deg, #0471d9 0%, #0356b8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(5, 135, 255, 0.3);
+}
+
+/* Add ripple effect for button interactions */
+.edit-btn::before,
+.insights-btn::before,
+.unpublish-btn::before,
+.start-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.edit-btn:active::before,
+.insights-btn:active::before,
+.unpublish-btn:active::before,
+.start-btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger animation for buttons inside published-buttons */
+.published-buttons .edit-btn {
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+.published-buttons .insights-btn {
+    animation: fadeInUp 0.6s ease-out 0.2s both;
 }
 
 @media (max-width: 512px) {
@@ -191,22 +286,34 @@
 
     .published-buttons {
         flex-direction: column;
-        gap: 0.8rem;
+        gap: 1rem;
+        max-width: 100%;
     }
 
     .published-buttons-container {
-        gap: 0.8rem;
+        gap: 1rem;
+        padding: 0.8rem;
+        margin: 0;
     }
 
     .edit-btn, .insights-btn {
         min-width: 100%;
-        padding: 0.7em 1em;
+        max-width: 100%;
+        padding: 0.8em 1.2em;
         font-size: 0.9rem;
     }
 
     .unpublish-btn {
         min-width: 100%;
-        padding: 0.7em 1em;
+        max-width: 100%;
+        padding: 0.8em 1.2em;
+        font-size: 0.9rem;
+    }
+
+    .start-btn {
+        min-width: 100%;
+        max-width: 280px;
+        padding: 0.8em 1.2em;
         font-size: 0.9rem;
     }
 }
@@ -273,23 +380,35 @@
 
     .published-buttons {
         flex-direction: column;
-        gap: 0.6rem;
+        gap: 0.8rem;
         width: 100%;
     }
 
     .published-buttons-container {
-        gap: 0.6rem;
+        gap: 1rem;
         width: 100%;
+        padding: 0.8rem;
+        margin: 0;
     }
 
     .edit-btn, .insights-btn {
         font-size: 0.85rem;
-        padding: 0.6em 0.8em;
+        padding: 0.7em 1em;
+        min-width: 100%;
+        max-width: 100%;
     }
 
     .unpublish-btn {
         font-size: 0.85rem;
-        padding: 0.6em 0.8em;
+        padding: 0.7em 1em;
         min-width: 100%;
+        max-width: 100%;
+    }
+
+    .start-btn {
+        font-size: 0.85rem;
+        padding: 0.7em 1em;
+        min-width: 100%;
+        max-width: 100%;
     }
 }
