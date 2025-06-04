@@ -70,15 +70,15 @@ const uploadQuestionnaire = async (req, res, next) => {
     }
     
     // Cannot add questions to a published survey
-    if (survey.published) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(400).json({
-        status: "failure",
-        code: 400,
-        msg: "Cannot add questions to a published survey"
-      });
-    }
+    // if (survey.published) {
+    //   await session.abortTransaction();
+    //   session.endSession();
+    //   return res.status(400).json({
+    //     status: "failure",
+    //     code: 400,
+    //     msg: "Cannot add questions to a published survey"
+    //   });
+    // }
 
     // Process document
     console.log(`Processing file: ${req.file.originalname} (${req.file.mimetype})`);

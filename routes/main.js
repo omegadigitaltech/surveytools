@@ -12,7 +12,8 @@ const { start, home,updateAnswer, submitAnswers, createSurvey,
   verifyPayment,
   uploadQuestionnaire,
   bulkAddOrUpdateQuestions,
-  exportSurveyData
+  exportSurveyData,
+  unpublishSurvey
  } = require('../controllers/main')
 
 
@@ -32,6 +33,7 @@ router.get('/surveys/:surveyId/max-participants',authMiddleware, checkSurveyMaxP
 router.get('/surveys',authMiddleware, getAllSurveys);
 router.get('/surveys/:surveyId/questions',authMiddleware, getSurveyQuestions);
 router.post('/surveys/:surveyId/publish',authMiddleware, publishSurvey);
+router.post('/surveys/:surveyId/unpublish', authMiddleware, unpublishSurvey);
 router.get('/surveys/:surveyId/analytics',authMiddleware, getSurveyAnalytics);
 router.get('/surveys/:surveyId/verify-payment', authMiddleware, verifyPayment);
 router.get('/surveys/:surveyId/export', authMiddleware, exportSurveyData);

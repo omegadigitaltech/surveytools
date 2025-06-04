@@ -571,13 +571,13 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
     }
     
     // Cannot add questions to a published survey
-    if (survey.published) {
-      return res.status(400).json({ 
-        status: "failure", 
-        code: 400, 
-        msg: "Cannot add questions to a published survey" 
-      });
-    }
+    // if (survey.published) {
+    //   return res.status(400).json({ 
+    //     status: "failure", 
+    //     code: 400, 
+    //     msg: "Cannot add questions to a published survey" 
+    //   });
+    // }
     
     // Process each question
     const results = {
@@ -944,6 +944,54 @@ const publishSurvey = async (req, res, next) => {
   }
 };
 
+const unpublishSurvey = async (req, res, next) => {
+  try {
+    const { surveyId } = req.params;
+    const survey = await Survey.findById(surveyId);
+    const user = await User.findOne({ id: req.userId });
+    
+    if (!survey) {
+      return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
+    }
+
+    if (!survey.user_id.equals(user._id)) {
+      return res.status(403).json({ status: "failure", code: 403, msg: 'User not authorized to unpublish this survey' });
+    }
+
+    // Check if survey is already unpublished
+    if (!survey.published) {
+      return res.status(400).json({ status: "failure", code: 400, msg: 'Survey is already unpublished' });
+    }
+
+    // Check if survey has any responses
+    // const hasResponses = survey.submittedUsers.length > 0;
+    // if (hasResponses) {
+    //   return res.status(400).json({ 
+    //     status: "failure", 
+    //     code: 400, 
+    //     msg: 'Cannot unpublish survey that already has responses. This would affect data integrity.' 
+    //   });
+    // }
+
+    // Unpublish the survey
+    survey.published = false;
+    survey.link = ''; // Clear the survey link
+    await survey.save();
+
+    res.status(200).json({ 
+      status: "success", 
+      code: 200, 
+      msg: 'Survey successfully unpublished',
+      survey: {
+        _id: survey._id,
+        title: survey.title,
+        published: survey.published
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 const getAllSurveys = async (req, res, next) => {
   try {
@@ -1520,5 +1568,6 @@ module.exports = {
   verifyPayment,
   uploadQuestionnaire,
   bulkAddOrUpdateQuestions,
-  exportSurveyData
+  exportSurveyData,
+  unpublishSurvey
 }
