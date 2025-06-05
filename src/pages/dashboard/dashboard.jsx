@@ -292,7 +292,7 @@ const Dashboard = () => {
                     </Link>
                   ))
                 ) : (
-                  <p className="no_result">Opps! Survey not found..</p>
+                  <p className="no_result">Please wait. Survey is loading...</p>
                 )
               ) : isLoading ? (
                 <div className="loader-container">
