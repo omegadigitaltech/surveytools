@@ -4,7 +4,7 @@ const config = {
   // API_URL: 'https://surveypro.onrender.com',
   API_URL: `https://api.surveyprotools.com`,
   // pk_live_e89e0ba144eaaa2dffdc6a6b117281ac5b67731c
-  PAYSTACK_PUBLIC_KEY: `pk_live_e89e0ba144eaaa2dffdc6a6b117281ac5b67731c`
+  PAYSTACK_PUBLIC_KEY: `pk_test_183d72c028ee376920f193555ea93ce89f2718d5`
 };
 
 export default config;
