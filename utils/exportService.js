@@ -81,6 +81,20 @@ const formatSurveyDataForGoogleStyleCsv = (survey, userMap = new Map()) => {
         responseValue = responseValue.join('; ');
       }
       
+      // Add additional input if it exists
+      if (answer.additionalInput && typeof answer.additionalInput === 'object') {
+        const additionalInputEntries = Object.entries(answer.additionalInput);
+        if (additionalInputEntries.length > 0) {
+          const additionalText = additionalInputEntries
+            .map(([option, input]) => `${option}: ${input}`)
+            .join('; ');
+          
+          responseValue = Array.isArray(answer.response) 
+            ? `${responseValue} [Additional: ${additionalText}]`
+            : `${responseValue} [Additional: ${additionalText}]`;
+        }
+      }
+      
       respondentsMap.get(respondentId).responses[question._id.toString()] = responseValue;
     });
   });

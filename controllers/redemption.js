@@ -169,8 +169,7 @@ const redeemAirtime = async (req, res) => {
         valueReceived: amount,
         status: "pending",
         transactionReference: transactionRef
-      }],
-      { session }
+      }]
     );
 
     // Deduct points from user within transaction

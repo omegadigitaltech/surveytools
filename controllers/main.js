@@ -155,6 +155,21 @@ const updateAnswer = async (req, res, next) => {
           session.endSession();
           return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be one of the provided options for multiple_choice question' });
         }
+        
+        // Check if selected option requires additional input
+        const { additionalInput } = req.body;
+        const selectedOption = question.options.find(opt => opt.text === response);
+        if (selectedOption && selectedOption.allowAdditionalInput) {
+          if (!additionalInput || !additionalInput[response]) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ 
+              status: "failure", 
+              code: 400, 
+              msg: `Additional input is required for option "${response}"` 
+            });
+          }
+        }
       } else if (question.questionType === 'multiple_selection') {
         // For multiple_selection, response must be an array of strings
         if (!Array.isArray(response) || response.length === 0) {
@@ -175,14 +190,35 @@ const updateAnswer = async (req, res, next) => {
             msg: `Response contains invalid options: ${invalidOptions.join(', ')}` 
           });
         }
+        
+        // Check if any selected options require additional input
+        for (const selectedOptionText of response) {
+          const selectedOption = question.options.find(opt => opt.text === selectedOptionText);
+          if (selectedOption && selectedOption.allowAdditionalInput) {
+            if (!additionalInput || !additionalInput[selectedOptionText]) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Additional input is required for option "${selectedOptionText}"` 
+              });
+            }
+          }
+        }
       }
-  
-  
+
       const existingAnswer = question.answers.find(a => a.userId.equals(user._id));
       if (existingAnswer) {
         existingAnswer.response = response;
+        existingAnswer.additionalInput = req.body.additionalInput || {};
       } else {
-        question.answers.push({ fullname: user.fullname, response, userId: user._id });
+        question.answers.push({ 
+          fullname: user.fullname, 
+          response, 
+          userId: user._id,
+          additionalInput: req.body.additionalInput || {}
+        });
       }
     }
 
@@ -314,6 +350,20 @@ const submitAnswers = async (req, res, next) => {
             session.endSession();
             return res.status(400).json({ status: "failure", code: 400, msg: `Response for question ${question._id} must be one of the provided options for multiple_choice question` });
           }
+          
+          // Check if selected option requires additional input
+          const selectedOption = question.options.find(opt => opt.text === answer.response);
+          if (selectedOption && selectedOption.allowAdditionalInput) {
+            if (!answer.additionalInput || !answer.additionalInput[answer.response]) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Additional input is required for option "${answer.response}" in question ${question._id}` 
+              });
+            }
+          }
         } else if (question.questionType === 'multiple_selection') {
           // For multiple_selection, response must be an array of strings
           if (!Array.isArray(answer.response) || answer.response.length === 0) {
@@ -334,13 +384,36 @@ const submitAnswers = async (req, res, next) => {
               msg: `Response for question ${question._id} contains invalid options: ${invalidOptions.join(', ')}` 
             });
           }
+          
+          // Check if any selected options require additional input
+          const { additionalInput } = req.body;
+          for (const selectedOptionText of answer.response) {
+            const selectedOption = question.options.find(opt => opt.text === selectedOptionText);
+            if (selectedOption && selectedOption.allowAdditionalInput) {
+              if (!additionalInput || !additionalInput[selectedOptionText]) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ 
+                  status: "failure", 
+                  code: 400, 
+                  msg: `Additional input is required for option "${selectedOptionText}" in question ${question._id}` 
+                });
+              }
+            }
+          }
         }
 
         const existingAnswer = question.answers.find(a => a.userId.equals(user._id));
         if (existingAnswer) {
           existingAnswer.response = answer.response;
+          existingAnswer.additionalInput = answer.additionalInput || {};
         } else {
-          question.answers.push({ fullname: user.fullname, response: answer.response, userId: user._id });
+          question.answers.push({ 
+            fullname: user.fullname, 
+            response: answer.response, 
+            userId: user._id,
+            additionalInput: answer.additionalInput || {}
+          });
         }
 
         question.analytics.totalResponses += 1;
@@ -491,9 +564,19 @@ const addOrUpdateQuestion = async (req, res, next) => {
     // Format `options` array if questionType is multiple_choice
     let formattedOptions = [];
     if ((questionType === 'multiple_choice' || questionType === 'multiple_selection') && Array.isArray(options)) {
-      formattedOptions = options.map(option => ({
-        text: option // Convert each option string to an object with `text` property
-      }));
+      formattedOptions = options.map(option => {
+        // Handle both string options and object options with additional input settings
+        if (typeof option === 'string') {
+          return { text: option };
+        } else if (typeof option === 'object' && option.text) {
+          return {
+            text: option.text,
+            allowAdditionalInput: option.allowAdditionalInput || false,
+            additionalInputPlaceholder: option.additionalInputPlaceholder || ''
+          };
+        }
+        return { text: option }; // Fallback
+      });
     }
 
   
@@ -633,9 +716,19 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
         // Format options for multiple-choice and multiple-selection questions
         let formattedOptions = [];
         if ((questionType === 'multiple_choice' || questionType === 'multiple_selection') && Array.isArray(options)) {
-          formattedOptions = options.map(option => ({
-            text: option // Convert each option string to an object with `text` property
-          }));
+          formattedOptions = options.map(option => {
+            // Handle both string options and object options with additional input settings
+            if (typeof option === 'string') {
+              return { text: option };
+            } else if (typeof option === 'object' && option.text) {
+              return {
+                text: option.text,
+                allowAdditionalInput: option.allowAdditionalInput || false,
+                additionalInputPlaceholder: option.additionalInputPlaceholder || ''
+              };
+            }
+            return { text: option }; // Fallback
+          });
         }
         
         // Find existing question or create new one

@@ -14,12 +14,19 @@ const answerSchema = new Schema({
     type: Schema.Types.Mixed, 
     required: [true, "Response field is required"],
     // Can be either a string (for single responses) or an array of strings (for multiple_selection)
+  },
+  additionalInput: { 
+    type: Schema.Types.Mixed, 
+    // Object storing additional text input for options that require it
+    // Format: { "optionText": "additional input text" }
   }
 });
 
 // Define the schema for survey options
 const optionSchema = new Schema({
-  text: { type: String,  required: [true, "Option text is required"]} 
+  text: { type: String,  required: [true, "Option text is required"]},
+  allowAdditionalInput: { type: Boolean, default: false }, // Whether this option allows additional text input
+  additionalInputPlaceholder: { type: String, default: '' } // Placeholder text for the additional input field
 });
 
 // Define the schema for survey questions
