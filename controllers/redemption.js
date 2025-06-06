@@ -223,6 +223,11 @@ const redeemAirtime = async (req, res) => {
       } else {
         // If API call failed, abort transaction (this automatically rolls back changes)
         await req.abortTransaction();
+        await RedemptionHistory.findByIdAndUpdate(
+          redemptionid,
+          { status: "failed", errorMessage: airtimeResponse.data || "Unknown error" },
+          { session }
+        );
 
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: false,
