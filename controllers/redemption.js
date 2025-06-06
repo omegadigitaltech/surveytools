@@ -265,6 +265,7 @@ const redeemAirtime = async (req, res) => {
 
 // Redeem points for data
 const redeemData = async (req, res) => {
+  let redemptionid;
   try {
     // Get session from the request object and start transaction
     const session = req.dbSession;
@@ -332,8 +333,7 @@ const redeemData = async (req, res) => {
     const transactionRef = `DATA${generateID_users(12)}`;
 
     // Create redemption record within transaction
-    const redemption = await RedemptionHistory.create(
-      [{
+    const redemption = await RedemptionHistory.create({
         userId,
         type: "data",
         network,
@@ -344,9 +344,9 @@ const redeemData = async (req, res) => {
         planId: selectedPlan.planid,
         status: "pending",
         transactionReference: transactionRef
-      }],
-      { session }
-    );
+    });
+    redemptionid = redemption._id;
+
 
     // Deduct points from user within transaction
     user.pointBalance -= pointsRequired;
@@ -376,9 +376,8 @@ const redeemData = async (req, res) => {
       if (dataResponse.data && dataResponse.status == 200 && dataResponse.data.status != false) {
         // Update redemption status to successful within transaction
         await RedemptionHistory.findByIdAndUpdate(
-          redemption[0]._id,
-          { status: "successful" },
-          { session }
+          redemptionid,
+          { status: "successful" }
         );
 
         // Commit the transaction
@@ -398,6 +397,10 @@ const redeemData = async (req, res) => {
       } else {
         // If API call failed, abort transaction
         await req.abortTransaction();
+        await RedemptionHistory.findByIdAndUpdate(
+          redemptionid,
+          { status: "failed", errorMessage: dataResponse.data || "Unknown error" }
+        );
 
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: false,
@@ -408,6 +411,11 @@ const redeemData = async (req, res) => {
     } catch (apiError) {
       // If API call throws an error, abort transaction
       await req.abortTransaction();
+      await RedemptionHistory.findByIdAndUpdate(
+        redemptionid,
+        { status: "failed", errorMessage: apiError.message }
+      );
+      
 
       console.error("API Error:", apiError);
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -419,6 +427,12 @@ const redeemData = async (req, res) => {
   } catch (error) {
     // If any error occurs, transaction will be aborted by middleware
     console.error("Error redeeming data plan:", error);
+    if (redemptionid) {
+      await RedemptionHistory.findByIdAndUpdate(
+        redemptionid,
+        { status: "failed", errorMessage: error.message }
+      );
+    }
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to redeem data plan",
