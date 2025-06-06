@@ -159,20 +159,18 @@ const redeemAirtime = async (req, res) => {
     // Generate transaction reference
     const transactionRef = `AIR${generateID_users(12)}`;
 
-    // Create redemption record within transaction
-    const redemption = await RedemptionHistory.create(
-      [{
-        userId,
-        type: "airtime",
-        network,
-        phoneNumber,
-        pointsRedeemed: pointsRequired,
-        valueReceived: amount,
-        status: "pending",
-        transactionReference: transactionRef
-      }]
-    );
-    redemptionid = redemption[0]._id;
+    // Create redemption record OUTSIDE transaction to persist even on failure
+    const redemption = await RedemptionHistory.create({
+      userId,
+      type: "airtime",
+      network,
+      phoneNumber,
+      pointsRedeemed: pointsRequired,
+      valueReceived: amount,
+      status: "pending",
+      transactionReference: transactionRef
+    });
+    redemptionid = redemption._id;
 
     // Deduct points from user within transaction
     user.pointBalance -= pointsRequired;
@@ -202,9 +200,8 @@ const redeemAirtime = async (req, res) => {
       if (airtimeResponse.data && airtimeResponse.status == 200 && airtimeResponse.data.status != false) {
         // Update redemption status to successful within transaction
         await RedemptionHistory.findByIdAndUpdate(
-          redemption[0]._id,
-          { status: "successful" },
-          { session }
+          redemptionid,
+          { status: "successful" }
         );
 
         // Commit the transaction
@@ -225,8 +222,7 @@ const redeemAirtime = async (req, res) => {
         await req.abortTransaction();
         await RedemptionHistory.findByIdAndUpdate(
           redemptionid,
-          { status: "failed", errorMessage: airtimeResponse.data || "Unknown error" },
-          { session }
+          { status: "failed", errorMessage: airtimeResponse.data || "Unknown error" }
         );
 
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -237,9 +233,8 @@ const redeemAirtime = async (req, res) => {
       }
     } catch (apiError) {
       await RedemptionHistory.findByIdAndUpdate(
-        redemption[0]._id,
-        { status: "failed", errorMessage: apiError },
-        { session }
+        redemptionid,
+        { status: "failed", errorMessage: apiError.message }
       );
       // If API call throws an error, abort transaction
       await req.abortTransaction();
@@ -252,14 +247,12 @@ const redeemAirtime = async (req, res) => {
       });
     }
   } catch (error) {
-
     // If any error occurs, transaction will be aborted by middleware
     console.error("Error redeeming airtime:", error);
     if (redemptionid) { 
       await RedemptionHistory.findByIdAndUpdate(
         redemptionid,
-        { status: "failed", errorMessage: error },
-        { session }
+        { status: "failed", errorMessage: error.message }
       );
     }
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
