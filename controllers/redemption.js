@@ -107,6 +107,7 @@ const getDataPlans = async () => {
 
 // Redeem points for airtime
 const redeemAirtime = async (req, res) => {
+  let redemptionid;
   try {
     // Get session from the request object and start transaction
     const session = req.dbSession;
@@ -171,6 +172,7 @@ const redeemAirtime = async (req, res) => {
         transactionReference: transactionRef
       }]
     );
+    redemptionid = redemption[0]._id;
 
     // Deduct points from user within transaction
     user.pointBalance -= pointsRequired;
@@ -229,6 +231,11 @@ const redeemAirtime = async (req, res) => {
         });
       }
     } catch (apiError) {
+      await RedemptionHistory.findByIdAndUpdate(
+        redemption[0]._id,
+        { status: "failed", errorMessage: apiError },
+        { session }
+      );
       // If API call throws an error, abort transaction
       await req.abortTransaction();
 
@@ -240,8 +247,16 @@ const redeemAirtime = async (req, res) => {
       });
     }
   } catch (error) {
+
     // If any error occurs, transaction will be aborted by middleware
     console.error("Error redeeming airtime:", error);
+    if (redemptionid) { 
+      await RedemptionHistory.findByIdAndUpdate(
+        redemptionid,
+        { status: "failed", errorMessage: error },
+        { session }
+      );
+    }
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to redeem airtime",

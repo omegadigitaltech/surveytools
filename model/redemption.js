@@ -41,6 +41,9 @@ const RedemptionHistorySchema = new Schema(
       enum: ["pending", "successful", "failed"],
       default: "pending",
     },
+    errorMessage: {
+      type: mongoose.Schema.Types.Mixed,
+    },
     transactionReference: {
       type: String,
     }
