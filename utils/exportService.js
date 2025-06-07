@@ -97,12 +97,30 @@ const formatSurveyDataForGoogleStyleCsv = (survey, userMap = new Map()) => {
   const headers = ['Timestamp'];
   const questions = [];
   
+  // Count duplicate question texts first
+  const questionCounts = {};
+  survey.questions.forEach(q => {
+    questionCounts[q.questionText] = (questionCounts[q.questionText] || 0) + 1;
+  });
+  
+  // Keep track of how many times we've seen each question text
+  const questionTextIndexes = {};
+  
   // Add all questions to the headers
-  survey.questions.forEach(question => {
-    headers.push(question.questionText);
+  survey.questions.forEach((question, index) => {
+    let headerText = question.questionText;
+    
+    // If there are duplicates, make the header unique
+    if (questionCounts[question.questionText] > 1) {
+      const currentIndex = (questionTextIndexes[question.questionText] || 0) + 1;
+      questionTextIndexes[question.questionText] = currentIndex;
+      headerText = `${question.questionText} (Q${index + 1})`;
+    }
+    
+    headers.push(headerText);
     questions.push({
       id: question._id.toString(),
-      text: question.questionText,
+      text: headerText,
       type: question.questionType
     });
   });
