@@ -43,10 +43,9 @@ const Insights = () => {
 
         setSurveyData(data.survey);
         
-        // Extract individual responses from the survey data instead of making separate API call
-        if (data.survey.individualResponses) {
-          setIndividualResponses(data.survey.individualResponses);
-        }
+        // Transform question answers into individual user responses
+        const userResponses = transformToIndividualResponses(data.survey);
+        setIndividualResponses(userResponses);
       } catch (error) {
         toast.error(error.message || "Error fetching insights");
       } finally {
@@ -56,6 +55,36 @@ const Insights = () => {
 
     fetchSurveyInsights();
   }, [id, authToken]);
+
+  // Function to transform question answers into individual user responses
+  const transformToIndividualResponses = (survey) => {
+    const userResponsesMap = new Map();
+
+    // Iterate through all questions and their answers
+    survey.questions.forEach(question => {
+      question.answers?.forEach(answer => {
+        const userId = answer.userId;
+        
+        // Initialize user response if not exists
+        if (!userResponsesMap.has(userId)) {
+          userResponsesMap.set(userId, {
+            userId: userId,
+            answers: [],
+            submittedAt: new Date() // We don't have submission time in this structure
+          });
+        }
+
+        // Add this question's answer to the user's response
+        userResponsesMap.get(userId).answers.push({
+          questionId: question._id,
+          response: answer.response,
+          _id: answer._id
+        });
+      });
+    });
+
+    return Array.from(userResponsesMap.values());
+  };
 
   const toggleAcceptingResponses = async () => {
     try {
@@ -308,7 +337,7 @@ const Insights = () => {
 
             {/* Quick Question Summary */}
             <div className="questions-summary">
-              <h3>Questions Overview test</h3>
+              <h3>Questions Overview</h3>
               <div className="questions-grid">
                 {surveyData.questions.map((question, index) => (
                   <div key={question._id} className="question-summary-card" onClick={() => {
@@ -511,7 +540,7 @@ const Insights = () => {
                     >
                       {individualResponses.map((response, idx) => (
                         <option key={idx} value={idx}>
-                          {response.userEmail || `Response ${idx + 1}`}
+                          {`Response ${idx + 1}`}
                         </option>
                       ))}
                     </select>
@@ -539,7 +568,7 @@ const Insights = () => {
 
                 <div className="response-detail">
                   <div className="response-header">
-                    <h3>{currentResponse?.userEmail || `Response ${currentResponseIndex + 1}`}</h3>
+                    <h3>{`Response ${currentResponseIndex + 1}`}</h3>
                     <p className="submission-time">
                       Submitted: {new Date(currentResponse?.submittedAt).toLocaleString()}
                     </p>
