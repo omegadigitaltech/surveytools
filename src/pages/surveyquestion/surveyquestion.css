@@ -338,3 +338,31 @@
         font-size: .8rem;
     }
 }
+
+.wrap-icon {
+    align-items: center;
+    margin-bottom: 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+}
+
+.custom-input-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.3rem;
+}
+
+.custom-input-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #0587FF;
+}
+
+.checkbox-label {
+    user-select: none;
+    cursor: pointer;
+}

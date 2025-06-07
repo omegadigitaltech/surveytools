@@ -85,6 +85,33 @@ input[type="checkbox"].tick-ans:checked {
     margin-bottom: 1rem;
 }
 
+.option-with-input {
+    margin-bottom: 0.8rem;
+}
+
+.custom-input-field {
+    width: 100%;
+    padding: 0.5rem 0.8rem;
+    margin-top: 0.5rem;
+    margin-left: 2rem;
+    border: 2px solid #e1e5e9;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.custom-input-field:focus {
+    outline: none;
+    border-color: #0587FF;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(5, 135, 255, 0.1);
+}
+
+.custom-input-field::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
 
 /* MEDIA QUERY */
 @media(max-width: 550px) {

@@ -1,9 +1,9 @@
-name: Deploy to Production
+name: Deploy to Staging
 
 on:
   push:
     branches:
-      - main  # Change this to your main branch name (e.g., master)
+      - frontend-staging  # Change this to your main branch name (e.g., master)
 
 jobs:
   deploy:
@@ -29,8 +29,8 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:latest
           build-args: |
-            VITE_API_URL=${{ secrets.PRODUCTION_API_URL }}
-            VITE_PAYSTACK_PUBLIC_KEY=${{ secrets.PRODUCTION_PAYSTACK_PUBLIC_KEY }}
+            VITE_API_URL=${{ secrets.STAGING_API_URL }}
+            VITE_PAYSTACK_PUBLIC_KEY=${{ secrets.STAGING_PAYSTACK_PUBLIC_KEY }}
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
@@ -43,12 +43,12 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:latest
             
             # Stop and remove the current container if it exists
-            docker stop surveytools-frontend || true
-            docker rm surveytools-frontend || true
+            docker stop surveytools-frontend-staging || true
+            docker rm surveytools-frontend-staging || true
             
             # Run the new container
-            docker run -d --name surveytools-frontend \
-              -p 3000:80 \
+            docker run -d --name surveytools-frontend-staging \
+              -p 3005:80 \
               --restart unless-stopped \
               ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:latest
               
