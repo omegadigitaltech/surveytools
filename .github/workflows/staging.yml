@@ -1,0 +1,53 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - frontend-staging  # Change this to your main branch name (e.g., master)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:latest
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            # Pull the latest image
+            docker pull ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:latest
+            
+            # Stop and remove the current container if it exists
+            docker stop surveytools-frontend-staging || true
+            docker rm surveytools-frontend-staging || true
+            
+            # Run the new container
+            docker run -d --name surveytools-frontend-staging \
+              -p 3005:80 \
+              --restart unless-stopped \
+              ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:latest
+              
+            # Clean up unused images
+            docker image prune -af 

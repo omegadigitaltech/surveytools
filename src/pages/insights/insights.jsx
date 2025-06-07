@@ -325,13 +325,30 @@ const Insights = () => {
                   <h4>Response Distribution</h4>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart 
-                      data={currentQuestion.options.map(opt => ({
-                        option: opt.text,
-                        responses: currentQuestion.answers?.filter(a => a.response === opt.text).length || 0,
-                        percentage: surveyData.participantCounts.filled 
-                          ? ((currentQuestion.answers?.filter(a => a.response === opt.text).length || 0) / surveyData.participantCounts.filled * 100).toFixed(1) 
-                          : 0
-                      }))}
+                      data={currentQuestion.options.map(opt => {
+                        const optionText = typeof opt === 'string' ? opt : opt.text;
+                        return {
+                          option: optionText,
+                          responses: currentQuestion.answers?.filter(a => {
+                            if (typeof a.response === 'string') {
+                              return a.response === optionText;
+                            } else if (typeof a.response === 'object' && a.response.selectedOption) {
+                              return a.response.selectedOption === optionText;
+                            }
+                            return false;
+                          }).length || 0,
+                          percentage: surveyData.participantCounts.filled 
+                            ? ((currentQuestion.answers?.filter(a => {
+                                if (typeof a.response === 'string') {
+                                  return a.response === optionText;
+                                } else if (typeof a.response === 'object' && a.response.selectedOption) {
+                                  return a.response.selectedOption === optionText;
+                                }
+                                return false;
+                              }).length || 0) / surveyData.participantCounts.filled * 100).toFixed(1) 
+                            : 0
+                        };
+                      })}
                       margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
@@ -380,25 +397,41 @@ const Insights = () => {
                   <h4>Response Distribution (Multiple Selection)</h4>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart 
-                      data={currentQuestion.options.map(opt => ({
-                        option: opt.text,
-                        responses: currentQuestion.answers?.reduce((count, answer) => {
-                          // If response is an array (multiple selection)
-                          if (Array.isArray(answer.response)) {
-                            return count + (answer.response.includes(opt.text) ? 1 : 0);
-                          }
-                          // Fallback in case response is stored as string
-                          return count + (answer.response === opt.text ? 1 : 0);
-                        }, 0) || 0,
-                        percentage: surveyData.participantCounts.filled 
-                          ? ((currentQuestion.answers?.reduce((count, answer) => {
-                              if (Array.isArray(answer.response)) {
-                                return count + (answer.response.includes(opt.text) ? 1 : 0);
-                              }
-                              return count + (answer.response === opt.text ? 1 : 0);
-                            }, 0) || 0) / surveyData.participantCounts.filled * 100).toFixed(1)
-                          : 0
-                      }))}
+                      data={currentQuestion.options.map(opt => {
+                        const optionText = typeof opt === 'string' ? opt : opt.text;
+                        return {
+                          option: optionText,
+                          responses: currentQuestion.answers?.reduce((count, answer) => {
+                            // If response is an array (multiple selection)
+                            if (Array.isArray(answer.response)) {
+                              return count + answer.response.filter(item => {
+                                if (typeof item === 'string') {
+                                  return item === optionText;
+                                } else if (typeof item === 'object' && item.selectedOption) {
+                                  return item.selectedOption === optionText;
+                                }
+                                return false;
+                              }).length;
+                            }
+                            return count;
+                          }, 0) || 0,
+                          percentage: surveyData.participantCounts.filled 
+                            ? ((currentQuestion.answers?.reduce((count, answer) => {
+                                if (Array.isArray(answer.response)) {
+                                  return count + answer.response.filter(item => {
+                                    if (typeof item === 'string') {
+                                      return item === optionText;
+                                    } else if (typeof item === 'object' && item.selectedOption) {
+                                      return item.selectedOption === optionText;
+                                    }
+                                    return false;
+                                  }).length;
+                                }
+                                return count;
+                              }, 0) || 0) / surveyData.participantCounts.filled * 100).toFixed(1)
+                            : 0
+                        };
+                      })}
                       margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
@@ -496,8 +529,15 @@ const Insights = () => {
                                 {question.questionType === 'five_point' 
                                   ? `${answer.response} / 5` 
                                   : question.questionType === 'multiple_selection' && Array.isArray(answer.response)
-                                    ? answer.response.join(', ')
-                                    : answer.response}
+                                    ? answer.response.map(item => {
+                                        if (typeof item === 'object' && item.selectedOption && item.customInput) {
+                                          return `${item.selectedOption}: ${item.customInput}`;
+                                        }
+                                        return typeof item === 'string' ? item : item.selectedOption || item;
+                                      }).join(', ')
+                                    : typeof answer.response === 'object' && answer.response.selectedOption && answer.response.customInput
+                                      ? `${answer.response.selectedOption}: ${answer.response.customInput}`
+                                      : answer.response}
                               </p>
                             ) : (
                               <p className="no-answer">No answer provided</p>

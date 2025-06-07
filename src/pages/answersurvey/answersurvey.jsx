@@ -22,6 +22,7 @@ const answerSurvey = () => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState({});
+  const [customInputs, setCustomInputs] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
@@ -60,7 +61,14 @@ const answerSurvey = () => {
     }));
   };
 
-  const handleMultipleSelectionChange = (questionId, optionValue, isChecked) => {
+  const handleCustomInputChange = (questionId, optionText, customValue) => {
+    setCustomInputs((prev) => ({
+      ...prev,
+      [`${questionId}_${optionText}`]: customValue,
+    }));
+  };
+
+  const handleMultipleSelectionChange = (questionId, optionValue, isChecked, allowsCustomInput = false) => {
     setAnswers((prevAnswers) => {
       // Get the current array of selected options or initialize empty array
       const currentSelections = Array.isArray(prevAnswers[questionId]) 
@@ -69,17 +77,83 @@ const answerSurvey = () => {
       
       // Add or remove the option based on checkbox state
       if (isChecked) {
-        return {
-          ...prevAnswers,
-          [questionId]: [...currentSelections, optionValue]
-        };
+        if (allowsCustomInput) {
+          // For options that allow custom input, we'll handle this in the submit function
+          return {
+            ...prevAnswers,
+            [questionId]: [...currentSelections, optionValue]
+          };
+        } else {
+          return {
+            ...prevAnswers,
+            [questionId]: [...currentSelections, optionValue]
+          };
+        }
       } else {
+        // Remove the option and clear any associated custom input
+        if (allowsCustomInput) {
+          setCustomInputs((prev) => {
+            const newInputs = { ...prev };
+            delete newInputs[`${questionId}_${optionValue}`];
+            return newInputs;
+          });
+        }
         return {
           ...prevAnswers,
-          [questionId]: currentSelections.filter(option => option !== optionValue)
+          [questionId]: currentSelections.filter(option => {
+            if (typeof option === 'string') {
+              return option !== optionValue;
+            } else {
+              return option.selectedOption !== optionValue;
+            }
+          })
         };
       }
     });
+  };
+
+  const formatAnswerForSubmission = (questionId, answer, question) => {
+    if (question.questionType === "multiple_selection" && Array.isArray(answer)) {
+      return answer.map(item => {
+        if (typeof item === 'string') {
+          // Check if this option allows custom input
+          const option = question.options.find(opt => 
+            (typeof opt === 'string' ? opt : opt.text) === item
+          );
+          const allowsCustomInput = typeof option === 'object' && option.allowsCustomInput;
+          
+          if (allowsCustomInput) {
+            const customInput = customInputs[`${questionId}_${item}`];
+            if (customInput) {
+              return {
+                selectedOption: item,
+                customInput: customInput
+              };
+            }
+          }
+          return item;
+        }
+        return item;
+      });
+    } else if (typeof answer === 'string') {
+      // Check if this is a single choice with custom input
+      const option = question.options.find(opt => 
+        (typeof opt === 'string' ? opt : opt.text) === answer
+      );
+      const allowsCustomInput = typeof option === 'object' && option.allowsCustomInput;
+      
+      if (allowsCustomInput) {
+        const customInput = customInputs[`${questionId}_${answer}`];
+        if (customInput) {
+          return {
+            selectedOption: answer,
+            customInput: customInput
+          };
+        }
+      }
+      return answer;
+    }
+    return answer;
   };
 
   const handleSubmit = async (e) => {
@@ -94,13 +168,51 @@ const answerSurvey = () => {
       toast.error("Please select at least one option for all required multiple selection questions");
       return;
     }
+
+    // Validate custom inputs
+    const missingCustomInputs = questions.some(question => {
+      const answer = answers[question._id];
+      if (!answer) return false;
+
+      // Check single choice questions
+      if (question.questionType === "multiple_choice") {
+        const option = question.options.find(opt => 
+          (typeof opt === 'string' ? opt : opt.text) === answer
+        );
+        if (typeof option === 'object' && option.allowsCustomInput) {
+          const customInput = customInputs[`${question._id}_${answer}`];
+          return !customInput || customInput.trim() === '';
+        }
+      }
+
+      // Check multiple selection questions
+      if (question.questionType === "multiple_selection" && Array.isArray(answer)) {
+        return answer.some(selectedOption => {
+          const option = question.options.find(opt => 
+            (typeof opt === 'string' ? opt : opt.text) === selectedOption
+          );
+          if (typeof option === 'object' && option.allowsCustomInput) {
+            const customInput = customInputs[`${question._id}_${selectedOption}`];
+            return !customInput || customInput.trim() === '';
+          }
+          return false;
+        });
+      }
+
+      return false;
+    });
+
+    if (missingCustomInputs) {
+      toast.error("Please provide custom input for all selected options that require it");
+      return;
+    }
     
     setSubmitting(true); // Set submitting state to true
 
     const answerArray = Object.entries(answers).map(
       ([questionId, response]) => ({
         questionId,
-        response,
+        response: formatAnswerForSubmission(questionId, response, questions.find(q => q._id === questionId)),
       })
     );
     console.log(answerArray[-2], answerArray[-1]);
@@ -180,40 +292,84 @@ const answerSurvey = () => {
                     <span>{index + 1}.</span> {question.questionText}
                   </p>
                   {question.questionType === "multiple_choice" ? (
-                    question.options.map((option, optIndex) => (
-                      <label key={optIndex} className="answer-ques-opt">
-                        <input
-                          type="radio"
-                          className="tick-ans"
-                          name={`question-${question._id}`}
-                          value={option.text}
-                          onChange={(e) =>
-                            handleAnswerChange(question._id, e.target.value)
-                          }
-                          required={question.required}
-                        />
-                        {option.text}
-                      </label>
-                    ))
+                    question.options.map((option, optIndex) => {
+                      const optionText = typeof option === 'string' ? option : option.text;
+                      const allowsCustomInput = typeof option === 'object' && option.allowsCustomInput;
+                      const isSelected = answers[question._id] === optionText;
+                      
+                      return (
+                        <div key={optIndex} className="option-with-input">
+                          <label className="answer-ques-opt">
+                            <input
+                              type="radio"
+                              className="tick-ans"
+                              name={`question-${question._id}`}
+                              value={optionText}
+                              onChange={(e) => {
+                                handleAnswerChange(question._id, e.target.value);
+                                // Clear custom input if switching away from this option
+                                if (!e.target.checked && allowsCustomInput) {
+                                  handleCustomInputChange(question._id, optionText, '');
+                                }
+                              }}
+                              required={question.required}
+                            />
+                            {optionText}
+                          </label>
+                          {allowsCustomInput && isSelected && (
+                            <input
+                              type="text"
+                              className="custom-input-field"
+                              placeholder="Please specify..."
+                              value={customInputs[`${question._id}_${optionText}`] || ''}
+                              onChange={(e) => handleCustomInputChange(question._id, optionText, e.target.value)}
+                              required
+                            />
+                          )}
+                        </div>
+                      );
+                    })
                   ) : question.questionType === "multiple_selection" ? (
-                    question.options.map((option, optIndex) => (
-                      <label key={optIndex} className="answer-ques-opt">
-                        <input
-                          type="checkbox"
-                          className="tick-ans"
-                          name={`question-${question._id}-option-${optIndex}`}
-                          value={option.text}
-                          onChange={(e) =>
-                            handleMultipleSelectionChange(
-                              question._id, 
-                              e.target.value, 
-                              e.target.checked
-                            )
-                          }
-                        />
-                        {option.text}
-                      </label>
-                    ))
+                    question.options.map((option, optIndex) => {
+                      const optionText = typeof option === 'string' ? option : option.text;
+                      const allowsCustomInput = typeof option === 'object' && option.allowsCustomInput;
+                      const isSelected = Array.isArray(answers[question._id]) && 
+                        answers[question._id].some(item => 
+                          typeof item === 'string' ? item === optionText : item.selectedOption === optionText
+                        );
+                      
+                      return (
+                        <div key={optIndex} className="option-with-input">
+                          <label className="answer-ques-opt">
+                            <input
+                              type="checkbox"
+                              className="tick-ans"
+                              name={`question-${question._id}-option-${optIndex}`}
+                              value={optionText}
+                              onChange={(e) =>
+                                handleMultipleSelectionChange(
+                                  question._id, 
+                                  e.target.value, 
+                                  e.target.checked,
+                                  allowsCustomInput
+                                )
+                              }
+                            />
+                            {optionText}
+                          </label>
+                          {allowsCustomInput && isSelected && (
+                            <input
+                              type="text"
+                              className="custom-input-field"
+                              placeholder="Please specify..."
+                              value={customInputs[`${question._id}_${optionText}`] || ''}
+                              onChange={(e) => handleCustomInputChange(question._id, optionText, e.target.value)}
+                              required
+                            />
+                          )}
+                        </div>
+                      );
+                    })
                   ) : question.questionType === "five_point" ? (
                     <div className="five-point-group">
                       {[1, 2, 3, 4, 5].map((n) => (
