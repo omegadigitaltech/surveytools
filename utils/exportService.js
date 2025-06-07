@@ -157,29 +157,55 @@ const formatSurveyDataForCsv = (survey, userMap = new Map()) => {
         distribution[option.text] = 0;
       });
       
-      // Count responses for each option
-      question.answers.forEach(answer => {
-        if (answer.response) {
-          let responseKey;
-          
-          // Handle responses with custom input
-          if (typeof answer.response === 'object' && answer.response.selectedOption) {
-            responseKey = answer.response.selectedOption;
-          } else {
-            responseKey = answer.response;
+      // Get distribution from question analytics if available
+      if (question.analytics && question.analytics.distribution) {
+        // Handle Map object (from database)
+        if (question.analytics.distribution instanceof Map) {
+          for (let [key, value] of question.analytics.distribution) {
+            // Find the original option text that matches the sanitized key
+            const originalOptionText = question.options.find(opt => 
+              opt.text.replace(/\./g, '_').replace(/\$/g, '_') === key.replace(/\./g, '_').replace(/\$/g, '_')
+            )?.text || key;
+            
+            if (distribution[originalOptionText] !== undefined) {
+              distribution[originalOptionText] = value;
+            }
           }
-          
-          // The stored keys might have dots replaced with underscores, 
-          // but we want to display the original option text
-          const originalOptionText = question.options.find(opt => 
-            opt.text.replace(/\./g, '_').replace(/\$/g, '_') === responseKey.replace(/\./g, '_').replace(/\$/g, '_')
-          )?.text || responseKey;
-          
-          if (distribution[originalOptionText] !== undefined) {
-            distribution[originalOptionText]++;
-          }
+        } else if (typeof question.analytics.distribution === 'object') {
+          // Handle plain object
+          Object.entries(question.analytics.distribution).forEach(([key, value]) => {
+            // Find the original option text that matches the sanitized key
+            const originalOptionText = question.options.find(opt => 
+              opt.text.replace(/\./g, '_').replace(/\$/g, '_') === key.replace(/\./g, '_').replace(/\$/g, '_')
+            )?.text || key;
+            
+            if (distribution[originalOptionText] !== undefined) {
+              distribution[originalOptionText] = value;
+            }
+          });
         }
-      });
+      }
+      
+      // If distribution is still empty, calculate it from answers
+      const hasDistributionData = Object.values(distribution).some(count => count > 0);
+      if (!hasDistributionData && question.answers.length > 0) {
+        question.answers.forEach(answer => {
+          if (answer.response) {
+            let responseKey;
+            
+            // Handle responses with custom input
+            if (typeof answer.response === 'object' && answer.response.selectedOption) {
+              responseKey = answer.response.selectedOption;
+            } else {
+              responseKey = answer.response;
+            }
+            
+            if (distribution[responseKey] !== undefined) {
+              distribution[responseKey]++;
+            }
+          }
+        });
+      }
       
       analytics.distribution = distribution;
       
@@ -200,30 +226,57 @@ const formatSurveyDataForCsv = (survey, userMap = new Map()) => {
         distribution[option.text] = 0;
       });
       
-      // Count selections for each option
-      question.answers.forEach(answer => {
-        if (Array.isArray(answer.response)) {
-          answer.response.forEach(selected => {
-            let responseKey;
-            
-            // Handle responses with custom input
-            if (typeof selected === 'object' && selected.selectedOption) {
-              responseKey = selected.selectedOption;
-            } else {
-              responseKey = selected;
-            }
-            
+      // Get distribution from question analytics if available
+      if (question.analytics && question.analytics.distribution) {
+        // Handle Map object (from database)
+        if (question.analytics.distribution instanceof Map) {
+          for (let [key, value] of question.analytics.distribution) {
             // Find the original option text that matches the sanitized key
             const originalOptionText = question.options.find(opt => 
-              opt.text.replace(/\./g, '_').replace(/\$/g, '_') === responseKey.replace(/\./g, '_').replace(/\$/g, '_')
-            )?.text || responseKey;
+              opt.text.replace(/\./g, '_').replace(/\$/g, '_') === key.replace(/\./g, '_').replace(/\$/g, '_')
+            )?.text || key;
             
             if (distribution[originalOptionText] !== undefined) {
-              distribution[originalOptionText]++;
+              distribution[originalOptionText] = value;
+            }
+          }
+        } else if (typeof question.analytics.distribution === 'object') {
+          // Handle plain object
+          Object.entries(question.analytics.distribution).forEach(([key, value]) => {
+            // Find the original option text that matches the sanitized key
+            const originalOptionText = question.options.find(opt => 
+              opt.text.replace(/\./g, '_').replace(/\$/g, '_') === key.replace(/\./g, '_').replace(/\$/g, '_')
+            )?.text || key;
+            
+            if (distribution[originalOptionText] !== undefined) {
+              distribution[originalOptionText] = value;
             }
           });
         }
-      });
+      }
+      
+      // If distribution is still empty, calculate it from answers
+      const hasDistributionData = Object.values(distribution).some(count => count > 0);
+      if (!hasDistributionData && question.answers.length > 0) {
+        question.answers.forEach(answer => {
+          if (Array.isArray(answer.response)) {
+            answer.response.forEach(selected => {
+              let responseKey;
+              
+              // Handle responses with custom input
+              if (typeof selected === 'object' && selected.selectedOption) {
+                responseKey = selected.selectedOption;
+              } else {
+                responseKey = selected;
+              }
+              
+              if (distribution[responseKey] !== undefined) {
+                distribution[responseKey]++;
+              }
+            });
+          }
+        });
+      }
       
       analytics.distribution = distribution;
       
@@ -245,13 +298,51 @@ const formatSurveyDataForCsv = (survey, userMap = new Map()) => {
       });
       analytics.averageRating = question.answers.length ? (sum / question.answers.length).toFixed(2) : 0;
       
-      // Distribution of ratings
+      // Distribution of ratings - handle both Map and plain object formats
       const distribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
-      question.answers.forEach(answer => {
-        distribution[answer.response]++;
-      });
+      
+      // Get distribution from question analytics if available
+      if (question.analytics && question.analytics.distribution) {
+        // Handle Map object (from database)
+        if (question.analytics.distribution instanceof Map) {
+          for (let [key, value] of question.analytics.distribution) {
+            if (distribution[key] !== undefined) {
+              distribution[key] = value;
+            }
+          }
+        } else if (typeof question.analytics.distribution === 'object') {
+          // Handle plain object
+          Object.entries(question.analytics.distribution).forEach(([key, value]) => {
+            if (distribution[key] !== undefined) {
+              distribution[key] = value;
+            }
+          });
+        }
+      }
+      
+      // If distribution is still empty, calculate it from answers
+      const hasDistributionData = Object.values(distribution).some(count => count > 0);
+      if (!hasDistributionData && question.answers.length > 0) {
+        question.answers.forEach(answer => {
+          const rating = String(answer.response);
+          if (distribution[rating] !== undefined) {
+            distribution[rating]++;
+          }
+        });
+      }
+      
       analytics.distribution = distribution;
       
+      // Find most common rating
+      let maxCount = 0;
+      let mostCommon = null;
+      Object.entries(distribution).forEach(([rating, count]) => {
+        if (count > maxCount) {
+          maxCount = count;
+          mostCommon = rating;
+        }
+      });
+      analytics.mostCommonResponse = mostCommon;
     } else if (question.questionType === 'fill_in') {
       // For fill_in questions, we just list all the responses
       analytics.responses = question.answers.map(answer => ({
