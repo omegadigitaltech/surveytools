@@ -76,9 +76,17 @@ const formatSurveyDataForGoogleStyleCsv = (survey, userMap = new Map()) => {
       // Store the response for this question, handling multiple_selection specially
       let responseValue = answer.response;
       
-      // If this is a multiple_selection question with array response, join with semicolons
-      if (question.questionType === 'multiple_selection' && Array.isArray(responseValue)) {
-        responseValue = responseValue.join('; ');
+      // Handle responses with custom input
+      if (typeof responseValue === 'object' && responseValue.selectedOption && responseValue.customInput) {
+        responseValue = `${responseValue.selectedOption}: ${responseValue.customInput}`;
+      } else if (question.questionType === 'multiple_selection' && Array.isArray(responseValue)) {
+        // Handle multiple_selection responses that might contain custom input
+        responseValue = responseValue.map(item => {
+          if (typeof item === 'object' && item.selectedOption && item.customInput) {
+            return `${item.selectedOption}: ${item.customInput}`;
+          }
+          return item;
+        }).join('; ');
       }
       
       respondentsMap.get(respondentId).responses[question._id.toString()] = responseValue;
@@ -152,11 +160,20 @@ const formatSurveyDataForCsv = (survey, userMap = new Map()) => {
       // Count responses for each option
       question.answers.forEach(answer => {
         if (answer.response) {
+          let responseKey;
+          
+          // Handle responses with custom input
+          if (typeof answer.response === 'object' && answer.response.selectedOption) {
+            responseKey = answer.response.selectedOption;
+          } else {
+            responseKey = answer.response;
+          }
+          
           // The stored keys might have dots replaced with underscores, 
           // but we want to display the original option text
           const originalOptionText = question.options.find(opt => 
-            opt.text.replace(/\./g, '_').replace(/\$/g, '_') === answer.response.replace(/\./g, '_').replace(/\$/g, '_')
-          )?.text || answer.response;
+            opt.text.replace(/\./g, '_').replace(/\$/g, '_') === responseKey.replace(/\./g, '_').replace(/\$/g, '_')
+          )?.text || responseKey;
           
           if (distribution[originalOptionText] !== undefined) {
             distribution[originalOptionText]++;
@@ -187,10 +204,19 @@ const formatSurveyDataForCsv = (survey, userMap = new Map()) => {
       question.answers.forEach(answer => {
         if (Array.isArray(answer.response)) {
           answer.response.forEach(selected => {
+            let responseKey;
+            
+            // Handle responses with custom input
+            if (typeof selected === 'object' && selected.selectedOption) {
+              responseKey = selected.selectedOption;
+            } else {
+              responseKey = selected;
+            }
+            
             // Find the original option text that matches the sanitized key
             const originalOptionText = question.options.find(opt => 
-              opt.text.replace(/\./g, '_').replace(/\$/g, '_') === selected.replace(/\./g, '_').replace(/\$/g, '_')
-            )?.text || selected;
+              opt.text.replace(/\./g, '_').replace(/\$/g, '_') === responseKey.replace(/\./g, '_').replace(/\$/g, '_')
+            )?.text || responseKey;
             
             if (distribution[originalOptionText] !== undefined) {
               distribution[originalOptionText]++;
