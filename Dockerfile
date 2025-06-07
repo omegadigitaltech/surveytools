@@ -1,6 +1,14 @@
 # Stage 1: Build the application
 FROM node:18-alpine as build
 
+# Build arguments for environment variables
+ARG VITE_API_URL
+ARG VITE_PAYSTACK_PUBLIC_KEY
+
+# Set environment variables from build args
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_PAYSTACK_PUBLIC_KEY=$VITE_PAYSTACK_PUBLIC_KEY
+
 WORKDIR /app
 
 # Copy package.json and package-lock.json
@@ -26,7 +34,6 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 80
 EXPOSE 80
-
 
 # Start Nginx server
 CMD ["nginx", "-g", "daemon off;"] 

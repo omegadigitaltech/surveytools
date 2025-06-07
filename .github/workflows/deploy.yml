@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy to Production
 
 on:
   push:
@@ -28,6 +28,9 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:latest
+          build-args: |
+            VITE_API_URL=${{ secrets.PRODUCTION_API_URL }}
+            VITE_PAYSTACK_PUBLIC_KEY=${{ secrets.PRODUCTION_PAYSTACK_PUBLIC_KEY }}
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
