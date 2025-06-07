@@ -1589,6 +1589,16 @@ const receivePaymentWebhook = async (req, res) => {
           const amountInNaira = Number(amount) / 100; // Convert amount to naira
           if ( amountInNaira !== decoded.price) {
             console.log("Invalid plan or amount")
+            const newPayment = new Payment({
+              userId: userId,
+              referenceNumber: id_,
+              surveyId: decoded.surveyId,
+              amount: amountInNaira,            
+              email,
+              datePaid: new Date(),
+              status: "failed"
+            });
+            await newPayment.save();
             return res.status(400).json({ error: "Invalid plan or amount" });
             // send notification
           }
@@ -1599,7 +1609,8 @@ const receivePaymentWebhook = async (req, res) => {
             surveyId: decoded.surveyId,
             amount: amountInNaira,            
             email,
-            datePaid: new Date()
+            datePaid: new Date(),
+            status: "paid"
           });
           await newPayment.save();
 

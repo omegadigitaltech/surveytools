@@ -9,6 +9,7 @@ const paymentSchema = new mongoose.Schema(
       surveyId: String,
       datePaid: Date,
       email: String,
+      status: String, // pending, paid, failed
     },
     { timestamps: true }
 );
