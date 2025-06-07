@@ -27,7 +27,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:staging
+          tags: ${{ secrets.DOCKER_USERNAME }}/surveytools-frontend:latest
           build-args: |
             VITE_API_URL=${{ secrets.STAGING_API_URL }}
             VITE_PAYSTACK_PUBLIC_KEY=${{ secrets.STAGING_PAYSTACK_PUBLIC_KEY }}
