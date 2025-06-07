@@ -1077,8 +1077,21 @@ const getSurveyInfo = async (req, res, next) => {
     const filledCount = survey.submittedUsers.length;
     const remainingSpots = survey.no_of_participants - filledCount;
 
+    // Convert survey to object and filter answers
+    const surveyObj = survey.toObject();
+    
+    // Filter answers to remove userId and fullname
+    if (surveyObj.questions) {
+      surveyObj.questions = surveyObj.questions.map(question => ({
+        ...question,
+        answers: question.answers ? question.answers.map(answer => ({
+          response: answer.response
+        })) : []
+      }));
+    }
+
     const surveyWithCounts = {
-      ...survey.toObject(),
+      ...surveyObj,
       participantCounts: {
         filled: filledCount,
         remaining: remainingSpots,
@@ -1272,8 +1285,21 @@ const getAllSurveys = async (req, res, next) => {
       const filledCount = survey.submittedUsers.length;
       const remainingSpots = survey.no_of_participants - filledCount;
       
+      // Convert survey to object and filter answers
+      const surveyObj = survey.toObject();
+      
+      // Filter answers to remove userId and fullname
+      if (surveyObj.questions) {
+        surveyObj.questions = surveyObj.questions.map(question => ({
+          ...question,
+          answers: question.answers ? question.answers.map(answer => ({
+            response: answer.response
+          })) : []
+        }));
+      }
+      
       return {
-        ...survey.toObject(),
+        ...surveyObj,
         participantCounts: {
           filled: filledCount,
           remaining: remainingSpots,
@@ -1311,7 +1337,9 @@ const getSurveyAnalytics = async (req, res, next) => {
       questionType: question.questionType,
       required: question.required,
       options: question.options,
-      answers: question.answers,
+      answers: question.answers.map(answer => ({
+        response: answer.response
+      })),
       analytics: question.analytics
     }));
 
@@ -1607,8 +1635,21 @@ const mySurveys = async (req, res) => {
       const filledCount = survey.submittedUsers.length;
       const remainingSpots = survey.no_of_participants - filledCount;
       
+      // Convert survey to object and filter answers
+      const surveyObj = survey.toObject();
+      
+      // Filter answers to remove userId and fullname
+      if (surveyObj.questions) {
+        surveyObj.questions = surveyObj.questions.map(question => ({
+          ...question,
+          answers: question.answers ? question.answers.map(answer => ({
+            response: answer.response
+          })) : []
+        }));
+      }
+      
       return {
-        ...survey.toObject(),
+        ...surveyObj,
         participantCounts: {
           filled: filledCount,
           remaining: remainingSpots,

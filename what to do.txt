@@ -1,0 +1,3 @@
+have a field to stoee entirte user point no deductiing , to know how much they have ever recied, 
+- firt write script to get points from redemption hosotry so as to add to this field as a start(plus what they have currently.)
+this ensure we monitor users to ensure all is well and no issue with syetme for over allcoating to a user
