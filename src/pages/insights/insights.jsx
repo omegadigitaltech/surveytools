@@ -60,26 +60,41 @@ const Insights = () => {
   const transformToIndividualResponses = (survey) => {
     const userResponsesMap = new Map();
 
-    // Iterate through all questions and their answers
+    // Use submittedUsers array as the authoritative source of users who completed the survey
+    const submittedUsers = survey.submittedUsers || [];
+    
+    // Also collect user IDs from answers in case submittedUsers is not complete
+    const userIdsFromAnswers = new Set();
+    survey.questions.forEach(question => {
+      question.answers?.forEach(answer => {
+        userIdsFromAnswers.add(answer.userId);
+      });
+    });
+
+    // Combine both sources to ensure we get all users
+    const allUserIds = new Set([...submittedUsers, ...userIdsFromAnswers]);
+
+    // Initialize response objects for all users
+    allUserIds.forEach(userId => {
+      userResponsesMap.set(userId, {
+        userId: userId,
+        answers: [],
+        submittedAt: new Date()
+      });
+    });
+
+    // Populate answers for each user
     survey.questions.forEach(question => {
       question.answers?.forEach(answer => {
         const userId = answer.userId;
         
-        // Initialize user response if not exists
-        if (!userResponsesMap.has(userId)) {
-          userResponsesMap.set(userId, {
-            userId: userId,
-            answers: [],
-            submittedAt: new Date() // We don't have submission time in this structure
+        if (userResponsesMap.has(userId)) {
+          userResponsesMap.get(userId).answers.push({
+            questionId: question._id,
+            response: answer.response,
+            _id: answer._id
           });
         }
-
-        // Add this question's answer to the user's response
-        userResponsesMap.get(userId).answers.push({
-          questionId: question._id,
-          response: answer.response,
-          _id: answer._id
-        });
       });
     });
 
@@ -337,7 +352,7 @@ const Insights = () => {
 
             {/* Quick Question Summary */}
             <div className="questions-summary">
-              <h3>Questions Overview test</h3>
+              <h3>Questions Overview</h3>
               <div className="questions-grid">
                 {surveyData.questions.map((question, index) => (
                   <div key={question._id} className="question-summary-card" onClick={() => {
