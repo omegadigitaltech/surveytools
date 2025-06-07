@@ -106,7 +106,7 @@ jobs:
                 env_file:
                   - .env
                 environment:
-                  - REDIS_URL=redis://redis:6378
+                  - REDIS_URL=redis://redis:6379
                 depends_on:
                   - redis
                 networks:
@@ -116,6 +116,8 @@ jobs:
                 image: redis:alpine
                 container_name: surveytools-redis-staging
                 restart: unless-stopped
+                ports:
+                  - "6378:6379"
                 volumes:
                   - redis-data-staging:/data
                 networks:
