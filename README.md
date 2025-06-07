@@ -561,3 +561,90 @@ The API will continue processing questions even if some fail. Failed questions w
   }
 }
 ```
+
+## Custom Input for Specific Options
+
+The survey system now supports allowing users to provide custom text input when they select specific options like "Other (please specify)". This is useful for options that need additional clarification.
+
+### Setting Up Options with Custom Input
+
+When creating questions with multiple choice or multiple selection, you can specify which options allow custom input:
+
+```json
+{
+  "questionText": "What is your preferred programming language?",
+  "questionType": "multiple_choice",
+  "required": true,
+  "options": [
+    "JavaScript",
+    "Python", 
+    "Java",
+    {
+      "text": "Other (please specify)",
+      "allowsCustomInput": true
+    }
+  ]
+}
+```
+
+### Response Format
+
+When users select an option that allows custom input, the response format changes:
+
+**For regular options:**
+```json
+{
+  "questionId": "question_id_here",
+  "response": "JavaScript"
+}
+```
+
+**For options with custom input:**
+```json
+{
+  "questionId": "question_id_here", 
+  "response": {
+    "selectedOption": "Other (please specify)",
+    "customInput": "Rust programming language"
+  }
+}
+```
+
+**For multiple selection with custom input:**
+```json
+{
+  "questionId": "question_id_here",
+  "response": [
+    "JavaScript",
+    "Python",
+    {
+      "selectedOption": "Other (please specify)",
+      "customInput": "Rust programming language" 
+    }
+  ]
+}
+```
+
+### CSV Export
+
+In CSV exports, responses with custom input are formatted as "Option: Custom Text":
+- Regular response: `JavaScript`
+- Custom input response: `Other (please specify): Rust programming language`
+
+### Validation
+
+The system automatically validates:
+- Only options marked with `allowsCustomInput: true` can have custom input
+- **When an option has `allowsCustomInput: true`, the response MUST be an object with both `selectedOption` and `customInput` - string responses are not allowed**
+- Custom input is required and cannot be empty when provided
+- Selected options must be valid options for the question
+
+**Important:** If you try to send a string response for an option that requires custom input, you will get a validation error:
+
+```json
+{
+  "status": "failure",
+  "code": 400,
+  "msg": "Option 'Other (please specify)' requires custom input. Response must be an object with selectedOption and customInput."
+}
+```

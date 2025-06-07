@@ -1,0 +1,175 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [ backend-staging ]  # Change to your main branch name (main, master, etc.)
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/surveytools-backend:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/surveytools-backend:latest
+          cache-to: type=inline
+      
+      - name: Setup domain and Nginx
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # # Install Nginx if not already installed
+            # if ! command -v nginx &> /dev/null; then
+            #   echo "Installing Nginx..."
+            #   sudo apt-get update
+            #   sudo apt-get install -y nginx certbot python3-certbot-nginx
+            # fi
+            
+            # # Create Nginx configuration for the domain
+            # NGINX_CONF="/etc/nginx/sites-available/api.surveyprotools.com"
+            # if [ ! -f "$NGINX_CONF" ]; then
+            #   echo "Setting up Nginx configuration for api.surveyprotools.com..."
+            #   sudo tee $NGINX_CONF > /dev/null << 'EOF'
+            # server {
+            #     listen 80;
+            #     server_name api.surveyprotools.com;
+            
+            #     location / {
+            #         proxy_pass http://localhost:5000;
+            #         proxy_set_header Host $host;
+            #         proxy_set_header X-Real-IP $remote_addr;
+            #         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            #         proxy_set_header X-Forwarded-Proto $scheme;
+            #     }
+            # }
+            # EOF
+            
+            #   # Enable the site
+            #   sudo ln -sf $NGINX_CONF /etc/nginx/sites-enabled/
+              
+            #   # Test Nginx configuration
+            #   sudo nginx -t
+              
+            #   # Reload Nginx
+            #   sudo systemctl reload nginx
+              
+            #   # Set up SSL certificate with Certbot
+            #   echo "Setting up SSL certificate..."
+            #   sudo certbot --nginx -d api.surveyprotools.com --non-interactive --agree-tos --email ${{ secrets.ADMIN_EMAIL }}
+            # fi
+      
+      - name: Copy docker-compose file and .env
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # Create app directory if it doesn't exist
+            mkdir -p ~/surveytools-backend-staging
+            
+            # Create .env file from GitHub secret
+            echo "${{ secrets.ENV_FILE_STAGING }}" > ~/surveytools-backend-staging/.env
+            
+            # Copy docker-compose file
+            cat > ~/surveytools-backend-staging/docker-compose.yml << 'EOL'
+            version: '3.8'
+            
+            services:
+              app:
+                image: ${{ secrets.DOCKER_USERNAME }}/surveytools-backend:latest
+                container_name: surveytools-backend-staging
+                restart: unless-stopped
+                ports:
+                  - "5004:5004"
+                env_file:
+                  - .env
+                environment:
+                  - REDIS_URL=redis://redis:6379
+                depends_on:
+                  - redis
+                networks:
+                  - app-network
+            
+              redis:
+                image: redis:alpine
+                container_name: surveytools-redis-staging
+                restart: unless-stopped
+                ports:
+                  - "6378:6379"
+                volumes:
+                  - redis-data-staging:/data
+                networks:
+                  - app-network
+            
+            networks:
+              app-network:
+                driver: bridge
+            
+            volumes:
+              redis-data-staging:
+            EOL
+      
+      - name: Deploy with Docker Compose
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # Navigate to the app directory
+            cd ~/surveytools-backend-staging
+            
+            # Install Docker and Docker Compose if not already installed
+            if ! command -v docker &> /dev/null; then
+              echo "Installing Docker..."
+              sudo apt-get update
+              sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+              sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+              sudo apt-get update
+              sudo apt-get install -y docker-ce
+              sudo systemctl enable docker
+              sudo systemctl start docker
+            fi
+            
+            if ! command -v docker-compose &> /dev/null; then
+              echo "Installing Docker Compose..."
+              sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+            
+            # Pull the latest images
+            sudo docker-compose pull
+            
+            # Stop, remove containers and start with the new configuration
+            sudo docker-compose down
+            sudo docker-compose up -d
+            
+            # Clean up unused images
+            sudo docker image prune -f
+            
+            # Ensure Nginx is running
+            sudo systemctl is-active --quiet nginx || sudo systemctl start nginx 

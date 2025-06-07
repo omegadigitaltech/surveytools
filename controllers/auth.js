@@ -29,9 +29,9 @@ const postRegister = async (req,res) => {
 
     // confirm password
     if(password != confirm_password ) {
-        return res.status(400).json({
+        return res.status(401).json({
             status: "failure",
-            code: 400,
+            code: 401,
             msg: "The passwords does not match"
         })
     }
@@ -106,16 +106,16 @@ const postLogin = async (req, res) => {
     const user = await User.findOne({email})
 
     if(!user) {
-        return res.status(404).json({
+        return res.status(401).json({
             status: "failure",
-            code: 404,
+            code: 401,
             msg: "Invalid credentials"
         })
     }
     if(!user.password) {
-        return res.status(400).json({
+        return res.status(401).json({
             status: "failure",
-            code: 400,
+            code: 401,
             msg: `User ${user.email} uses ${user.type} Login`
         })
     }

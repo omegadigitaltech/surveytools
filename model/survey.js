@@ -19,12 +19,13 @@ const answerSchema = new Schema({
 
 // Define the schema for survey options
 const optionSchema = new Schema({
-  text: { type: String,  required: [true, "Option text is required"]} 
+  text: { type: String,  required: [true, "Option text is required"]},
+  allowsCustomInput: { type: Boolean, default: false } // New field to indicate if this option allows custom text input
 });
 
 // Define the schema for survey questions
 const questionSchema = new Schema({
-  questionText: { type: String, required: [true, "Question Text is required"] },
+  questionText: { type: String, required: [true, "Quest≥ion Text is required"] },
   questionType: { type: String, required: [true, "Question Type is required"], enum: {
     values: ['multiple_choice', 'five_point', 'fill_in', 'multiple_selection'],
     message: 'Question type must be either "multiple_choice", "five_point", "fill_in", or "multiple_selection"'

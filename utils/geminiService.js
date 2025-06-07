@@ -71,6 +71,12 @@ Analyze the following document and extract all questions, organizing them by typ
 - For open-ended questions, identify them as "fill_in".
 - Determine if each question is required or optional based on context clues.
 
+IMPORTANT: For multiple_choice and multiple_selection questions, analyze each option and determine if it should allow custom input. Set "allowsCustomInput" to true for options that:
+- Contain words like "Other", "Others", "Specify", "Please specify", "Please explain", "If other", "If yes, please explain"
+- End with phrases like "(please specify)", "(specify)", "(explain)", "(other)"
+- Are clearly meant to capture additional information beyond the standard options
+- Use phrases like "None of the above (please explain)", "Something else", "Additional comments"
+
 The JSON output should match this structure:
 {
   "questions": [
@@ -78,17 +84,36 @@ The JSON output should match this structure:
       "questionText": "The full text of the question",
       "questionType": "multiple_choice | multiple_selection | five_point | fill_in",
       "required": true | false,
-      "options": ["Option 1", "Option 2", "Option 3"] // Only for multiple_choice and multiple_selection questions
+      "options": [
+        {
+          "text": "Option text",
+          "allowsCustomInput": true | false
+        }
+      ] // Only for multiple_choice and multiple_selection questions
     }
   ]
 }
 
 Extract only the questions from the document, and format them according to the structure above.
 Look for context clues to distinguish between single-choice (multiple_choice) and multi-selection (multiple_selection) questions:
-- Words like "select all that apply", "check all appropriate", "select multiple" suggest multiple_selection
-- Words like "choose one", "select only one", "best option" suggest multiple_choice
+- Words like "select all that apply", "check all appropriate", "select multiple", "choose all", "mark all" suggest multiple_selection
+- Words like "choose one", "select only one", "best option", "most appropriate" suggest multiple_choice
 
-IMPORTANT: Use your initiative to figure out what type of questions they are, the above is just for guide.
+IMPORTANT: Use your initiative to figure out what type of questions they are and which options need custom input. Be intelligent about detecting:
+1. Question types based on context and instructions
+2. Options that clearly need additional user input (especially those with "Other", "Specify", etc.)
+3. Whether questions are required based on formatting, asterisks (*), or explicit mentions
+
+Examples of options that should have "allowsCustomInput": true:
+- "Other (please specify)"
+- "None of the above - please explain"
+- "Other:"
+- "Something else"
+- "If other, specify"
+- "Additional comments"
+- "Please specify if different"
+
+Be thorough and intelligent in your analysis.
 `;
 
     let result;
