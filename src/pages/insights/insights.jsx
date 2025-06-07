@@ -58,47 +58,36 @@ const Insights = () => {
 
   // Function to transform question answers into individual user responses
   const transformToIndividualResponses = (survey) => {
-    const userResponsesMap = new Map();
-
-    // Use submittedUsers array as the authoritative source of users who completed the survey
-    const submittedUsers = survey.submittedUsers || [];
+    // Get the number of responses from the first question that has answers
+    const firstQuestionWithAnswers = survey.questions.find(q => q.answers && q.answers.length > 0);
+    if (!firstQuestionWithAnswers) return [];
     
-    // Also collect user IDs from answers in case submittedUsers is not complete
-    const userIdsFromAnswers = new Set();
-    survey.questions.forEach(question => {
-      question.answers?.forEach(answer => {
-        userIdsFromAnswers.add(answer.userId);
-      });
-    });
+    const numResponses = firstQuestionWithAnswers.answers.length;
+    const individualResponses = [];
 
-    // Combine both sources to ensure we get all users
-    const allUserIds = new Set([...submittedUsers, ...userIdsFromAnswers]);
-
-    // Initialize response objects for all users
-    allUserIds.forEach(userId => {
-      userResponsesMap.set(userId, {
-        userId: userId,
+    // Create response objects for each user (by index position)
+    for (let responseIndex = 0; responseIndex < numResponses; responseIndex++) {
+      const userResponse = {
+        userId: `user_${responseIndex}`, // Generate a temporary ID for internal use
         answers: [],
         submittedAt: new Date()
-      });
-    });
+      };
 
-    // Populate answers for each user
-    survey.questions.forEach(question => {
-      question.answers?.forEach(answer => {
-        const userId = answer.userId;
-        
-        if (userResponsesMap.has(userId)) {
-          userResponsesMap.get(userId).answers.push({
+      // Go through each question and get the answer at this index
+      survey.questions.forEach(question => {
+        if (question.answers && question.answers[responseIndex]) {
+          userResponse.answers.push({
             questionId: question._id,
-            response: answer.response,
-            _id: answer._id
+            response: question.answers[responseIndex].response,
+            _id: question.answers[responseIndex]._id || `answer_${responseIndex}_${question._id}`
           });
         }
       });
-    });
 
-    return Array.from(userResponsesMap.values());
+      individualResponses.push(userResponse);
+    }
+
+    return individualResponses;
   };
 
   const toggleAcceptingResponses = async () => {
