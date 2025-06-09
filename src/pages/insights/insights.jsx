@@ -43,17 +43,9 @@ const Insights = () => {
 
         setSurveyData(data.survey);
         
-        // Get individual responses
-        const responsesResponse = await fetch(`${config.API_URL}/surveys/${id}/responses`, {
-          headers: {
-            "Authorization": `Bearer ${authToken}`,
-          },
-        });
-        
-        const responsesData = await responsesResponse.json();
-        if (responsesResponse.ok) {
-          setIndividualResponses(responsesData.responses || []);
-        }
+        // Transform question answers into individual user responses
+        const userResponses = transformToIndividualResponses(data.survey);
+        setIndividualResponses(userResponses);
       } catch (error) {
         toast.error(error.message || "Error fetching insights");
       } finally {
@@ -63,6 +55,40 @@ const Insights = () => {
 
     fetchSurveyInsights();
   }, [id, authToken]);
+
+  // Function to transform question answers into individual user responses
+  const transformToIndividualResponses = (survey) => {
+    // Get the number of responses from the first question that has answers
+    const firstQuestionWithAnswers = survey.questions.find(q => q.answers && q.answers.length > 0);
+    if (!firstQuestionWithAnswers) return [];
+    
+    const numResponses = firstQuestionWithAnswers.answers.length;
+    const individualResponses = [];
+
+    // Create response objects for each user (by index position)
+    for (let responseIndex = 0; responseIndex < numResponses; responseIndex++) {
+      const userResponse = {
+        userId: `user_${responseIndex}`, // Generate a temporary ID for internal use
+        answers: [],
+        submittedAt: new Date()
+      };
+
+      // Go through each question and get the answer at this index
+      survey.questions.forEach(question => {
+        if (question.answers && question.answers[responseIndex]) {
+          userResponse.answers.push({
+            questionId: question._id,
+            response: question.answers[responseIndex].response,
+            _id: question.answers[responseIndex]._id || `answer_${responseIndex}_${question._id}`
+          });
+        }
+      });
+
+      individualResponses.push(userResponse);
+    }
+
+    return individualResponses;
+  };
 
   const toggleAcceptingResponses = async () => {
     try {
@@ -135,6 +161,86 @@ const Insights = () => {
     }
   };
 
+  // Helper function to get response counts for multiple choice with custom input support
+  const getMultipleChoiceData = (question) => {
+    return question.options.map(opt => {
+      const optionText = typeof opt === 'string' ? opt : opt.text;
+      let responses = 0;
+      let customInputs = [];
+
+      question.answers?.forEach(answer => {
+        if (typeof answer.response === 'string' && answer.response === optionText) {
+          responses++;
+        } else if (typeof answer.response === 'object' && answer.response.selectedOption === optionText) {
+          responses++;
+          if (answer.response.customInput) {
+            customInputs.push(answer.response.customInput);
+          }
+        }
+      });
+
+      return {
+        option: optionText,
+        responses,
+        customInputs,
+        percentage: surveyData.participantCounts.filled 
+          ? ((responses / surveyData.participantCounts.filled) * 100).toFixed(1) 
+          : 0
+      };
+    });
+  };
+
+  // Helper function to get response counts for multiple selection with custom input support
+  const getMultipleSelectionData = (question) => {
+    return question.options.map(opt => {
+      const optionText = typeof opt === 'string' ? opt : opt.text;
+      let responses = 0;
+      let customInputs = [];
+
+      question.answers?.forEach(answer => {
+        if (Array.isArray(answer.response)) {
+          answer.response.forEach(item => {
+            if (typeof item === 'string' && item === optionText) {
+              responses++;
+            } else if (typeof item === 'object' && item.selectedOption === optionText) {
+              responses++;
+              if (item.customInput) {
+                customInputs.push(item.customInput);
+              }
+            }
+          });
+        }
+      });
+
+      return {
+        option: optionText,
+        responses,
+        customInputs,
+        percentage: surveyData.participantCounts.filled 
+          ? ((responses / surveyData.participantCounts.filled) * 100).toFixed(1)
+          : 0
+      };
+    });
+  };
+
+  // Helper function to get response counts for five point scale (handle both string and number)
+  const getFivePointData = (question) => {
+    return [1, 2, 3, 4, 5].map(point => {
+      const responses = question.answers?.filter(a => {
+        // Handle both string and number responses
+        return a.response == point || a.response === point.toString();
+      }).length || 0;
+
+      return {
+        point: `${point}`,
+        responses,
+        percentage: surveyData.participantCounts.filled 
+          ? ((responses / surveyData.participantCounts.filled) * 100).toFixed(1) 
+          : 0
+      };
+    });
+  };
+
   if (loading) return <div className="loading">Loading insights...</div>;
   if (!surveyData) return <div className="error">Failed to load survey data</div>;
 
@@ -164,20 +270,6 @@ const Insights = () => {
           </button>
         </div>
 
-        {/* <div className="response-toggle">
-          <div className="toggle-indicator">
-            <span>Accepting responses</span>
-            <label className="switch">
-              <input 
-                type="checkbox" 
-                checked={acceptingResponses} 
-                onChange={toggleAcceptingResponses}
-              />
-              <span className="slider round"></span>
-            </label>
-          </div>
-        </div> */}
-
         <div className="insights-tabs">
           <button 
             className={`tab-button ${activeTab === "summary" ? "active" : ""}`}
@@ -194,7 +286,7 @@ const Insights = () => {
           >
             Question
           </button>
-          {/* <button 
+          <button 
             className={`tab-button ${activeTab === "individual" ? "active" : ""}`}
             onClick={() => {
               setActiveTab("individual");
@@ -202,7 +294,7 @@ const Insights = () => {
             }}
           >
             Individual
-          </button> */}
+          </button>
         </div>
 
         {activeTab === "summary" && (
@@ -221,10 +313,6 @@ const Insights = () => {
                 <h3>Response Rate</h3>
                 <p>{((surveyData.participantCounts.filled / surveyData.no_of_participants) * 100).toFixed(1)}%</p>
               </div>
-              {/* <div className="card">
-                <h3>Average Completion Time</h3>
-                <p>{surveyData.avgCompletionTime || "N/A"}</p>
-              </div> */}
             </div>
 
             {/* Participation Chart */}
@@ -325,13 +413,7 @@ const Insights = () => {
                   <h4>Response Distribution</h4>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart 
-                      data={currentQuestion.options.map(opt => ({
-                        option: opt.text,
-                        responses: currentQuestion.answers?.filter(a => a.response === opt.text).length || 0,
-                        percentage: surveyData.participantCounts.filled 
-                          ? ((currentQuestion.answers?.filter(a => a.response === opt.text).length || 0) / surveyData.participantCounts.filled * 100).toFixed(1) 
-                          : 0
-                      }))}
+                      data={getMultipleChoiceData(currentQuestion)}
                       margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
@@ -348,6 +430,25 @@ const Insights = () => {
                       <Bar dataKey="percentage" fill="#82ca9d" name="Percentage (%)" />
                     </BarChart>
                   </ResponsiveContainer>
+                  
+                  {/* Show custom inputs if any */}
+                  {getMultipleChoiceData(currentQuestion).some(item => item.customInputs.length > 0) && (
+                    <div className="custom-inputs-section">
+                      <h4>Custom Inputs</h4>
+                      {getMultipleChoiceData(currentQuestion).map((item, idx) => 
+                        item.customInputs.length > 0 && (
+                          <div key={idx} className="custom-input-group">
+                            <h5>{item.option}:</h5>
+                            <ul>
+                              {item.customInputs.map((input, inputIdx) => (
+                                <li key={inputIdx}>"{input}"</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -355,15 +456,7 @@ const Insights = () => {
                 <div className="response-distribution">
                   <h4>Response Distribution</h4>
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart 
-                      data={[1, 2, 3, 4, 5].map(point => ({
-                        point: `${point}`,
-                        responses: currentQuestion.answers?.filter(a => a.response === point.toString()).length || 0,
-                        percentage: surveyData.participantCounts.filled 
-                          ? ((currentQuestion.answers?.filter(a => a.response === point.toString()).length || 0) / surveyData.participantCounts.filled * 100).toFixed(1) 
-                          : 0
-                      }))}
-                    >
+                    <BarChart data={getFivePointData(currentQuestion)}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="point" />
                       <YAxis />
@@ -380,25 +473,7 @@ const Insights = () => {
                   <h4>Response Distribution (Multiple Selection)</h4>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart 
-                      data={currentQuestion.options.map(opt => ({
-                        option: opt.text,
-                        responses: currentQuestion.answers?.reduce((count, answer) => {
-                          // If response is an array (multiple selection)
-                          if (Array.isArray(answer.response)) {
-                            return count + (answer.response.includes(opt.text) ? 1 : 0);
-                          }
-                          // Fallback in case response is stored as string
-                          return count + (answer.response === opt.text ? 1 : 0);
-                        }, 0) || 0,
-                        percentage: surveyData.participantCounts.filled 
-                          ? ((currentQuestion.answers?.reduce((count, answer) => {
-                              if (Array.isArray(answer.response)) {
-                                return count + (answer.response.includes(opt.text) ? 1 : 0);
-                              }
-                              return count + (answer.response === opt.text ? 1 : 0);
-                            }, 0) || 0) / surveyData.participantCounts.filled * 100).toFixed(1)
-                          : 0
-                      }))}
+                      data={getMultipleSelectionData(currentQuestion)}
                       margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
@@ -415,6 +490,25 @@ const Insights = () => {
                       <Bar dataKey="percentage" fill="#82ca9d" name="Percentage (%)" />
                     </BarChart>
                   </ResponsiveContainer>
+                  
+                  {/* Show custom inputs if any */}
+                  {getMultipleSelectionData(currentQuestion).some(item => item.customInputs.length > 0) && (
+                    <div className="custom-inputs-section">
+                      <h4>Custom Inputs</h4>
+                      {getMultipleSelectionData(currentQuestion).map((item, idx) => 
+                        item.customInputs.length > 0 && (
+                          <div key={idx} className="custom-input-group">
+                            <h5>{item.option}:</h5>
+                            <ul>
+                              {item.customInputs.map((input, inputIdx) => (
+                                <li key={inputIdx}>"{input}"</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -450,7 +544,7 @@ const Insights = () => {
                     >
                       {individualResponses.map((response, idx) => (
                         <option key={idx} value={idx}>
-                          {response.userEmail || `Response ${idx + 1}`}
+                          {`Response ${idx + 1}`}
                         </option>
                       ))}
                     </select>
@@ -478,7 +572,7 @@ const Insights = () => {
 
                 <div className="response-detail">
                   <div className="response-header">
-                    <h3>{currentResponse?.userEmail || `Response ${currentResponseIndex + 1}`}</h3>
+                    <h3>{`Response ${currentResponseIndex + 1}`}</h3>
                     <p className="submission-time">
                       Submitted: {new Date(currentResponse?.submittedAt).toLocaleString()}
                     </p>
@@ -496,8 +590,15 @@ const Insights = () => {
                                 {question.questionType === 'five_point' 
                                   ? `${answer.response} / 5` 
                                   : question.questionType === 'multiple_selection' && Array.isArray(answer.response)
-                                    ? answer.response.join(', ')
-                                    : answer.response}
+                                    ? answer.response.map(item => {
+                                        if (typeof item === 'object' && item.selectedOption && item.customInput) {
+                                          return `${item.selectedOption}: ${item.customInput}`;
+                                        }
+                                        return typeof item === 'string' ? item : item.selectedOption || item;
+                                      }).join(', ')
+                                    : typeof answer.response === 'object' && answer.response.selectedOption && answer.response.customInput
+                                      ? `${answer.response.selectedOption}: ${answer.response.customInput}`
+                                      : answer.response}
                               </p>
                             ) : (
                               <p className="no-answer">No answer provided</p>

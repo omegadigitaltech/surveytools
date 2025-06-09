@@ -37,7 +37,7 @@ const SurveyQuestions = () => {
       questionText: "",
       questionType: "multiple_choice",
       required: true,
-      options: [""],
+      options: [{ text: "", allowsCustomInput: false }],
     },
   ]);
 
@@ -62,7 +62,10 @@ const SurveyQuestions = () => {
             questionText: q.questionText,
             questionType: q.questionType,
             required: q.required,
-            options: q.options.map(opt => opt.text),
+            options: q.options.map(opt => ({
+              text: typeof opt === 'string' ? opt : opt.text,
+              allowsCustomInput: typeof opt === 'object' ? opt.allowsCustomInput || false : false
+            })),
           }));
           setQuestions(formattedQuestions);
         }
@@ -97,9 +100,11 @@ const SurveyQuestions = () => {
      options: 
       (question.questionType === "multiple_choice" || question.questionType === "multiple_selection")
         ? question.options
-        .map(opt =>  typeof opt === 'string' ? opt.trim() : opt.text.trim() )// Handle new/existing options
-        // }))
-        .filter(text => text !== "") // Remove empty options
+        .map(opt => ({
+          text: typeof opt === 'string' ? opt.trim() : opt.text.trim(),
+          allowsCustomInput: typeof opt === 'object' ? opt.allowsCustomInput || false : false
+        }))
+        .filter(opt => opt.text !== "") // Remove empty options
         : undefined // Exclude options for non-multiple_choice questions
    }))
   };
@@ -174,7 +179,7 @@ const SurveyQuestions = () => {
       questionText: "",
       questionType: "multiple_choice",
       required: false,
-      options: [""],
+      options: [{ text: "", allowsCustomInput: false }],
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -237,18 +242,18 @@ const SurveyQuestions = () => {
 
   const addOption = (id) => {
     const updatedQuestions = questions.map((q) =>
-      q.id === id ? { ...q, options: [...q.options, ""] } : q
+      q.id === id ? { ...q, options: [...q.options, { text: "", allowsCustomInput: false }] } : q
     );
     setQuestions(updatedQuestions);
   };
 
-  const handleOptionChange = (questionId, index, value) => {
+  const handleOptionChange = (questionId, index, field, value) => {
     const updatedQuestions = questions.map((q) =>
       q.id === questionId
         ? {
           ...q,
           options: q.options.map((option, i) =>
-            i === index ? value : option
+            i === index ? { ...option, [field]: value } : option
           ),
         }
         : q
@@ -309,7 +314,10 @@ const handleFileUpload = async (e) => {
         questionText: q.questionText,
         questionType: q.questionType,
         required: q.required,
-        options: q.options.map(opt => opt.text),
+        options: q.options.map(opt => ({
+          text: typeof opt === 'string' ? opt : opt.text,
+          allowsCustomInput: typeof opt === 'object' ? opt.allowsCustomInput || false : false
+        })),
       }));
       
       setQuestions(formattedQuestions);
@@ -427,16 +435,32 @@ const handleFileUpload = async (e) => {
                                 type="text"
                                 name="options"
                                 placeholder={`Option ${index + 1}`}
-                                value={option}
+                                value={option.text}
                                 onChange={(e) =>
                                   handleOptionChange(
                                     question.id,
                                     index,
+                                    "text",
                                     e.target.value
                                   )
                                 }
                                 className="option-input"
                               />
+                              <label className="custom-input-checkbox">
+                                <input
+                                  type="checkbox"
+                                  checked={option.allowsCustomInput}
+                                  onChange={(e) =>
+                                    handleOptionChange(
+                                      question.id,
+                                      index,
+                                      "allowsCustomInput",
+                                      e.target.checked
+                                    )
+                                  }
+                                />
+                                <span className="checkbox-label">Allow custom input</span>
+                              </label>
                             </div>
                           ))}
                         </div>
