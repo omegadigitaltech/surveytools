@@ -120,7 +120,18 @@ const uploadQuestionnaire = async (req, res, next) => {
           // Add options for multiple-choice or multiple-selection questions
           if ((question.questionType === 'multiple_choice' || question.questionType === 'multiple_selection') && 
               Array.isArray(question.options)) {
-            questionData.options = question.options.map(opt => ({ text: opt }));
+            questionData.options = question.options.map(opt => {
+              if (typeof opt === 'string') {
+                return { text: opt, allowsCustomInput: false };
+              } else if (typeof opt === 'object' && opt.text) {
+                return {
+                  text: opt.text,
+                  allowsCustomInput: opt.allowsCustomInput || false
+                };
+              } else {
+                throw new Error('Invalid option format');
+              }
+            });
             console.log(`Added ${question.options.length} options to ${question.questionType} question`);
           }
           

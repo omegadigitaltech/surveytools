@@ -150,13 +150,71 @@ const updateAnswer = async (req, res, next) => {
         }
       } else if (question.questionType === 'multiple_choice') {
         const validOptions = question.options.map(opt => opt.text);
-        if (!validOptions.includes(response)) {
+        
+        // Handle custom input for options that allow it
+        if (typeof response === 'object' && response.selectedOption && response.customInput) {
+          // This is a response with custom input
+          const selectedOption = question.options.find(opt => opt.text === response.selectedOption);
+          if (!selectedOption) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ 
+              status: "failure", 
+              code: 400, 
+              msg: `Response contains invalid selected option: ${response.selectedOption}` 
+            });
+          }
+          
+          if (!selectedOption.allowsCustomInput) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ 
+              status: "failure", 
+              code: 400, 
+              msg: `Response contains custom input for option that doesn't allow it: ${response.selectedOption}` 
+            });
+          }
+          
+          // Validate that custom input is provided and not empty
+          if (!response.customInput || response.customInput.trim() === '') {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ 
+              status: "failure", 
+              code: 400, 
+              msg: `Response requires custom input for option: ${response.selectedOption}` 
+            });
+          }
+        } else if (typeof response === 'string') {
+          // This is a regular string response - check if the option requires custom input
+          const selectedOption = question.options.find(opt => opt.text === response);
+          if (!selectedOption) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be one of the provided options for multiple_choice question' });
+          }
+          
+          // If the selected option allows custom input, the response MUST be an object
+          if (selectedOption.allowsCustomInput) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ 
+              status: "failure", 
+              code: 400, 
+              msg: `Option "${response}" requires custom input. Response must be an object with selectedOption and customInput.` 
+            });
+          }
+        } else {
           await session.abortTransaction();
           session.endSession();
-          return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be one of the provided options for multiple_choice question' });
+          return res.status(400).json({ 
+            status: "failure", 
+            code: 400, 
+            msg: 'Response must be either a string or an object with selectedOption and customInput' 
+          });
         }
       } else if (question.questionType === 'multiple_selection') {
-        // For multiple_selection, response must be an array of strings
+        // For multiple_selection, response must be an array of strings or objects with custom input
         if (!Array.isArray(response) || response.length === 0) {
           await session.abortTransaction();
           session.endSession();
@@ -164,16 +222,73 @@ const updateAnswer = async (req, res, next) => {
         }
         
         const validOptions = question.options.map(opt => opt.text);
-        // Check if all selected options are valid
-        const invalidOptions = response.filter(option => !validOptions.includes(option));
-        if (invalidOptions.length > 0) {
-          await session.abortTransaction();
-          session.endSession();
-          return res.status(400).json({ 
-            status: "failure", 
-            code: 400, 
-            msg: `Response contains invalid options: ${invalidOptions.join(', ')}` 
-          });
+        // Check if all selected options are valid and handle custom input
+        for (const responseItem of response) {
+          if (typeof responseItem === 'string') {
+            // Regular string option - check if it requires custom input
+            const selectedOption = question.options.find(opt => opt.text === responseItem);
+            if (!selectedOption) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Response contains invalid option: ${responseItem}` 
+              });
+            }
+            
+            // If the selected option allows custom input, the response MUST be an object
+            if (selectedOption.allowsCustomInput) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Option "${responseItem}" for question ${question._id} requires custom input. Response must be an object with selectedOption and customInput.` 
+              });
+            }
+          } else if (typeof responseItem === 'object' && responseItem.selectedOption && responseItem.customInput) {
+            // Response with custom input
+            const selectedOption = question.options.find(opt => opt.text === responseItem.selectedOption);
+            if (!selectedOption) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Response contains invalid selected option: ${responseItem.selectedOption}` 
+              });
+            }
+            
+            if (!selectedOption.allowsCustomInput) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Response contains custom input for option that doesn't allow it: ${responseItem.selectedOption}` 
+              });
+            }
+            
+            // Validate that custom input is provided and not empty
+            if (!responseItem.customInput || responseItem.customInput.trim() === '') {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Response requires custom input for option: ${responseItem.selectedOption}` 
+              });
+            }
+          } else {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ 
+              status: "failure", 
+              code: 400, 
+              msg: 'Response contains invalid format. Each item must be either a string or an object with selectedOption and customInput' 
+            });
+          }
         }
       }
   
@@ -309,13 +424,71 @@ const submitAnswers = async (req, res, next) => {
           question.analytics.averageRating = (question.analytics.averageRating * question.analytics.totalResponses + parseInt(answer.response)) / (question.analytics.totalResponses + 1);
         } else if (question.questionType === 'multiple_choice') {
           const validOptions = question.options.map(opt => opt.text);
-          if (!validOptions.includes(answer.response)) {
+          
+          // Handle custom input for options that allow it
+          if (typeof answer.response === 'object' && answer.response.selectedOption && answer.response.customInput) {
+            // This is a response with custom input
+            const selectedOption = question.options.find(opt => opt.text === answer.response.selectedOption);
+            if (!selectedOption) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Response for question ${question._id} contains invalid selected option: ${answer.response.selectedOption}` 
+              });
+            }
+            
+            if (!selectedOption.allowsCustomInput) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Response for question ${question._id} contains custom input for option that doesn't allow it: ${answer.response.selectedOption}` 
+              });
+            }
+            
+            // Validate that custom input is provided and not empty
+            if (!answer.response.customInput || answer.response.customInput.trim() === '') {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Response for question ${question._id} requires custom input for option: ${answer.response.selectedOption}` 
+              });
+            }
+          } else if (typeof answer.response === 'string') {
+            // This is a regular string response - check if the option requires custom input
+            const selectedOption = question.options.find(opt => opt.text === answer.response);
+            if (!selectedOption) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ status: "failure", code: 400, msg: `Response for question ${question._id} must be one of the provided options for multiple_choice question` });
+            }
+            
+            // If the selected option allows custom input, the response MUST be an object
+            if (selectedOption.allowsCustomInput) {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Option "${answer.response}" for question ${question._id} requires custom input. Response must be an object with selectedOption and customInput.` 
+              });
+            }
+          } else {
             await session.abortTransaction();
             session.endSession();
-            return res.status(400).json({ status: "failure", code: 400, msg: `Response for question ${question._id} must be one of the provided options for multiple_choice question` });
+            return res.status(400).json({ 
+              status: "failure", 
+              code: 400, 
+              msg: `Response for question ${question._id} must be either a string or an object with selectedOption and customInput` 
+            });
           }
         } else if (question.questionType === 'multiple_selection') {
-          // For multiple_selection, response must be an array of strings
+          // For multiple_selection, response must be an array of strings or objects with custom input
           if (!Array.isArray(answer.response) || answer.response.length === 0) {
             await session.abortTransaction();
             session.endSession();
@@ -323,16 +496,73 @@ const submitAnswers = async (req, res, next) => {
           }
           
           const validOptions = question.options.map(opt => opt.text);
-          // Check if all selected options are valid
-          const invalidOptions = answer.response.filter(option => !validOptions.includes(option));
-          if (invalidOptions.length > 0) {
-            await session.abortTransaction();
-            session.endSession();
-            return res.status(400).json({ 
-              status: "failure", 
-              code: 400, 
-              msg: `Response for question ${question._id} contains invalid options: ${invalidOptions.join(', ')}` 
-            });
+          // Check if all selected options are valid and handle custom input
+          for (const responseItem of answer.response) {
+            if (typeof responseItem === 'string') {
+              // Regular string option - check if it requires custom input
+              const selectedOption = question.options.find(opt => opt.text === responseItem);
+              if (!selectedOption) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ 
+                  status: "failure", 
+                  code: 400, 
+                  msg: `Response for question ${question._id} contains invalid option: ${responseItem}` 
+                });
+              }
+              
+              // If the selected option allows custom input, the response MUST be an object
+              if (selectedOption.allowsCustomInput) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ 
+                  status: "failure", 
+                  code: 400, 
+                  msg: `Option "${responseItem}" for question ${question._id} requires custom input. Response must be an object with selectedOption and customInput.` 
+                });
+              }
+            } else if (typeof responseItem === 'object' && responseItem.selectedOption && responseItem.customInput) {
+              // Response with custom input
+              const selectedOption = question.options.find(opt => opt.text === responseItem.selectedOption);
+              if (!selectedOption) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ 
+                  status: "failure", 
+                  code: 400, 
+                  msg: `Response for question ${question._id} contains invalid selected option: ${responseItem.selectedOption}` 
+                });
+              }
+              
+              if (!selectedOption.allowsCustomInput) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ 
+                  status: "failure", 
+                  code: 400, 
+                  msg: `Response for question ${question._id} contains custom input for option that doesn't allow it: ${responseItem.selectedOption}` 
+                });
+              }
+              
+              // Validate that custom input is provided and not empty
+              if (!responseItem.customInput || responseItem.customInput.trim() === '') {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ 
+                  status: "failure", 
+                  code: 400, 
+                  msg: `Response for question ${question._id} requires custom input for option: ${responseItem.selectedOption}` 
+                });
+              }
+            } else {
+              await session.abortTransaction();
+              session.endSession();
+              return res.status(400).json({ 
+                status: "failure", 
+                code: 400, 
+                msg: `Response for question ${question._id} contains invalid format. Each item must be either a string or an object with selectedOption and customInput` 
+              });
+            }
           }
         }
 
@@ -352,9 +582,19 @@ const submitAnswers = async (req, res, next) => {
         if (question.questionType === 'multiple_choice' || question.questionType === 'five_point') {
           
           // Convert the response to a string before using it as a Map key
-          const responseKey = String(answer.response)
-            .replace(/\./g, '_') // Replace dots with underscores
-            .replace(/\$/g, '_'); // Replace $ with underscores
+          let responseKey;
+          if (typeof answer.response === 'object' && answer.response.selectedOption) {
+            // For responses with custom input, use the selected option as the key
+            responseKey = String(answer.response.selectedOption)
+              .replace(/\./g, '_') // Replace dots with underscores
+              .replace(/\$/g, '_'); // Replace $ with underscores
+          } else {
+            // For regular responses, use the response value as the key
+            responseKey = String(answer.response)
+              .replace(/\./g, '_') // Replace dots with underscores
+              .replace(/\$/g, '_'); // Replace $ with underscores
+          }
+          
           question.analytics.distribution.set(responseKey, (question.analytics.distribution.get(responseKey) || 0) + 1);
           
           if (question.questionType === 'five_point') {
@@ -362,10 +602,19 @@ const submitAnswers = async (req, res, next) => {
           }
         } else if (question.questionType === 'multiple_selection') {
           // For multiple_selection, update distribution for each selected option
-          answer.response.forEach(selectedOption => {
-            const responseKey = String(selectedOption)
-              .replace(/\./g, '_') // Replace dots with underscores
-              .replace(/\$/g, '_'); // Replace $ with underscores
+          answer.response.forEach(selectedItem => {
+            let responseKey;
+            if (typeof selectedItem === 'object' && selectedItem.selectedOption) {
+              // For responses with custom input, use the selected option as the key
+              responseKey = String(selectedItem.selectedOption)
+                .replace(/\./g, '_') // Replace dots with underscores
+                .replace(/\$/g, '_'); // Replace $ with underscores
+            } else {
+              // For regular responses, use the response value as the key
+              responseKey = String(selectedItem)
+                .replace(/\./g, '_') // Replace dots with underscores
+                .replace(/\$/g, '_'); // Replace $ with underscores
+            }
             question.analytics.distribution.set(responseKey, (question.analytics.distribution.get(responseKey) || 0) + 1);
           });
         }
@@ -491,9 +740,18 @@ const addOrUpdateQuestion = async (req, res, next) => {
     // Format `options` array if questionType is multiple_choice
     let formattedOptions = [];
     if ((questionType === 'multiple_choice' || questionType === 'multiple_selection') && Array.isArray(options)) {
-      formattedOptions = options.map(option => ({
-        text: option // Convert each option string to an object with `text` property
-      }));
+      formattedOptions = options.map(option => {
+        if (typeof option === 'string') {
+          return { text: option }; // Convert string to object with text property
+        } else if (typeof option === 'object' && option.text) {
+          return {
+            text: option.text,
+            allowsCustomInput: option.allowsCustomInput || false
+          };
+        } else {
+          throw new Error('Invalid option format');
+        }
+      });
     }
 
   
@@ -633,9 +891,18 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
         // Format options for multiple-choice and multiple-selection questions
         let formattedOptions = [];
         if ((questionType === 'multiple_choice' || questionType === 'multiple_selection') && Array.isArray(options)) {
-          formattedOptions = options.map(option => ({
-            text: option // Convert each option string to an object with `text` property
-          }));
+          formattedOptions = options.map(option => {
+            if (typeof option === 'string') {
+              return { text: option }; // Convert string to object with text property
+            } else if (typeof option === 'object' && option.text) {
+              return {
+                text: option.text,
+                allowsCustomInput: option.allowsCustomInput || false
+              };
+            } else {
+              throw new Error('Invalid option format');
+            }
+          });
         }
         
         // Find existing question or create new one
@@ -810,8 +1077,21 @@ const getSurveyInfo = async (req, res, next) => {
     const filledCount = survey.submittedUsers.length;
     const remainingSpots = survey.no_of_participants - filledCount;
 
+    // Convert survey to object and filter answers
+    const surveyObj = survey.toObject();
+    
+    // Filter answers to remove userId and fullname
+    if (surveyObj.questions) {
+      surveyObj.questions = surveyObj.questions.map(question => ({
+        ...question,
+        answers: question.answers ? question.answers.map(answer => ({
+          response: answer.response
+        })) : []
+      }));
+    }
+
     const surveyWithCounts = {
-      ...survey.toObject(),
+      ...surveyObj,
       participantCounts: {
         filled: filledCount,
         remaining: remainingSpots,
@@ -1005,8 +1285,21 @@ const getAllSurveys = async (req, res, next) => {
       const filledCount = survey.submittedUsers.length;
       const remainingSpots = survey.no_of_participants - filledCount;
       
+      // Convert survey to object and filter answers
+      const surveyObj = survey.toObject();
+      
+      // Filter answers to remove userId and fullname
+      if (surveyObj.questions) {
+        surveyObj.questions = surveyObj.questions.map(question => ({
+          ...question,
+          answers: question.answers ? question.answers.map(answer => ({
+            response: answer.response
+          })) : []
+        }));
+      }
+      
       return {
-        ...survey.toObject(),
+        ...surveyObj,
         participantCounts: {
           filled: filledCount,
           remaining: remainingSpots,
@@ -1044,7 +1337,9 @@ const getSurveyAnalytics = async (req, res, next) => {
       questionType: question.questionType,
       required: question.required,
       options: question.options,
-      answers: question.answers,
+      answers: question.answers.map(answer => ({
+        response: answer.response
+      })),
       analytics: question.analytics
     }));
 
@@ -1294,6 +1589,16 @@ const receivePaymentWebhook = async (req, res) => {
           const amountInNaira = Number(amount) / 100; // Convert amount to naira
           if ( amountInNaira !== decoded.price) {
             console.log("Invalid plan or amount")
+            const newPayment = new Payment({
+              userId: userId,
+              referenceNumber: id_,
+              surveyId: decoded.surveyId,
+              amount: amountInNaira,            
+              email,
+              datePaid: new Date(),
+              status: "failed"
+            });
+            await newPayment.save();
             return res.status(400).json({ error: "Invalid plan or amount" });
             // send notification
           }
@@ -1304,7 +1609,8 @@ const receivePaymentWebhook = async (req, res) => {
             surveyId: decoded.surveyId,
             amount: amountInNaira,            
             email,
-            datePaid: new Date()
+            datePaid: new Date(),
+            status: "paid"
           });
           await newPayment.save();
 
@@ -1340,8 +1646,21 @@ const mySurveys = async (req, res) => {
       const filledCount = survey.submittedUsers.length;
       const remainingSpots = survey.no_of_participants - filledCount;
       
+      // Convert survey to object and filter answers
+      const surveyObj = survey.toObject();
+      
+      // Filter answers to remove userId and fullname
+      if (surveyObj.questions) {
+        surveyObj.questions = surveyObj.questions.map(question => ({
+          ...question,
+          answers: question.answers ? question.answers.map(answer => ({
+            response: answer.response
+          })) : []
+        }));
+      }
+      
       return {
-        ...survey.toObject(),
+        ...surveyObj,
         participantCounts: {
           filled: filledCount,
           remaining: remainingSpots,
