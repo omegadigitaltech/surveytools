@@ -9,6 +9,7 @@ const useAuthStore = create(
       userEmail: '',
       userName: '',
       userInst: '',
+      isAdmin: false,
       currentSurveyId: '',
       signupEmail: '',
       isLogoutVisible: false,
@@ -17,8 +18,8 @@ const useAuthStore = create(
       hasPaid: false,
 
       // Action to set authentication data after successful login
-      setAuthData: (token, email, name, inst) => {
-        set({ authToken: token, isAuthenticated: true, userEmail: email, userName: name, userInst: inst, });
+      setAuthData: (token, email, name, inst, admin = false) => {
+        set({ authToken: token, isAuthenticated: true, userEmail: email, userName: name, userInst: inst, isAdmin: admin });
       },
 
       setSignupEmail: (email) => {
@@ -43,7 +44,7 @@ const useAuthStore = create(
      },
       // Action to clear user data on logout
       logout: () => {
-        set({ authToken: '', isAuthenticated: false, userEmail: '', userName: '', currentSurveyId: '' });
+        set({ authToken: '', isAuthenticated: false, userEmail: '', userName: '', currentSurveyId: '', isAdmin: false });
       }
     }),
     {
@@ -55,7 +56,8 @@ const useAuthStore = create(
         isAuthenticated: state.isAuthenticated,
         userEmail: state.userEmail,
         userName: state.userName,
-        userInst: state.userInst
+        userInst: state.userInst,
+        isAdmin: state.isAdmin
       })
     }
   )

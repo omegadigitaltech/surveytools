@@ -42,6 +42,7 @@ const action = async ({ formData }) => {
       userName: json.data.user.fullname,
       userVerified: json.data.user.verified,
       userInst: json.data.user.instituition,
+      isAdmin: json.data.user.admin || false,
     };
   } catch (err) {
     toast.error("An error occurred. Please try again.");

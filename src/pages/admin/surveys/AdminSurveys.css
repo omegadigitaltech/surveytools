@@ -1,0 +1,484 @@
+.admin-surveys {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.admin-surveys-header {
+  margin-bottom: 2rem;
+}
+
+.header-left .back-link {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  display: inline-block;
+  transition: color 0.2s ease;
+}
+
+.header-left .back-link:hover {
+  color: #3730a3;
+}
+
+.admin-surveys-header h1 {
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.admin-surveys-header p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.admin-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  font-size: 1.2rem;
+  color: #6b7280;
+}
+
+.admin-surveys-controls {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.search-form {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.search-btn {
+  padding: 0.75rem 1.5rem;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-btn:hover {
+  background: #3730a3;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-select,
+.limit-select {
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.filter-select:focus,
+.limit-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.surveys-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.surveys-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.surveys-table th {
+  background: #f9fafb;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.surveys-table th.sortable {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.surveys-table th.sortable:hover {
+  background: #f3f4f6;
+}
+
+.surveys-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: top;
+}
+
+.surveys-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.survey-title .title-info .title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.survey-title .title-info .description {
+  color: #6b7280;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.survey-owner .owner-info .owner-name {
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.survey-owner .owner-info .owner-email {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.survey-owner .owner-info .owner-points {
+  color: #059669;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.participants .participant-stats .filled {
+  font-weight: 600;
+  color: #059669;
+  margin-bottom: 0.25rem;
+}
+
+.participants .participant-stats .total {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.participants .participant-stats .remaining {
+  color: #dc2626;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.published {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.unpublished {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.payment-info .payment-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.payment-badge.paid {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.payment-badge.unpaid {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.payment-details .amount {
+  font-weight: 600;
+  color: #059669;
+  margin-bottom: 0.25rem;
+}
+
+.payment-details .payment-date {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.date {
+  color: #6b7280;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.actions .action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.action-btn.mark-paid {
+  background: #10b981;
+  color: white;
+}
+
+.action-btn.mark-paid:hover:not(:disabled) {
+  background: #059669;
+}
+
+.action-btn.unpublish {
+  background: #ef4444;
+  color: white;
+}
+
+.action-btn.unpublish:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.no-surveys {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.no-surveys-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.no-surveys h3 {
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.no-surveys p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-btn {
+  padding: 0.5rem 1rem;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #3730a3;
+}
+
+.pagination-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .admin-surveys {
+    padding: 1rem;
+  }
+
+  .admin-surveys-header h1 {
+    font-size: 2rem;
+  }
+
+  .admin-surveys-controls {
+    padding: 1rem;
+  }
+
+  .search-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-btn {
+    width: 100%;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-select,
+  .limit-select {
+    width: 100%;
+  }
+
+  .surveys-table-container {
+    overflow-x: auto;
+  }
+
+  .surveys-table {
+    min-width: 800px;
+  }
+
+  .surveys-table th,
+  .surveys-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .action-buttons {
+    gap: 0.25rem;
+  }
+
+  .action-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .pagination-info {
+    order: -1;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .admin-surveys {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  }
+
+  .admin-surveys-header h1 {
+    color: #f9fafb;
+  }
+
+  .admin-surveys-header p {
+    color: #d1d5db;
+  }
+
+  .admin-surveys-controls,
+  .surveys-table-container,
+  .no-surveys,
+  .pagination {
+    background: #374151;
+    color: #f9fafb;
+  }
+
+  .surveys-table th {
+    background: #4b5563;
+    color: #f9fafb;
+    border-bottom-color: #6b7280;
+  }
+
+  .surveys-table td {
+    border-bottom-color: #4b5563;
+  }
+
+  .surveys-table tbody tr:hover {
+    background: #4b5563;
+  }
+
+  .search-input,
+  .filter-select,
+  .limit-select {
+    background: #4b5563;
+    border-color: #6b7280;
+    color: #f9fafb;
+  }
+
+  .search-input:focus,
+  .filter-select:focus,
+  .limit-select:focus {
+    border-color: #6366f1;
+  }
+} 
