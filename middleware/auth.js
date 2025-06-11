@@ -1,6 +1,3 @@
-
-
-
 const jwt = require('jsonwebtoken')
 const jwtSecret = process.env.JWT_SECRET
 const User = require("../model/user")
@@ -126,8 +123,46 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
+// Admin middleware - checks if user is admin
+const adminMiddleware = async (req, res, next) => {
+  try {
+    const { userId } = req;
+    
+    if (!userId) {
+      return res.status(401).json({
+        status: "failure",
+        code: 401,
+        msg: "Authentication required"
+      });
+    }
 
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      return res.status(404).json({
+        status: "failure",
+        code: 404,
+        msg: "User not found"
+      });
+    }
 
+    if (!user.admin) {
+      return res.status(403).json({
+        status: "failure",
+        code: 403,
+        msg: "Admin access required"
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error('Admin middleware error:', error);
+    res.status(500).json({
+      status: "failure",
+      code: 500,
+      msg: "Internal server error"
+    });
+  }
+};
 
 // Check if they are admin and if so grant them access
 // const authAdmin = async (req, res, next) => {
@@ -160,6 +195,7 @@ const authMiddleware = async (req, res, next) => {
 
 module.exports = {
     authMiddleware,
+    adminMiddleware,
     // authAdmin,
     // notAdmin,
     // auth,

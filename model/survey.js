@@ -95,6 +95,17 @@ const surveySchema = new Schema({
     questions: [questionSchema],// reference question documents
     published: { type: Boolean, default: false },
     link: { type: String, default: '' },
+    
+    // Payment tracking fields
+    isPaid: { type: Boolean, default: false },
+    paymentAmount: { type: Number },
+    paymentDate: { type: Date },
+    
+    // Unpublish tracking fields
+    unpublishedAt: { type: Date },
+    unpublishedBy: { type: String }, // 'admin' or 'user'
+    unpublishReason: { type: String },
+    
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });

@@ -149,6 +149,7 @@ const postLogin = async (req, res) => {
             redirectUrl: redirectUrl,
             user: user
         },
+        admin: user.admin,
         token
     })
 }
@@ -270,7 +271,7 @@ const isLoggedIn = async (req, res) => {
           msg: "User is not Logged in: Token not found",
           data: {
             isLoggedIn: false,
-          },
+          }
         });
       }
   
@@ -286,7 +287,7 @@ const isLoggedIn = async (req, res) => {
           msg: "Token error. User not found",
           data: {
             isLoggedIn: false,
-          },
+          }
         });
       }
   
@@ -297,6 +298,7 @@ const isLoggedIn = async (req, res) => {
         data: {
           isLoggedIn: true,
         },
+        admin: user.admin,
       });
     } catch (error) {
       console.log(error);
@@ -309,7 +311,7 @@ const isLoggedIn = async (req, res) => {
           msg: "User is not Logged in: Invalid token",
           data: {
             isLoggedIn: false,
-          },
+          }
         });
       }
   
@@ -320,7 +322,7 @@ const isLoggedIn = async (req, res) => {
         data: {
           isLoggedIn: false,
           error: error.message || "An error occured",
-        },
+        }
       });
     }
   };

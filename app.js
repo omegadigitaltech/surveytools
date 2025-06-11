@@ -20,6 +20,7 @@ const User = require('./model/user')
 const authRouter = require('./routes/auth')
 const mainRouter = require('./routes/main')
 const redemptionRouter = require('./routes/redemption')
+const adminRouter = require('./routes/admin')
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const uploadErrorHandler = require('./middleware/errorHandler')
 const notFoundMiddleware = require('./middleware/not-found')
@@ -128,6 +129,7 @@ const checkRedisConnection = async () => {
 app.use('/', mainRouter)
 app.use('/', authRouter)
 app.use('/', redemptionRouter)
+app.use('/', adminRouter)
 
 
 // Use the new error handler for file uploads
