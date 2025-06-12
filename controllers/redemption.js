@@ -126,7 +126,7 @@ const redeemAirtime = async (req, res) => {
     }
 
     // Minimum amount validation
-    if (amount < 100) {
+    if (amount < 10) {
       await req.abortTransaction();
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -232,18 +232,21 @@ const redeemAirtime = async (req, res) => {
         });
       }
     } catch (apiError) {
+      // Log the full error response to understand the structure
+      console.log("Full API Error Response:", apiError.response?.data);
       await RedemptionHistory.findByIdAndUpdate(
         redemptionid,
-        { status: "failed", errorMessage: apiError.message }
+        { status: "failed", errorMessage: apiError.response?.data || "Unknown error" }
       );
       // If API call throws an error, abort transaction
       await req.abortTransaction();
 
-      console.error("API Error:", apiError);
+      // console.error("API Error:", apiError);
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Failed to process airtime purchase",
-        error: apiError.message
+        error: apiError.response?.data?.message || apiError.message,
+        details: apiError.response?.data?.data || null
       });
     }
   } catch (error) {
@@ -252,7 +255,7 @@ const redeemAirtime = async (req, res) => {
     if (redemptionid) { 
       await RedemptionHistory.findByIdAndUpdate(
         redemptionid,
-        { status: "failed", errorMessage: error.message }
+        { status: "failed", errorMessage: error.message, errorData:  error.response?.data}
       );
     }
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -410,14 +413,15 @@ const redeemData = async (req, res) => {
       }
     } catch (apiError) {
       // If API call throws an error, abort transaction
+      console.error("API Error:", apiError.response?.data);
+
       await req.abortTransaction();
       await RedemptionHistory.findByIdAndUpdate(
         redemptionid,
-        { status: "failed", errorMessage: apiError.message }
+        { status: "failed", errorMessage: apiError.response?.data || "Unknown error" }
       );
       
 
-      console.error("API Error:", apiError);
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Failed to process data purchase",
@@ -426,11 +430,11 @@ const redeemData = async (req, res) => {
     }
   } catch (error) {
     // If any error occurs, transaction will be aborted by middleware
-    console.error("Error redeeming data plan:", error);
+    console.error("Error redeeming data plan:", error.response?.data);
     if (redemptionid) {
       await RedemptionHistory.findByIdAndUpdate(
         redemptionid,
-        { status: "failed", errorMessage: error.message }
+        { status: "failed", errorMessage: error.response?.data || "Unknown error", errorData: error.response?.data }
       );
     }
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
