@@ -44,6 +44,9 @@ const RedemptionHistorySchema = new Schema(
     errorMessage: {
       type: mongoose.Schema.Types.Mixed,
     },
+    errorData: {
+      type: mongoose.Schema.Types.Mixed,
+    },
     transactionReference: {
       type: String,
     }

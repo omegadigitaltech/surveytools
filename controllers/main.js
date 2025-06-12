@@ -1256,6 +1256,8 @@ const unpublishSurvey = async (req, res, next) => {
     // Unpublish the survey
     survey.published = false;
     survey.link = ''; // Clear the survey link
+    survey.unpublishedAt = new Date();
+    survey.unpublishedBy = user.fullname;
     await survey.save();
 
     res.status(200).json({ 
