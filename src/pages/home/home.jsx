@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import { TypeAnimation } from "react-type-animation";
 import "./home.css";
-import ContestModal from "../../components/ContestModal";
+// import ContestModal from "../../components/ContestModal";
 
 const Home = () => {
     return (
         <section className="home">
-            <ContestModal />
+            {/* <ContestModal /> */}
             <div className="home-inner wrap">
                 <h1 className="home-title">
                 <TypeAnimation
