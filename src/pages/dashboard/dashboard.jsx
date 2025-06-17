@@ -236,13 +236,15 @@ const Dashboard = () => {
               {activeTab === "available" ? (
                 filteredSurveys.length > 0 ? (
                   filteredSurveys.map((survey, index) => (
-                    <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
                       <div
                         className={`survey_post ${
                           index === 0 ? "first_post" : ""
                         }`}
                         key={survey._id}
+                        onClick={() => window.location = `/expandsurvey/${survey._id}`}
                       >
+                        {/* new div new */}
+                          <div className="survey-card-content">
                         <div className="post_time flex">
                           <p className="posted">
                             Posted{" "}
@@ -265,7 +267,7 @@ const Dashboard = () => {
                         </div>
                         <p className="survey_info">
                           {survey.description}
-                          <a href="">...see more</a>
+                          <span href="" className="see-more">...see more</span>
                         </p>
                         <div className="survey_class flex">
                           <div className="dept flex">
@@ -288,8 +290,8 @@ const Dashboard = () => {
                             <p> Participants</p>
                           </div>
                         </div>
+                        </div>
                       </div>
-                    </Link>
                   ))
                 ) : (
                   <p className="no_result">Please wait. Survey is loading...</p>

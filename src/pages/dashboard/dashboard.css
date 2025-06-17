@@ -204,6 +204,8 @@ form ::placeholder {
 .survey_info {
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .survey_info::first-letter {
@@ -216,7 +218,7 @@ form ::placeholder {
   width: 85%;
 }
 
-.survey_info a {
+.survey_info span{
   margin-bottom: 1.5rem;
   color: var(--base);
 }
