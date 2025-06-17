@@ -21,7 +21,7 @@ import RedeemModal from "./RedeemModal";
 import ConfirmDetails from "./ConfirmDetails";
 import Report from "./Report";
 import useAppStore from "../../store/useAppStore";
-import ContestModal from "../../components/ContestModal";
+// import ContestModal from "../../components/ContestModal";
 
 const Dashboard = () => {
   const [searchKey, setSearchKey] = useState("");
@@ -165,7 +165,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <ContestModal />
+      {/* <ContestModal /> */}
       <section className="dashboard">
         <div className="dashboard_inner wrap">
           <div className="points-board ">
