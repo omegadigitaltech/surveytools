@@ -69,9 +69,23 @@ if (emailQueue) {
         case 'survey-published':
           await sendSurveyPublishedNotification(data);
           break;
+        case 'password-reset':
+          await sendDirectEmail(data);
+          break;
+        case 'password-reset-confirmation':
+          await sendDirectEmail(data);
+          break;
+        case 'direct-email':
+          await sendDirectEmail(data);
+          break;
         // Add other email types as needed
         default:
-          throw new Error(`Unknown email type: ${emailType}`);
+          // If no emailType is specified, assume it's direct email data
+          if (typeof job.data === 'object' && job.data.to && job.data.subject) {
+            await sendDirectEmail(job.data);
+          } else {
+            throw new Error(`Unknown email type: ${emailType}`);
+          }
       }
       return { success: true };
     } catch (error) {
@@ -152,15 +166,56 @@ async function sendSurveyPublishedNotification(data) {
   console.log(`Notification emails sent to ${users.length} users for survey: ${survey.title}`);
 }
 
+// Send direct email (for password reset, confirmations, etc.)
+async function sendDirectEmail(emailData) {
+  const transporter = getEmailTransporter();
+  
+  try {
+    const result = await transporter.sendMail({
+      from: `${process.env.EMAIL_USER || "tech.digitalomega@gmail.com"}`,
+      to: emailData.to,
+      subject: emailData.subject,
+      html: emailData.html,
+      text: emailData.text || '' // Optional plain text version
+    });
+    
+    console.log(`Direct email sent successfully to ${emailData.to}`);
+    return result;
+  } catch (error) {
+    console.error(`Failed to send email to ${emailData.to}:`, error);
+    throw error;
+  }
+}
+
 // Add job to queue
-const addEmailToQueue = (emailType, data, options = {}) => {
+const addEmailToQueue = (emailTypeOrData, data, options = {}) => {
   if (!emailQueue) {
     console.error('Email queue not initialized, cannot add job');
     return Promise.resolve({ status: 'error', message: 'Queue not available' });
   }
   
+  let jobData;
+  
+  // Check if first parameter is an email data object (new pattern)
+  if (typeof emailTypeOrData === 'object' && emailTypeOrData.to && emailTypeOrData.subject) {
+    // Direct email data pattern - used by password reset
+    jobData = { 
+      emailType: 'direct-email', 
+      data: emailTypeOrData 
+    };
+  } else if (typeof emailTypeOrData === 'string' && data) {
+    // Traditional pattern - emailType and data
+    jobData = { 
+      emailType: emailTypeOrData, 
+      data: data 
+    };
+  } else {
+    console.error('Invalid parameters for addEmailToQueue');
+    return Promise.resolve({ status: 'error', message: 'Invalid parameters' });
+  }
+  
   return emailQueue.add(
-    { emailType, data },
+    jobData,
     { 
       attempts: 3,
       backoff: {

@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const {authMiddleware} = require('../middleware/auth');
-const { getVerification, verify, failurePage, postLogin, logout, isLoggedIn, googleLogin, facebookLogin, postRegister, updateUser, getUserProfile, getUserPoints} = require('../controllers/auth');
+const { getVerification, verify, failurePage, postLogin, logout, isLoggedIn, googleLogin, facebookLogin, postRegister, updateUser, getUserProfile, getUserPoints, forgetPassword, resetPassword} = require('../controllers/auth');
 const passport = require("passport");
 const jwt = require('jsonwebtoken')
 
@@ -24,6 +24,10 @@ router.get('/failure', failurePage)
 
 router.post('/login', postLogin)
 router.post('/register', postRegister)
+
+// Password reset routes
+router.post('/forget-password', forgetPassword)
+router.post('/reset-password', resetPassword)
 
 router.get('/auth/logout', logout)
 
