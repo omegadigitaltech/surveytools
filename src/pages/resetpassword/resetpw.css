@@ -1,0 +1,11 @@
+.reset-section {
+  margin-top: 3rem;
+  width: 100%;
+  justify-content: center;
+}
+.reset-btn {
+  margin-top: 2rem;
+}
+.reset-auth-field {
+  margin-bottom: 1.5rem;
+}

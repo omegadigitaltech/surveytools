@@ -68,7 +68,7 @@ const SignIn = () => {
             {/* <label className="auth-w5-block" htmlFor="remember">
               <input className="auth-w5-check" type="checkbox" name="checkbox" /> Remember me
             </label> */}
-            <Link className="auth-w5-reset">Forgot password?</Link>
+            <Link to='/forgotpassword' className="auth-w5-reset">Forgot password?</Link>
           </div>
 
           {/* Show spinner if loading, otherwise show Sign In button */}
