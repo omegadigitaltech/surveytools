@@ -66,6 +66,13 @@ const UserSchema = new Schema(
     pic_url: {
       type: String
     },
+    // Password reset fields
+    resetPasswordToken: {
+      type: String
+    },
+    resetPasswordExpires: {
+      type: Date
+    },
     notification_settings: {
       email: {
         type: [String],
