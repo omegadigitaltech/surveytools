@@ -71,6 +71,11 @@ const Navbar = () => {
                     Post Survey
                   </NavLink>
                 </li>
+                <li className="header-w2-item show header-w2-hide">
+                  <NavLink className="header-w2-link" to="/create-form">
+                    Create Form
+                  </NavLink>
+                </li>
               </>
             )}
             {!isAuthenticated && (
@@ -142,6 +147,15 @@ const Navbar = () => {
                 onClick={closeMenu}
               >
                 Post a Survey
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/create-form"
+                className="menu-item"
+                onClick={closeMenu}
+              >
+                Create Form
               </NavLink>
             </li>
             {/* LATER, API NOT READY */}

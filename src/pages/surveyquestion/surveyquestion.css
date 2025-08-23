@@ -338,7 +338,10 @@
         font-size: .8rem;
     }
 }
+.type-row{
+    flex-direction: row !important;
 
+}
 .wrap-icon {
     align-items: center;
     margin-bottom: 0.5rem;

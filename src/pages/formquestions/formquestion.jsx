@@ -1,11 +1,9 @@
 import { Link, Form, useActionData, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import action from "./action";
-import "./surveyquestion.css";
 import backaro from "../../assets/img/backaro.svg";
 import del from "../../assets/img/del.svg";
 import add from "../../assets/img/add.svg";
-import plus from "../../assets/img/icon-add.svg"
+import plus from "../../assets/img/icon-add.svg";
 import dot from "../../assets/img/dot.svg";
 import copy from "../../assets/img/copy.svg";
 import useAuthStore from "../../store/useAuthStore";
@@ -14,8 +12,9 @@ import { toast } from "react-toastify";
 import config from "../../config/config";
 import axios from "axios";
 import verifyPayment from "../../utils/helpers/verifyPayment";
+import ShareLink from "../../components/sharelink/sharelink"
 
-const SurveyQuestions = () => {
+const FormQuestions = () => {
   const navigate = useNavigate();
   const data = useActionData();
   const { currentSurveyId, hasPaid, setHasPaid } = useAuthStore();
@@ -47,24 +46,30 @@ const SurveyQuestions = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/questions`, {
-          headers: {
-            "Authorization": `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `${config.API_URL}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const data = await response.json();
-        
+
         if (response.ok && data.questions.length > 0) {
-          const formattedQuestions = data.questions.map(q => ({
+          const formattedQuestions = data.questions.map((q) => ({
             id: Date.now() + Math.random(),
             questionId: q._id,
             questionText: q.questionText,
             questionType: q.questionType,
             required: q.required,
-            options: q.options.map(opt => ({
-              text: typeof opt === 'string' ? opt : opt.text,
-              allowsCustomInput: typeof opt === 'object' ? opt.allowsCustomInput || false : false
+            options: q.options.map((opt) => ({
+              text: typeof opt === "string" ? opt : opt.text,
+              allowsCustomInput:
+                typeof opt === "object"
+                  ? opt.allowsCustomInput || false
+                  : false,
             })),
           }));
           setQuestions(formattedQuestions);
@@ -88,54 +93,67 @@ const SurveyQuestions = () => {
     setIsSaving(true);
     try {
       // Prepare bulk payload
-      const validTypes = ["multiple_choice", "five_point", "fill_in", "multiple_selection"];
+      const validTypes = [
+        "multiple_choice",
+        "five_point",
+        "fill_in",
+        "multiple_selection",
+      ];
 
       const bulkPayload = {
-     questions: questions.map((question) => ({
-     questionId: question.questionId || "", // Keep existing ID or empty for new
-     questionText: question.questionText.trim(), // Trim whitespace
-     questionType: question.questionType,
-     required: Boolean(question.required),
-     // Conditional options handling
-     options: 
-      (question.questionType === "multiple_choice" || question.questionType === "multiple_selection")
-        ? question.options
-        .map(opt => ({
-          text: typeof opt === 'string' ? opt.trim() : opt.text.trim(),
-          allowsCustomInput: typeof opt === 'object' ? opt.allowsCustomInput || false : false
-        }))
-        .filter(opt => opt.text !== "") // Remove empty options
-        : undefined // Exclude options for non-multiple_choice questions
-   }))
-  };
-       
-        const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`, {
+        questions: questions.map((question) => ({
+          questionId: question.questionId || "", // Keep existing ID or empty for new
+          questionText: question.questionText.trim(), // Trim whitespace
+          questionType: question.questionType,
+          required: Boolean(question.required),
+          // Conditional options handling
+          options:
+            question.questionType === "multiple_choice" ||
+            question.questionType === "multiple_selection"
+              ? question.options
+                  .map((opt) => ({
+                    text:
+                      typeof opt === "string" ? opt.trim() : opt.text.trim(),
+                    allowsCustomInput:
+                      typeof opt === "object"
+                        ? opt.allowsCustomInput || false
+                        : false,
+                  }))
+                  .filter((opt) => opt.text !== "") // Remove empty options
+              : undefined, // Exclude options for non-multiple_choice questions
+        })),
+      };
+
+      const response = await fetch(
+        `${config.API_URL}/form`,
+        {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(bulkPayload),
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok) {
-          console.error("Error response:", data);
-          throw new Error("Failed to save question" || data.msg  );
         }
-    // Update question IDs from response
-        setQuestions(prevQuestions => 
-          prevQuestions.map(q => {
-            const serverQuestion = data.results.details.find(
-              sq => sq.question === q.questionText
-            );
-            return serverQuestion?.questionId 
-              ? { ...q, questionId: serverQuestion.questionId }
-              : q;
-          })
-        );
-      
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Error response:", data);
+        throw new Error("Failed to save question" || data.msg);
+      }
+      // Update question IDs from response
+      setQuestions((prevQuestions) =>
+        prevQuestions.map((q) => {
+          const serverQuestion = data.results.details.find(
+            (sq) => sq.question === q.questionText
+          );
+          return serverQuestion?.questionId
+            ? { ...q, questionId: serverQuestion.questionId }
+            : q;
+        })
+      );
+
       toast.success("Questions saved successfully!" || data.msg);
     } catch (error) {
       toast.error("Faill to save questions");
@@ -151,11 +169,11 @@ const SurveyQuestions = () => {
 
     try {
       await handleSave(); // Reuse bulk save logic
-      
+
       // Check payment status before showing pricing modal
       const isPaid = await verifyPayment(currentSurveyId, authToken);
       setHasPaid(isPaid);
-      
+
       if (isPaid) {
         // If payment verified, navigate directly to publish page
         toast.success("Payment already verified!");
@@ -164,7 +182,7 @@ const SurveyQuestions = () => {
         // If not paid, show pricing modal
         setShowPricingModal(true);
       }
-   } catch (error) {
+    } catch (error) {
       toast.error("Error saving questions");
     } finally {
       setIsPosting(false);
@@ -187,16 +205,16 @@ const SurveyQuestions = () => {
   const deleteQuestion = async (id) => {
     setIsDeletingId(id); // Show loading state for specific question
     try {
-      const questionToDelete = questions.find(q => q.id === id);
-      
+      const questionToDelete = questions.find((q) => q.id === id);
+
       if (questionToDelete.questionId) {
         const response = await fetch(
-        // here
-          `${config.API_URL}/surveys/${currentSurveyId}/questions/${questionToDelete.questionId}`, 
+          // here
+          `${config.API_URL}/surveys/${currentSurveyId}/questions/${questionToDelete.questionId}`,
           {
             method: "DELETE",
             headers: {
-              "Authorization": `Bearer ${authToken}`,
+              Authorization: `Bearer ${authToken}`,
               "Content-Type": "application/json",
             },
           }
@@ -231,18 +249,28 @@ const SurveyQuestions = () => {
 
   const handleQuestionChange = (id, field, value) => {
     const updatedQuestions = questions.map((q) =>
-      q.id === id ? { 
-        ...q, 
-        [field]: value, 
-        ...(field === "questionType" && (value === "fill_in" || value === "five_point") ? { options: [] } : {})
-      } : q
+      q.id === id
+        ? {
+            ...q,
+            [field]: value,
+            ...(field === "questionType" &&
+            (value === "fill_in" || value === "five_point")
+              ? { options: [] }
+              : {}),
+          }
+        : q
     );
     setQuestions(updatedQuestions);
   };
 
   const addOption = (id) => {
     const updatedQuestions = questions.map((q) =>
-      q.id === id ? { ...q, options: [...q.options, { text: "", allowsCustomInput: false }] } : q
+      q.id === id
+        ? {
+            ...q,
+            options: [...q.options, { text: "", allowsCustomInput: false }],
+          }
+        : q
     );
     setQuestions(updatedQuestions);
   };
@@ -251,88 +279,95 @@ const SurveyQuestions = () => {
     const updatedQuestions = questions.map((q) =>
       q.id === questionId
         ? {
-          ...q,
-          options: q.options.map((option, i) =>
-            i === index ? { ...option, [field]: value } : option
-          ),
-        }
+            ...q,
+            options: q.options.map((option, i) =>
+              i === index ? { ...option, [field]: value } : option
+            ),
+          }
         : q
     );
     setQuestions(updatedQuestions);
   };
 
-// Question Upload Function
-const handleFileUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  // Question Upload Function
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  if (file.type !== "application/pdf") {
-    toast.error("Please upload a PDF file");
-    return;
-  }
-  const formData = new FormData();
-  formData.append("document", file);
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("document", file);
 
-  try {
-    setIsUploading(true);
-    setUploadProgress(30);
-    
-    // Used Axios for the upload tracking
-    const response = await axios.post(
-      `${config.API_URL}/surveys/${currentSurveyId}/upload-questionnaire`,
-      formData,
-      {
-        headers: {
-          "Authorization": `Bearer ${authToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setUploadProgress(percentCompleted);
-        },
-      }
-    );
+    try {
+      setIsUploading(true);
+      setUploadProgress(30);
 
-    if (response.data.status === "success") {
-      toast.success(response.data.msg);
-      // Refresh questions after successful upload
-        // here
-      const newQuestionsResponse = await axios.get(
-        `${config.API_URL}/surveys/${currentSurveyId}/questions`,
+      // Used Axios for the upload tracking
+      const response = await axios.post(
+        `${config.API_URL}/surveys/${currentSurveyId}/upload-questionnaire`,
+        formData,
         {
           headers: {
-            "Authorization": `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadProgress(percentCompleted);
           },
         }
       );
-      
-      const formattedQuestions = newQuestionsResponse.data.questions.map(q => ({
-        id: Date.now() + Math.random(),
-        questionId: q._id,
-        questionText: q.questionText,
-        questionType: q.questionType,
-        required: q.required,
-        options: q.options.map(opt => ({
-          text: typeof opt === 'string' ? opt : opt.text,
-          allowsCustomInput: typeof opt === 'object' ? opt.allowsCustomInput || false : false
-        })),
-      }));
-      
-      setQuestions(formattedQuestions);
+
+      if (response.data.status === "success") {
+        toast.success(response.data.msg);
+        // Refresh questions after successful upload
+        // here
+        const newQuestionsResponse = await axios.get(
+          `${config.API_URL}/surveys/${currentSurveyId}/questions`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+
+        const formattedQuestions = newQuestionsResponse.data.questions.map(
+          (q) => ({
+            id: Date.now() + Math.random(),
+            questionId: q._id,
+            questionText: q.questionText,
+            questionType: q.questionType,
+            required: q.required,
+            options: q.options.map((opt) => ({
+              text: typeof opt === "string" ? opt : opt.text,
+              allowsCustomInput:
+                typeof opt === "object"
+                  ? opt.allowsCustomInput || false
+                  : false,
+            })),
+          })
+        );
+
+        setQuestions(formattedQuestions);
+      }
+    } catch (error) {
+      console.error("File upload failed:", error);
+      toast.error(error.response?.data?.message || "Failed to upload PDF");
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+      e.target.value = ""; // Reset file input
     }
-  } catch (error) {
-    console.error("File upload failed:", error);
-    toast.error(error.response?.data?.message || "Failed to upload PDF");
-  } finally {
-    setIsUploading(false);
-    setUploadProgress(0);
-    e.target.value = ""; // Reset file input
-  }
-};
+  };
 
   return (
+    <>
+   <ShareLink/>
     <section className="form-page">
       <div className="wrap">
         <div className="form-head flex">
@@ -340,7 +375,7 @@ const handleFileUpload = async (e) => {
             <img src={backaro} className="backaro" alt="Back" />
           </Link>
           <div className="form-h">
-            <h3>Add Questions</h3>
+            <h3>Add Form Questions</h3>
           </div>
         </div>
 
@@ -348,10 +383,13 @@ const handleFileUpload = async (e) => {
           <div className="loading">Loading questions...</div>
         ) : (
           <div className="form-container">
-            <Form method="post" action="/surveyquestion" onSubmit={handlePostSubmit}>
-         
-            {/* Upload File Questions */}
-            <div className="Q-file-upload">
+            <Form
+              method="post"
+              action="/surveyquestion"
+              onSubmit={handlePostSubmit}
+            >
+              {/* Upload File Questions */}
+              {/* <div className="Q-file-upload">
                 <label className="flex Q-upload">
                   <input
                     type="file"
@@ -371,10 +409,14 @@ const handleFileUpload = async (e) => {
                 <p className="upload-note">
                   Upload a PDF file to automatically populate questions
                 </p>
-              </div>
+              </div> */}
 
               {/* To pass id to action */}
-              <input type="hidden" name="currentSurveyId" value={currentSurveyId} />
+              <input
+                type="hidden"
+                name="currentSurveyId"
+                value={currentSurveyId}
+              />
 
               {questions.map((question) => (
                 <div className="oneQuestion" key={question.id}>
@@ -387,7 +429,11 @@ const handleFileUpload = async (e) => {
                       placeholder="Untitled Question"
                       value={question.questionText}
                       onChange={(e) =>
-                        handleQuestionChange(question.id, "questionText", e.target.value)
+                        handleQuestionChange(
+                          question.id,
+                          "questionText",
+                          e.target.value
+                        )
                       }
                     />
                     <img
@@ -415,17 +461,24 @@ const handleFileUpload = async (e) => {
                         name="questionType"
                         value={question.questionType}
                         onChange={(e) =>
-                          handleQuestionChange(question.id, "questionType", e.target.value)
+                          handleQuestionChange(
+                            question.id,
+                            "questionType",
+                            e.target.value
+                          )
                         }
                         className="choice-select"
                       >
                         <option value="multiple_choice">Multiple Choice</option>
-                        <option value="multiple_selection">Multiple Selection</option>
+                        <option value="multiple_selection">
+                          Multiple Selection
+                        </option>
                         <option value="fill_in">Fill in</option>
                         <option value="five_point">Five Point</option>
                       </select>
                     </div>
-                    {(question.questionType === "multiple_choice" || question.questionType === "multiple_selection") && (
+                    {(question.questionType === "multiple_choice" ||
+                      question.questionType === "multiple_selection") && (
                       <div className="options-list flex">
                         <div className="option">
                           {question.options.map((option, index) => (
@@ -459,7 +512,9 @@ const handleFileUpload = async (e) => {
                                     )
                                   }
                                 />
-                                <span className="checkbox-label">Allow custom input</span>
+                                <span className="checkbox-label">
+                                  Allow custom input
+                                </span>
                               </label>
                             </div>
                           ))}
@@ -483,49 +538,17 @@ const handleFileUpload = async (e) => {
               </button>
 
               <div className="button-group flex">
-                <button 
-                  type="button" 
-                  className="save-btn"
-                  onClick={handleSave}
-                  disabled={isSaving}
-                >
-                  {isSaving ? "Saving..." : "Save"}
-                </button>
-                
-                <button 
-                  type="submit" 
-                  className="post-btn"
-                  disabled={isPosting}
-                >
-                  {isPosting ? "Posting..." : "Post"}
+                <button type="submit" className="post-btn" disabled={isPosting}>
+                  {isPosting ? "Creating..." : "Create"}
                 </button>
               </div>
             </Form>
           </div>
         )}
-
       </div>
-
-      {showPricingModal && (
-        <PricingModal onClose={() => setShowPricingModal(false)} />
-      )}
-
-      {showSaveSuccessModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Success!</h3>
-            <p>Your questions have been saved successfully.</p>
-            <button 
-              className="modal-btn"
-              onClick={() => setShowSaveSuccessModal(false)}
-            >
-              Continue Editing
-            </button>
-          </div>
-        </div>
-      )}
     </section>
+    </>
   );
 };
 
-export default SurveyQuestions;
+export default FormQuestions;
