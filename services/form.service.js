@@ -1,4 +1,4 @@
-import { Form } from "../model/form";
+import { Form } from "../model/form.js";
 
 
 class FormService {

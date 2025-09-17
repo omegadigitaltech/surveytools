@@ -1,5 +1,7 @@
-import { formService } from "../services/form.service";
-const User = require('../model/user')
+import { formService } from "../services/form.service.js";
+import  User  from "../model/user.js";
+import { Form } from "../model/form.js";
+
 class FormController {
   async createForm(req, res) {
     try {

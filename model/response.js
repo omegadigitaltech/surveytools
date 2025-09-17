@@ -12,4 +12,8 @@ const ResponseSchema = new Schema({
   submittedAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("Response", ResponseSchema);
+const Response = mongoose.model("Response", ResponseSchema);
+
+module.exports = {
+  Response
+}; 

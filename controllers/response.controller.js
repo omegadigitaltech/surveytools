@@ -1,5 +1,5 @@
 
-import { responseService } from "../services/response.service";
+import  {responseService}  from "../services/response.service.js";
 class ResponseController {
   async submitResponse(req, res) {
     try {

@@ -1,12 +1,9 @@
-import { authMiddleware } from "../middleware/auth";
+import express from "express";
+import { formController } from "../controllers/form.js";
+import { responseController } from "../controllers/response.controller.js";
 
-const express = require("express");
-const { formController } = require("../controllers/form");
-const { responseController } = require("../controllers/response.controller");
 const router = express.Router();
 
-
-router.use(authMiddleware)
 // Forms
 router.post("/", formController.createForm);
 router.get("/", formController.getForms);
@@ -18,4 +15,4 @@ router.delete("/:id", formController.deleteForm);
 router.post("/:formId/responses", responseController.submitResponse);
 router.get("/:formId/responses", responseController.getResponses);
 
-export const  formRouter = router()
+export const formRouter = router;
