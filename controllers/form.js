@@ -6,6 +6,7 @@ class FormController {
   async createForm(req, res) {
     try {
       const user = await User.findOne({ id: req.userId });
+      console.log(req.userId)
       if (!user) {
         return res.status(404).json({
           status: "failure",
@@ -14,7 +15,7 @@ class FormController {
         });
       }
 
-      const form = await formService.createForm(req.body, req.userId);
+      const form = await formService.createForm(req.body, user._id);
 
       res.status(201).json(form);
     } catch (err) {
@@ -24,6 +25,7 @@ class FormController {
 
   async getForms(req, res) {
     try {
+
       const user = await User.findOne({ id: req.userId });
       if (!user) {
         return res.status(404).json({
@@ -33,7 +35,8 @@ class FormController {
         });
       }
 
-      const forms = await formService.getForms(req.user._id);
+
+      const forms = await formService.getForms(user._id);
       res.json(forms);
     } catch (err) {
       res.status(500).json({ error: err.message });

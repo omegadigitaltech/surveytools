@@ -1,18 +1,19 @@
 import express from "express";
 import { formController } from "../controllers/form.js";
 import { responseController } from "../controllers/response.controller.js";
+import { authMiddleware } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // Forms
-router.post("/", formController.createForm);
-router.get("/", formController.getForms);
-router.get("/:id", formController.getFormById);
-router.put("/:id", formController.updateForm);
-router.delete("/:id", formController.deleteForm);
+router.post("/",  authMiddleware, formController.createForm);
+router.get("/",authMiddleware, formController.getForms);
+router.get("/:id",authMiddleware, formController.getFormById);
+router.put("/:id",authMiddleware, formController.updateForm);
+router.delete("/:id", authMiddleware,formController.deleteForm);
 
 // Responses
-router.post("/:formId/responses", responseController.submitResponse);
-router.get("/:formId/responses", responseController.getResponses);
+router.post("/:formId/responses", authMiddleware, responseController.submitResponse);
+router.get("/:formId/responses", authMiddleware, responseController.getResponses);
 
 export const formRouter = router;

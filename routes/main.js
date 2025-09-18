@@ -46,7 +46,7 @@ router.post('/payment-webhook', receivePaymentWebhook)
 router.post('/get-price', authMiddleware, getPrice)
 router.get('/my-surveys', authMiddleware, mySurveys)
 
-router.all("/form", formRouter)
+router.use("/forms", formRouter)
 
 module.exports = router;
 
