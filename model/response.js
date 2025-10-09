@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const AnswerSchema = new Schema({
@@ -6,14 +6,12 @@ const AnswerSchema = new Schema({
   value: Schema.Types.Mixed, // flexible (string, number, array, etc.)
 });
 
-const ResponseSchema = new Schema({
+export const ResponseSchema = new Schema({
   formId: { type: Schema.Types.ObjectId, ref: "Form", required: true },
   answers: [AnswerSchema],
   submittedAt: { type: Date, default: Date.now },
 });
 
-const Response = mongoose.model("Response", ResponseSchema);
+export const Response = mongoose.model("Response", ResponseSchema);
 
-module.exports = {
-  Response
-}; 
+ 

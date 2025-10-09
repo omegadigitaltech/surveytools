@@ -28,6 +28,11 @@ class ResponseService {
   async getResponses(formId) {
     return await Response.find({ formId }).lean();
   }
+
+  // Get a single response by ID
+  async getResponseById(id) {
+    return await Response.findById(id).lean();
+  }
 }
 
 export const responseService = new ResponseService();

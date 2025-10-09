@@ -15,5 +15,6 @@ router.delete("/:id", authMiddleware,formController.deleteForm);
 // Responses
 router.post("/:formId/responses", authMiddleware, responseController.submitResponse);
 router.get("/:formId/responses", authMiddleware, responseController.getResponses);
+router.get("/responses/:id", authMiddleware, responseController.getResponseById);
 
 export const formRouter = router;

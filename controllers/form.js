@@ -1,12 +1,12 @@
 import { formService } from "../services/form.service.js";
-import  User  from "../model/user.js";
+import User from "../model/user.js";
 import { Form } from "../model/form.js";
 
 class FormController {
   async createForm(req, res) {
     try {
       const user = await User.findOne({ id: req.userId });
-      console.log(req.userId)
+      console.log(req.userId);
       if (!user) {
         return res.status(404).json({
           status: "failure",
@@ -14,7 +14,18 @@ class FormController {
           msg: "User Not Found"
         });
       }
-
+      const similarformExists = await Form.findOne({
+        title: req.body.title,
+        createdBy: user._id
+      });
+      if (similarformExists) {
+        return res.status(400).json({
+          status: "failure",
+          code: 400,
+          msg: "Form with this title already exists",
+          form: similarformExists
+        });
+      }
       const form = await formService.createForm(req.body, user._id);
 
       res.status(201).json(form);
@@ -25,7 +36,6 @@ class FormController {
 
   async getForms(req, res) {
     try {
-
       const user = await User.findOne({ id: req.userId });
       if (!user) {
         return res.status(404).json({
@@ -34,7 +44,6 @@ class FormController {
           msg: "User Not Found"
         });
       }
-
 
       const forms = await formService.getForms(user._id);
       res.json(forms);

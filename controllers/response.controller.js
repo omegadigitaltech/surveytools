@@ -21,6 +21,11 @@ class ResponseController {
       res.status(500).json({ error: err.message });
     }
   }
+
+  async getResponseById(req, res) {
+    const response = await responseService.getResponseById(req.params.id);
+    res.json(response);
+  }
 }
 
 export const responseController  = new ResponseController();

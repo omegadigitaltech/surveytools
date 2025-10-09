@@ -15,7 +15,7 @@ class FormService {
 
   // Get a single form by ID
   async getFormById(formId) {
-    return await Form.findById(formId).lean();
+    return await Form.findById(formId).lean().populate("responses");
   }
 
   // Update a form
