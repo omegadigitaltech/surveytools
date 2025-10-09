@@ -60,7 +60,8 @@ const FormSchema = new Schema({
 
   // Content Details
   fields: [FieldSchema], // An array of the questions/inputs on the form
-
+  shareLink: { type: String, default: '' },
+  htmlEmbedCode: { type: String, default: '' },
   // Sharing Details
   shares: { type: ShareSchema, default: { type: "public" } },
 });
