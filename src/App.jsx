@@ -29,6 +29,7 @@ import signUpAction from "./pages/signup/action";
 import postAction from "./pages/surveyquestion/action";
 import surveyAction from "./pages/postsurvey/action";
 import ExpandSurvey from "./pages/expandsurvey/expandsurvey";
+import StartSurvey from "./pages/postsurvey/startsurvey.jsx";
 import PostSurvey from "./pages/postsurvey/postsurvey";
 import SurveyQuestion from "./pages/surveyquestion/surveyquestion";
 import Publish from "./pages/publish/publish";
@@ -50,15 +51,18 @@ const router = createBrowserRouter(
     <Route>
       <Route element={<HomeLayout />}>
         <Route index element={<Home />} />
-
-        <Route element={<ProtectRoute />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
-          <Route
+        {/* WILL BE ADDED TO PROTECT ROUTE LATER */}
+        <Route path="start-survey" element={<StartSurvey/>} />
+        <Route
             path="postsurvey"
             element={<PostSurvey />}
             action={surveyAction}
           />
+          {/* //////// */}
+        <Route element={<ProtectRoute />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
+          
           <Route
             path="surveyquestion"
             element={<SurveyQuestion />}
