@@ -23,7 +23,7 @@
   --secondary-blue: #35c6f4;
   --lemon: #14fe19;
   --greytxt: #6b7280;
-
+  --greyborder: #b0b0b0;
   /* --green: #196332; */
 
   /* Font-Sizes */
@@ -68,7 +68,10 @@ a {
 ul {
   list-style: none;
 }
-
+.head{
+  font-size: 2rem;
+  font-weight: 500;
+}
 img {
   display: block;
   max-width: 100%;
@@ -177,6 +180,13 @@ button.inactive {
 /* SPIN EFFECT */
 
 /* MEDIA QUERY */
+@media (max-width: 668px) {
+.head {
+  font-size: 1.2rem;
+}
+}
+
+
 @media (max-width: 550px) {
   .wrap {
     width: 95%;

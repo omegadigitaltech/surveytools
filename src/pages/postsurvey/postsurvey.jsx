@@ -98,7 +98,7 @@ const PostSurvey = () => {
                   id="participant_num"
                   value={participants}
                   onChange={handleParticipantsChange}
-                  placeholder="Enter number of participants"
+                  placeholder="0-500"
                   min="1"
                   required
                 />

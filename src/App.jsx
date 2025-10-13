@@ -53,23 +53,24 @@ const router = createBrowserRouter(
         <Route index element={<Home />} />
         {/* WILL BE ADDED TO PROTECT ROUTE LATER */}
         <Route path="start-survey" element={<StartSurvey/>} />
+        <Route path="formquestions" element={<FormQuestions />} />
         <Route
             path="postsurvey"
             element={<PostSurvey />}
             action={surveyAction}
+          />
+            <Route
+            path="surveyquestion"
+            element={<SurveyQuestion />}
+            action={postAction}
           />
           {/* //////// */}
         <Route element={<ProtectRoute />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
           
-          <Route
-            path="surveyquestion"
-            element={<SurveyQuestion />}
-            action={postAction}
-          />
+        
           <Route path="create-form" element={<CreateForm />} />
-          <Route path="formquestions" element={<FormQuestions />} />
           <Route path="publish" element={<Publish />} />
           <Route path="payment" element={<Payment />} />
           <Route path="pricing" element={<Pricing />} />

@@ -8,6 +8,9 @@ import add from "../../assets/img/add.svg";
 import plus from "../../assets/img/icon-add.svg"
 import dot from "../../assets/img/dot.svg";
 import copy from "../../assets/img/copy.svg";
+import close from "../../assets/img/close.svg"
+import palette from "../../assets/img/palette.svg"
+import add_circle from "../../assets/img/add_circle.svg"
 import useAuthStore from "../../store/useAuthStore";
 import PricingModal from "../../components/pricingmodal/pricingmodal";
 import { toast } from "react-toastify";
@@ -27,7 +30,7 @@ const SurveyQuestions = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
-
+  const [showTheme, setShowTheme] = useState(false);
   // Add new state for delete loading
   const [isDeletingId, setIsDeletingId] = useState(null);
   const [questions, setQuestions] = useState([
@@ -42,6 +45,22 @@ const SurveyQuestions = () => {
   ]);
 
   const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false);
+
+// Track Select questions
+const [activeQuestionId, setActiveQuestionId] = useState(null);
+
+const handleFocusQuestion = (id) => {
+  setActiveQuestionId(id);
+};
+
+const handleBlurQuestion = () => {
+  setActiveQuestionId(null);
+};
+// THEME
+const toggleTheme = () => {
+  setShowTheme(!showTheme);
+};
+
 
   // Load existing questions
   useEffect(() => {
@@ -335,151 +354,190 @@ const handleFileUpload = async (e) => {
   return (
     <section className="form-page">
       <div className="wrap">
-        <div className="form-head flex">
-          <Link to="/postsurvey">
-            <img src={backaro} className="backaro" alt="Back" />
-          </Link>
-          <div className="form-h">
-            <h3>Add Questions</h3>
-          </div>
+      <div className="surveyform-head flex">
+            <h1 className="head">Create Questionnaire</h1>
+            <div className="flex import_style">
+            <label className="import-survey" >
+      {isUploading ? `Uploading... ${uploadProgress}%` : "Import from files"}
+      <input
+        type="file"
+        accept=".pdf"
+        name="document"
+        onChange={handleFileUpload}
+        style={{ display: "none" }}
+        disabled={isUploading}
+      />
+    </label>
+            <div className="theme-wrapper">
+      {/* Palette Icon (keep existing positioning in page layout) */}
+      <img
+        src={palette}
+        alt="palette"
+        className="palette-icon"
+        onClick={() => setShowTheme(!showTheme)}
+      />
+
+      {/* Theme side card */}
+      <div className={`form-theme ${showTheme ? "open" : ""}`}>
+        <div className="flex theme-head">
+          <p>Style</p>
+          <img src={close} alt="close" onClick={() => setShowTheme(false)} />
         </div>
+
+        <div className="theme-section">
+          <p>Background Color</p>
+        </div>
+
+        <div className="theme-section">
+          <p>Font Family</p>
+        </div>
+      </div>
+    </div>
+      
+            </div>
+          </div>
+        <div className="question-box">
 
         {isLoading ? (
           <div className="loading">Loading questions...</div>
         ) : (
           <div className="form-container">
             <Form method="post" action="/surveyquestion" onSubmit={handlePostSubmit}>
-         
-            {/* Upload File Questions */}
-            <div className="Q-file-upload">
-                <label className="flex Q-upload">
-                  <input
-                    type="file"
-                    accept=".pdf"
-                    name="document"
-                    onChange={handleFileUpload}
-                    style={{ display: "none" }}
-                    disabled={isUploading}
-                  />
-                  <img src={plus} alt="" />
-                  {isUploading ? (
-                    `Uploading... ${uploadProgress}%`
-                  ) : (
-                    "Upload Questions PDF"
-                  )}
-                </label>
-                <p className="upload-note">
-                  Upload a PDF file to automatically populate questions
-                </p>
-              </div>
-
+         <h1 form-title>Title of my Survey will appear here</h1>
               {/* To pass id to action */}
               <input type="hidden" name="currentSurveyId" value={currentSurveyId} />
 
-              {questions.map((question) => (
-                <div className="oneQuestion" key={question.id}>
-                  <div className="question-field flex">
+              {questions.map((question) => {
+  const isActive = activeQuestionId === question.id;
+  return (
+    <div
+      className={`oneQuestion ${isActive ? "active" : ""}`}
+      key={question.id}
+      onClick={() => handleFocusQuestion(question.id)}
+    >
+      {isActive ? (
+        <>
+          <div className="question-field flex">
+            <input
+              className="question-input"
+              type="text"
+              name="questionText"
+              required
+              placeholder="Question title"
+              value={question.questionText}
+              onChange={(e) =>
+                handleQuestionChange(question.id, "questionText", e.target.value)
+              }
+              onBlur={handleBlurQuestion}
+            />
+            <div className="question-actions flex">
+              <img
+                src={copy}
+                className="copy-icon"
+                alt="Duplicate"
+                onClick={() => duplicateQuestion(question.id)}
+              />
+              {isDeletingId === question.id ? (
+                <span className="deleting-spinner">Deleting...</span>
+              ) : (
+                <img
+                  src={del}
+                  className="delete-icon"
+                  alt="Delete"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteQuestion(question.id);
+                  }}
+                />
+              )}
+            </div>
+          </div>
+
+          <div className="choice-field custom-dropdown flexx">
+            <div className="wrap-icon type-row flex">
+              <img src={dot} className="dot-icon" alt="Dot" />
+              <select
+                name="questionType"
+                value={question.questionType}
+                onChange={(e) =>
+                  handleQuestionChange(question.id, "questionType", e.target.value)
+                }
+                className="choice-select"
+              >
+                <option value="multiple_choice">Multiple Choice</option>
+                <option value="multiple_selection">Multiple Selection</option>
+                <option value="fill_in">Fill in</option>
+                <option value="five_point">Five Point</option>
+              </select>
+            </div>
+
+            {(question.questionType === "multiple_choice" ||
+              question.questionType === "multiple_selection") && (
+              <div className="options-list flex">
+                {question.options.map((option, index) => (
+                  <div className="option-row flex" key={index}>
                     <input
-                      className="question-input"
                       type="text"
-                      name="questionText"
-                      required
-                      placeholder="Untitled Question"
-                      value={question.questionText}
+                      placeholder={`Option ${index + 1}`}
+                      value={option.text}
                       onChange={(e) =>
-                        handleQuestionChange(question.id, "questionText", e.target.value)
+                        handleOptionChange(
+                          question.id,
+                          index,
+                          "text",
+                          e.target.value
+                        )
                       }
+                      className="option-input"
                     />
-                    <img
-                      src={copy}
-                      className="copy-icon"
-                      alt="Duplicate"
-                      onClick={() => duplicateQuestion(question.id)}
-                    />
-                    {isDeletingId === question.id ? (
-                      <span className="deleting-spinner">Deleting...</span>
-                    ) : (
-                      <img
-                        src={del}
-                        className="delete-icon"
-                        alt="Delete"
-                        onClick={() => deleteQuestion(question.id)}
-                      />
-                    )}
-                  </div>
-
-                  <div className="choice-field custom-dropdown flex">
-                    <div className="wrap-icon type-row flex">
-                      <img src={dot} className="dot-icon" alt="Dot" />
-                      <select
-                        name="questionType"
-                        value={question.questionType}
+                    <label className="custom-input-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={option.allowsCustomInput}
                         onChange={(e) =>
-                          handleQuestionChange(question.id, "questionType", e.target.value)
+                          handleOptionChange(
+                            question.id,
+                            index,
+                            "allowsCustomInput",
+                            e.target.checked
+                          )
                         }
-                        className="choice-select"
-                      >
-                        <option value="multiple_choice">Multiple Choice</option>
-                        <option value="multiple_selection">Multiple Selection</option>
-                        <option value="fill_in">Fill in</option>
-                        <option value="five_point">Five Point</option>
-                      </select>
-                    </div>
-                    {(question.questionType === "multiple_choice" || question.questionType === "multiple_selection") && (
-                      <div className="options-list flex">
-                        <div className="option">
-                          {question.options.map((option, index) => (
-                            <div className="wrap-icon flex" key={index}>
-                              <input
-                                key={index}
-                                type="text"
-                                name="options"
-                                placeholder={`Option ${index + 1}`}
-                                value={option.text}
-                                onChange={(e) =>
-                                  handleOptionChange(
-                                    question.id,
-                                    index,
-                                    "text",
-                                    e.target.value
-                                  )
-                                }
-                                className="option-input"
-                              />
-                              <label className="custom-input-checkbox">
-                                <input
-                                  type="checkbox"
-                                  checked={option.allowsCustomInput}
-                                  onChange={(e) =>
-                                    handleOptionChange(
-                                      question.id,
-                                      index,
-                                      "allowsCustomInput",
-                                      e.target.checked
-                                    )
-                                  }
-                                />
-                                <span className="checkbox-label">Allow custom input</span>
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-
-                        <button
-                          className="option-select flex"
-                          type="button"
-                          onClick={() => addOption(question.id)}
-                        >
-                          Add option
-                        </button>
-                      </div>
-                    )}
+                      />
+                      <span>Allow custom input</span>
+                    </label>
                   </div>
-                </div>
+                ))}
+                <button
+                  className="option-select flex"
+                  type="button"
+                  onClick={() => addOption(question.id)}
+                >
+                  Add option
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        //  Collapsed Preview Mode
+        <div className="collapsed-preview">
+          <p className="preview-question">
+            {question.questionText || "Untitled Question"}
+          </p>
+          {question.options && question.options.length > 0 && (
+            <ul className="preview-options">
+              {question.options.map((opt, i) => (
+                <li key={i}>{opt.text || "Option " + (i + 1)}</li>
               ))}
-
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  );
+})}
               <button className="next-question flex" onClick={addNewQuestion}>
-                Next Question <img src={add} alt="Add" />
+                <img src={add_circle} alt="Add" /> Add Question 
               </button>
 
               <div className="button-group flex">
@@ -497,13 +555,26 @@ const handleFileUpload = async (e) => {
                   className="post-btn"
                   disabled={isPosting}
                 >
-                  {isPosting ? "Posting..." : "Post"}
+                  {isPosting ? "Publishng..." : "Publish"}
                 </button>
               </div>
             </Form>
           </div>
         )}
 
+<div className="form-theme">
+  <div className="flex theme-head" >
+    <p>Style</p>
+    <img src={close} alt="" />
+  </div>
+            <div>
+              <p>Background Color</p>
+            </div>
+            <div>
+              <p>Font Family</p>
+            </div>
+        </div>
+            </div>
       </div>
 
       {showPricingModal && (
