@@ -117,7 +117,10 @@ span.tools {
 }
 
 .header-w2-link {
-    color: var(--text-dark);
+    /* color: var(--text-dark); */
+}
+.button.header-w2-link {
+   background-color: var(--base);
 }
 
 .header-w2-hide,

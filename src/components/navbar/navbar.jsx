@@ -40,13 +40,10 @@ const Navbar = () => {
           </button>
 
           <NavLink className="header-w1-logo" to="/">
-            <span className="survey">Survey</span>
-            <span className="tools">Tools</span>{" "}
-            <span className="watermark subscript text-[.6rem] font-medium text-black/90">
-              BETA
-            </span>
+            <img src="/Blue-logo-1.svg" alt="Blue Logo" className="md:w-[10rem] h-[2.5rem] md:h-auto" />
           </NavLink>
         </div>
+
         <div className="header-w2">
           <ul className="header-w2-list">
             <li className="header-w2-item hide">
@@ -56,9 +53,29 @@ const Navbar = () => {
             </li>
             <li className="header-w2-item hide">
               <NavLink className="header-w2-link" to="/">
-                About Us
+                Pricing
               </NavLink>
             </li>
+            <li className="header-w2-item hide">
+              <NavLink className="header-w2-link" to="/">
+                Services
+              </NavLink>
+            </li>
+            <li className="header-w2-item hide">
+              <NavLink className="header-w2-link" to="/">
+                Blog
+              </NavLink>
+            </li>
+            
+            {/* <li className="header-w2-item hide">
+              <NavLink className="header-w2-link" to="/">
+                About Us
+              </NavLink>
+            </li> */}
+          </ul>
+        </div>
+        <div className="header-w2">
+          <ul className="header-w2-list">
             {isAuthenticated && (
               <>
                 <li className="header-w2-item show header-w2-hide">
@@ -81,6 +98,11 @@ const Navbar = () => {
             {!isAuthenticated && (
               <>
                 <li className="header-w2-item hide">
+                  <NavLink className="header-w2-link button text-white px-[2.5rem] py-[1rem] rounded-md" to="/signin">
+                    Get Started
+                  </NavLink>
+                </li>
+                {/* <li className="header-w2-item hide">
                   <NavLink className="header-w2-link" to="/signin">
                     Log In
                   </NavLink>
@@ -89,7 +111,7 @@ const Navbar = () => {
                   <NavLink className="header-w2-link" to="/signup">
                     Sign Up
                   </NavLink>
-                </li>
+                </li> */}
               </>
             )}
           </ul>
