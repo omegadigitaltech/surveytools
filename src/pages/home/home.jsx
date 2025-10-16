@@ -5,13 +5,13 @@ import "./home.css";
 
 const Home = () => {
   return (
-    <section className="home flex overflow-hidden">
-      <div className="content flex flex-col items-center max-w-[40%] ml-[8%]">
+    <section className="home flex flex-col md:flex-row overflow-hidden">
+      <div className="content flex flex-col items-center max-w-[40% p-[5%] md:p-[2%] lg:p-auto md:ml-[2%] lg:ml-[8%] md:mt-[8%]">
         <div>
-          <h1 className="text-5xl/14 font-[500] ">
+          <h1 className="text-3xl/10 md:text-4xl/10 lg:text-5xl/14 font-[500] ">
             Create Smart Surveys <br /> Simply for Everyone
           </h1>
-          <p className="max-w-[90%] my-4">
+          <p className="md:max-w-[90%] my-4">
             Whether you’re a student, a busy professional, or a corporation, our
             platform makes it simple to design surveys, reach the right
             audience, and collect results you can trust
@@ -22,9 +22,9 @@ const Home = () => {
               <div className="">1k+ satisfied users</div>
             </div>
           </div>
-          <div className="flex gap-8 mt-4">
-            <Link className="button-filled px-10 py-4 rounded-md">Get Started</Link>
-            <Link className="px-10 py-4 rounded-md border-[1px]">How it Works</Link>
+          <div className="flex gap-4 lg:gap-8 mt-4">
+            <Link className="button-filled px-5 py-3 lg:px-10 lg:py-4 rounded-md">Get Started</Link>
+            <Link className="px-5 py-3 lg:px-10 lg:py-4 rounded-md border-[1px]">How it Works</Link>
           </div>
         </div>
       </div>
@@ -38,7 +38,7 @@ const Home = () => {
           />
           <img
             src="/green-text-box.svg"
-            className="absolute top-[50%] left-0"
+            className="absolute top-[40%] md:top-[40%] lg:top-[50%] left-0 md:-left-[5%]"
             alt="green-text-box"
           />
           <img
