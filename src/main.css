@@ -8,8 +8,8 @@
 
   /* Colors */
   /* --base: #1D8C9C; */
-  --base: #2095D3;
-  --btns: #149BBA;
+  --base: #2095d3;
+  --btns: #149bba;
   --blue-border: #bfe9f3;
   --wht: #fff;
   --fade: #e6e6e6;
@@ -19,9 +19,11 @@
   --ltgray: #e7e7e73d;
   --green: rgb(53, 143, 53);
   --border: 0.5px solid rgb(167, 167, 167);
-  --primary: #2095D3;
-  --secondary-blue: #35C6F4;
-  --lemon: #14FE19;
+  --primary: #2095d3;
+  --secondary-blue: #35c6f4;
+  --lemon: #14fe19;
+  --greytxt: #6b7280;
+  --greyborder: #b0b0b0;
   /* --green: #196332; */
 
   /* Font-Sizes */
@@ -43,7 +45,6 @@
   --bp-md: 768px;
   --bp-sm: 512px;
   --bp-xs: 384px;
-
 }
 
 *,
@@ -57,6 +58,7 @@
 body {
   font-size: var(--fs-md);
   font-family: var(--ff-body);
+  background: #e5e7eb;
 }
 
 a {
@@ -66,12 +68,17 @@ a {
 ul {
   list-style: none;
 }
-
+.head{
+  font-size: 2rem;
+  font-weight: 500;
+}
 img {
   display: block;
   max-width: 100%;
 }
-
+.greytxt {
+  color: var(--greytxt);
+}
 /* input,
 button {
   font: inherit;
@@ -119,13 +126,13 @@ button.inactive {
   border-radius: 5px;
 }
 
-.fw-5h{
-font-weight: 500;
+.fw-5h {
+  font-weight: 500;
 }
-.fw-6h{
+.fw-6h {
   font-weight: 600;
-  }
-  
+}
+
 /* SPIN EFFECT */
 .spin-btn {
   background: var(--base);
@@ -173,6 +180,13 @@ font-weight: 500;
 /* SPIN EFFECT */
 
 /* MEDIA QUERY */
+@media (max-width: 668px) {
+.head {
+  font-size: 1.2rem;
+}
+}
+
+
 @media (max-width: 550px) {
   .wrap {
     width: 95%;
@@ -188,4 +202,3 @@ font-weight: 500;
     font-size: 0.9rem;
   }
 }
-

@@ -1,0 +1,96 @@
+/* #e5e7eb */
+
+.startsurvey {
+  justify-content: center;
+  margin: 3rem 0;
+  /* height: 90vh; */
+}
+.startsurvey-wrap {
+  border-radius: 0.8rem;
+  background: var(--wht);
+  padding: 1.5rem;
+  width: 70%;
+  border: 1px solid var(--fade);
+}
+.startsurvey-head h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.startsurvey-head p {
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+}
+.startoption-box {
+  border-radius: 0.8rem;
+  width: 100%;
+  gap: 2rem;
+}
+.start-option {
+  border: 1px solid var(--fade);
+  width: 100%;
+  height: 15rem;
+  border-radius: 0.8rem;
+  padding: 1.6rem;
+}
+.click-option {
+  border: 2px solid var(--base);
+}
+.start-option h1 {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-top: 0.6rem;
+}
+.start-option p {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0.3rem 0 4rem;
+  color: var(--greytxt);
+}
+.startsurvey-btn {
+  width: 100% !important;
+}
+
+/* MEIDA QUERY */
+@media (max-width: 780px) {
+  .startsurvey-wrap {
+    width: 90%;
+  }
+  .startsurvey {
+    justify-content: center;
+    /* margin: 2rem 0; */
+  }
+  .startoption-box {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 680px) {
+  .startsurvey {
+    margin: 2rem 0;
+  }
+  .startsurvey-head h1 {
+    font-size: 1.5rem;
+  }
+  .startsurvey-head p {
+    font-size: 1.1rem;
+  }
+  .start-option h1 {
+    font-size: 1rem;
+  }
+  .start-option p {
+    font-size: 0.9rem;
+  }
+}
+@media (max-width: 460px) {
+  .start-option p {
+    font-size: 0.85rem;
+  }
+  .startsurvey-head h1 {
+    font-size: 1.3rem;
+  }
+  .startsurvey-head p {
+    font-size: 1rem;
+  }
+}

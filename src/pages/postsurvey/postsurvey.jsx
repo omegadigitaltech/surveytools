@@ -1,16 +1,15 @@
 import { Link, Form, useNavigate, useActionData } from "react-router-dom";
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import "./postsurvey.css";
 import backaro from "../../assets/img/backaro.svg";
 import { faculty_dept } from "../../utils/constants/facultyData";
 
-
 const PostSurvey = () => {
   const data = useActionData();
-  console.log(data)
+  console.log(data);
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [participants, setParticipants] = useState("");
   const [gender, setGender] = useState("all_genders");
   const [amount, setAmount] = useState(0);
@@ -27,8 +26,6 @@ const PostSurvey = () => {
       setLoading(false);
     }
   }, [data]);
-
-
 
   const handleParticipantsChange = (e) => {
     const value = e.target.value;
@@ -47,11 +44,18 @@ const PostSurvey = () => {
     <section className="postsurvey">
       <div className="postsurvey_wrap wrap">
         <div className="post-head flex">
-          <Link to="/dashboard"><img src={backaro} className="backaro" /></Link>
-          <h3>Post Questionnaire</h3>
+          <Link to="/dashboard">
+            <img src={backaro} className="backaro" />
+          </Link>
+          <h1>Create A Questionnaire</h1>
         </div>
         <div className="postsurvey_div">
-          <Form className="survey_form" method="post" action="/postsurvey" onSubmit={handleSubmit}>
+          <Form
+            className="survey_form"
+            method="post"
+            action="/postsurvey"
+            onSubmit={handleSubmit}
+          >
             <div className="postsurvey-field">
               <label className="postsurvey-label" htmlFor="title">
                 <h4>Title of Survey</h4>
@@ -61,6 +65,7 @@ const PostSurvey = () => {
                 type="text"
                 name="title"
                 id="title"
+                placeholder="Untitled"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
@@ -93,21 +98,11 @@ const PostSurvey = () => {
                   id="participant_num"
                   value={participants}
                   onChange={handleParticipantsChange}
-                  placeholder="Enter number of participants"
+                  placeholder="0-500"
                   min="1"
                   required
                 />
               </div>
-              {/* <div className="postsurvey-field custom-dropdown">
-                <label className="required-label" htmlFor="range-dropdown">
-                  <h4>Est. amount to be paid (₦)</h4>
-                </label> */}
-                {/* Calculated amount to be paid */}
-                {/* <p className="num_partp-input">
-                  ₦ <span className="result">{amount}</span>
-                </p>
-              </div> */}
-
             </div>
             <div className="postsurvey-field gender-area custom-dropdown">
               <label className="required-label" htmlFor="range-dropdown">
@@ -116,7 +111,8 @@ const PostSurvey = () => {
               <select
                 name="gender"
                 id="range-dropdown"
-                className="custom-select">
+                className="custom-select"
+              >
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 <option value="all_genders">All genders</option>
@@ -128,38 +124,54 @@ const PostSurvey = () => {
               <label className="required-label" htmlFor="range-dropdown">
                 <h4>Preferred Participants</h4>
               </label>
-              <select name="faculty" value={preferredFaculty}
+              <select
+                name="faculty"
+                value={preferredFaculty}
                 className="custom-select"
                 id="range-dropdown"
-                onChange={handleFacultyChange}>
+                onChange={handleFacultyChange}
+              >
                 <option value="all_faculties">All Faculties</option>
                 {faculty_dept.map((item) => (
-                  <option key={item.faculty} value={item.faculty}>{item.faculty}</option>
+                  <option key={item.faculty} value={item.faculty}>
+                    {item.faculty}
+                  </option>
                 ))}
               </select>
-
             </div>
             {/* Where users can select department if they choose a particular faculty */}
             <div className="postsurvey-field custom-dropdown">
-
               {preferredFaculty !== "all_faculties" && (
                 <div className="postsurvey-field">
-                  <label><h4>Preferred Department</h4></label>
-                  <select name="department" value={preferredDepartment}
+                  <label>
+                    <h4>Preferred Department</h4>
+                  </label>
+                  <select
+                    name="department"
+                    value={preferredDepartment}
                     id="range-dropdown"
                     className="custom-select"
-                    onChange={(e) => setPreferredDepartment(e.target.value)}>
+                    onChange={(e) => setPreferredDepartment(e.target.value)}
+                  >
                     <option value="all_departments">All Departments</option>
-                    {faculty_dept.find(f => f.faculty === preferredFaculty)?.departments.map((dept) => (
-                      <option key={dept} value={dept}>{dept}</option>
-                    ))}
+                    {faculty_dept
+                      .find((f) => f.faculty === preferredFaculty)
+                      ?.departments.map((dept) => (
+                        <option key={dept} value={dept}>
+                          {dept}
+                        </option>
+                      ))}
                   </select>
                 </div>
               )}
             </div>
             <div className="flex btn_div">
               <input type="hidden" name="amount" value={amount} />
-              <button type="submit" className="continue_survey btn" disabled={loading}>
+              <button
+                type="submit"
+                className="continue_survey btn"
+                disabled={loading}
+              >
                 {loading ? "Submitting..." : "Continue"}
               </button>
             </div>
