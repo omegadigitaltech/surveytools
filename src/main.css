@@ -58,7 +58,7 @@
 body {
   font-size: var(--fs-md);
   font-family: var(--ff-body);
-  background: #e5e7eb;
+  background: #f7f5fa;
 }
 
 a {
@@ -109,6 +109,9 @@ button.inactive {
 .flex {
   display: flex;
   align-items: center;
+}
+.flex.items-start {
+  align-items: flex-start;
 }
 
 .grid {
