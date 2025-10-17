@@ -5,8 +5,8 @@ import "./home.css";
 
 const Home = () => {
   return (
-    <section className="home flex flex-col md:flex-row overflow-hidden">
-      <div className="content flex flex-col items-center max-w-[40% p-[5%] md:p-[2%] lg:p-auto md:ml-[2%] lg:ml-[8%] md:mt-[8%]">
+    <section className="home bg-white flex flex-col md:flex-row overflow-hidden">
+      <div className="content flex flex-col items-center md:max-w-[40%] p-[5%] md:p-[2%] lg:p-auto md:ml-[2%] lg:ml-[8%] md:mt-[8%]">
         <div>
           <h1 className="text-3xl/10 md:text-4xl/10 lg:text-5xl/14 font-[500] ">
             Create Smart Surveys <br /> Simply for Everyone
