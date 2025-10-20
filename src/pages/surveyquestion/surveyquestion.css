@@ -1,26 +1,27 @@
-
 .form-page {
-    margin: 1.5rem 0;
-    }
-.surveyform-head{
-    justify-content: space-between;
-    margin-bottom: 2rem;
+  margin: 1.5rem 0;
+  max-width: 100%; /* 👈 never exceed viewport */
+  overflow-x: hidden;
 }
-.form-page .import-survey{
-    border: 1.5px solid var(--base);
-    padding: .5rem;
-    color: var(--base);
-    border-radius: .4rem;
-    font-weight: 500;
-    width: 10rem;
+.surveyform-head {
+  justify-content: space-between;
+  margin-bottom: 2rem;
 }
-.import_style{
-    gap: 1.5rem;
+.form-page .import-survey {
+  border: 1.5px solid var(--base);
+  padding: 0.5rem;
+  color: var(--base);
+  border-radius: 0.4rem;
+  font-weight: 500;
+  width: 10rem;
 }
-.question-box{
-    display: flex;
-    align-items: flex-start;
-    gap: 2rem;
+.import_style {
+  gap: 1.5rem;
+}
+.question-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
 }
 /* .form-theme{
     background: #fff;
@@ -40,523 +41,554 @@
 cursor: pointer;
 } */
 .theme-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  
-  /* Keep your palette icon in its existing position */
-  .palette-icon {
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    margin-left: auto;
-    transition: transform 0.2s ease;
-  }
-  
-  .palette-icon:hover {
-    transform: rotate(15deg);
-  }
-  
-  /* THEME PANEL */
-  .form-theme {
-    position: absolute;
-    top: 0;
-    right: -280px; /* Initially hidden (will slide in) */
-    width: 260px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 12px 0 0 12px;
-    box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.08);
-    padding: 16px;
-    height: auto;
-    transition: all 0.35s ease;
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
-  }
-  
-  /* Active (open) state */
-  .form-theme.open {
-    right: 0;
-    opacity: 1;
-    pointer-events: auto;
-  }
-  
-  /* Smooth slide-out fix */
-  .form-theme.closing {
-    right: -300px;
-    opacity: 0;
-    pointer-events: none;
-  }
-  
-  .theme-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
-  }
-  
-  .theme-head img {
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-  }
-  
-  .theme-section {
-    margin-bottom: 20px;
-  }
-  
-  .theme-section p {
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 8px;
-  }
-  
-
-
-
-
-.form-theme p{
-font-size: 1rem;
-font-weight: 500;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
-.form-wrap{
-    width: 100%;
+
+/* Keep your palette icon in its existing position */
+.palette-icon {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.palette-icon:hover {
+  transform: rotate(15deg);
+}
+
+/* THEME PANEL */
+.form-theme {
+  position: fixed; /* Change from absolute to fixed */
+  top: 30%; /* Center vertically */
+  right: -280px;
+  transform: translateY(-50%); /* Perfect vertical centering */
+  width: 300px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px 0 0 12px;
+  box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  height: auto;
+  transition: all 0.35s ease;
+  z-index: 1000; /* Higher z-index */
+  opacity: 0;
+  pointer-events: none;
+  max-height: 90vh; /* Prevent vertical overflow too */
+  overflow-y: auto; /* Scroll if content is too tall */
+}
+/* Active (open) state */
+.form-theme.open {
+  right: 0;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Smooth slide-out fix */
+.form-theme.closing {
+  right: -300px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+.theme-head img {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.theme-section {
+  margin-bottom: 20px;
+}
+
+.theme-section p {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-theme p {
+  font-size: 1rem;
+  font-weight: 500;
+}
+.form-wrap {
+  width: 100%;
 }
 .form-container {
-    border: 1px solid var(--greyborder);
-        border-radius: 8px;
-        width: 100%;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        background: #fff;
+  border: 1px solid var(--greyborder);
+  border-radius: 8px;
+  width: 100%;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  background: #fff;
 }
-.form-container h1{
-font-size: 1.2rem;
-font-weight: 500;
-margin-bottom:1rem;
+.form-container h1 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
 }
 .oneQuestion {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .question-field {
-    justify-content: space-between;
+  justify-content: space-between;
 }
-.question-actions{
-    gap: 2rem;
+.num-drag {
+  gap: 50%;
+  margin-bottom: 0.5rem;
+}
+.drag-handle {
+  width: 12px;
+  height: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 3px); /* 3 columns */
+  grid-template-rows: repeat(3, 3px); /* 3 rows */
+  gap: 4px;
+  cursor: grab;
+}
+
+.drag-handle div {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #666; /* dot color */
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.question-actions {
+  gap: 2rem;
 }
 .question-field:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 .copy-icon {
-    width: 1.8rem;
+  width: 1.8rem;
 }
 .delete-icon {
-    width: 1.2rem;
+  width: 1.2rem;
 }
 
 /* TEST  */
 .oneQuestion {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    transition: all 0.2s ease;
-    background: #fff;
-  }
-  .oneQuestion.active {
-    border-color: var(--base);
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-  }
-  .collapsed-preview {
-    cursor: pointer;
-    padding: 0.5rem;
-  }
-  .preview-question {
-    font-weight: 600;
-    font-size: 1rem;
-    color: #333;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+.oneQuestion.active {
+  border-color: var(--base);
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+.collapsed-preview {
+  cursor: pointer;
+  padding: 0.5rem;
+}
+.preview-question {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+.preview-options {
+  list-style: none;
+  padding-left: 0;
+}
+.preview-options li {
+  background: var(--litgray);
+  padding: 0.4rem 0.6rem;
+  border-radius: 5px;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.option-row {
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.option-row input[type="text"] {
+  flex: 1;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  /* gap: 6px;  */
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.slider {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 20px;
+  transition: background-color 0.3s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  top: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.switch input:checked + .slider {
+  background-color: #4285f4;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+.switch-label-txt {
+  font-size: 0.7rem;
+}
+
+@media (max-width: 768px) {
+  .option-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0rem;
     margin-bottom: 0.5rem;
   }
-  .preview-options {
-    list-style: none;
-    padding-left: 0;
+  .option-input {
+    margin-bottom: 0.1rem;
   }
-  .preview-options li {
-    background: var(--litgray);
-    padding: 0.4rem 0.6rem;
-    border-radius: 5px;
-    margin-bottom: 0.3rem;
-    font-size: 0.9rem;
-    color: #555;
-  }
-  
-  .option-row {
-    justify-content: space-between;
-    gap: 1rem;
-    width: 100%;
-  }
-  
-  .option-row input[type="text"] {
-    flex: 1;
-  }
-  
   .custom-input-checkbox {
-    white-space: nowrap;
+    margin-top: 0.3rem;
   }
-  
-  
-  @media (max-width: 768px) {
-    .option-row {
-      flex-direction: column;
-      align-items: flex-start !important;
-      gap: 0rem;
-      margin-bottom: .5rem;
-    }
-    .option-input {
-        margin-bottom: 0.1rem;
-    }
-    .custom-input-checkbox {
-      margin-top: 0.3rem;
-    }
-  }
-  
+}
 
 /* TEST */
 .question-input {
-    width: 80%;
-    background: var(--litgray);
-    padding: 1em;
-    border-radius: 6px;
-    border-bottom: 0.5px solid;
+  width: 80%;
+  background: var(--litgray);
+  padding: 1em;
+  border-radius: 6px;
+  border-bottom: 0.5px solid;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 
 .choice-field {
-    margin-top: .8rem;
-    gap: 1rem;
-    display: flex;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    
+  margin-top: 0.8rem;
+  gap: 1rem;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .custom-dropdown {
-    position: relative;
-    width: 100%;
+  position: relative;
+  width: 100%;
 }
 
 .custom-select-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .dot-icon {
-    position: absolute;
-    left: 10px;
-    width: 13px;
-    color: #333;
+  position: absolute;
+  left: 10px;
+  width: 13px;
+  color: #333;
 }
 
 .choice-select {
-    padding: 10px;
-    padding-left: 40px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: var(--wht);
-    font-size: .9rem;
-    cursor: pointer;
-    box-sizing: border-box;
-    /* appearance: none;  */
-    font-size: var(--fs-md);
-    font-family: var(--ff-body);
+  padding: 10px;
+  padding-left: 40px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: var(--wht);
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-sizing: border-box;
+  /* appearance: none;  */
+  font-size: var(--fs-md);
+  font-family: var(--ff-body);
 }
-
 
 .options-list {
-    justify-content: space-between;
-    width: 70%;
-    flex-wrap: wrap;
+  justify-content: space-between;
+  width: 70%;
+  flex-wrap: wrap;
 }
 .option-input {
-    border: 0.5px solid rgb(167, 167, 167);
-    padding: 10px;
-    border-radius: 8px;
-    width: 100%;
-    margin-bottom: .3rem;
+  border: 0.5px solid rgb(167, 167, 167);
+  padding: 10px;
+  border-radius: 8px;
+  width: 100%;
+  margin-bottom: 0.3rem;
 }
 
 .option {
-    width: 65%;
+  width: 65%;
 }
 
 .option-select {
-    padding: 10px;
-    padding-right: 50px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    appearance: none;
-    background: url('../../assets/img/add.svg') no-repeat right center;
-    background-size: 17px;
-    cursor: pointer;
-    font-size: .9rem;
-    background-color: var(--litgray);
-    background-position: right 15px center;
-    font-size: var(--fs-md);
-    font-family: var(--ff-body);
-    margin-top: 1rem;
+  padding: 10px;
+  padding-right: 50px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  appearance: none;
+  background: url("../../assets/img/add.svg") no-repeat right center;
+  background-size: 17px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  background-color: var(--litgray);
+  background-position: right 15px center;
+  font-size: var(--fs-md);
+  font-family: var(--ff-body);
+  margin-top: 1rem;
 }
 
-
-
 .next-question {
-    padding: 10px;
-    color: #fff;
-    /* border: 1px solid #ccc; */
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: .8rem;
-    background-color: var(--base);
-    gap: .8rem;
+  padding: 10px;
+  color: #fff;
+  /* border: 1px solid #ccc; */
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  background-color: var(--base);
+  gap: 0.8rem;
 }
 
 .next-question img {
-    width: 1.1rem;
+  width: 1.1rem;
 }
 
 /* Add to surveyquestion.css */
-.Q-file-upload{
-    margin-bottom: 1.5rem;
+.Q-file-upload {
+  margin-bottom: 1.5rem;
 }
 .Q-upload-btn {
-    margin-bottom: .8rem;
+  margin-bottom: 0.8rem;
 }
 
 .post-btn,
 .Q-upload {
-    display: block;
-    background-color: var(--base);
-    padding: 0.8em 3rem;
-    color: #fff;
-    font-weight: bold;
-    border-radius: 5px;
+  display: block;
+  background-color: var(--base);
+  padding: 0.8em 3rem;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 5px;
 }
 
 .Q-file-upload label {
-    cursor: pointer;
-    padding: 12px 20px;
-    transition: background 0.3s ease;
+  cursor: pointer;
+  padding: 12px 20px;
+  transition: background 0.3s ease;
 }
 
 .Q-file-upload label:hover {
-    background: var(--secondary-blue);
+  background: var(--secondary-blue);
 }
 
 .upload-note {
-    font-size: 0.8rem;
-    color: #666;
-    margin-top: 8px;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 8px;
 }
 
 .post-btn:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .button-group {
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 3rem;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 3rem;
 }
 
 .save-btn {
-    background-color: var(--wht);
-    border: 2px solid var(--base);
-    color: var(--base);
-    padding: 0.8em 3rem;
-    font-weight: bold;
-    border-radius: 5px;
+  background-color: var(--wht);
+  border: 2px solid var(--base);
+  color: var(--base);
+  padding: 0.8em 3rem;
+  font-weight: bold;
+  border-radius: 5px;
 }
 
 .save-btn:hover {
-    background-color: var(--litgray);
-    cursor: pointer;
+  background-color: var(--litgray);
+  cursor: pointer;
 }
 
 .loading {
-    text-align: center;
-    margin: 2rem;
-    font-size: 1.2rem;
-    color: var(--gray);
+  text-align: center;
+  margin: 2rem;
+  font-size: 1.2rem;
+  color: var(--gray);
 }
 
 .deleting-spinner {
-    font-size: 0.8rem;
-    color: var(--gray);
-    margin-left: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--gray);
+  margin-left: 0.5rem;
 }
 
 /* MEDAI QUERY */
-@media(max-width:1050px) {}
-
-@media(max-width:512px) {
-    .form-head {
-        gap: 2rem
-    }
-
-    .form-head h3 {
-        font-size: 1.1rem;
-    }
-
-    .form-h {
-        padding: 1.5rem;
-        width: 85%;
-    }
-    .surveyform-head {
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    .form-page .import-survey {
-        padding: .4rem;
-        font-size: .9rem;
-    }
-        .import_style {
-            gap: 1.5rem;
-            justify-content: space-between;
-            width: 90%;
-        }
-    .form-container {
-        width: 100%;
-        margin-left: 0rem;
-        padding: 1rem;
-    }
-    .form-container h1{
-        font-size: 1rem;
-    }
-    .question-actions {
-        gap: 1rem;
-    }
-    .copy-icon {
-        width: 1.3rem;
-    }
-
-    .delete-icon {
-        width: .8rem;
-    }
-
-    .question-option {
-        width: 0.3rem;
-        height: .7rem;
-    }
-
-    .options-list {
-        width: 100%;
-    }
-
-    .option-input {
-        margin-bottom: .5rem;
-    }
-
-    .choice-field {
-        flex-wrap: wrap;
-        gap: .2rem;
-    }
-    .post-btn {
-        padding: 0.6em 2.5rem;
-        font-size: .9rem;
-    }
-
-    .options-list {
-        flex-wrap: wrap;
-    }
+@media (max-width: 1050px) {
 }
 
-@media(max-width:400px) {
-    .form-head {
-        gap: 1rem
-    }
+@media (max-width: 512px) {
+  .form-head {
+    gap: 2rem;
+  }
 
-    .form-head h3 {
-        font-size: 1rem;
-    }
+  .form-head h3 {
+    font-size: 1.1rem;
+  }
 
-    .form-h {
-        padding: 1.2rem;
-        width: 85%;
-    }
+  .form-h {
+    padding: 1.5rem;
+    width: 85%;
+  }
+  .surveyform-head {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .form-page .import-survey {
+    padding: 0.4rem;
+    font-size: 0.9rem;
+  }
+  .import_style {
+    gap: 1.5rem;
+    justify-content: space-between;
+    width: 90%;
+  }
+  .form-container {
+    width: 100%;
+    margin-left: 0rem;
+    padding: 1rem;
+  }
+  .form-container h1 {
+    font-size: 1rem;
+  }
+  .question-actions {
+    gap: 1rem;
+  }
+  .copy-icon {
+    width: 1.3rem;
+  }
 
+  .delete-icon {
+    width: 0.8rem;
+  }
 
-    .form-container {
-        width: 100%;
-        margin-left: 0rem;
-        padding: 1rem;
-    }
-    .oneQuestion {
-        padding: .5rem;
-    }
-    .question-input {
-        width: 75%;
-        background: var(--litgray);
-        padding: 0.8em;
-    }
+  .question-option {
+    width: 0.3rem;
+    height: 0.7rem;
+  }
 
-    .copy-icon {
-        width: 1.2rem;
-    }
+  .options-list {
+    width: 100%;
+  }
 
-    .delete-icon {
-        width: .75rem;
-    }
-
-    .question-option {
-        width: 0.3rem;
-        height: .7rem;
-    }
-
-    .options-list {
-        width: 100%;
-    }
-
-    .option-input {
-        margin-bottom: .5rem;
-    }
-
-    .choice-select,
-    .option-select {
-        font-size: .8rem;
-    }
-}
-.type-row{
-    flex-direction: row !important;
-
-}
-.wrap-icon {
-    align-items: center;
+  .option-input {
     margin-bottom: 0.5rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.3rem;
+  }
+
+  .choice-field {
+    flex-wrap: wrap;
+    gap: 0.2rem;
+  }
+  .post-btn {
+    padding: 0.6em 2.5rem;
+    font-size: 0.9rem;
+  }
+
+  .options-list {
+    flex-wrap: wrap;
+  }
 }
 
-.custom-input-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 0.3rem;
-}
+@media (max-width: 400px) {
+  .form-head {
+    gap: 1rem;
+  }
 
-.custom-input-checkbox input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #0587FF;
-}
+  .form-head h3 {
+    font-size: 1rem;
+  }
 
-.checkbox-label {
-    user-select: none;
-    cursor: pointer;
+  .form-h {
+    padding: 1.2rem;
+    width: 85%;
+  }
+
+  .form-container {
+    width: 100%;
+    margin-left: 0rem;
+    padding: 1rem;
+  }
+  .oneQuestion {
+    padding: 0.5rem;
+  }
+  .question-input {
+    width: 75%;
+    background: var(--litgray);
+    padding: 0.8em;
+  }
+
+  .copy-icon {
+    width: 1.2rem;
+  }
+
+  .delete-icon {
+    width: 0.75rem;
+  }
+
+  .question-option {
+    width: 0.3rem;
+    height: 0.7rem;
+  }
+
+  .options-list {
+    width: 100%;
+  }
+
+  .option-input {
+    margin-bottom: 0.5rem;
+  }
+
+  .choice-select,
+  .option-select {
+    font-size: 0.8rem;
+  }
 }
