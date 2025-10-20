@@ -14,7 +14,8 @@ const { start, home,updateAnswer, submitAnswers, createSurvey,
   bulkAddOrUpdateQuestions,
   exportSurveyData,
   unpublishSurvey
- } = require('../controllers/main')
+ } = require('../controllers/main');
+const { formRouter } = require('./form');
 
 
 // Answer-related endpoints
@@ -44,6 +45,9 @@ router.post('/surveys/:surveyId/upload-questionnaire', authMiddleware, upload.si
 router.post('/payment-webhook', receivePaymentWebhook)
 router.post('/get-price', authMiddleware, getPrice)
 router.get('/my-surveys', authMiddleware, mySurveys)
+
+router.use("/forms", formRouter)
+
 module.exports = router;
 
 
