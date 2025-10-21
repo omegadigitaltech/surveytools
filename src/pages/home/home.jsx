@@ -4,6 +4,8 @@ import "./home.css";
 import Features from "./Features";
 import Utilities from "./Utilities";
 import TestimonialSection from "./Testimonials";
+import Pricing from "../pricing/pricing"
+import CTA from "./CTA";
 // import ContestModal from "../../components/ContestModal";
 
 const Home = () => {
@@ -17,6 +19,10 @@ const Home = () => {
       <Utilities />
       {/* Testimonials */}
       <TestimonialSection />
+      {/* Pricing */}
+      <Pricing />
+      {/* CTA */}
+      <CTA />
     </>
 
     // <section className="home">

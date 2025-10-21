@@ -73,7 +73,7 @@ const router = createBrowserRouter(
           <Route path="create-form" element={<CreateForm />} />
           <Route path="publish" element={<Publish />} />
           <Route path="payment" element={<Payment />} />
-          <Route path="pricing" element={<Pricing />} />
+          {/* <Route path="pricing" element={<Pricing />} /> */}
           <Route path="verify-payment" element={<VerifyPayment />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="withdraw" element={<Withdraw />} />
