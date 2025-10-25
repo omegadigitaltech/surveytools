@@ -23,6 +23,8 @@ const Home = () => {
       <Pricing />
       {/* CTA */}
       <CTA />
+      {/* Footer */}
+      
     </>
 
     // <section className="home">

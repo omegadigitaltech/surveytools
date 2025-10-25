@@ -63,7 +63,7 @@
     font-weight: 600;
     
 }
-.home .button-filled {
+.button-filled {
     background-color: var(--base);
     color: white;
 }
