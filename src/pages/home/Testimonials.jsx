@@ -45,7 +45,7 @@ const TestimonialSection = () => {
         <h4 className="font-[500] text-black tracking-wide">
           Testimonials
         </h4>
-        <h2 className="text-5xl font-bold text-gray-900 mt-2 py-2">
+        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-2 py-2">
           Our Trusted Users
         </h2>
       </div>

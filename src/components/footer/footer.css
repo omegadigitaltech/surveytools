@@ -29,7 +29,7 @@
     align-items: center;
     padding-top: 1em;
     justify-content: space-between;
-    border-top: 1px solid #fff;
+    /* border-top: 1px solid #fff; */
 }
 
 .footer-w2-copy {
@@ -39,7 +39,7 @@
 .footer-w2-list {
     display: flex;
     align-items: center;
-    column-gap: 0.5rem;
+    /* column-gap: 0.5rem; */
 }
 
 .footer-w2-link {
