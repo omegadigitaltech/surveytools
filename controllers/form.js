@@ -1,6 +1,6 @@
-import { formService } from "../services/form.service.js";
-import User from "../model/user.js";
-import { Form } from "../model/form.js";
+const formService = require("../services/form.service.js");
+const User = require("../model/user.js");
+const Form = require("../model/form.js");
 
 class FormController {
   async createForm(req, res) {
@@ -110,4 +110,4 @@ class FormController {
   }
 }
 
-export const formController = new FormController();
+module.exports = { formController: new FormController() };

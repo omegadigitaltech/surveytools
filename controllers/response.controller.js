@@ -1,5 +1,5 @@
 
-import  {responseService}  from "../services/response.service.js";
+const responseService = require("../services/response.service.js");
 class ResponseController {
   async submitResponse(req, res) {
     try {
@@ -28,4 +28,4 @@ class ResponseController {
   }
 }
 
-export const responseController  = new ResponseController();
+module.exports = { responseController: new ResponseController() };

@@ -1,7 +1,7 @@
-import express from "express";
-import { formController } from "../controllers/form.js";
-import { responseController } from "../controllers/response.controller.js";
-import { authMiddleware } from "../middleware/auth.js";
+const express = require("express");
+const { formController } = require("../controllers/form.js");
+const { responseController } = require("../controllers/response.controller.js");
+const { authMiddleware } = require("../middleware/auth.js");
 
 const router = express.Router();
 
@@ -17,4 +17,4 @@ router.post("/:formId/responses", authMiddleware, responseController.submitRespo
 router.get("/:formId/responses", authMiddleware, responseController.getResponses);
 router.get("/responses/:id", authMiddleware, responseController.getResponseById);
 
-export const formRouter = router;
+module.exports = router;

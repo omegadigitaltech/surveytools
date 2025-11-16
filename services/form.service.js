@@ -1,4 +1,4 @@
-import { Form } from "../model/form.js";
+const Form = require("../model/form.js");
 
 class FormService {
   // Create a new form
@@ -41,4 +41,4 @@ class FormService {
   }
 }
 
-export const formService = new FormService();
+module.exports = new FormService();

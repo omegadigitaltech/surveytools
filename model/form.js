@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
-import { ResponseSchema } from "./response.js";
+const { ResponseSchema } = require("./response.js");
 
 // --- Helper Schemas ---
 
@@ -39,8 +39,7 @@ const ShareSchema = new Schema({
 
 // --- Main Form Schema ---
 
-// 3. FormSchema (Minor property name clarification for styles)
-export const FormSchema = new Schema({
+const FormSchema = new Schema({
   // Form Details
   title: { type: String, required: true }, // Corresponds to 'Untitled Form' placeholder
   description: { type: String },
@@ -89,5 +88,5 @@ export const FormSchema = new Schema({
   responses: { type: [ResponseSchema], default: [] }
 });
 
-export const Form = mongoose.model("Form", FormSchema);
+module.exports = mongoose.model("Form", FormSchema);
 

@@ -15,7 +15,7 @@ const { start, home,updateAnswer, submitAnswers, createSurvey,
   exportSurveyData,
   unpublishSurvey
  } = require('../controllers/main');
-const { formRouter } = require('./form');
+const formRouter = require('./form');
 
 
 // Answer-related endpoints

@@ -1,6 +1,7 @@
 
-import { Form } from "../model/form.js";
-import { Response } from "../model/response.js";
+
+const Form = require("../model/form.js");
+const { Response } = require("../model/response.js");
 
 
 class ResponseService {
@@ -35,7 +36,7 @@ class ResponseService {
   }
 }
 
-export const responseService = new ResponseService();
+module.exports = new ResponseService();
 
 
 
