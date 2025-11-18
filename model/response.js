@@ -9,6 +9,10 @@ const AnswerSchema = new Schema({
 const ResponseSchema = new Schema({
   formId: { type: Schema.Types.ObjectId, ref: "Form", required: true },
   answers: [AnswerSchema],
+  email:{
+    type:String,
+    required:true,
+  },
   submittedAt: { type: Date, default: Date.now },
 });
 
