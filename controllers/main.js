@@ -9,6 +9,7 @@ const {calculateSentiment} = require('../middleware/helper')
 const { uploadQuestionnaire } = require('./questionnaireUpload');
 const { createCsvString, formatSurveyDataForCsv } = require('../utils/exportService');
 const { addEmailToQueue } = require('../utils/queueService');
+const Section = require('../model/section.js');
 
 const main_url = process.env.FRONTEND_URL
 
@@ -713,7 +714,7 @@ const addOrUpdateQuestion = async (req, res, next) => {
   console.log(req.userId)
   try {
     const { surveyId } = req.params;
-    const { questionId, questionText, questionType, required, options } = req.body;
+    const { questionId, questionText, questionType, required, options, sectionId } = req.body;
     console.log(req.body)
 
     const user = await User.findOne({ id: req.userId });
@@ -755,12 +756,23 @@ const addOrUpdateQuestion = async (req, res, next) => {
     }
 
   
+    // Validate sectionId if provided
+    if (sectionId) {
+      const section = await Section.findOne({ _id: sectionId, surveyId });
+      if (!section) {
+        return res.status(400).json({ status: "failure", code: 400, msg: 'Invalid sectionId for this survey' });
+      }
+    }
+
     const question = survey.questions.find(q => q._id.toString() === questionId);
     if (question) {
       question.questionText = questionText;
       question.questionType = questionType;
       question.required = required !== undefined ? required : question.required; // Use existing value if undefined
       question.options = (questionType === 'multiple_choice' || questionType === 'multiple_selection') ? formattedOptions : [];
+      if (sectionId !== undefined) {
+        question.sectionId = sectionId || null;
+      }
       survey.updatedAt = new Date();
     } else {
       survey.questions.push({
@@ -769,7 +781,8 @@ const addOrUpdateQuestion = async (req, res, next) => {
         required,
         options,
         required: required || false,
-        options: (questionType === 'multiple_choice' || questionType === 'multiple_selection') ? formattedOptions : []
+        options: (questionType === 'multiple_choice' || questionType === 'multiple_selection') ? formattedOptions : [],
+        sectionId: sectionId || null
 
       });
       survey.updatedAt = new Date();
@@ -850,7 +863,7 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
     for (const question of questions) {
       try {
         // Extract question data
-        const { questionId, questionText, questionType, required, options } = question;
+        const { questionId, questionText, questionType, required, options, sectionId } = question;
         console.log(options)
         
         // Validate required fields
@@ -905,6 +918,20 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
           });
         }
         
+        // Validate sectionId if provided
+        if (sectionId) {
+          const section = await Section.findOne({ _id: sectionId, surveyId });
+          if (!section) {
+            results.failed++;
+            results.details.push({
+              question: questionText,
+              status: 'failed',
+              reason: 'Invalid sectionId for this survey'
+            });
+            continue;
+          }
+        }
+
         // Find existing question or create new one
         const existingQuestion = questionId ? survey.questions.find(q => q._id.toString() === questionId) : null;
         
@@ -915,6 +942,9 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
           existingQuestion.questionType = questionType;
           existingQuestion.required = required !== undefined ? required : existingQuestion.required;
           existingQuestion.options = (questionType === 'multiple_choice' || questionType === 'multiple_selection') ? formattedOptions : [];
+          if (sectionId !== undefined) {
+            existingQuestion.sectionId = sectionId || null;
+          }
           
           results.updated++;
           results.details.push({
@@ -938,7 +968,8 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
               distribution: new Map(),
               mostCommonResponse: null,
               sentimentAnalysis: null
-            }
+            },
+            sectionId: sectionId || null
           };
           
           survey.questions.push(newQuestion);
@@ -1080,14 +1111,23 @@ const getSurveyInfo = async (req, res, next) => {
     // Convert survey to object and filter answers
     const surveyObj = survey.toObject();
     
-    // Filter answers to remove userId and fullname
+    // Filter answers to remove userId and fullname and include section details
     if (surveyObj.questions) {
+      const sections = await Section.find({ surveyId }).lean();
+      const sectionMap = new Map(sections.map(s => [s._id.toString(), s]));
       surveyObj.questions = surveyObj.questions.map(question => ({
-        ...question,
+        _id: question._id,
+        questionText: question.questionText,
+        questionType: question.questionType,
+        required: question.required,
+        options: question.options,
+        sectionId: question.sectionId || null,
+        section: question.sectionId ? sectionMap.get(question.sectionId.toString()) || null : null,
         answers: question.answers ? question.answers.map(answer => ({
           response: answer.response
         })) : []
       }));
+      surveyObj.sections = sections;
     }
 
     const surveyWithCounts = {
@@ -1355,13 +1395,24 @@ const getSurveyAnalytics = async (req, res, next) => {
 const getSurveyQuestions = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
-    const survey = await Survey.findById(surveyId).select('questions._id questions.questionText questions.questionType questions.required questions.options');
+    const survey = await Survey.findById(surveyId).select('questions._id questions.questionText questions.questionType questions.required questions.options questions.sectionId');
 
     if (!survey) {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
     }
 
-    res.status(200).json({ status: "success", code: 200, questions: survey.questions });
+    const sections = await Section.find({ surveyId }).lean();
+    const sectionMap = new Map(sections.map(s => [s._id.toString(), s]));
+    const questions = survey.questions.map(q => ({
+      _id: q._id,
+      questionText: q.questionText,
+      questionType: q.questionType,
+      required: q.required,
+      options: q.options,
+      sectionId: q.sectionId || null,
+      section: q.sectionId ? sectionMap.get(q.sectionId.toString()) || null : null
+    }));
+    res.status(200).json({ status: "success", code: 200, questions });
   } catch (error) {
     next(error);
   }
@@ -1865,6 +1916,36 @@ const exportSurveyData = async (req, res, next) => {
   }
 };
 
+const createSection = async (req, res, next) => {
+  try {
+    const { surveyId } = req.params;
+    const { title, description, order } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ status: "failure", code: 400, msg: 'Section title is required' });
+    }
+
+    const user = await User.findOne({ id: req.userId });
+    if (!user) {
+      return res.status(404).json({ status: "failure", code: 404, msg: "User Not Found" });
+    }
+
+    const survey = await Survey.findById(surveyId);
+    if (!survey) {
+      return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
+    }
+
+    if (!survey.user_id.equals(user._id)) {
+      return res.status(403).json({ status: "failure", code: 403, msg: 'User not authorized to modify this survey' });
+    }
+
+    const section = await Section.create({ surveyId, title, description: description || '', order });
+    res.status(201).json({ status: "success", code: 201, section });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   start,
   home, 
@@ -1890,5 +1971,6 @@ module.exports = {
   uploadQuestionnaire,
   bulkAddOrUpdateQuestions,
   exportSurveyData,
-  unpublishSurvey
+  unpublishSurvey,
+  createSection
 }

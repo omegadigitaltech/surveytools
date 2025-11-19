@@ -31,6 +31,7 @@ const questionSchema = new Schema({
     message: 'Question type must be either "multiple_choice", "five_point", "fill_in", or "multiple_selection"'
   }},
   required: { type: Boolean, default: false },
+  sectionId: { type: Schema.Types.ObjectId, ref: 'Section', default: null },
   options: {
     type:[optionSchema], // Only for multiple_choice and multiple_selection questions
     validate: {
