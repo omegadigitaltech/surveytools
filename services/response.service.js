@@ -1,11 +1,9 @@
-
 import { Form } from "../model/form.js";
 import { Response } from "../model/response.js";
 
-
 class ResponseService {
   // Submit response
-  async submitResponse(formId, answers) {
+  async submitResponse(formId, email, answers) {
     const form = await Form.findById(formId);
     if (!form) throw new Error("Form not found");
 
@@ -21,7 +19,7 @@ class ResponseService {
       }
     });
 
-    return await Response.create({ formId, answers });
+    return await Response.create({ formId, email, answers });
   }
 
   // Get all responses for a form
@@ -36,6 +34,3 @@ class ResponseService {
 }
 
 export const responseService = new ResponseService();
-
-
-

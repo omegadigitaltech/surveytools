@@ -5,6 +5,7 @@ class ResponseController {
     try {
       const response = await responseService.submitResponse(
         req.params.formId,
+        req.body.email,
         req.body.answers
       );
       res.status(201).json(response);
