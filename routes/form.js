@@ -13,7 +13,7 @@ router.put("/:id",authMiddleware, formController.updateForm);
 router.delete("/:id", authMiddleware,formController.deleteForm);
 
 // Responses
-router.post("/:formId/responses", authMiddleware, responseController.submitResponse);
+router.post("/:formId/responses", responseController.submitResponse);
 router.get("/:formId/responses", authMiddleware, responseController.getResponses);
 router.get("/responses/:id", responseController.getResponseById);
 
