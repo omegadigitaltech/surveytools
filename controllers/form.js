@@ -54,14 +54,7 @@ class FormController {
 
   async getFormById(req, res) {
     try {
-      const user = await User.findOne({ id: req.userId });
-      if (!user) {
-        return res.status(404).json({
-          status: "failure",
-          code: 404,
-          msg: "User Not Found"
-        });
-      }
+    
 
       const form = await formService.getFormById(req.params.id);
       if (!form) return res.status(404).json({ error: "Form not found" });
