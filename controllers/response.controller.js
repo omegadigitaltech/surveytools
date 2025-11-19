@@ -8,6 +8,7 @@ class ResponseController {
         req.body.email,
         req.body.answers
       );
+      console.log("hey");
       res.status(201).json(response);
     } catch (err) {
       res.status(400).json({ error: err.message });
