@@ -8,13 +8,13 @@ const router = express.Router();
 // Forms
 router.post("/",  authMiddleware, formController.createForm);
 router.get("/",authMiddleware, formController.getForms);
-router.get("/:id",authMiddleware, formController.getFormById);
+router.get("/:id", formController.getFormById);
 router.put("/:id",authMiddleware, formController.updateForm);
 router.delete("/:id", authMiddleware,formController.deleteForm);
 
 // Responses
 router.post("/:formId/responses", authMiddleware, responseController.submitResponse);
 router.get("/:formId/responses", authMiddleware, responseController.getResponses);
-router.get("/responses/:id", authMiddleware, responseController.getResponseById);
+router.get("/responses/:id", responseController.getResponseById);
 
 module.exports = router;
