@@ -455,7 +455,7 @@ const markSurveyAsPaid = async (req, res) => {
     }
 
     // Calculate the correct amount using base rate calculation
-    const BASE_RATE = 2000;
+    const BASE_RATE = 3000;
     const QUESTION_RATE = 10;
     const PARTICIPANT_RATE = 20;
 
