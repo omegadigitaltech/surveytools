@@ -43,5 +43,4 @@ class FormService {
   }
 }
 
-const formService = new FormService();
-module.exports = { formService };
+module.exports = FormService;

@@ -1,7 +1,7 @@
-const formService = require("../services/form.service.js");
 const User = require("../model/user.js");
 const Form = require("../model/form.js");
-
+const FormService = require ("../services/form.service.js")
+const formService = new FormService();
 class FormController {
  async createForm(req, res) {
   try {
