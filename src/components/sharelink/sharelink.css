@@ -10,6 +10,7 @@
   align-items: flex-start !important;
   gap: 1rem;
   z-index: 1001;
+  position: relative;
 }
 .share-box h2 {
   font-size: 1rem;

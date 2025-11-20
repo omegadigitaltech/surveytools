@@ -1,25 +1,40 @@
 import { Link, Form, useNavigate, useActionData } from "react-router-dom";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import backaro from "../../assets/img/backaro.svg";
-import "./createform.css"
+import "./createform.css";
 
-const CreateForm = () =>{
-    const [loading, setLoading] = useState(false);
+const CreateForm = () => {
+  const [loading, setLoading] = useState(false);
+  const data = useActionData();
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    // Reset loading when action completes (whether success or error)
+    if (data !== undefined) {
+      setLoading(false);
+    }
+  }, [data]);
 
-const handleSubmit = () => {
-            setLoading(true);
-          };
+  const handleSubmit = () => {
+    setLoading(true);
+  };
 
-    return(
-          <section className="postsurvey">
-         <div className="postsurvey_wrap wrap">
-          <div className="post-head flex">
-          <Link to="/dashboard"><img src={backaro} className="backaro" /></Link>
-           <h3>Create Form</h3>
-          </div>
-          <div className="postsurvey_div">
-          <Form className="survey_form" method="post" >
+  return (
+    <section className="postsurvey">
+      <div className="postsurvey_wrap wrap">
+        <div className="post-head flex">
+          <Link to="/dashboard">
+            <img src={backaro} className="backaro" alt="Back" />
+          </Link>
+          <h3>Create Form</h3>
+        </div>
+        <div className="postsurvey_div">
+          <Form
+            className="survey_form"
+            method="post"
+            action="/create-form"
+            onSubmit={handleSubmit}
+          >
             <div className="postsurvey-field">
               <label className="postsurvey-label" htmlFor="title">
                 <h4>Form Title</h4>
@@ -29,12 +44,10 @@ const handleSubmit = () => {
                 type="text"
                 name="title"
                 id="title"
-                // value={title}
-                // onChange={(e) => setTitle(e.target.value)}
                 required
               />
-              </div>
-             <div className="postsurvey-field">
+            </div>
+            <div className="postsurvey-field">
               <label className="postsurvey-label" htmlFor="description">
                 <h4>Form Description</h4>
               </label>
@@ -45,21 +58,22 @@ const handleSubmit = () => {
                 rows="10"
                 placeholder="Write a description..."
                 required
-                // value={description}
-                // onChange={(e) => setDescription(e.target.value)}
-                ></textarea>
-             </div>
-             <div className="flex btn_div">
-              <button type="submit" className="continue_survey btn" disabled={loading}>
+              ></textarea>
+            </div>
+            <div className="flex btn_div">
+              <button
+                type="submit"
+                className="continue_survey btn"
+                disabled={loading}
+              >
                 {loading ? "Submitting..." : "Continue"}
               </button>
             </div>
-                </Form>
-             </div>
-             </div>
-              </section>
-
-    )
+          </Form>
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default CreateForm;

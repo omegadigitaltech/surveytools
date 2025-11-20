@@ -1,0 +1,31 @@
+/* Reuse insights.css styles or add form-specific styles */
+.number-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.field-type {
+  font-size: 0.85rem;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.field-summary-card {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.field-summary-card:hover {
+  transform: translateY(-2px);
+}
+
+.response-count {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+

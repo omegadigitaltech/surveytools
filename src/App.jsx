@@ -35,14 +35,17 @@ import Publish from "./pages/publish/publish";
 import Payment from "./components/payment/payment";
 import Pricing from "./pages/pricing/pricing";
 import CreateForm from "./pages/createform/createform.jsx";
-import FormQuestions from "./pages/formquestions/formquestion.jsx"
+import FormQuestions from "./pages/formquestions/formquestion.jsx";
+import createFormAction from "./pages/createform/action";
 // import Payment from "./pages/payment/payment";
 import Notifications from "./pages/notifications/notifications";
 import Withdraw from "./pages/withdraw/withdraw";
 import Profile from "./pages/profile/profile";
 import AnswerSurvey from "./pages/answersurvey/answersurvey";
+import AnswerForm from "./pages/answerform/answerform";
 import Settings from "./pages/settings/settings";
 import Insights from "./pages/insights/insights";
+import FormInsights from "./pages/forminsights/forminsights";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
 
 const router = createBrowserRouter(
@@ -50,6 +53,8 @@ const router = createBrowserRouter(
     <Route>
       <Route element={<HomeLayout />}>
         <Route index element={<Home />} />
+        {/* PUBLIC ROUTES (no login needed) */}
+        <Route path="answerform/:id" element={<AnswerForm />} />
 
         <Route element={<ProtectRoute />}>
           <Route path="dashboard" element={<Dashboard />} />
@@ -64,7 +69,11 @@ const router = createBrowserRouter(
             element={<SurveyQuestion />}
             action={postAction}
           />
-          <Route path="create-form" element={<CreateForm />} />
+          <Route
+            path="create-form"
+            element={<CreateForm />}
+            action={createFormAction}
+          />
           <Route path="formquestions" element={<FormQuestions />} />
           <Route path="publish" element={<Publish />} />
           <Route path="payment" element={<Payment />} />
@@ -76,6 +85,7 @@ const router = createBrowserRouter(
           <Route path="answersurvey/:id" element={<AnswerSurvey />} />
           <Route path="settings" element={<Settings />} />
           <Route path="insights/:id" element={<Insights />} />
+          <Route path="forminsights/:id" element={<FormInsights />} />
         </Route>
       </Route>
 

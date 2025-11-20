@@ -1,0 +1,22 @@
+/* Reuse answersurvey styles or add form-specific styles */
+.ans-description {
+  color: #666;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.required-star {
+  color: red;
+}
+
+.no-options {
+  color: #999;
+  font-style: italic;
+}
+
+.textarea-ans {
+  min-height: 100px;
+  resize: vertical;
+}
+
+
