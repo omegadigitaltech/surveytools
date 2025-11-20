@@ -21,9 +21,9 @@ const FieldSchema = new Schema({
       "checkbox",
       "radio",
       "multiple-choice",
-      "likert"           // NEW: Likert Scale
+      "likert", // NEW: Likert Scale
     ],
-    required: true
+    required: true,
   },
 
   required: { type: Boolean, default: false },
@@ -38,13 +38,12 @@ const FieldSchema = new Schema({
     statement: { type: String }, // optional extra description for item
     scale: [
       {
-        value: Number,     // 1–5 or 1–7 etc
-        label: String      // Strongly Agree, Agree, Neutral...
-      }
-    ]
-  }
+        value: Number, // 1–5 or 1–7 etc
+        label: String, // Strongly Agree, Agree, Neutral...
+      },
+    ],
+  },
 });
-
 
 //
 // ---------------------------
@@ -54,9 +53,8 @@ const FieldSchema = new Schema({
 const SectionSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String }, // optional
-  fields: [FieldSchema]          // fields inside this section
+  fields: [FieldSchema], // fields inside this section
 });
-
 
 //
 // ---------------------------
@@ -66,9 +64,8 @@ const SectionSchema = new Schema({
 const ShareSchema = new Schema({
   type: { type: String, enum: ["public", "private"], default: "public" },
   emails: [{ type: String }],
-  userIds: [{ type: Schema.Types.ObjectId, ref: "User" }]
+  userIds: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
-
 
 //
 // ---------------------------
@@ -90,20 +87,20 @@ const FormSchema = new Schema({
     point: { type: String },
     totalRequiredParticipants: { type: String },
     preferredParticipants: { type: String },
-    totalParticipants: { type: String }
+    totalParticipants: { type: String },
   },
 
   //
   // NEW: Replace fields[] with sections[]
   //
-  sections: [SectionSchema],
+  sections: { type: [SectionSchema], default: [] },
 
   shareLink: { type: String, default: "" },
   htmlEmbedCode: { type: String, default: "" },
 
   shares: { type: ShareSchema, default: { type: "public" } },
 
-  responses: { type: [ResponseSchema], default: [] }
+  responses: { type: [ResponseSchema], default: [] },
 });
 
 module.exports = mongoose.model("Form", FormSchema);
