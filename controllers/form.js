@@ -24,19 +24,48 @@ class FormController {
       if (similarformExists) {
         return res.status(400).json({
           status: "failure",
-          code: 400,
-          msg: "Form with this title already exists",
-          form: similarformExists
+          msg: "Each section must have a title"
         });
       }
-      const form = await formService.createForm(req.body, user._id);
 
-      res.status(201).json(form);
-    } catch (err) {
-      
-      res.status(400).json({ error: err.message });
+      // Fields validation
+      if (section.fields && Array.isArray(section.fields)) {
+        for (const field of section.fields) {
+          if (!field.questionText || !field.type) {
+            return res.status(400).json({
+              status: "failure",
+              msg: "Each field must include questionText and type"
+            });
+          }
+
+          // Likert validation
+          if (field.type === "likert") {
+            if (!field.likert || !Array.isArray(field.likert.scale)) {
+              return res.status(400).json({
+                status: "failure",
+                msg: "Likert fields must contain likert.scale array"
+              });
+            }
+          }
+        }
+      }
     }
+
+    // Create form through service
+    const form = await formService.createForm(req.body, user._id);
+
+    res.status(201).json({
+      status: "success",
+      msg: "Form created successfully",
+      form
+    });
+
+  } catch (err) {
+    console.error("CREATE FORM ERROR:", err);
+    res.status(500).json({ status: "error", msg: err.message });
   }
+}
+
 
   async getForms(req, res) {
     try {
