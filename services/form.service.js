@@ -3,9 +3,11 @@ const Form = require("../model/form.js");
 class FormService {
   // Create a new form
   async createForm(data, userId) {
-    
-    console.log("createdby", userId);
-    return await Form.create({ ...data, createdBy: userId });
+    return await Form.create({
+      ...data,
+      createdBy: userId,
+      createdAt: new Date(),
+    });
   }
 
   // Get all forms (could filter by user)
