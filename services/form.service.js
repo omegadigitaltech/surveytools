@@ -3,12 +3,11 @@ const Form = require("../model/form.js");
 class FormService {
   // Create a new form
   async createForm(data, userId) {
-    
     console.log("createdby", userId);
     return await Form.create({ ...data, createdBy: userId });
   }
 
-  // Get all forms (could filter by user)
+  // Get all forms (filter by user)
   async getForms(userId) {
     return await Form.find({ createdBy: userId }).lean();
   }
@@ -28,7 +27,7 @@ class FormService {
     return await Form.findByIdAndDelete(formId);
   }
 
-  // Check if a user/email can access a form
+  // Check if a user/email can access the form
   async canAccessForm(form, user) {
     if (form.shares.type === "public") return true;
 
@@ -41,5 +40,4 @@ class FormService {
   }
 }
 
-const formService = new FormService();
-module.exports = { formService };
+module.exports = FormService;

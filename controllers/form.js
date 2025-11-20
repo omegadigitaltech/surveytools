@@ -1,9 +1,12 @@
-const formService = require("../services/form.service.js");
+// const formService = require("../services/form.service.js");
 const User = require("../model/user.js");
 const Form = require("../model/form.js");
+const FormService = require ("../services/form.service.js")
+const formService = new FormService();
 
 class FormController {
   async createForm(req, res) {
+    console.log("got heere ")
     try {
       const user = await User.findOne({ id: req.userId });
       console.log(req.userId);
@@ -30,6 +33,7 @@ class FormController {
 
       res.status(201).json(form);
     } catch (err) {
+      
       res.status(400).json({ error: err.message });
     }
   }

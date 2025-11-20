@@ -1,6 +1,7 @@
 
-const { Form } = require("../model/form.js");
+const Form = require("../model/form.js");
 const { Response } = require("../model/response.js");
+
 
 class ResponseService {
   // Submit response
