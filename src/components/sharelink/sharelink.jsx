@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./sharelink.css";
-
 import copy from "../../assets/img/copyicon.svg";
 import wa from "../../assets/img/wa.svg";
 import x from "../../assets/img/xicon.svg";
