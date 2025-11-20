@@ -1,27 +1,45 @@
-// const formService = require("../services/form.service.js");
 const User = require("../model/user.js");
 const Form = require("../model/form.js");
 const FormService = require ("../services/form.service.js")
 const formService = new FormService();
-
 class FormController {
-  async createForm(req, res) {
-    console.log("got heere ")
-    try {
-      const user = await User.findOne({ id: req.userId });
-      console.log(req.userId);
-      if (!user) {
-        return res.status(404).json({
-          status: "failure",
-          code: 404,
-          msg: "User Not Found"
-        });
-      }
-      const similarformExists = await Form.findOne({
-        title: req.body.title,
-        createdBy: user._id
+ async createForm(req, res) {
+  try {
+    const user = await User.findOne({ id: req.userId });
+
+    if (!user) {
+      return res.status(404).json({
+        status: "failure",
+        code: 404,
+        msg: "User Not Found"
       });
-      if (similarformExists) {
+    }
+
+    // Ensure form title is unique for this user
+    const existingForm = await Form.findOne({
+      title: req.body.title,
+      createdBy: user._id
+    });
+
+    if (existingForm) {
+      return res.status(400).json({
+        status: "failure",
+        code: 400,
+        msg: "Form with this title already exists",
+        form: existingForm
+      });
+    }
+
+    // Validate sections structure
+    if (!req.body.sections || !Array.isArray(req.body.sections)) {
+      return res.status(400).json({
+        status: "failure",
+        msg: "Sections must be a non-empty array"
+      });
+    }
+
+    for (const section of req.body.sections) {
+      if (!section.title) {
         return res.status(400).json({
           status: "failure",
           msg: "Each section must have a title"
