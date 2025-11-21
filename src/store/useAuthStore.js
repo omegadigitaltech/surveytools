@@ -21,7 +21,7 @@ const useAuthStore = create(
       formDraft: {
         title: "",
         description: "",
-        fields: [],
+        sections: [], // Changed from fields to sections
         config: {
           time: "10 minutes",
           point: "100",
@@ -70,7 +70,7 @@ const useAuthStore = create(
           formDraft: {
             title: "",
             description: "",
-            fields: [],
+            sections: [], // Changed from fields to sections
             config: {
               time: "10 minutes",
               point: "100",
@@ -114,7 +114,7 @@ const useAuthStore = create(
           formDraft: {
             title: "",
             description: "",
-            fields: [],
+            sections: [], // Changed from fields to sections
             config: {
               time: "10 minutes",
               point: "100",

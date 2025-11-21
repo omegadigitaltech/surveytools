@@ -9,6 +9,7 @@ import copy from "../../assets/img/copy.svg";
 import useAuthStore from "../../store/useAuthStore";
 import { toast } from "react-toastify";
 import config from "../../config/config";
+import "./formquestion.css";
 
 const FormQuestions = () => {
   const navigate = useNavigate();
@@ -20,23 +21,30 @@ const FormQuestions = () => {
 
   // Add new state for delete loading
   const [isDeletingId, setIsDeletingId] = useState(null);
-  const [fields, setFields] = useState([
-    {
-      id: Date.now(),
-      label: "",
-      type: "fill_in",
-      required: true,
-      options: [],
-    },
+  const [isDeletingSectionId, setIsDeletingSectionId] = useState(null);
+  
+  // Sections state - each section contains fields
+  const [sections, setSections] = useState([]);
+  
+  // Likert scale management
+  const [showLikertModal, setShowLikertModal] = useState(false);
+  const [editingLikertFieldId, setEditingLikertFieldId] = useState(null);
+  const [editingLikertSectionId, setEditingLikertSectionId] = useState(null);
+  const [currentLikertScale, setCurrentLikertScale] = useState([
+    { value: 1, label: "Strongly Disagree" },
+    { value: 2, label: "Disagree" },
+    { value: 3, label: "Neutral" },
+    { value: 4, label: "Agree" },
+    { value: 5, label: "Strongly Agree" },
   ]);
 
-  // Map UI field types to backend field types (forms API uses different format)
+  // Map UI field types to backend field types
   const mapFieldTypeToBackend = (uiType) => {
     const mapping = {
       multiple_choice: "multiple-choice",
       multiple_selection: "checkbox",
       fill_in: "text",
-      five_point: "multiple-choice",
+      likert: "likert",
     };
     return mapping[uiType] || uiType;
   };
@@ -50,12 +58,12 @@ const FormQuestions = () => {
       textarea: "fill_in",
       date: "fill_in",
       number: "fill_in",
+      likert: "likert",
     };
     return mapping[backendType] || "fill_in";
   };
 
-  // Generate a unique ID for the form
-
+  // Generate a unique ID
   const generateUniqueId = () => {
     try {
       if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -70,104 +78,151 @@ const FormQuestions = () => {
     return `form_${timestamp}_${randomStr}${randomStr2}`;
   };
 
-  const fieldsInitializedRef = useRef(false);
+  const sectionsInitializedRef = useRef(false);
 
-  // Load draft data from Zustand on mount (only once)
+  // Load draft data from Zustand on mount
   useEffect(() => {
-    if (fieldsInitializedRef.current) return;
+    if (sectionsInitializedRef.current) return;
 
     if (!formDraft.title) {
       toast.error("Please start by creating a form");
       navigate("/create-form");
       return;
     }
-    if (formDraft.fields && formDraft.fields.length > 0) {
+
+    // Handle migration from old format (fields) to new format (sections)
+    if (formDraft.sections && formDraft.sections.length > 0) {
+      const formattedSections = formDraft.sections.map((section, sectionIndex) => ({
+        id: `section_${Date.now()}_${sectionIndex}`,
+        title: section.title || "",
+        description: section.description || "",
+        fields: (section.fields || []).map((field, fieldIndex) => ({
+          id: `field_${Date.now()}_${sectionIndex}_${fieldIndex}`,
+          label: field.questionText || field.label || "",
+          type: mapBackendTypeToUI(field.type) || "fill_in",
+          required: field.required !== undefined ? field.required : true,
+          options: field.options || [],
+          likert: field.likert || null,
+        })),
+      }));
+      setSections(formattedSections);
+    } else if (formDraft.fields && formDraft.fields.length > 0) {
+      // Migrate old format: create a default section with all fields
       const formattedFields = formDraft.fields.map((field, index) => ({
-        id: Date.now() + index,
+        id: `field_${Date.now()}_${index}`,
         label: field.questionText || field.label || "",
-        type: mapBackendTypeToUI(field.type) || "text",
+        type: mapBackendTypeToUI(field.type) || "fill_in",
         required: field.required !== undefined ? field.required : true,
         options: field.options || [],
+        likert: field.likert || null,
       }));
-      setFields(formattedFields);
+      setSections([
+        {
+          id: `section_${Date.now()}`,
+          title: "",
+          description: "",
+          fields: formattedFields,
+        },
+      ]);
     }
 
-    fieldsInitializedRef.current = true;
+    sectionsInitializedRef.current = true;
     setIsLoading(false);
-  }, [formDraft.title, formDraft.fields, navigate]);
+  }, [formDraft.title, formDraft.sections, formDraft.fields, navigate]);
 
+  // Save sections to draft whenever they change
   useEffect(() => {
-    if (!fieldsInitializedRef.current) return;
+    if (!sectionsInitializedRef.current) return;
 
-    const fieldsPayload = fields.map((field) => {
-      const fieldData = {
-        questionText: field.label || "",
-        type: mapFieldTypeToBackend(field.type),
-        required: Boolean(field.required),
-      };
-      if (
-        field.type === "multiple_choice" ||
-        field.type === "multiple_selection"
-      ) {
-        fieldData.options = field.options
-          .map((opt) => (typeof opt === "string" ? opt : opt.text || ""))
-          .filter((opt) => opt !== "");
-      } else if (field.type === "five_point") {
-        fieldData.options = ["1", "2", "3", "4", "5"];
-      } else {
-        fieldData.options = [];
-      }
+    const sectionsPayload = sections.map((section) => ({
+      title: section.title || "",
+      description: section.description || "",
+      fields: section.fields.map((field) => {
+        const fieldData = {
+          questionText: field.label || "",
+          type: mapFieldTypeToBackend(field.type),
+          required: Boolean(field.required),
+        };
 
-      return fieldData;
-    });
+        if (field.type === "multiple_choice" || field.type === "multiple_selection") {
+          fieldData.options = field.options
+            .map((opt) => (typeof opt === "string" ? opt : opt.text || ""))
+            .filter((opt) => opt !== "");
+        } else if (field.type === "likert" && field.likert) {
+          fieldData.likert = field.likert;
+        } else {
+          fieldData.options = [];
+        }
 
-    setFormDraft({ fields: fieldsPayload });
-  }, [fields, setFormDraft]);
+        return fieldData;
+      }),
+    }));
+
+    setFormDraft({ sections: sectionsPayload });
+  }, [sections, setFormDraft]);
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
     setIsPosting(true);
 
     try {
-      const validFields = fields.filter((field) => field.label.trim() !== "");
-      if (validFields.length === 0) {
-        toast.error("Please add at least one field to your form");
+      // Validate sections
+      if (sections.length === 0) {
+        toast.error("Please add at least one section to your form");
         setIsPosting(false);
         return;
       }
 
-      // Convert fields to backend format
-      const fieldsPayload = validFields.map((field) => {
-        const fieldData = {
-          questionText: field.label.trim(),
-          type: mapFieldTypeToBackend(field.type),
-          required: Boolean(field.required),
-        };
-
-        // Add options for multiple_choice, multiple_selection, and five_point types
-        if (
-          field.type === "multiple_choice" ||
-          field.type === "multiple_selection"
-        ) {
-          const cleanOptions = field.options
-            .map((opt) =>
-              typeof opt === "string" ? opt.trim() : opt.text?.trim() || ""
-            )
-            .filter((opt) => opt !== "");
-          if (cleanOptions.length === 0) {
-            throw new Error(
-              `Field "${field.label}" requires at least one option`
-            );
-          }
-
-          fieldData.options = cleanOptions;
-        } else if (field.type === "five_point") {
-          fieldData.options = ["1", "2", "3", "4", "5"];
-        } else {
-          fieldData.options = [];
+      // Validate each section has at least one field
+      for (const section of sections) {
+        const validFields = section.fields.filter((field) => field.label.trim() !== "");
+        if (validFields.length === 0) {
+          toast.error(`Section "${section.title || 'Untitled'}" must have at least one field`);
+          setIsPosting(false);
+          return;
         }
+      }
 
-        return fieldData;
+      // Convert sections to backend format
+      const sectionsPayload = sections.map((section) => {
+        const validFields = section.fields.filter((field) => field.label.trim() !== "");
+        
+        return {
+          title: section.title.trim() || "Untitled Section",
+          description: section.description.trim() || "",
+          fields: validFields.map((field) => {
+            const fieldData = {
+              questionText: field.label.trim(),
+              type: mapFieldTypeToBackend(field.type),
+              required: Boolean(field.required),
+            };
+
+            if (field.type === "multiple_choice" || field.type === "multiple_selection") {
+              const cleanOptions = field.options
+                .map((opt) =>
+                  typeof opt === "string" ? opt.trim() : opt.text?.trim() || ""
+                )
+                .filter((opt) => opt !== "");
+              if (cleanOptions.length === 0) {
+                throw new Error(
+                  `Field "${field.label}" requires at least one option`
+                );
+              }
+              fieldData.options = cleanOptions;
+            } else if (field.type === "likert") {
+              if (!field.likert || !field.likert.scale || field.likert.scale.length === 0) {
+                throw new Error(
+                  `Field "${field.label}" requires a Likert scale`
+                );
+              }
+              fieldData.likert = field.likert;
+            } else {
+              fieldData.options = [];
+            }
+
+            return fieldData;
+          }),
+        };
       });
 
       const uniqueId = generateUniqueId();
@@ -196,7 +251,7 @@ const FormQuestions = () => {
           emails: formDraft.shares?.emails || [],
           userIds: formDraft.shares?.userIds || [],
         },
-        fields: fieldsPayload,
+        sections: sectionsPayload,
       };
 
       console.log("=== FORM SUBMISSION DEBUG ===");
@@ -219,7 +274,6 @@ const FormQuestions = () => {
       if (!response.ok) {
         console.error("Error response:", responseData);
 
-        // Special handling for duplicate key error
         if (
           responseData.error &&
           responseData.error.includes("E11000 duplicate key error")
@@ -241,7 +295,6 @@ const FormQuestions = () => {
 
       toast.success("Form created successfully!");
 
-      // Store form ID and share link if returned
       const formId =
         responseData.form?._id ||
         responseData._id ||
@@ -258,7 +311,6 @@ const FormQuestions = () => {
       }
       clearFormDraft();
 
-      // Navigate to form insights page to show share link and form details
       if (formId) {
         setTimeout(() => {
           navigate(`/forminsights/${formId}`);
@@ -276,107 +328,328 @@ const FormQuestions = () => {
     }
   };
 
-  const addNewField = () => {
+  // Section management
+  const addNewSection = () => {
+    const newSection = {
+      id: `section_${Date.now()}`,
+      title: "",
+      description: "",
+      fields: [],
+    };
+    setSections([...sections, newSection]);
+  };
+
+  const deleteSection = (sectionId) => {
+    if (sections.length === 1) {
+      toast.error("You must have at least one section");
+      return;
+    }
+
+    setIsDeletingSectionId(sectionId);
+    try {
+      setSections(sections.filter((section) => section.id !== sectionId));
+      toast.success("Section deleted successfully");
+    } catch (error) {
+      toast.error(error.message || "Error deleting section");
+    } finally {
+      setIsDeletingSectionId(null);
+    }
+  };
+
+  const handleSectionChange = (sectionId, field, value) => {
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId ? { ...section, [field]: value } : section
+      )
+    );
+  };
+
+  // Field management
+  const addNewField = (sectionId) => {
     const newField = {
-      id: Date.now(),
+      id: `field_${Date.now()}_${sectionId}`,
       label: "",
       type: "fill_in",
       required: false,
       options: [],
+      likert: null,
     };
-    setFields([...fields, newField]);
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? { ...section, fields: [...section.fields, newField] }
+          : section
+      )
+    );
   };
 
-  const deleteField = async (id) => {
-    if (fields.length === 1) {
-      toast.error("You must have at least one field");
+  const deleteField = (sectionId, fieldId) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          if (section.fields.length === 1) {
+            toast.error("You must have at least one field in a section");
+            return section;
+          }
+          return {
+            ...section,
+            fields: section.fields.filter((field) => field.id !== fieldId),
+          };
+        }
+        return section;
+      })
+    );
+    toast.success("Field deleted successfully");
+  };
+
+  const duplicateField = (sectionId, fieldId) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          const fieldToDuplicate = section.fields.find((f) => f.id === fieldId);
+          if (fieldToDuplicate) {
+            const duplicatedField = {
+              ...fieldToDuplicate,
+              id: `field_${Date.now()}_${sectionId}`,
+            };
+            return {
+              ...section,
+              fields: [...section.fields, duplicatedField],
+            };
+          }
+        }
+        return section;
+      })
+    );
+    toast.success("Field duplicated");
+  };
+
+  const handleFieldChange = (sectionId, fieldId, field, value) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            fields: section.fields.map((f) =>
+              f.id === fieldId
+                ? {
+                    ...f,
+                    [field]: value,
+                    ...(field === "type" && value === "fill_in"
+                      ? { options: [], likert: null }
+                      : {}),
+                    ...(field === "type" &&
+                    (value === "multiple_choice" || value === "multiple_selection") &&
+                    f.options.length === 0
+                      ? { options: ["Option 1"], likert: null }
+                      : {}),
+                    ...(field === "type" && value === "likert"
+                      ? { options: [], likert: null }
+                      : {}),
+                  }
+                : f
+            ),
+          };
+        }
+        return section;
+      })
+    );
+  };
+
+  const addOption = (sectionId, fieldId) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            fields: section.fields.map((f) =>
+              f.id === fieldId
+                ? {
+                    ...f,
+                    options: [...f.options, `Option ${f.options.length + 1}`],
+                  }
+                : f
+            ),
+          };
+        }
+        return section;
+      })
+    );
+  };
+
+  const handleOptionChange = (sectionId, fieldId, index, value) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            fields: section.fields.map((f) =>
+              f.id === fieldId
+                ? {
+                    ...f,
+                    options: f.options.map((opt, i) => (i === index ? value : opt)),
+                  }
+                : f
+            ),
+          };
+        }
+        return section;
+      })
+    );
+  };
+
+  const removeOption = (sectionId, fieldId, index) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          const field = section.fields.find((f) => f.id === fieldId);
+          if (field && field.options.length <= 1) {
+            toast.error("Must have at least one option");
+            return section;
+          }
+          return {
+            ...section,
+            fields: section.fields.map((f) =>
+              f.id === fieldId
+                ? {
+                    ...f,
+                    options: f.options.filter((_, i) => i !== index),
+                  }
+                : f
+            ),
+          };
+        }
+        return section;
+      })
+    );
+  };
+
+  // Likert scale management
+  const openLikertModal = (sectionId, fieldId) => {
+    setEditingLikertSectionId(sectionId);
+    setEditingLikertFieldId(fieldId);
+    const field = sections
+      .find((s) => s.id === sectionId)
+      ?.fields.find((f) => f.id === fieldId);
+    if (field && field.likert && field.likert.scale) {
+      setCurrentLikertScale([...field.likert.scale]);
+    } else {
+      setCurrentLikertScale([
+        { value: 1, label: "Strongly Disagree" },
+        { value: 2, label: "Disagree" },
+        { value: 3, label: "Neutral" },
+        { value: 4, label: "Agree" },
+        { value: 5, label: "Strongly Agree" },
+      ]);
+    }
+    setShowLikertModal(true);
+  };
+
+  const closeLikertModal = () => {
+    setShowLikertModal(false);
+    setEditingLikertFieldId(null);
+    setEditingLikertSectionId(null);
+  };
+
+  const saveLikertScale = () => {
+    if (currentLikertScale.length === 0) {
+      toast.error("Likert scale must have at least one option");
       return;
     }
 
-    setIsDeletingId(id);
-    try {
-      setFields(fields.filter((field) => field.id !== id));
-      toast.success("Field deleted successfully");
-    } catch (error) {
-      toast.error(error.message || "Error deleting field");
-    } finally {
-      setIsDeletingId(null);
+    setSections(
+      sections.map((section) => {
+        if (section.id === editingLikertSectionId) {
+          return {
+            ...section,
+            fields: section.fields.map((f) =>
+              f.id === editingLikertFieldId
+                ? {
+                    ...f,
+                    likert: {
+                      scale: currentLikertScale.map((item) => ({
+                        value: item.value,
+                        label: item.label.trim(),
+                      })),
+                    },
+                  }
+                : f
+            ),
+          };
+        }
+        return section;
+      })
+    );
+    closeLikertModal();
+    toast.success("Likert scale saved");
+  };
+
+  const addLikertScaleItem = () => {
+    const maxValue = Math.max(...currentLikertScale.map((item) => item.value), 0);
+    setCurrentLikertScale([
+      ...currentLikertScale,
+      { value: maxValue + 1, label: "" },
+    ]);
+  };
+
+  const removeLikertScaleItem = (index) => {
+    if (currentLikertScale.length <= 1) {
+      toast.error("Likert scale must have at least one option");
+      return;
     }
+    setCurrentLikertScale(currentLikertScale.filter((_, i) => i !== index));
   };
 
-  const duplicateField = (id) => {
-    const fieldToDuplicate = fields.find((f) => f.id === id);
-    if (fieldToDuplicate) {
-      const duplicatedField = {
-        ...fieldToDuplicate,
-        id: Date.now(),
-      };
-      setFields([...fields, duplicatedField]);
-      toast.success("Field duplicated");
-    }
-  };
-
-  const handleFieldChange = (id, field, value) => {
-    const updatedFields = fields.map((f) =>
-      f.id === id
-        ? {
-            ...f,
-            [field]: value,
-            ...(field === "type" && value === "fill_in" ? { options: [] } : {}),
-            ...(field === "type" &&
-            (value === "multiple_choice" || value === "multiple_selection") &&
-            f.options.length === 0
-              ? { options: ["Option 1"] }
-              : {}),
-            ...(field === "type" && value === "five_point"
-              ? { options: ["1", "2", "3", "4", "5"] }
-              : {}),
-          }
-        : f
+  const updateLikertScaleItem = (index, field, value) => {
+    setCurrentLikertScale(
+      currentLikertScale.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
     );
-    setFields(updatedFields);
   };
 
-  const addOption = (id) => {
-    const updatedFields = fields.map((f) =>
-      f.id === id
-        ? {
-            ...f,
-            options: [...f.options, `Option ${f.options.length + 1}`],
-          }
-        : f
-    );
-    setFields(updatedFields);
-  };
+  // Apply Likert scale to multiple questions
+  const applyLikertToMultiple = (sectionId, startFieldId, endFieldId) => {
+    const section = sections.find((s) => s.id === sectionId);
+    if (!section) return;
 
-  const handleOptionChange = (fieldId, index, value) => {
-    const updatedFields = fields.map((f) =>
-      f.id === fieldId
-        ? {
-            ...f,
-            options: f.options.map((opt, i) => (i === index ? value : opt)),
-          }
-        : f
-    );
-    setFields(updatedFields);
-  };
+    const startIndex = section.fields.findIndex((f) => f.id === startFieldId);
+    const endIndex = section.fields.findIndex((f) => f.id === endFieldId);
 
-  const removeOption = (fieldId, index) => {
-    const field = fields.find((f) => f.id === fieldId);
-    if (field && field.options.length <= 1) {
-      toast.error("Must have at least one option");
+    if (startIndex === -1 || endIndex === -1 || startIndex > endIndex) {
+      toast.error("Invalid field selection");
       return;
     }
 
-    const updatedFields = fields.map((f) =>
-      f.id === fieldId
-        ? {
-            ...f,
-            options: f.options.filter((_, i) => i !== index),
-          }
-        : f
+    // Get the Likert scale from the first field
+    const sourceField = section.fields[startIndex];
+    if (!sourceField.likert || !sourceField.likert.scale) {
+      toast.error("Please set a Likert scale on the first field first");
+      return;
+    }
+
+    const scaleToApply = sourceField.likert.scale;
+
+    setSections(
+      sections.map((s) => {
+        if (s.id === sectionId) {
+          return {
+            ...s,
+            fields: s.fields.map((f, idx) => {
+              if (idx >= startIndex && idx <= endIndex && f.type === "likert") {
+                return {
+                  ...f,
+                  likert: { scale: scaleToApply },
+                };
+              }
+              return f;
+            }),
+          };
+        }
+        return s;
+      })
     );
-    setFields(updatedFields);
+    toast.success(`Likert scale applied to ${endIndex - startIndex + 1} questions`);
   };
 
   return (
@@ -401,165 +674,254 @@ const FormQuestions = () => {
                 action="/formquestions"
                 onSubmit={handlePostSubmit}
               >
-                {fields.map((field) => (
-                  <div className="oneQuestion" key={field.id}>
-                    <div className="question-field flex">
-                      <input
-                        className="question-input"
-                        type="text"
-                        name="label"
-                        required
-                        placeholder="Field Label"
-                        value={field.label}
-                        onChange={(e) =>
-                          handleFieldChange(field.id, "label", e.target.value)
-                        }
-                      />
-                      <img
-                        src={copy}
-                        className="copy-icon"
-                        alt="Duplicate"
-                        onClick={() => duplicateField(field.id)}
-                      />
-                      {isDeletingId === field.id ? (
-                        <span className="deleting-spinner">Deleting...</span>
-                      ) : (
-                        <img
-                          src={del}
-                          className="delete-icon"
-                          alt="Delete"
-                          onClick={() => deleteField(field.id)}
-                        />
-                      )}
-                    </div>
-
-                    <div className="choice-field custom-dropdown flex">
-                      <div className="wrap-icon type-row flex">
-                        <img src={dot} className="dot-icon" alt="Dot" />
-                        <select
-                          name="type"
-                          value={field.type}
-                          onChange={(e) =>
-                            handleFieldChange(field.id, "type", e.target.value)
-                          }
-                          className="choice-select"
-                        >
-                          <option value="multiple_choice">
-                            Multiple Choice
-                          </option>
-                          <option value="multiple_selection">
-                            Multiple Selection
-                          </option>
-                          <option value="fill_in">Fill in</option>
-                          <option value="five_point">Five Point</option>
-                        </select>
-                      </div>
-
-                      <div className="required-field">
-                        <label className="custom-input-checkbox">
+                {sections.length === 0 ? (
+                  <div className="empty-state">
+                    <p>No sections yet. Create your first section to get started.</p>
+                  </div>
+                ) : (
+                  sections.map((section) => (
+                    <div className="section-container" key={section.id}>
+                      <div className="section-header">
+                        <div className="section-title-field">
                           <input
-                            type="checkbox"
-                            checked={field.required}
+                            className="section-title-input"
+                            type="text"
+                            placeholder="Section Title"
+                            value={section.title}
                             onChange={(e) =>
-                              handleFieldChange(
-                                field.id,
-                                "required",
-                                e.target.checked
-                              )
+                              handleSectionChange(section.id, "title", e.target.value)
                             }
                           />
-                          <span className="checkbox-label">Required</span>
-                        </label>
+                          <input
+                            className="section-description-input"
+                            type="text"
+                            placeholder="Section Description (optional)"
+                            value={section.description}
+                            onChange={(e) =>
+                              handleSectionChange(section.id, "description", e.target.value)
+                            }
+                          />
+                        </div>
+                        {isDeletingSectionId === section.id ? (
+                          <span className="deleting-spinner">Deleting...</span>
+                        ) : (
+                          <img
+                            src={del}
+                            className="delete-icon"
+                            alt="Delete Section"
+                            onClick={() => deleteSection(section.id)}
+                            title="Delete Section"
+                          />
+                        )}
                       </div>
 
-                      {(field.type === "multiple_choice" ||
-                        field.type === "multiple_selection") && (
-                        <div className="options-list flex">
-                          <div className="option">
-                            {field.options.map((option, index) => (
-                              <div
-                                className="wrap-icon flex"
-                                key={index}
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "0.5rem",
-                                  marginBottom: "0.5rem",
-                                }}
+                      {section.fields.map((field) => (
+                        <div className="oneQuestion" key={field.id}>
+                          <div className="question-field flex">
+                            <input
+                              className="question-input"
+                              type="text"
+                              name="label"
+                              required
+                              placeholder="Field Label"
+                              value={field.label}
+                              onChange={(e) =>
+                                handleFieldChange(section.id, field.id, "label", e.target.value)
+                              }
+                            />
+                            <img
+                              src={copy}
+                              className="copy-icon"
+                              alt="Duplicate"
+                              onClick={() => duplicateField(section.id, field.id)}
+                            />
+                            <img
+                              src={del}
+                              className="delete-icon"
+                              alt="Delete"
+                              onClick={() => deleteField(section.id, field.id)}
+                            />
+                          </div>
+
+                          <div className="choice-field custom-dropdown flex">
+                            <div className="wrap-icon type-row flex">
+                              <img src={dot} className="dot-icon" alt="Dot" />
+                              <select
+                                name="type"
+                                value={field.type}
+                                onChange={(e) =>
+                                  handleFieldChange(section.id, field.id, "type", e.target.value)
+                                }
+                                className="choice-select"
                               >
+                                <option value="multiple_choice">
+                                  Multiple Choice
+                                </option>
+                                <option value="multiple_selection">
+                                  Multiple Selection
+                                </option>
+                                <option value="fill_in">Fill in</option>
+                                <option value="likert">Likert</option>
+                              </select>
+                            </div>
+
+                            <div className="required-field">
+                              <label className="custom-input-checkbox">
                                 <input
-                                  type="text"
-                                  name="options"
-                                  placeholder={`Option ${index + 1}`}
-                                  value={
-                                    typeof option === "string"
-                                      ? option
-                                      : option.text || ""
-                                  }
+                                  type="checkbox"
+                                  checked={field.required}
                                   onChange={(e) =>
-                                    handleOptionChange(
+                                    handleFieldChange(
+                                      section.id,
                                       field.id,
-                                      index,
-                                      e.target.value
+                                      "required",
+                                      e.target.checked
                                     )
                                   }
-                                  className="option-input"
-                                  style={{ flex: 1 }}
                                 />
-                                {field.options.length > 1 && (
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      removeOption(field.id, index)
-                                    }
-                                    className="remove-option-btn"
-                                    style={{
-                                      background: "none",
-                                      border: "none",
-                                      cursor: "pointer",
-                                      fontSize: "1.5rem",
-                                      color: "#ff4444",
-                                      padding: "0 0.5rem",
-                                    }}
-                                    title="Remove option"
-                                  >
-                                    ×
-                                  </button>
+                                <span className="checkbox-label">Required</span>
+                              </label>
+                            </div>
+
+                            {field.type === "likert" && (
+                              <div className="likert-controls">
+                                <button
+                                  type="button"
+                                  className="likert-scale-btn"
+                                  onClick={() => openLikertModal(section.id, field.id)}
+                                >
+                                  {field.likert && field.likert.scale
+                                    ? `Edit Scale (${field.likert.scale.length} items)`
+                                    : "Set Likert Scale"}
+                                </button>
+                                {field.likert && field.likert.scale && (
+                                  <div className="likert-preview">
+                                    {field.likert.scale.map((item, idx) => (
+                                      <span key={idx} className="likert-item-preview">
+                                        {item.value}: {item.label}
+                                      </span>
+                                    ))}
+                                  </div>
                                 )}
                               </div>
-                            ))}
-                          </div>
+                            )}
 
-                          <button
-                            className="option-select flex"
-                            type="button"
-                            onClick={() => addOption(field.id)}
-                          >
-                            Add option
-                          </button>
-                        </div>
-                      )}
-                      {field.type === "five_point" && (
-                        <div className="options-list flex">
-                          <div className="option">
-                            <p style={{ color: "#666", fontStyle: "italic" }}>
-                              Five point scale options: 1, 2, 3, 4, 5
-                              (automatically set)
-                            </p>
+                            {(field.type === "multiple_choice" ||
+                              field.type === "multiple_selection") && (
+                              <div className="options-list flex">
+                                <div className="option">
+                                  {field.options.map((option, index) => (
+                                    <div
+                                      className="wrap-icon flex"
+                                      key={index}
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.5rem",
+                                        marginBottom: "0.5rem",
+                                      }}
+                                    >
+                                      <input
+                                        type="text"
+                                        name="options"
+                                        placeholder={`Option ${index + 1}`}
+                                        value={
+                                          typeof option === "string"
+                                            ? option
+                                            : option.text || ""
+                                        }
+                                        onChange={(e) =>
+                                          handleOptionChange(
+                                            section.id,
+                                            field.id,
+                                            index,
+                                            e.target.value
+                                          )
+                                        }
+                                        className="option-input"
+                                        style={{ flex: 1 }}
+                                      />
+                                      {field.options.length > 1 && (
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            removeOption(section.id, field.id, index)
+                                          }
+                                          className="remove-option-btn"
+                                          style={{
+                                            background: "none",
+                                            border: "none",
+                                            cursor: "pointer",
+                                            fontSize: "1.5rem",
+                                            color: "#ff4444",
+                                            padding: "0 0.5rem",
+                                          }}
+                                          title="Remove option"
+                                        >
+                                          ×
+                                        </button>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+
+                                <button
+                                  className="option-select flex"
+                                  type="button"
+                                  onClick={() => addOption(section.id, field.id)}
+                                >
+                                  Add option
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
-                      )}
+                      ))}
+
+                      <button
+                        className="next-question flex"
+                        type="button"
+                        onClick={() => addNewField(section.id)}
+                      >
+                        Add Question <img src={add} alt="Add" />
+                      </button>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
 
-                <button
-                  className="next-question flex"
-                  type="button"
-                  onClick={addNewField}
-                >
-                  Add Field <img src={add} alt="Add" />
-                </button>
+                <div className="button-group-section">
+                  {sections.length === 0 ? (
+                    <button
+                      className="next-question flex"
+                      type="button"
+                      onClick={addNewSection}
+                    >
+                      Add Section <img src={add} alt="Add" />
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        className="next-question flex"
+                        type="button"
+                        onClick={addNewSection}
+                      >
+                        Add Section <img src={add} alt="Add" />
+                      </button>
+                      <button
+                        className="next-question flex"
+                        type="button"
+                        onClick={() => {
+                          const lastSection = sections[sections.length - 1];
+                          if (lastSection) {
+                            addNewField(lastSection.id);
+                          }
+                        }}
+                      >
+                        Add Question <img src={add} alt="Add" />
+                      </button>
+                    </>
+                  )}
+                </div>
 
                 <div className="button-group flex">
                   <button
@@ -575,6 +937,86 @@ const FormQuestions = () => {
           )}
         </div>
       </section>
+
+      {/* Likert Scale Modal */}
+      {showLikertModal && (
+        <div className="modal-overlay" onClick={closeLikertModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Configure Likert Scale</h3>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={closeLikertModal}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="likert-scale-items">
+                {currentLikertScale.map((item, index) => (
+                  <div key={index} className="likert-scale-item">
+                    <input
+                      type="number"
+                      value={item.value}
+                      onChange={(e) =>
+                        updateLikertScaleItem(
+                          index,
+                          "value",
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className="likert-value-input"
+                      placeholder="Value"
+                    />
+                    <input
+                      type="text"
+                      value={item.label}
+                      onChange={(e) =>
+                        updateLikertScaleItem(index, "label", e.target.value)
+                      }
+                      className="likert-label-input"
+                      placeholder="Label"
+                    />
+                    {currentLikertScale.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeLikertScaleItem(index)}
+                        className="remove-likert-item-btn"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={addLikertScaleItem}
+                className="add-likert-item-btn"
+              >
+                Add Scale Item
+              </button>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                onClick={closeLikertModal}
+                className="modal-cancel-btn"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={saveLikertScale}
+                className="modal-save-btn"
+              >
+                Save Scale
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

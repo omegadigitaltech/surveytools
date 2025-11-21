@@ -88,11 +88,16 @@ const FormInsights = () => {
     try {
       setExporting(true);
 
+      // Handle both old structure (fields) and new structure (sections)
+      const allFields = formData.sections
+        ? formData.sections.flatMap((section) => section.fields || [])
+        : formData.fields || [];
+
       // Create CSV content
       const headers = [
         "Response ID",
         "Submitted At",
-        ...formData.fields.map((f) => f.label || f.questionText || "Field"),
+        ...allFields.map((f) => f.label || f.questionText || "Field"),
       ];
       const rows = responses.map((response, idx) => {
         const row = [
@@ -100,7 +105,7 @@ const FormInsights = () => {
           response.submittedAt || "",
         ];
 
-        formData.fields.forEach((field) => {
+        allFields.forEach((field) => {
           const answer = response.answers?.find(
             (a) => a.fieldId === field._id || a.fieldId === field.id
           );
@@ -143,9 +148,13 @@ const FormInsights = () => {
   };
 
   const navigateField = (direction) => {
+    const allFields = formData.sections
+      ? formData.sections.flatMap((section) => section.fields || [])
+      : formData.fields || [];
+    
     if (
       direction === "next" &&
-      currentFieldIndex < formData.fields.length - 1
+      currentFieldIndex < allFields.length - 1
     ) {
       setCurrentFieldIndex(currentFieldIndex + 1);
     } else if (direction === "prev" && currentFieldIndex > 0) {
@@ -202,7 +211,18 @@ const FormInsights = () => {
   if (loading) return <div className="loading">Loading insights...</div>;
   if (!formData) return <div className="error">Failed to load form data</div>;
 
-  const currentField = formData.fields[currentFieldIndex];
+  // Handle both old structure (fields) and new structure (sections)
+  const allFields = formData.sections
+    ? formData.sections.flatMap((section) => section.fields || [])
+    : formData.fields || [];
+
+  // Ensure currentFieldIndex is valid
+  const safeFieldIndex = Math.max(0, Math.min(currentFieldIndex, allFields.length - 1));
+  if (safeFieldIndex !== currentFieldIndex && allFields.length > 0) {
+    setCurrentFieldIndex(0);
+  }
+
+  const currentField = allFields.length > 0 ? allFields[safeFieldIndex] : null;
   const currentResponse = responses[currentResponseIndex] || null;
   const totalResponses = responses.length;
 
@@ -293,7 +313,7 @@ const FormInsights = () => {
               </div>
               <div className="card">
                 <h3>Total Fields</h3>
-                <p>{formData.fields.length}</p>
+                <p>{allFields.length}</p>
               </div>
               <div className="card">
                 <h3>Form Status</h3>
@@ -305,7 +325,7 @@ const FormInsights = () => {
             <div className="fields-summary">
               <h3>Fields Overview</h3>
               <div className="fields-grid">
-                {formData.fields.map((field, index) => {
+                {allFields.map((field, index) => {
                   const fieldResponses = responses.filter((response) => {
                     const answer = response.answers?.find(
                       (a) => a.fieldId === field._id || a.fieldId === field.id
@@ -347,7 +367,7 @@ const FormInsights = () => {
           </div>
         )}
 
-        {activeTab === "field" && currentField && (
+        {activeTab === "field" && currentField && allFields.length > 0 && (
           <div className="field-view">
             <div className="field-navigation">
               <button
@@ -358,11 +378,11 @@ const FormInsights = () => {
                 &lt; Previous
               </button>
               <div className="field-pagination">
-                Field {currentFieldIndex + 1} of {formData.fields.length}
+                Field {currentFieldIndex + 1} of {allFields.length}
               </div>
               <button
                 onClick={() => navigateField("next")}
-                disabled={currentFieldIndex === formData.fields.length - 1}
+                disabled={currentFieldIndex === allFields.length - 1}
                 className="nav-button"
               >
                 Next &gt;
@@ -624,7 +644,7 @@ const FormInsights = () => {
                   </div>
 
                   <div className="response-answers">
-                    {formData.fields.map((field, fIdx) => {
+                    {allFields.map((field, fIdx) => {
                       const answer = currentResponse?.answers?.find(
                         (a) => a.fieldId === field._id || a.fieldId === field.id
                       );
