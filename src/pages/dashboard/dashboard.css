@@ -82,8 +82,6 @@
   text-align: center;
 }
 
-
-
 .redeem-button {
   background-color: white;
   color: var(--base);
@@ -160,7 +158,7 @@ form ::placeholder {
 }
 
 .first_post {
-  background: rgba(53, 198, 244, .5);
+  background: rgba(53, 198, 244, 0.5);
   box-shadow: 0.4rem 0.4rem 0.4rem rgba(0, 0, 0, 0.1);
 }
 
@@ -196,14 +194,16 @@ form ::placeholder {
   margin-bottom: 2rem;
 }
 
- .user-point {
+.user-point {
   font-weight: 500;
-  font-size: .85rem;
+  font-size: 0.85rem;
 }
 
 .survey_info {
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .survey_info::first-letter {
@@ -216,7 +216,7 @@ form ::placeholder {
   width: 85%;
 }
 
-.survey_info a {
+.survey_info span {
   margin-bottom: 1.5rem;
   color: var(--base);
 }
@@ -262,7 +262,6 @@ form ::placeholder {
 .no_result {
   margin: 3rem;
 }
-
 
 .survey_head h3 {
   cursor: pointer;
@@ -361,9 +360,9 @@ form ::placeholder {
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, .5);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 500;
-  transition: background-color .5s ease-out;
+  transition: background-color 0.5s ease-out;
 }
 
 .overlay.overlay-active {
@@ -381,8 +380,7 @@ form ::placeholder {
   z-index: 999;
   width: 50%;
   /* font-family: K2D; */
-  transition: transform .5s ease-out;
-
+  transition: transform 0.5s ease-out;
 }
 
 .modal h2 {
@@ -411,7 +409,7 @@ form ::placeholder {
 
 .confirm-modal h2 {
   color: #101010;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 }
 
 .modal.confirm-modal .title {
@@ -435,11 +433,11 @@ form ::placeholder {
   width: 100%;
 }
 
-.converter>* {
+.converter > * {
   width: 100%;
 }
 
-.converter>.title {
+.converter > .title {
   margin-bottom: 0.5rem;
   font-weight: 600;
 }
@@ -476,31 +474,31 @@ form ::placeholder {
   top: 100%;
   left: 0;
   background: white;
-  padding: .5rem 0;
-  border-radius: .3rem;
+  padding: 0.5rem 0;
+  border-radius: 0.3rem;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
-.modal-selector>li {
+.modal-selector > li {
   cursor: pointer;
   transition: 300ms;
   width: 100%;
   text-align: start;
-  padding: .5rem .5rem;
+  padding: 0.5rem 0.5rem;
 }
 
-.modal-selector>li:hover {
+.modal-selector > li:hover {
   background-color: #e1e0e0;
 }
 
 .modal-state-selector {
-  gap: .1rem;
+  gap: 0.1rem;
 }
 
-.plans-selector>li {
+.plans-selector > li {
   width: max-content;
 }
 
@@ -509,7 +507,7 @@ form ::placeholder {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
 .button-main {
@@ -570,7 +568,6 @@ form ::placeholder {
     padding: 1rem;
     width: 100%;
     height: auto;
-
   }
 
   .points-main,
@@ -588,22 +585,22 @@ form ::placeholder {
   }
 
   .points-label {
-    gap: .1rem;
-    font-size: .8rem;
+    gap: 0.1rem;
+    font-size: 0.8rem;
   }
 
   .transactions-history {
-    font-size: .8rem;
-    padding-top: .3rem;
+    font-size: 0.8rem;
+    padding-top: 0.3rem;
   }
 
   .transactions-history img {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 
   .redeem-button {
-    font-size: .9rem;
-    padding: .5rem 1rem;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
   }
 
   .dashboard_sort {
@@ -642,7 +639,7 @@ form ::placeholder {
   }
 
   .survey_class .dept {
-    font-size: .65rem;
+    font-size: 0.65rem;
   }
 
   .participants p {
@@ -665,7 +662,7 @@ form ::placeholder {
   }
 
   .points-label {
-    font-size: .725rem;
+    font-size: 0.725rem;
     font-weight: 500;
     gap: 0.2rem;
   }
@@ -680,17 +677,16 @@ form ::placeholder {
 
   .transactions-history {
     padding-top: 0;
-
   }
 
   .transactions-history a {
-    font-size: .725rem;
+    font-size: 0.725rem;
     /* width: min-content; */
   }
 
   .transactions-history img {
-    margin-left: .5rem;
-    width: .5rem;
+    margin-left: 0.5rem;
+    width: 0.5rem;
   }
 
   .redeem-button {
@@ -778,7 +774,7 @@ form ::placeholder {
   }
 
   .modal-state-selector {
-    font-size: .8rem;
+    font-size: 0.8rem;
   }
 
   .phone-input-wrapper {
@@ -809,8 +805,8 @@ form ::placeholder {
 
   .button-main,
   .button-tertiary {
-    font-size: .9rem;
-    padding: .7rem 1rem;
+    font-size: 0.9rem;
+    padding: 0.7rem 1rem;
   }
 
   .survey_title {
@@ -818,7 +814,7 @@ form ::placeholder {
   }
 
   .survey_details .point {
-    margin-top: .8rem;
+    margin-top: 0.8rem;
   }
 }
 

@@ -7,7 +7,6 @@ import { faculty_dept } from "../../utils/constants/facultyData";
 
 const PostSurvey = () => {
   const data = useActionData();
-  console.log(data)
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');

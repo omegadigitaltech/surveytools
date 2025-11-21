@@ -1,11 +1,11 @@
 import { Link, Form, useActionData, useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import action from "./action";
 import "./surveyquestion.css";
 import backaro from "../../assets/img/backaro.svg";
 import del from "../../assets/img/del.svg";
 import add from "../../assets/img/add.svg";
-import plus from "../../assets/img/icon-add.svg"
+import plus from "../../assets/img/icon-add.svg";
 import dot from "../../assets/img/dot.svg";
 import copy from "../../assets/img/copy.svg";
 import useAuthStore from "../../store/useAuthStore";
@@ -30,115 +30,252 @@ const SurveyQuestions = () => {
 
   // Add new state for delete loading
   const [isDeletingId, setIsDeletingId] = useState(null);
-  const [questions, setQuestions] = useState([
-    {
-      id: Date.now(),
-      questionId: "",
-      questionText: "",
-      questionType: "multiple_choice",
-      required: true,
-      options: [{ text: "", allowsCustomInput: false }],
-    },
+  const [isDeletingSectionId, setIsDeletingSectionId] = useState(null);
+  
+  // Sections state - each section contains questions (matching formquestions structure)
+  const [sections, setSections] = useState([]);
+
+  // Likert scale management
+  const [showLikertModal, setShowLikertModal] = useState(false);
+  const [editingLikertQuestionId, setEditingLikertQuestionId] = useState(null);
+  const [editingLikertSectionId, setEditingLikertSectionId] = useState(null);
+  const [currentLikertScale, setCurrentLikertScale] = useState([
+    { value: 1, label: "Strongly Disagree" },
+    { value: 2, label: "Disagree" },
+    { value: 3, label: "Neutral" },
+    { value: 4, label: "Agree" },
+    { value: 5, label: "Strongly Agree" },
   ]);
 
-  const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false);
+  const sectionsInitializedRef = useRef(false);
 
-  // Load existing questions
+  // Load sections and questions, then organize into sections structure
   useEffect(() => {
-    const fetchQuestions = async () => {
+    if (sectionsInitializedRef.current) return;
+
+    const loadData = async () => {
       try {
-        const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/questions`, {
-          headers: {
-            "Authorization": `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
-        
-        if (response.ok && data.questions.length > 0) {
-          const formattedQuestions = data.questions.map(q => ({
-            id: Date.now() + Math.random(),
-            questionId: q._id,
-            questionText: q.questionText,
-            questionType: q.questionType,
-            required: q.required,
-            options: q.options.map(opt => ({
-              text: typeof opt === 'string' ? opt : opt.text,
-              allowsCustomInput: typeof opt === 'object' ? opt.allowsCustomInput || false : false
-            })),
-          }));
-          setQuestions(formattedQuestions);
+        // Load sections
+        let sectionsData = [];
+        try {
+          const sectionsResponse = await fetch(
+            `${config.API_URL}/surveys/${currentSurveyId}/sections`,
+            {
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (sectionsResponse.ok) {
+            const sectionsResult = await sectionsResponse.json();
+            sectionsData =
+              Array.isArray(sectionsResult) ? sectionsResult : sectionsResult.sections || [];
+          } else if (sectionsResponse.status === 404) {
+            // 404 is expected when no sections exist yet - not an error
+            sectionsData = [];
+          }
+        } catch (error) {
+          // Silently handle errors loading sections - they might not exist yet
+          console.log("No sections found or error loading sections:", error);
+          sectionsData = [];
         }
+
+        // Load questions
+        const questionsResponse = await fetch(
+          `${config.API_URL}/surveys/${currentSurveyId}/questions`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        let questionsData = [];
+        if (questionsResponse.ok) {
+          const questionsResult = await questionsResponse.json();
+          if (questionsResult.questions && questionsResult.questions.length > 0) {
+            questionsData = questionsResult.questions.map((q) => ({
+              id: `question_${Date.now()}_${Math.random()}`,
+              questionId: q._id,
+              questionText: q.questionText || "",
+              questionType: q.questionType === "five_point" ? "likert" : q.questionType,
+              required: q.required !== undefined ? q.required : true,
+              options: q.options
+                ? q.options.map((opt) => ({
+                    text: typeof opt === "string" ? opt : opt.text || "",
+                    allowsCustomInput:
+                      typeof opt === "object" ? opt.allowsCustomInput || false : false,
+                  }))
+                : [],
+              likert: q.likert || null,
+              sectionId: q.sectionId || null,
+            }));
+          }
+        }
+
+        // Organize questions into sections structure
+        const organizedSections = [];
+        
+        // Add sections with their questions
+        sectionsData.forEach((section) => {
+          const sectionId = section._id || section.id;
+          const sectionQuestions = questionsData.filter(
+            (q) => q.sectionId === sectionId
+          );
+          
+          organizedSections.push({
+            id: sectionId,
+            sectionId: sectionId, // Keep API ID
+            title: section.title || "",
+            description: section.description || "",
+            order: section.order || organizedSections.length + 1,
+            questions: sectionQuestions.map((q) => ({
+              ...q,
+              sectionId: sectionId, // Ensure sectionId is set
+            })),
+          });
+        });
+
+        // Add unsectioned questions to a default section if any exist
+        const unsectionedQuestions = questionsData.filter((q) => !q.sectionId);
+        if (unsectionedQuestions.length > 0 && sectionsData.length > 0) {
+          // If we have sections but some questions are unsectioned, add them to first section
+          if (organizedSections.length > 0) {
+            organizedSections[0].questions.push(...unsectionedQuestions);
+          } else {
+            // Create a default section for unsectioned questions
+            organizedSections.push({
+              id: `section_${Date.now()}`,
+              sectionId: null,
+              title: "",
+              description: "",
+              order: 1,
+              questions: unsectionedQuestions,
+            });
+          }
+        }
+
+        // If no sections exist but we have questions, create a default section
+        if (organizedSections.length === 0 && questionsData.length > 0) {
+          organizedSections.push({
+            id: `section_${Date.now()}`,
+            sectionId: null,
+            title: "",
+            description: "",
+            order: 1,
+            questions: questionsData,
+          });
+        }
+
+        setSections(organizedSections);
+        sectionsInitializedRef.current = true;
       } catch (error) {
-        console.error("Error loading questions:", error);
-        toast.error("Error loading existing questions");
+        console.error("Error loading data:", error);
+        toast.error("Error loading survey data");
       } finally {
         setIsLoading(false);
       }
     };
 
     if (currentSurveyId) {
-      fetchQuestions();
+      loadData();
     } else {
       setIsLoading(false);
     }
   }, [currentSurveyId, authToken]);
 
+  // Flatten sections to questions for saving
+  const flattenSectionsToQuestions = () => {
+    const allQuestions = [];
+    sections.forEach((section) => {
+      section.questions.forEach((question) => {
+        allQuestions.push({
+          ...question,
+          sectionId: section.sectionId, // Use section's API ID
+        });
+      });
+    });
+    return allQuestions;
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Prepare bulk payload
-      const validTypes = ["multiple_choice", "five_point", "fill_in", "multiple_selection"];
-
+      const allQuestions = flattenSectionsToQuestions();
+      
       const bulkPayload = {
-     questions: questions.map((question) => ({
-     questionId: question.questionId || "", // Keep existing ID or empty for new
-     questionText: question.questionText.trim(), // Trim whitespace
-     questionType: question.questionType,
-     required: Boolean(question.required),
-     // Conditional options handling
-     options: 
-      (question.questionType === "multiple_choice" || question.questionType === "multiple_selection")
-        ? question.options
-        .map(opt => ({
-          text: typeof opt === 'string' ? opt.trim() : opt.text.trim(),
-          allowsCustomInput: typeof opt === 'object' ? opt.allowsCustomInput || false : false
-        }))
-        .filter(opt => opt.text !== "") // Remove empty options
-        : undefined // Exclude options for non-multiple_choice questions
-   }))
-  };
-       
-        const response = await fetch(`${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`, {
+        questions: allQuestions.map((question) => {
+          const questionData = {
+            questionId: question.questionId || "",
+            questionText: question.questionText.trim(),
+            questionType: question.questionType === "likert" ? "likert" : question.questionType,
+            required: Boolean(question.required),
+          };
+
+          if (
+            question.questionType === "multiple_choice" ||
+            question.questionType === "multiple_selection"
+          ) {
+            questionData.options = question.options
+              .map((opt) => ({
+                text: typeof opt === "string" ? opt.trim() : opt.text.trim(),
+                allowsCustomInput:
+                  typeof opt === "object" ? opt.allowsCustomInput || false : false,
+              }))
+              .filter((opt) => opt.text !== "");
+          } else if (question.questionType === "likert") {
+            if (question.likert && question.likert.scale && question.likert.scale.length > 0) {
+              questionData.likert = question.likert;
+            }
+          }
+
+          if (question.sectionId) {
+            questionData.sectionId = question.sectionId;
+          }
+
+          return questionData;
+        }),
+      };
+
+      const response = await fetch(
+        `${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`,
+        {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(bulkPayload),
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok) {
-          console.error("Error response:", data);
-          throw new Error("Failed to save question" || data.msg  );
         }
-    // Update question IDs from response
-        setQuestions(prevQuestions => 
-          prevQuestions.map(q => {
-            const serverQuestion = data.results.details.find(
-              sq => sq.question === q.questionText
-            );
-            return serverQuestion?.questionId 
-              ? { ...q, questionId: serverQuestion.questionId }
-              : q;
-          })
-        );
-      
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Error response:", data);
+        throw new Error("Failed to save question" || data.msg);
+      }
+
+      // Update question IDs from response
+      const updatedSections = sections.map((section) => ({
+        ...section,
+        questions: section.questions.map((q) => {
+          const serverQuestion = data.results?.details?.find(
+            (sq) => sq.question === q.questionText
+          );
+          return serverQuestion?.questionId
+            ? { ...q, questionId: serverQuestion.questionId }
+            : q;
+        }),
+      }));
+      setSections(updatedSections);
+
       toast.success("Questions saved successfully!" || data.msg);
     } catch (error) {
-      toast.error("Faill to save questions");
+      toast.error("Failed to save questions");
     } finally {
       setIsSaving(false);
     }
@@ -150,21 +287,18 @@ const SurveyQuestions = () => {
     setIsCheckingPayment(true);
 
     try {
-      await handleSave(); // Reuse bulk save logic
-      
-      // Check payment status before showing pricing modal
+      await handleSave();
+
       const isPaid = await verifyPayment(currentSurveyId, authToken);
       setHasPaid(isPaid);
-      
+
       if (isPaid) {
-        // If payment verified, navigate directly to publish page
         toast.success("Payment already verified!");
         navigate("/publish");
       } else {
-        // If not paid, show pricing modal
         setShowPricingModal(true);
       }
-   } catch (error) {
+    } catch (error) {
       toast.error("Error saving questions");
     } finally {
       setIsPosting(false);
@@ -172,31 +306,156 @@ const SurveyQuestions = () => {
     }
   };
 
-  const addNewQuestion = (id) => {
+  // Section management
+  const addNewSection = async () => {
+    try {
+      // Use a default title since API requires it
+      const defaultTitle = `Section ${sections.length + 1}`;
+      
+      const response = await fetch(
+        `${config.API_URL}/surveys/${currentSurveyId}/sections`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: defaultTitle,
+            description: "",
+            order: sections.length + 1,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.msg || "Failed to create section");
+      }
+
+      const newSection = data.section || data;
+      setSections([
+        ...sections,
+        {
+          id: newSection._id || newSection.id,
+          sectionId: newSection._id || newSection.id,
+          title: defaultTitle,
+          description: "",
+          order: newSection.order || sections.length + 1,
+          questions: [],
+        },
+      ]);
+      toast.success("Section created successfully");
+    } catch (error) {
+      console.error("Error creating section:", error);
+      toast.error(error.message || "Error creating section");
+    }
+  };
+
+  const deleteSection = async (sectionId) => {
+    if (sections.length === 1) {
+      toast.error("You must have at least one section");
+      return;
+    }
+
+    setIsDeletingSectionId(sectionId);
+    try {
+      const section = sections.find((s) => s.sectionId === sectionId);
+      
+      // Delete section from API if it has an API ID
+      if (section && section.sectionId) {
+        const response = await fetch(
+          `${config.API_URL}/surveys/${currentSurveyId}/sections/${section.sectionId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.message || "Failed to delete section");
+        }
+      }
+
+      setSections(sections.filter((s) => s.id !== sectionId));
+      toast.success("Section deleted successfully");
+    } catch (error) {
+      toast.error(error.message || "Error deleting section");
+    } finally {
+      setIsDeletingSectionId(null);
+    }
+  };
+
+  const handleSectionChange = async (sectionId, field, value) => {
+    const section = sections.find((s) => s.id === sectionId);
+    if (!section) return;
+
+    // Update local state immediately
+    setSections(
+      sections.map((s) =>
+        s.id === sectionId ? { ...s, [field]: value } : s
+      )
+    );
+
+    // Update on API if section has an API ID
+    if (section.sectionId) {
+      try {
+        await fetch(
+          `${config.API_URL}/surveys/${currentSurveyId}/sections/${section.sectionId}`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ [field]: value }),
+          }
+        );
+      } catch (error) {
+        console.error("Error updating section:", error);
+      }
+    }
+  };
+
+  // Question management
+  const addNewQuestion = (sectionId) => {
     const newQuestion = {
-      id: Date.now(),
-      questionId: currentSurveyId,
+      id: `question_${Date.now()}_${Math.random()}`,
+      questionId: "",
       questionText: "",
       questionType: "multiple_choice",
       required: false,
       options: [{ text: "", allowsCustomInput: false }],
+      likert: null,
+      sectionId: sections.find((s) => s.id === sectionId)?.sectionId || null,
     };
-    setQuestions([...questions, newQuestion]);
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? { ...section, questions: [...section.questions, newQuestion] }
+          : section
+      )
+    );
   };
 
-  const deleteQuestion = async (id) => {
-    setIsDeletingId(id); // Show loading state for specific question
+  const deleteQuestion = async (sectionId, questionId) => {
+    setIsDeletingId(questionId);
     try {
-      const questionToDelete = questions.find(q => q.id === id);
-      
-      if (questionToDelete.questionId) {
+      const section = sections.find((s) => s.id === sectionId);
+      const question = section?.questions.find((q) => q.id === questionId);
+
+      if (question && question.questionId) {
         const response = await fetch(
-        // here
-          `${config.API_URL}/surveys/${currentSurveyId}/questions/${questionToDelete.questionId}`, 
+          `${config.API_URL}/surveys/${currentSurveyId}/questions/${question.questionId}`,
           {
             method: "DELETE",
             headers: {
-              "Authorization": `Bearer ${authToken}`,
+              Authorization: `Bearer ${authToken}`,
               "Content-Type": "application/json",
             },
           }
@@ -208,129 +467,263 @@ const SurveyQuestions = () => {
         }
       }
 
-      setQuestions(questions.filter((question) => question.id !== id));
+      setSections(
+        sections.map((section) => {
+          if (section.id === sectionId) {
+            if (section.questions.length === 1) {
+              toast.error("You must have at least one question in a section");
+              return section;
+            }
+            return {
+              ...section,
+              questions: section.questions.filter((q) => q.id !== questionId),
+            };
+          }
+          return section;
+        })
+      );
       toast.success("Question deleted successfully");
     } catch (error) {
       toast.error(error.message || "Error deleting question");
     } finally {
-      setIsDeletingId(null); // Clear loading state
+      setIsDeletingId(null);
     }
   };
 
-  const duplicateQuestion = (id) => {
-    const questionToDuplicate = questions.find((q) => q.id === id);
-    if (questionToDuplicate) {
-      const duplicatedQuestion = {
-        ...questionToDuplicate,
-        id: Date.now(),
-        // id: questions.length + 1,
-      };
-      setQuestions([...questions, duplicatedQuestion]);
-    }
-  };
-
-  const handleQuestionChange = (id, field, value) => {
-    const updatedQuestions = questions.map((q) =>
-      q.id === id ? { 
-        ...q, 
-        [field]: value, 
-        ...(field === "questionType" && (value === "fill_in" || value === "five_point") ? { options: [] } : {})
-      } : q
-    );
-    setQuestions(updatedQuestions);
-  };
-
-  const addOption = (id) => {
-    const updatedQuestions = questions.map((q) =>
-      q.id === id ? { ...q, options: [...q.options, { text: "", allowsCustomInput: false }] } : q
-    );
-    setQuestions(updatedQuestions);
-  };
-
-  const handleOptionChange = (questionId, index, field, value) => {
-    const updatedQuestions = questions.map((q) =>
-      q.id === questionId
-        ? {
-          ...q,
-          options: q.options.map((option, i) =>
-            i === index ? { ...option, [field]: value } : option
-          ),
+  const duplicateQuestion = (sectionId, questionId) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          const questionToDuplicate = section.questions.find((q) => q.id === questionId);
+          if (questionToDuplicate) {
+            const duplicatedQuestion = {
+              ...questionToDuplicate,
+              id: `question_${Date.now()}_${Math.random()}`,
+              questionId: "", // Reset for new question
+              likert: questionToDuplicate.likert
+                ? { ...questionToDuplicate.likert }
+                : null,
+            };
+            return {
+              ...section,
+              questions: [...section.questions, duplicatedQuestion],
+            };
+          }
         }
-        : q
+        return section;
+      })
     );
-    setQuestions(updatedQuestions);
+    toast.success("Question duplicated");
   };
 
-// Question Upload Function
-const handleFileUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  if (file.type !== "application/pdf") {
-    toast.error("Please upload a PDF file");
-    return;
-  }
-  const formData = new FormData();
-  formData.append("document", file);
-
-  try {
-    setIsUploading(true);
-    setUploadProgress(30);
-    
-    // Used Axios for the upload tracking
-    const response = await axios.post(
-      `${config.API_URL}/surveys/${currentSurveyId}/upload-questionnaire`,
-      formData,
-      {
-        headers: {
-          "Authorization": `Bearer ${authToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setUploadProgress(percentCompleted);
-        },
-      }
+  const handleQuestionChange = (sectionId, questionId, field, value) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            questions: section.questions.map((q) =>
+              q.id === questionId
+                ? {
+                    ...q,
+                    [field]: value,
+                    ...(field === "questionType" && value === "fill_in"
+                      ? { options: [], likert: null }
+                      : {}),
+                    ...(field === "questionType" && value === "likert"
+                      ? { options: [], likert: null }
+                      : {}),
+                    ...(field === "questionType" &&
+                    (value === "multiple_choice" || value === "multiple_selection") &&
+                    q.options.length === 0
+                      ? { options: [{ text: "", allowsCustomInput: false }], likert: null }
+                      : {}),
+                  }
+                : q
+            ),
+          };
+        }
+        return section;
+      })
     );
+  };
 
-    if (response.data.status === "success") {
-      toast.success(response.data.msg);
-      // Refresh questions after successful upload
-        // here
-      const newQuestionsResponse = await axios.get(
-        `${config.API_URL}/surveys/${currentSurveyId}/questions`,
+  const addOption = (sectionId, questionId) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            questions: section.questions.map((q) =>
+              q.id === questionId
+                ? {
+                    ...q,
+                    options: [...q.options, { text: "", allowsCustomInput: false }],
+                  }
+                : q
+            ),
+          };
+        }
+        return section;
+      })
+    );
+  };
+
+  const handleOptionChange = (sectionId, questionId, index, field, value) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            questions: section.questions.map((q) =>
+              q.id === questionId
+                ? {
+                    ...q,
+                    options: q.options.map((option, i) =>
+                      i === index ? { ...option, [field]: value } : option
+                    ),
+                  }
+                : q
+            ),
+          };
+        }
+        return section;
+      })
+    );
+  };
+
+  // Likert scale management
+  const openLikertModal = (sectionId, questionId) => {
+    setEditingLikertSectionId(sectionId);
+    setEditingLikertQuestionId(questionId);
+    const section = sections.find((s) => s.id === sectionId);
+    const question = section?.questions.find((q) => q.id === questionId);
+    if (question && question.likert && question.likert.scale) {
+      setCurrentLikertScale([...question.likert.scale]);
+    } else {
+      setCurrentLikertScale([
+        { value: 1, label: "Strongly Disagree" },
+        { value: 2, label: "Disagree" },
+        { value: 3, label: "Neutral" },
+        { value: 4, label: "Agree" },
+        { value: 5, label: "Strongly Agree" },
+      ]);
+    }
+    setShowLikertModal(true);
+  };
+
+  const closeLikertModal = () => {
+    setShowLikertModal(false);
+    setEditingLikertQuestionId(null);
+    setEditingLikertSectionId(null);
+  };
+
+  const saveLikertScale = () => {
+    if (currentLikertScale.length === 0) {
+      toast.error("Likert scale must have at least one option");
+      return;
+    }
+
+    setSections(
+      sections.map((section) => {
+        if (section.id === editingLikertSectionId) {
+          return {
+            ...section,
+            questions: section.questions.map((q) =>
+              q.id === editingLikertQuestionId
+                ? {
+                    ...q,
+                    likert: {
+                      scale: currentLikertScale.map((item) => ({
+                        value: item.value,
+                        label: item.label.trim(),
+                      })),
+                    },
+                  }
+                : q
+            ),
+          };
+        }
+        return section;
+      })
+    );
+    closeLikertModal();
+    toast.success("Likert scale saved");
+  };
+
+  const addLikertScaleItem = () => {
+    const maxValue = Math.max(...currentLikertScale.map((item) => item.value), 0);
+    setCurrentLikertScale([
+      ...currentLikertScale,
+      { value: maxValue + 1, label: "" },
+    ]);
+  };
+
+  const removeLikertScaleItem = (index) => {
+    if (currentLikertScale.length <= 1) {
+      toast.error("Likert scale must have at least one option");
+      return;
+    }
+    setCurrentLikertScale(currentLikertScale.filter((_, i) => i !== index));
+  };
+
+  const updateLikertScaleItem = (index, field, value) => {
+    setCurrentLikertScale(
+      currentLikertScale.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  // Question Upload Function
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("document", file);
+
+    try {
+      setIsUploading(true);
+      setUploadProgress(30);
+
+      const response = await axios.post(
+        `${config.API_URL}/surveys/${currentSurveyId}/upload-questionnaire`,
+        formData,
         {
           headers: {
-            "Authorization": `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadProgress(percentCompleted);
           },
         }
       );
-      
-      const formattedQuestions = newQuestionsResponse.data.questions.map(q => ({
-        id: Date.now() + Math.random(),
-        questionId: q._id,
-        questionText: q.questionText,
-        questionType: q.questionType,
-        required: q.required,
-        options: q.options.map(opt => ({
-          text: typeof opt === 'string' ? opt : opt.text,
-          allowsCustomInput: typeof opt === 'object' ? opt.allowsCustomInput || false : false
-        })),
-      }));
-      
-      setQuestions(formattedQuestions);
+
+      if (response.data.status === "success") {
+        toast.success(response.data.msg);
+        // Reload data to refresh sections and questions
+        sectionsInitializedRef.current = false;
+        setIsLoading(true);
+        window.location.reload(); // Simple reload to refresh everything
+      }
+    } catch (error) {
+      console.error("File upload failed:", error);
+      toast.error(error.response?.data?.message || "Failed to upload PDF");
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+      e.target.value = "";
     }
-  } catch (error) {
-    console.error("File upload failed:", error);
-    toast.error(error.response?.data?.message || "Failed to upload PDF");
-  } finally {
-    setIsUploading(false);
-    setUploadProgress(0);
-    e.target.value = ""; // Reset file input
-  }
-};
+  };
 
   return (
     <section className="form-page">
@@ -349,9 +742,8 @@ const handleFileUpload = async (e) => {
         ) : (
           <div className="form-container">
             <Form method="post" action="/surveyquestion" onSubmit={handlePostSubmit}>
-         
-            {/* Upload File Questions */}
-            <div className="Q-file-upload">
+              {/* Upload File Questions */}
+              <div className="Q-file-upload">
                 <label className="flex Q-upload">
                   <input
                     type="file"
@@ -362,11 +754,9 @@ const handleFileUpload = async (e) => {
                     disabled={isUploading}
                   />
                   <img src={plus} alt="" />
-                  {isUploading ? (
-                    `Uploading... ${uploadProgress}%`
-                  ) : (
-                    "Upload Questions PDF"
-                  )}
+                  {isUploading
+                    ? `Uploading... ${uploadProgress}%`
+                    : "Upload Questions PDF"}
                 </label>
                 <p className="upload-note">
                   Upload a PDF file to automatically populate questions
@@ -376,151 +766,347 @@ const handleFileUpload = async (e) => {
               {/* To pass id to action */}
               <input type="hidden" name="currentSurveyId" value={currentSurveyId} />
 
-              {questions.map((question) => (
-                <div className="oneQuestion" key={question.id}>
-                  <div className="question-field flex">
-                    <input
-                      className="question-input"
-                      type="text"
-                      name="questionText"
-                      required
-                      placeholder="Untitled Question"
-                      value={question.questionText}
-                      onChange={(e) =>
-                        handleQuestionChange(question.id, "questionText", e.target.value)
-                      }
-                    />
-                    <img
-                      src={copy}
-                      className="copy-icon"
-                      alt="Duplicate"
-                      onClick={() => duplicateQuestion(question.id)}
-                    />
-                    {isDeletingId === question.id ? (
-                      <span className="deleting-spinner">Deleting...</span>
-                    ) : (
-                      <img
-                        src={del}
-                        className="delete-icon"
-                        alt="Delete"
-                        onClick={() => deleteQuestion(question.id)}
-                      />
-                    )}
-                  </div>
-
-                  <div className="choice-field custom-dropdown flex">
-                    <div className="wrap-icon flex">
-                      <img src={dot} className="dot-icon" alt="Dot" />
-                      <select
-                        name="questionType"
-                        value={question.questionType}
-                        onChange={(e) =>
-                          handleQuestionChange(question.id, "questionType", e.target.value)
-                        }
-                        className="choice-select"
-                      >
-                        <option value="multiple_choice">Multiple Choice</option>
-                        <option value="multiple_selection">Multiple Selection</option>
-                        <option value="fill_in">Fill in</option>
-                        <option value="five_point">Five Point</option>
-                      </select>
+              {sections.length === 0 ? (
+                <div className="empty-state">
+                  <p>No sections yet. Create your first section to get started.</p>
+                </div>
+              ) : (
+                sections.map((section) => (
+                  <div className="section-container" key={section.id}>
+                    <div className="section-header">
+                      <div className="section-title-field">
+                        <input
+                          className="section-title-input"
+                          type="text"
+                          placeholder="Section Title"
+                          value={section.title}
+                          onChange={(e) =>
+                            handleSectionChange(section.id, "title", e.target.value)
+                          }
+                        />
+                        <input
+                          className="section-description-input"
+                          type="text"
+                          placeholder="Section Description (optional)"
+                          value={section.description}
+                          onChange={(e) =>
+                            handleSectionChange(section.id, "description", e.target.value)
+                          }
+                        />
+                      </div>
+                      {isDeletingSectionId === section.id ? (
+                        <span className="deleting-spinner">Deleting...</span>
+                      ) : (
+                        <img
+                          src={del}
+                          className="delete-icon"
+                          alt="Delete Section"
+                          onClick={() => deleteSection(section.id)}
+                          title="Delete Section"
+                        />
+                      )}
                     </div>
-                    {(question.questionType === "multiple_choice" || question.questionType === "multiple_selection") && (
-                      <div className="options-list flex">
-                        <div className="option">
-                          {question.options.map((option, index) => (
-                            <div className="wrap-icon flex" key={index}>
-                              <input
-                                key={index}
-                                type="text"
-                                name="options"
-                                placeholder={`Option ${index + 1}`}
-                                value={option.text}
-                                onChange={(e) =>
-                                  handleOptionChange(
-                                    question.id,
-                                    index,
-                                    "text",
-                                    e.target.value
-                                  )
-                                }
-                                className="option-input"
-                              />
-                              <label className="custom-input-checkbox">
-                                <input
-                                  type="checkbox"
-                                  checked={option.allowsCustomInput}
-                                  onChange={(e) =>
-                                    handleOptionChange(
-                                      question.id,
-                                      index,
-                                      "allowsCustomInput",
-                                      e.target.checked
-                                    )
-                                  }
-                                />
-                                <span className="checkbox-label">Allow custom input</span>
-                              </label>
-                            </div>
-                          ))}
+
+                    {section.questions.map((question) => (
+                      <div className="oneQuestion" key={question.id}>
+                        <div className="question-field flex">
+                          <input
+                            className="question-input"
+                            type="text"
+                            name="questionText"
+                            required
+                            placeholder="Untitled Question"
+                            value={question.questionText}
+                            onChange={(e) =>
+                              handleQuestionChange(
+                                section.id,
+                                question.id,
+                                "questionText",
+                                e.target.value
+                              )
+                            }
+                          />
+                          <img
+                            src={copy}
+                            className="copy-icon"
+                            alt="Duplicate"
+                            onClick={() => duplicateQuestion(section.id, question.id)}
+                          />
+                          {isDeletingId === question.id ? (
+                            <span className="deleting-spinner">Deleting...</span>
+                          ) : (
+                            <img
+                              src={del}
+                              className="delete-icon"
+                              alt="Delete"
+                              onClick={() => deleteQuestion(section.id, question.id)}
+                            />
+                          )}
                         </div>
 
-                        <button
-                          className="option-select flex"
-                          type="button"
-                          onClick={() => addOption(question.id)}
-                        >
-                          Add option
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+                        <div className="choice-field custom-dropdown flex">
+                          <div className="wrap-icon type-row flex">
+                            <img src={dot} className="dot-icon" alt="Dot" />
+                            <select
+                              name="questionType"
+                              value={question.questionType}
+                              onChange={(e) =>
+                                handleQuestionChange(
+                                  section.id,
+                                  question.id,
+                                  "questionType",
+                                  e.target.value
+                                )
+                              }
+                              className="choice-select"
+                            >
+                              <option value="multiple_choice">Multiple Choice</option>
+                              <option value="multiple_selection">Multiple Selection</option>
+                              <option value="fill_in">Fill in</option>
+                              <option value="likert">Likert</option>
+                            </select>
+                          </div>
 
-              <button className="next-question flex" onClick={addNewQuestion}>
-                Next Question <img src={add} alt="Add" />
-              </button>
+                          <div className="required-field">
+                            <label className="custom-input-checkbox">
+                              <input
+                                type="checkbox"
+                                checked={question.required}
+                                onChange={(e) =>
+                                  handleQuestionChange(
+                                    section.id,
+                                    question.id,
+                                    "required",
+                                    e.target.checked
+                                  )
+                                }
+                              />
+                              <span className="checkbox-label">Required</span>
+                            </label>
+                          </div>
+
+                          {question.questionType === "likert" && (
+                            <div className="likert-controls">
+                              <button
+                                type="button"
+                                className="likert-scale-btn"
+                                onClick={() => openLikertModal(section.id, question.id)}
+                              >
+                                {question.likert && question.likert.scale
+                                  ? `Edit Scale (${question.likert.scale.length} items)`
+                                  : "Set Likert Scale"}
+                              </button>
+                              {question.likert && question.likert.scale && (
+                                <div className="likert-preview">
+                                  {question.likert.scale.map((item, idx) => (
+                                    <span key={idx} className="likert-item-preview">
+                                      {item.value}: {item.label}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {(question.questionType === "multiple_choice" ||
+                            question.questionType === "multiple_selection") && (
+                            <div className="options-list flex">
+                              <div className="option">
+                                {question.options.map((option, index) => (
+                                  <div className="wrap-icon flex" key={index}>
+                                    <input
+                                      type="text"
+                                      name="options"
+                                      placeholder={`Option ${index + 1}`}
+                                      value={option.text}
+                                      onChange={(e) =>
+                                        handleOptionChange(
+                                          section.id,
+                                          question.id,
+                                          index,
+                                          "text",
+                                          e.target.value
+                                        )
+                                      }
+                                      className="option-input"
+                                    />
+                                    <label className="custom-input-checkbox">
+                                      <input
+                                        type="checkbox"
+                                        checked={option.allowsCustomInput}
+                                        onChange={(e) =>
+                                          handleOptionChange(
+                                            section.id,
+                                            question.id,
+                                            index,
+                                            "allowsCustomInput",
+                                            e.target.checked
+                                          )
+                                        }
+                                      />
+                                      <span className="checkbox-label">Allow custom input</span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+
+                              <button
+                                className="option-select flex"
+                                type="button"
+                                onClick={() => addOption(section.id, question.id)}
+                              >
+                                Add option
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    <button
+                      className="next-question flex"
+                      type="button"
+                      onClick={() => addNewQuestion(section.id)}
+                    >
+                      Add Question <img src={add} alt="Add" />
+                    </button>
+                  </div>
+                ))
+              )}
+
+              <div className="button-group-section">
+                {sections.length === 0 ? (
+                  <button
+                    className="next-question flex"
+                    type="button"
+                    onClick={addNewSection}
+                  >
+                    Add Section <img src={add} alt="Add" />
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      className="next-question flex"
+                      type="button"
+                      onClick={addNewSection}
+                    >
+                      Add Section <img src={add} alt="Add" />
+                    </button>
+                    <button
+                      className="next-question flex"
+                      type="button"
+                      onClick={() => {
+                        const lastSection = sections[sections.length - 1];
+                        if (lastSection) {
+                          addNewQuestion(lastSection.id);
+                        }
+                      }}
+                    >
+                      Add Question <img src={add} alt="Add" />
+                    </button>
+                  </>
+                )}
+              </div>
 
               <div className="button-group flex">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="save-btn"
                   onClick={handleSave}
                   disabled={isSaving}
                 >
                   {isSaving ? "Saving..." : "Save"}
                 </button>
-                
-                <button 
-                  type="submit" 
-                  className="post-btn"
-                  disabled={isPosting}
-                >
+
+                <button type="submit" className="post-btn" disabled={isPosting}>
                   {isPosting ? "Posting..." : "Post"}
                 </button>
               </div>
             </Form>
           </div>
         )}
-
       </div>
 
       {showPricingModal && (
         <PricingModal onClose={() => setShowPricingModal(false)} />
       )}
 
-      {showSaveSuccessModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Success!</h3>
-            <p>Your questions have been saved successfully.</p>
-            <button 
-              className="modal-btn"
-              onClick={() => setShowSaveSuccessModal(false)}
-            >
-              Continue Editing
-            </button>
+      {/* Likert Scale Modal */}
+      {showLikertModal && (
+        <div className="modal-overlay" onClick={closeLikertModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Configure Likert Scale</h3>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={closeLikertModal}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="likert-scale-items">
+                {currentLikertScale.map((item, index) => (
+                  <div key={index} className="likert-scale-item">
+                    <input
+                      type="number"
+                      value={item.value}
+                      onChange={(e) =>
+                        updateLikertScaleItem(
+                          index,
+                          "value",
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className="likert-value-input"
+                      placeholder="Value"
+                    />
+                    <input
+                      type="text"
+                      value={item.label}
+                      onChange={(e) =>
+                        updateLikertScaleItem(index, "label", e.target.value)
+                      }
+                      className="likert-label-input"
+                      placeholder="Label"
+                    />
+                    {currentLikertScale.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeLikertScaleItem(index)}
+                        className="remove-likert-item-btn"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={addLikertScaleItem}
+                className="add-likert-item-btn"
+              >
+                Add Scale Item
+              </button>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                onClick={closeLikertModal}
+                className="modal-cancel-btn"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={saveLikertScale}
+                className="modal-save-btn"
+              >
+                Save Scale
+              </button>
+            </div>
           </div>
         </div>
       )}

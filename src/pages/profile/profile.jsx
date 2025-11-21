@@ -32,11 +32,11 @@ const Profile = () => {
                                 <img src={user} className="userImage" alt="" />
                                 {/* Upload profile image */}
                             </div>
-                            <div className="profilecard-btns flex">
+                            {/* <div className="profilecard-btns flex">
                                 <hr />
                                 <Link to="/settings" className="settings-btn"> Settings</Link>
                                 <Link to="/settings" className="edit-profile">Edit Profile</Link>
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className="profile-info">

@@ -34,7 +34,7 @@ const SignIn = () => {
 
     // Check if login was successful and set auth data in Zustand store
     if (response?.status === "success") {
-      setAuthData(response.token, response.userEmail, response.userName, response.userInst, response.isAdmin);
+      setAuthData(response.token, response.userEmail, response.userName, response.userInst, response.userId);
       setTimeout(() => {
         if (response.userVerified) {
           navigate("/dashboard");
@@ -68,7 +68,7 @@ const SignIn = () => {
             {/* <label className="auth-w5-block" htmlFor="remember">
               <input className="auth-w5-check" type="checkbox" name="checkbox" /> Remember me
             </label> */}
-            <Link className="auth-w5-reset">Forgot password?</Link>
+            <Link to='/forgotpassword' className="auth-w5-reset">Forgot password?</Link>
           </div>
 
           {/* Show spinner if loading, otherwise show Sign In button */}

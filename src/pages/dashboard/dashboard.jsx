@@ -21,16 +21,18 @@ import RedeemModal from "./RedeemModal";
 import ConfirmDetails from "./ConfirmDetails";
 import Report from "./Report";
 import useAppStore from "../../store/useAppStore";
-import ContestModal from "../../components/ContestModal";
+// import ContestModal from "../../components/ContestModal";
 
 const Dashboard = () => {
   const [searchKey, setSearchKey] = useState("");
   const [activeTab, setActiveTab] = useState("available");
   const authToken = useAuthStore((state) => state.authToken);
+  const userId = useAuthStore((state) => state.userId);
   const surveys = useAuthStore((state) => state.surveys);
   const setSurveys = useAuthStore((state) => state.setSurveys);
   const [showPoint, setShowPoint] = useState(false);
   const [mySurveys, setMySurveys] = useState([]);
+  const [myForms, setMyForms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPoints, setIsLoadingPoints] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -65,7 +67,7 @@ const Dashboard = () => {
         throw new Error(json.message || "Failed to fetch my surveys");
       }
 
-      setMySurveys(json.mySurveys);
+      setMySurveys(json.mySurveys || []);
     } catch (error) {
       toast.error(error.message || "Error fetching my surveys");
       console.error("Error fetching my surveys:", error);
@@ -74,10 +76,52 @@ const Dashboard = () => {
     }
   };
 
+  const fetchMyForms = async () => {
+    try {
+      const API_URL = `${config.API_URL}/my-forms`;
+      const options = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      };
+      
+      const response = await fetch(API_URL, options);
+      const json = await response.json();
+
+      if (response.ok) {
+        setMyForms(json.myForms || json.forms || []);
+      } else {
+        // If endpoint doesn't exist, try fetching all forms and filter by user
+        console.warn("my-forms endpoint not available, trying alternative");
+        const allFormsResponse = await fetch(`${config.API_URL}/forms`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        const allFormsJson = await allFormsResponse.json();
+        
+        if (allFormsResponse.ok) {
+          const userForms = Array.isArray(allFormsJson) 
+            ? allFormsJson.filter(form => form.createdBy === userId || form.userId === userId)
+            : (allFormsJson.forms || []).filter(form => form.createdBy === userId || form.userId === userId);
+          setMyForms(userForms);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching my forms:", error);
+      // Silently fail - forms will just not show up
+      setMyForms([]);
+    }
+  };
+
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     if (tab === "my-surveys") {
       fetchMySurveys();
+      fetchMyForms();
     }
   };
 
@@ -165,7 +209,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <ContestModal />
+      {/* <ContestModal /> */}
       <section className="dashboard">
         <div className="dashboard_inner wrap">
           <div className="points-board ">
@@ -236,13 +280,15 @@ const Dashboard = () => {
               {activeTab === "available" ? (
                 filteredSurveys.length > 0 ? (
                   filteredSurveys.map((survey, index) => (
-                    <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
                       <div
                         className={`survey_post ${
                           index === 0 ? "first_post" : ""
                         }`}
                         key={survey._id}
+                        onClick={() => window.location = `/expandsurvey/${survey._id}`}
                       >
+                        {/* new div new */}
+                          <div className="survey-card-content">
                         <div className="post_time flex">
                           <p className="posted">
                             Posted{" "}
@@ -265,7 +311,7 @@ const Dashboard = () => {
                         </div>
                         <p className="survey_info">
                           {survey.description}
-                          <a href="">...see more</a>
+                          <span href="" className="see-more">...see more</span>
                         </p>
                         <div className="survey_class flex">
                           <div className="dept flex">
@@ -288,8 +334,8 @@ const Dashboard = () => {
                             <p> Participants</p>
                           </div>
                         </div>
+                        </div>
                       </div>
-                    </Link>
                   ))
                 ) : (
                   <p className="no_result">Please wait. Survey is loading...</p>
@@ -297,73 +343,126 @@ const Dashboard = () => {
               ) : isLoading ? (
                 <div className="loader-container">
                   <div className="loader"></div>
-                  <p>Loading your surveys...</p>
+                  <p>Loading your surveys and forms...</p>
                 </div>
-              ) : mySurveys.length > 0 ? (
-                mySurveys.map((survey, index) => (
-                  <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
-                    <div
-                      className={`survey_post ${
-                        index === 0 ? "first_post" : ""
-                      }`}
-                      key={survey._id}
-                    >
-                      <div className="post_time flex">
-                        <p className="posted">
-                          Posted{" "}
-                          {formatDistanceToNow(parseISO(survey.createdAt), {
-                            addSuffix: true,
-                          }) || "N/A"}
-                        </p>
-                        <div className="status-container flex">
-                          <span
-                            className={`status-badge ${
-                              survey.published ? "published" : "draft"
-                            }`}
-                          >
-                            {survey.published ? "Published" : "Draft"}
-                          </span>
-                          <p className="duration">
-                            Duration: <b>{survey.duration || 0}</b> min
+              ) : mySurveys.length > 0 || myForms.length > 0 ? (
+                <>
+                  {/* Render Surveys */}
+                  {mySurveys.map((survey, index) => (
+                    <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>
+                      <div
+                        className={`survey_post ${
+                          index === 0 && myForms.length === 0 ? "first_post" : ""
+                        }`}
+                        key={survey._id}
+                      >
+                        <div className="post_time flex">
+                          <p className="posted">
+                            Posted{" "}
+                            {formatDistanceToNow(parseISO(survey.createdAt), {
+                              addSuffix: true,
+                            }) || "N/A"}
                           </p>
-                        </div>
-                      </div>
-                      <div className="survey_details flex">
-                        <h3 className="survey_title">{survey.title}</h3>
-                        <h4 className="point">
-                          {survey.point_per_user || 0} Pts
-                        </h4>
-                      </div>
-                      <p className="survey_info">
-                        {survey.description}
-                        <a href="">...see more</a>
-                      </p>
-                      <div className="survey_class flex">
-                        <div className="dept flex">
-                          <img src={dept} alt="" />
-                          <h4 className="department">
-                            Preferred:{" "}
-                            <span className="dept">
-                              {survey.preferred_participants.join(", ")}
+                          <div className="status-container flex">
+                            <span
+                              className={`status-badge ${
+                                survey.published ? "published" : "draft"
+                              }`}
+                            >
+                              {survey.published ? "Published" : "Draft"}
                             </span>
+                            <p className="duration">
+                              Duration: <b>{survey.duration || 0}</b> min
+                            </p>
+                          </div>
+                        </div>
+                        <div className="survey_details flex">
+                          <h3 className="survey_title">{survey.title}</h3>
+                          <h4 className="point">
+                            {survey.point_per_user || 0} Pts
                           </h4>
                         </div>
-                        <div className="participants flex">
-                          <img src={members} alt="" />
-                          <p>
-                            <span className="num_participant">
-                              {survey.participantCounts?.filled || 0}
-                            </span>{" "}
-                            Participants
-                          </p>
+                        <p className="survey_info">
+                          {survey.description}
+                          <a href="">...see more</a>
+                        </p>
+                        <div className="survey_class flex">
+                          <div className="dept flex">
+                            <img src={dept} alt="" />
+                            <h4 className="department">
+                              Preferred:{" "}
+                              <span className="dept">
+                                {survey.preferred_participants?.join(", ") || "N/A"}
+                              </span>
+                            </h4>
+                          </div>
+                          <div className="participants flex">
+                            <img src={members} alt="" />
+                            <p>
+                              <span className="num_participant">
+                                {survey.participantCounts?.filled || 0}
+                              </span>{" "}
+                              Participants
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                ))
+                    </Link>
+                  ))}
+                  {/* Render Forms */}
+                  {myForms.map((form, index) => (
+                    <Link key={form._id} to={`/forminsights/${form._id}`}>
+                      <div
+                        className={`survey_post ${
+                          index === 0 && mySurveys.length === 0 ? "first_post" : ""
+                        }`}
+                        key={form._id}
+                      >
+                        <div className="post_time flex">
+                          <p className="posted">
+                            Posted{" "}
+                            {formatDistanceToNow(parseISO(form.createdAt), {
+                              addSuffix: true,
+                            }) || "N/A"}
+                          </p>
+                          <div className="status-container flex">
+                            <span className="status-badge published">
+                              Form
+                            </span>
+                          </div>
+                        </div>
+                        <div className="survey_details flex">
+                          <h3 className="survey_title">{form.title}</h3>
+                        </div>
+                        <p className="survey_info">
+                          {form.description || "No description"}
+                          <a href="">...see more</a>
+                        </p>
+                        <div className="survey_class flex">
+                          <div className="dept flex">
+                            <img src={dept} alt="" />
+                            <h4 className="department">
+                              <span className="dept">
+                                {form.fields?.length || 0} Fields
+                              </span>
+                            </h4>
+                          </div>
+                          <div className="participants flex">
+                            <img src={members} alt="" />
+                            <p>
+                              <span className="num_participant">
+                                View Insights
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </>
               ) : (
                 <p className="no_result">
-                  You haven't created any surveys yet.
+                  You haven't created any surveys or forms yet.
                 </p>
               )}
             </div>

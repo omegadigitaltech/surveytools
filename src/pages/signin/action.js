@@ -38,11 +38,11 @@ const action = async ({ formData }) => {
     return {
       status: "success",
       token,
+      userId: json.data.user._id || json.data.user.id,
       userEmail: json.data.user.email,
       userName: json.data.user.fullname,
       userVerified: json.data.user.verified,
       userInst: json.data.user.instituition,
-      isAdmin: json.data.user.admin || false,
     };
   } catch (err) {
     toast.error("An error occurred. Please try again.");
