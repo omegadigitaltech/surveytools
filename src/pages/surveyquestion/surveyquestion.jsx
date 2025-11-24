@@ -349,7 +349,7 @@ const SurveyQuestions = () => {
       toast.success("Section created successfully");
     } catch (error) {
       console.error("Error creating section:", error);
-      toast.error(error.message || "Error creating section");
+      toast.error( "Opps, Kindly retry" || error.message );
     }
   };
 
@@ -361,10 +361,15 @@ const SurveyQuestions = () => {
 
     setIsDeletingSectionId(sectionId);
     try {
-      const section = sections.find((s) => s.sectionId === sectionId);
+      // Find section by local id (not sectionId)
+      const section = sections.find((s) => s.id === sectionId);
+      
+      if (!section) {
+        throw new Error("Section not found");
+      }
       
       // Delete section from API if it has an API ID
-      if (section && section.sectionId) {
+      if (section.sectionId) {
         const response = await fetch(
           `${config.API_URL}/surveys/${currentSurveyId}/sections/${section.sectionId}`,
           {
@@ -382,9 +387,11 @@ const SurveyQuestions = () => {
         }
       }
 
+      // Remove section from state
       setSections(sections.filter((s) => s.id !== sectionId));
       toast.success("Section deleted successfully");
     } catch (error) {
+      console.error("Error deleting section:", error);
       toast.error(error.message || "Error deleting section");
     } finally {
       setIsDeletingSectionId(null);
@@ -664,7 +671,14 @@ const SurveyQuestions = () => {
       toast.error("Likert scale must have at least one option");
       return;
     }
-    setCurrentLikertScale(currentLikertScale.filter((_, i) => i !== index));
+    // Remove the item and renumber the remaining items sequentially
+    const updatedScale = currentLikertScale
+      .filter((_, i) => i !== index)
+      .map((item, newIndex) => ({
+        ...item,
+        value: newIndex + 1, // Renumber starting from 1
+      }));
+    setCurrentLikertScale(updatedScale);
   };
 
   const updateLikertScaleItem = (index, field, value) => {
@@ -862,8 +876,8 @@ const SurveyQuestions = () => {
                             >
                               <option value="multiple_choice">Multiple Choice</option>
                               <option value="multiple_selection">Multiple Selection</option>
-                              <option value="fill_in">Fill in</option>
-                              <option value="likert">Likert</option>
+                              <option value="fill_in">Short Text</option>
+                              <option value="likert">Likert Scale</option>
                             </select>
                           </div>
 
@@ -992,7 +1006,7 @@ const SurveyQuestions = () => {
                     >
                       Add Section <img src={add} alt="Add" />
                     </button>
-                    <button
+                    {/* <button
                       className="next-question flex"
                       type="button"
                       onClick={() => {
@@ -1003,7 +1017,7 @@ const SurveyQuestions = () => {
                       }}
                     >
                       Add Question <img src={add} alt="Add" />
-                    </button>
+                    </button> */}
                   </>
                 )}
               </div>

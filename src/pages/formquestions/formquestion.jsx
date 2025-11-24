@@ -597,7 +597,14 @@ const FormQuestions = () => {
       toast.error("Likert scale must have at least one option");
       return;
     }
-    setCurrentLikertScale(currentLikertScale.filter((_, i) => i !== index));
+    // Remove the item and renumber the remaining items sequentially
+    const updatedScale = currentLikertScale
+      .filter((_, i) => i !== index)
+      .map((item, newIndex) => ({
+        ...item,
+        value: newIndex + 1, // Renumber starting from 1
+      }));
+    setCurrentLikertScale(updatedScale);
   };
 
   const updateLikertScaleItem = (index, field, value) => {
@@ -760,8 +767,8 @@ const FormQuestions = () => {
                                 <option value="multiple_selection">
                                   Multiple Selection
                                 </option>
-                                <option value="fill_in">Fill in</option>
-                                <option value="likert">Likert</option>
+                                <option value="fill_in">Short Text</option>
+                                <option value="likert">Likert Scale</option>
                               </select>
                             </div>
 
@@ -907,7 +914,7 @@ const FormQuestions = () => {
                       >
                         Add Section <img src={add} alt="Add" />
                       </button>
-                      <button
+                      {/* <button
                         className="next-question flex"
                         type="button"
                         onClick={() => {
@@ -918,7 +925,7 @@ const FormQuestions = () => {
                         }}
                       >
                         Add Question <img src={add} alt="Add" />
-                      </button>
+                      </button> */}
                     </>
                   )}
                 </div>
