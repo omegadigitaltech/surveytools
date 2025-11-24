@@ -254,10 +254,10 @@ const FormQuestions = () => {
         sections: sectionsPayload,
       };
 
-      console.log("=== FORM SUBMISSION DEBUG ===");
-      console.log("Generated uniqueId:", uniqueId);
-      console.log("Full payload:", JSON.stringify(finalPayload, null, 2));
-      console.log("============================");
+      // console.log("=== FORM SUBMISSION DEBUG ===");
+      // console.log("Generated uniqueId:", uniqueId);
+      // console.log("Full payload:", JSON.stringify(finalPayload, null, 2));
+      // console.log("============================");
 
       const response = await fetch(`${config.API_URL}/forms`, {
         method: "POST",
@@ -322,7 +322,7 @@ const FormQuestions = () => {
       }
     } catch (error) {
       console.error("Error creating form:", error);
-      toast.error(error.message || "Error creating form");
+      toast.error("Error creating form" || error.message );
     } finally {
       setIsPosting(false);
     }
@@ -348,7 +348,7 @@ const FormQuestions = () => {
     setIsDeletingSectionId(sectionId);
     try {
       setSections(sections.filter((section) => section.id !== sectionId));
-      toast.success("Section deleted successfully");
+      // toast.success("Section deleted successfully");
     } catch (error) {
       toast.error(error.message || "Error deleting section");
     } finally {
@@ -399,7 +399,7 @@ const FormQuestions = () => {
         return section;
       })
     );
-    toast.success("Field deleted successfully");
+    // toast.success("Field deleted successfully");
   };
 
   const duplicateField = (sectionId, fieldId) => {

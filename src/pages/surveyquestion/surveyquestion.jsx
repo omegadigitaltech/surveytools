@@ -346,14 +346,14 @@ const SurveyQuestions = () => {
           questions: [],
         },
       ]);
-      toast.success("Section created successfully");
+      // toast.success("Section created successfully");
     } catch (error) {
       console.error("Error creating section:", error);
       toast.error( "Opps, Kindly retry" || error.message );
     }
   };
 
-  const deleteSection = async (sectionId) => {
+  const deleteSection = (sectionId) => {
     if (sections.length === 1) {
       toast.error("You must have at least one section");
       return;
@@ -361,35 +361,43 @@ const SurveyQuestions = () => {
 
     setIsDeletingSectionId(sectionId);
     try {
-      // Find section by local id (not sectionId)
+      // Find section by local id
       const section = sections.find((s) => s.id === sectionId);
       
       if (!section) {
         throw new Error("Section not found");
       }
-      
-      // Delete section from API if it has an API ID
-      if (section.sectionId) {
-        const response = await fetch(
-          `${config.API_URL}/surveys/${currentSurveyId}/sections/${section.sectionId}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
 
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.message || "Failed to delete section");
-        }
+      // Move questions from deleted section to the first remaining section
+      const remainingSections = sections.filter((s) => s.id !== sectionId);
+      let updatedSections = remainingSections;
+
+      if (remainingSections.length > 0 && section.questions.length > 0) {
+        const targetSection = remainingSections[0];
+        const questionsToMove = section.questions.map((q) => ({
+          ...q,
+          sectionId: targetSection.sectionId, // Update sectionId to target section
+        }));
+
+        // Update sections: remove deleted section and add questions to target section
+        updatedSections = remainingSections.map((s) =>
+          s.id === targetSection.id
+            ? {
+                ...s,
+                questions: [...s.questions, ...questionsToMove],
+              }
+            : s
+        );
       }
 
-      // Remove section from state
-      setSections(sections.filter((s) => s.id !== sectionId));
-      toast.success("Section deleted successfully");
+      // Update order of remaining sections
+      updatedSections = updatedSections.map((s, index) => ({
+        ...s,
+        order: index + 1,
+      }));
+
+      setSections(updatedSections);
+      // toast.success("Section deleted successfully");
     } catch (error) {
       console.error("Error deleting section:", error);
       toast.error(error.message || "Error deleting section");
@@ -489,7 +497,7 @@ const SurveyQuestions = () => {
           return section;
         })
       );
-      toast.success("Question deleted successfully");
+      // toast.success("Question deleted successfully");
     } catch (error) {
       toast.error(error.message || "Error deleting question");
     } finally {
@@ -520,7 +528,7 @@ const SurveyQuestions = () => {
         return section;
       })
     );
-    toast.success("Question duplicated");
+    // toast.success("Question duplicated");
   };
 
   const handleQuestionChange = (sectionId, questionId, field, value) => {
@@ -553,6 +561,56 @@ const SurveyQuestions = () => {
         return section;
       })
     );
+  };
+
+  // Move question to a different section
+  const moveQuestionToSection = (currentSectionId, questionId, targetSectionId) => {
+    if (currentSectionId === targetSectionId) return; // No change needed
+
+    const currentSection = sections.find((s) => s.id === currentSectionId);
+    const targetSection = sections.find((s) => s.id === targetSectionId);
+
+    if (!currentSection || !targetSection) {
+      toast.error("Section not found");
+      return;
+    }
+
+    const question = currentSection.questions.find((q) => q.id === questionId);
+    if (!question) {
+      toast.error("Question not found");
+      return;
+    }
+
+    // Remove question from current section and add to target section
+    setSections(
+      sections.map((section) => {
+        if (section.id === currentSectionId) {
+          // Remove question from current section
+          if (section.questions.length === 1) {
+            toast.error("You must have at least one question in a section");
+            return section;
+          }
+          return {
+            ...section,
+            questions: section.questions.filter((q) => q.id !== questionId),
+          };
+        } else if (section.id === targetSectionId) {
+          // Add question to target section with updated sectionId
+          return {
+            ...section,
+            questions: [
+              ...section.questions,
+              {
+                ...question,
+                sectionId: targetSection.sectionId, // Update sectionId to match target section
+              },
+            ],
+          };
+        }
+        return section;
+      })
+    );
+    // toast.success("Question moved to section");
   };
 
   const addOption = (sectionId, questionId) => {
@@ -856,6 +914,28 @@ const SurveyQuestions = () => {
                               onClick={() => deleteQuestion(section.id, question.id)}
                             />
                           )}
+                        </div>
+
+                        {/* Section selector for moving questions */}
+                        <div style={{ marginTop: "0.5rem", marginBottom: "0.5rem" }}>
+                          <label style={{ fontSize: "0.85rem", color: "#666", marginBottom: "0.3rem", display: "block" }}>
+                            Section:
+                          </label>
+                          <select
+                            className="choice-select"
+                            value={section.id}
+                            onChange={(e) => {
+                              const targetSectionId = e.target.value;
+                              moveQuestionToSection(section.id, question.id, targetSectionId);
+                            }}
+                            style={{ width: "100%", maxWidth: "300px", fontSize: "0.85rem" }}
+                          >
+                            {sections.map((s) => (
+                              <option key={s.id} value={s.id}>
+                                {s.title || `Section ${sections.indexOf(s) + 1}`}
+                              </option>
+                            ))}
+                          </select>
                         </div>
 
                         <div className="choice-field custom-dropdown flex">
