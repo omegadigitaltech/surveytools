@@ -20,3 +20,85 @@
 }
 
 
+/* LIKERT */
+.likert-scale-container {
+  margin: 1.5rem 0;
+}
+
+.likert-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.likert-legend {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* --- Desktop / Tablet Layout (Horizontal) --- */
+.likert-options {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.likert-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1 1 100px; /* grows but has a reasonable minimum */
+  cursor: pointer;
+}
+
+.likert-option input[type="radio"] {
+  margin-bottom: 0.4rem;
+  /* width: 1.1rem; */
+  height: 1.1rem;
+}
+
+.likert-label {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+/* Hover effect for larger screens */
+@media (hover: hover) {
+  .likert-option:hover .likert-label {
+    color: #000;
+    font-weight: 500;
+  }
+}
+
+/* --- Mobile Layout (Stack options vertically or 2-per row) --- */
+@media (max-width: 600px) {
+  .likert-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .likert-option {
+    flex-direction: row;       /* Horizontal alignment on mobile */
+    justify-content: flex-start;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+  }
+
+  .likert-option input[type="radio"] {
+    margin: 0 0.5rem 0 0;
+  }
+
+  .likert-label {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 385px) {
+  .likert-label {
+    font-size: .85rem;
+  }
+}

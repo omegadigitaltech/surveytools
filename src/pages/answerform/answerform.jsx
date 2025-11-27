@@ -58,7 +58,28 @@ const AnswerForm = () => {
         if (!response.ok)
           throw new Error(json.msg || json.message || "Failed to fetch form");
         setForm(json);
-        setFields(json.fields || []);
+
+        // setFields(json.fields || []);
+      // Flatten section.fields → into a single fields array for the renderer
+let extractedFields = [];
+
+if (json.sections && Array.isArray(json.sections)) {
+  json.sections.forEach(section => {
+    if (Array.isArray(section.fields)) {
+      extractedFields.push(
+        ...section.fields.map(field => ({
+          ...field,
+          _id: field._id,   // JUST ADDED
+          label: field.label || field.questionText  // ensure renderer reads label
+        }))
+      );
+    }
+  });
+}
+
+setFields(extractedFields);
+        
+
       } catch (error) {
         console.error("Error:", error);
         toast.error(error.message || "Failed to load form");
@@ -145,7 +166,10 @@ const AnswerForm = () => {
     if (answer === undefined || answer === null) return null;
 
     let value = answer;
-    if (field.type === "number") value = Number(answer);
+    // if (field.type === "number") value = Number(answer);
+    if (field.type === "number" || field.type === "likert") {
+      value = Number(answer);
+    }    
     else if (field.type === "checkbox") value = Array.isArray(answer) ? answer : [answer];
 
     return { fieldId, value };
@@ -260,7 +284,63 @@ const AnswerForm = () => {
                       <span>{index + 1}.</span> {field.label || field.questionText || ""}
                       {field.required && <span className="required-star"> *</span>}
                     </p>
-                    {field.type === "multiple-choice" || field.type === "radio" ? (
+
+                    {field.type === "likert" ? (
+  // <div className="likert-scale-container">
+  //   {field.likert?.scale?.length > 0 ? (
+  //     <div className="likert-options">
+  //       {field.likert.scale.map((option) => (
+  //         <label key={option._id} className="likert-option">
+  //           <input
+  //             type="radio"
+  //             name={`likert-${field._id}`}
+  //             value={option.value}
+  //             onChange={(e) =>
+  //               handleAnswerChange(field._id, e.target.value)
+  //             }
+  //             required={field.required}
+  //           />
+  //           <span>{option.label}</span>
+  //         </label>
+  //       ))}
+  //     </div>
+  //   ) : (
+  //     <p>No likert scale options found</p>
+  //   )}
+  // </div>
+
+  // FIRST THAT SHOW
+  <div className="likert-scale-container">
+  {field.likert?.scale?.length > 0 ? (
+    <fieldset className="likert-fieldset">
+      {/* <legend className="likert-legend">{field.label}</legend> */}
+
+      <div className="likert-options">
+        {field.likert.scale.map((option) => (
+          <label key={option._id} className="likert-option">
+            <input
+              type="radio"
+              name={`likert-${field._id}`}
+              value={option.value}
+              onChange={(e) =>
+                handleAnswerChange(field._id, Number(e.target.value))
+              }
+              required={field.required}
+            />
+            <span className="likert-label">{option.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  ) : (
+    <p>Getting options, kinly wait</p>
+  )}
+</div>
+
+) : field.type === "multiple-choice" || field.type === "radio" ? (
+
+
+                    // {field.type === "multiple-choice" || field.type === "radio" ? (
                       field.options && field.options.length > 0 ? (
                         field.options.map((option, optIndex) => (
                           <label key={optIndex} className="answer-ques-opt">
