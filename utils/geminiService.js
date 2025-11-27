@@ -58,7 +58,7 @@ async function uploadFile(buffer, mimeType) {
 async function processQuestionnaire(documentData) {
   try {
     // Use Gemini-1.5-flash model
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // Create a detailed prompt for the AI
     const textPrompt = `
