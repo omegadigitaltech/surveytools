@@ -1,36 +1,39 @@
+const Form = require("../model/form.js");
 
-const { Form } = require("../model/form.js");
 const { Response } = require("../model/response.js");
 
 class ResponseService {
   // Submit response
   async submitResponse(formId, email, answers) {
-    // 1. Load form
+    // Load form
     const form = await Form.findById(formId);
+    if (!form) throw new Error("Form not found");
 
-    if (!form) {
-      throw new Error("Form not found");
-    }
+    // Flatten all fields inside sections
+    const allFields = (form.sections || []).flatMap((sec) => sec.fields || []);
 
-    // Convert ids for easier matching
+    // Build fieldMap for quick lookups
     const fieldMap = {};
-    form.fields.forEach((field) => {
+    allFields.forEach((field) => {
       fieldMap[field._id.toString()] = field;
     });
 
-    // -----------------------------
-    // 2. CHECK: All answers must map to valid fields in this form
-    // -----------------------------
+    console.log("Flattened fields:", allFields);
+
+    // ----------------------------------------
+    // 1. Check all answers map to valid fieldIds
+    // ----------------------------------------
     answers.forEach((ans) => {
-      if (!fieldMap[ans.fieldId]) {
+      const field = fieldMap[ans.fieldId];
+      if (!field) {
         throw new Error(`Invalid fieldId sent: ${ans.fieldId}`);
       }
     });
 
-    // -----------------------------
-    // 3. CHECK: Required fields must be answered
-    // -----------------------------
-    form.fields.forEach((field) => {
+    // ----------------------------------------
+    // 2. Validate required fields
+    // ----------------------------------------
+    allFields.forEach((field) => {
       if (field.required) {
         const answered = answers.find(
           (ans) => ans.fieldId.toString() === field._id.toString()
@@ -42,9 +45,9 @@ class ResponseService {
       }
     });
 
-    // -----------------------------
-    // 4. (Optional) TYPE VALIDATION
-    // -----------------------------
+    // ----------------------------------------
+    // 3. Type validation
+    // ----------------------------------------
     for (let ans of answers) {
       const field = fieldMap[ans.fieldId];
 
@@ -56,11 +59,32 @@ class ResponseService {
           break;
 
         case "multiple-choice":
-          if (!field.options.includes(ans.value)) {
+        case "select":
+        case "radio":
+          if (!field.options?.includes(ans.value)) {
             throw new Error(
               `Invalid option for "${
                 field.questionText
-              }". Expected one of: ${field.options.join(", ")}`
+              }". Allowed: ${field.options.join(", ")}`
+            );
+          }
+          break;
+
+        case "likert":
+          const allowedValues = field.likert?.scale?.map((s) => s.value) || [];
+          if (!allowedValues.includes(ans.value)) {
+            throw new Error(
+              `Invalid Likert value for "${
+                field.questionText
+              }". Allowed: ${allowedValues.join(", ")}`
+            );
+          }
+          break;
+
+        case "checkbox":
+          if (!Array.isArray(ans.value)) {
+            throw new Error(
+              `Field "${field.questionText}" (checkbox) requires an array`
             );
           }
           break;
@@ -74,9 +98,9 @@ class ResponseService {
       }
     }
 
-    // -----------------------------
-    // 5. Save the response
-    // -----------------------------
+    // ----------------------------------------
+    // 4. Save Response
+    // ----------------------------------------
     return await Response.create({
       formId,
       email,
