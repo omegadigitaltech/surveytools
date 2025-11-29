@@ -155,12 +155,12 @@ const uploadQuestionnaire = async (req, res, next) => {
         status: "success",
         code: 200,
         msg: `${addedQuestions} questions successfully added to survey from uploaded document`,
-        survey: {
-          _id: updatedSurvey._id,
-          title: updatedSurvey.title,
-          questionsCount: updatedSurvey.questions.length,
-          questions: updatedSurvey.questions
-        }
+        // survey: {
+        //   _id: updatedSurvey._id,
+        //   title: updatedSurvey.title,
+        //   questionsCount: updatedSurvey.questions.length,
+        //   questions: updatedSurvey.questions
+        // }
       });
       try {
         await fs.unlink(filePath);
