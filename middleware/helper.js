@@ -29,13 +29,13 @@ async function sendNotification(email, owner, text, title) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth:{
-            user: "tech.digitalomega",
+            user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASSWORD
         }
     })
   
     const mailOptions = {
-        from: 'tech.digitalomega@gmail.com',
+        from: process.env.EMAIL,
         to: email,
         subject: title,
         html: htmlContent,
