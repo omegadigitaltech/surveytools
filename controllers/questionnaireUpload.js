@@ -154,24 +154,25 @@ const uploadQuestionnaire = async (req, res, next) => {
 
       session.endSession();
       console.log(`Survey ${surveyId} updated successfully. ${addedQuestions} questions added.`);
-      res.status(200).json({
-        status: "success",
-        code: 200,
-        msg: `${addedQuestions} questions successfully added to survey from uploaded document`,
-        // survey: {
-        //   _id: updatedSurvey._id,
-        //   title: updatedSurvey.title,
-        //   questionsCount: updatedSurvey.questions.length,
-        //   questions: updatedSurvey.questions
-        // }
-      });
-      console.log(`Deleted temporary file after successful processing: ${filePath}`);
+
       try {
         await fs.unlink(filePath);
       } catch (unlinkError) {
         console.error('Error deleting uploaded file:', unlinkError);
       }
-      return;
+      console.log(`Deleted temporary file after successful processing: ${filePath}`);
+
+      return res.status(200).json({
+        status: "success",
+        code: 200,
+        msg: `${addedQuestions} questions successfully added to survey from uploaded document`,
+        survey: {
+          _id: updatedSurvey._id,
+          title: updatedSurvey.title,
+          questionsCount: updatedSurvey.questions.length,
+          questions: updatedSurvey.questions
+        }
+      });
     } catch (processingError) {
       // Handle document processing errors within the transaction
       console.error('Document processing error:', processingError);
