@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const { Survey } = require('../model/survey');
+const Section = require('../model/section');
 const User = require('../model/user');
 const { extractTextFromDocument } = require('../utils/documentProcessor');
 const { processQuestionnaire } = require('../utils/geminiService');
@@ -93,6 +94,28 @@ const uploadQuestionnaire = async (req, res, next) => {
       console.log('Sending document to Gemini for processing...');
       const extractedData = await processQuestionnaire(documentData);
       console.log(`Received response from Gemini: ${JSON.stringify(extractedData).substring(0, 300)}...`);
+
+      // Create sections first and build mapping from temporary IDs to DB IDs
+      let sectionIdMap = {};
+      if (extractedData && Array.isArray(extractedData.sections) && extractedData.sections.length > 0) {
+        console.log(`Found ${extractedData.sections.length} sections to create`);
+        for (const [index, section] of extractedData.sections.entries()) {
+          if (!section || !section.title) {
+            console.log('Skipping section due to missing title');
+            continue;
+          }
+          const created = await Section.create([
+            {
+              surveyId: survey._id,
+              title: section.title,
+              description: section.description || '',
+              order: typeof section.order === 'number' ? section.order : index + 1
+            }
+          ], { session });
+          const tempId = section.id || `sec_${index + 1}`;
+          sectionIdMap[tempId] = created[0]._id;
+        }
+      }
       
       // Track how many questions were added
       let addedQuestions = 0;
@@ -114,7 +137,8 @@ const uploadQuestionnaire = async (req, res, next) => {
           const questionData = {
             questionText: question.questionText,
             questionType: question.questionType,
-            required: question.required || false
+            required: question.required || false,
+            sectionId: (question.sectionId && sectionIdMap[question.sectionId]) ? sectionIdMap[question.sectionId] : null
           };
           
           // Add options for multiple-choice or multiple-selection questions
@@ -220,4 +244,4 @@ const uploadQuestionnaire = async (req, res, next) => {
 
 module.exports = {
   uploadQuestionnaire
-}; 
+};
