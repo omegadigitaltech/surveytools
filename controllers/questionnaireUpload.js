@@ -169,18 +169,11 @@ const uploadQuestionnaire = async (req, res, next) => {
         throw new Error('No valid questions could be extracted from the document');
       }
       
-      // Update the survey's last updated timestamp
       survey.updatedAt = new Date();
       await survey.save({ session });
-      console.log(`Saved survey with ID: ${survey._id}`);
-      
-      // Clean up the uploaded file
-      await fs.unlink(filePath);
-      console.log(`Deleted temporary file: ${filePath}`);
-      
       await session.commitTransaction();
       session.endSession();
-      
+      await fs.unlink(filePath);
       res.status(200).json({
         status: "success",
         code: 200,
