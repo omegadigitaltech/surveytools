@@ -151,7 +151,6 @@ const uploadQuestionnaire = async (req, res, next) => {
       });
 
       session.endSession();
-      await fs.unlink(filePath);
       res.status(200).json({
         status: "success",
         code: 200,
@@ -163,6 +162,12 @@ const uploadQuestionnaire = async (req, res, next) => {
           questions: updatedSurvey.questions
         }
       });
+      try {
+        await fs.unlink(filePath);
+      } catch (unlinkError) {
+        console.error('Error deleting uploaded file:', unlinkError);
+      }
+      return;
     } catch (processingError) {
       // Handle document processing errors within the transaction
       console.error('Document processing error:', processingError);
