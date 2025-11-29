@@ -140,6 +140,7 @@ const uploadQuestionnaire = async (req, res, next) => {
               });
             }
             surveyTxn.questions.push(questionData);
+            console.log(`Added question: ${questionData.questionText} (Type: ${questionData.questionType})`);
             addedQuestions++;
           }
         } else {
@@ -149,8 +150,10 @@ const uploadQuestionnaire = async (req, res, next) => {
         await surveyTxn.save({ session });
         updatedSurvey = surveyTxn;
       });
+      console.log(`Transaction completed successfully. Added ${addedQuestions} questions to survey ${surveyId}`);
 
       session.endSession();
+      console.log(`Survey ${surveyId} updated successfully. ${addedQuestions} questions added.`);
       res.status(200).json({
         status: "success",
         code: 200,
@@ -162,6 +165,7 @@ const uploadQuestionnaire = async (req, res, next) => {
         //   questions: updatedSurvey.questions
         // }
       });
+      console.log(`Deleted temporary file after successful processing: ${filePath}`);
       try {
         await fs.unlink(filePath);
       } catch (unlinkError) {
