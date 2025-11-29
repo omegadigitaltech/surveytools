@@ -49,42 +49,12 @@ const SurveyQuestions = () => {
 
   const sectionsInitializedRef = useRef(false);
 
-  // Load sections and questions, then organize into sections structure
-  useEffect(() => {
-    if (sectionsInitializedRef.current) return;
-
-    const loadData = async () => {
+  const refreshSectionsAndQuestions = async () => {
+    try {
+      let sectionsData = [];
       try {
-        // Load sections
-        let sectionsData = [];
-        try {
-          const sectionsResponse = await fetch(
-            `${config.API_URL}/surveys/${currentSurveyId}/sections`,
-            {
-              headers: {
-                Authorization: `Bearer ${authToken}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (sectionsResponse.ok) {
-            const sectionsResult = await sectionsResponse.json();
-            sectionsData =
-              Array.isArray(sectionsResult) ? sectionsResult : sectionsResult.sections || [];
-          } else if (sectionsResponse.status === 404) {
-            // 404 is expected when no sections exist yet - not an error
-            sectionsData = [];
-          }
-        } catch (error) {
-          // Silently handle errors loading sections - they might not exist yet
-          console.log("No sections found or error loading sections:", error);
-          sectionsData = [];
-        }
-
-        // Load questions
-        const questionsResponse = await fetch(
-          `${config.API_URL}/surveys/${currentSurveyId}/questions`,
+        const sectionsResponse = await fetch(
+          `${config.API_URL}/surveys/${currentSurveyId}/sections`,
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -93,11 +63,36 @@ const SurveyQuestions = () => {
           }
         );
 
-        let questionsData = [];
-        if (questionsResponse.ok) {
-          const questionsResult = await questionsResponse.json();
-          if (questionsResult.questions && questionsResult.questions.length > 0) {
-            questionsData = questionsResult.questions.map((q) => ({
+        if (sectionsResponse.ok) {
+          const sectionsResult = await sectionsResponse.json();
+          sectionsData = Array.isArray(sectionsResult)
+            ? sectionsResult
+            : sectionsResult.sections || [];
+        } else if (sectionsResponse.status === 404) {
+          sectionsData = [];
+        }
+      } catch (error) {
+        sectionsData = [];
+      }
+
+      const questionsResponse = await fetch(
+        `${config.API_URL}/surveys/${currentSurveyId}/questions`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      let questionsData = [];
+      if (questionsResponse.ok) {
+        const questionsResult = await questionsResponse.json();
+        if (questionsResult.questions && questionsResult.questions.length > 0) {
+          questionsData = questionsResult.questions.map((q) => {
+            const secObj = q.section || {};
+            const secId = q.sectionId || secObj._id || null;
+            return {
               id: `question_${Date.now()}_${Math.random()}`,
               questionId: q._id,
               questionText: q.questionText || "",
@@ -111,77 +106,101 @@ const SurveyQuestions = () => {
                   }))
                 : [],
               likert: q.likert || null,
-              sectionId: q.sectionId || null,
-            }));
-          }
+              sectionId: secId,
+              __sectionMeta: {
+                id: secId,
+                title: secObj.title || "",
+                description: secObj.description || "",
+                order: secObj.order !== undefined ? secObj.order : undefined,
+              },
+            };
+          });
         }
+      }
 
-        // Organize questions into sections structure
-        const organizedSections = [];
-        
-        // Add sections with their questions
-        sectionsData.forEach((section) => {
-          const sectionId = section._id || section.id;
-          const sectionQuestions = questionsData.filter(
-            (q) => q.sectionId === sectionId
-          );
-          
-          organizedSections.push({
-            id: sectionId,
-            sectionId: sectionId, // Keep API ID
+      const sectionsMap = new Map();
+
+      questionsData.forEach((q) => {
+        const meta = q.__sectionMeta || {};
+        const sid = meta.id || null;
+        if (!sectionsMap.has(sid)) {
+          sectionsMap.set(sid, {
+            id: sid || `section_${sectionsMap.size + 1}`,
+            sectionId: sid,
+            title: meta.title || "",
+            description: meta.description || "",
+            order:
+              meta.order !== undefined && meta.order !== null
+                ? meta.order
+                : sectionsMap.size + 1,
+            questions: [],
+          });
+        }
+        const s = sectionsMap.get(sid);
+        s.questions.push({ ...q });
+      });
+
+      sectionsData.forEach((section) => {
+        const sid = section._id || section.id || null;
+        if (!sectionsMap.has(sid)) {
+          sectionsMap.set(sid, {
+            id: sid || `section_${sectionsMap.size + 1}`,
+            sectionId: sid,
             title: section.title || "",
             description: section.description || "",
-            order: section.order || organizedSections.length + 1,
-            questions: sectionQuestions.map((q) => ({
-              ...q,
-              sectionId: sectionId, // Ensure sectionId is set
-            })),
+            order:
+              section.order !== undefined && section.order !== null
+                ? section.order
+                : sectionsMap.size + 1,
+            questions: [],
           });
+        } else {
+          const s = sectionsMap.get(sid);
+          sectionsMap.set(sid, {
+            ...s,
+            title: section.title || s.title,
+            description: section.description || s.description,
+            order:
+              section.order !== undefined && section.order !== null
+                ? section.order
+                : s.order,
+          });
+        }
+      });
+
+      let organizedSections = Array.from(sectionsMap.values());
+      organizedSections = organizedSections.sort((a, b) => {
+        const ao = a.order ?? 9999;
+        const bo = b.order ?? 9999;
+        if (ao === bo) return 0;
+        return ao < bo ? -1 : 1;
+      });
+
+      if (organizedSections.length === 0 && questionsData.length > 0) {
+        organizedSections.push({
+          id: `section_${Date.now()}`,
+          sectionId: null,
+          title: "",
+          description: "",
+          order: 1,
+          questions: questionsData,
         });
-
-        // Add unsectioned questions to a default section if any exist
-        const unsectionedQuestions = questionsData.filter((q) => !q.sectionId);
-        if (unsectionedQuestions.length > 0 && sectionsData.length > 0) {
-          // If we have sections but some questions are unsectioned, add them to first section
-          if (organizedSections.length > 0) {
-            organizedSections[0].questions.push(...unsectionedQuestions);
-          } else {
-            // Create a default section for unsectioned questions
-            organizedSections.push({
-              id: `section_${Date.now()}`,
-              sectionId: null,
-              title: "",
-              description: "",
-              order: 1,
-              questions: unsectionedQuestions,
-            });
-          }
-        }
-
-        // If no sections exist but we have questions, create a default section
-        if (organizedSections.length === 0 && questionsData.length > 0) {
-          organizedSections.push({
-            id: `section_${Date.now()}`,
-            sectionId: null,
-            title: "",
-            description: "",
-            order: 1,
-            questions: questionsData,
-          });
-        }
-
-        setSections(organizedSections);
-        sectionsInitializedRef.current = true;
-      } catch (error) {
-        console.error("Error loading data:", error);
-        toast.error("Error loading survey data");
-      } finally {
-        setIsLoading(false);
       }
-    };
 
+      setSections(organizedSections);
+      sectionsInitializedRef.current = true;
+    } catch (error) {
+      toast.error("Error loading survey data");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load sections and questions, then organize into sections structure
+  useEffect(() => {
+    if (sectionsInitializedRef.current) return;
     if (currentSurveyId) {
-      loadData();
+      refreshSectionsAndQuestions();
     } else {
       setIsLoading(false);
     }
@@ -769,7 +788,6 @@ const SurveyQuestions = () => {
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
-            "Content-Type": "multipart/form-data",
           },
           onUploadProgress: (progressEvent) => {
             const percentCompleted = Math.round(
@@ -782,10 +800,9 @@ const SurveyQuestions = () => {
 
       if (response.data.status === "success") {
         toast.success(response.data.msg);
-        // Reload data to refresh sections and questions
         sectionsInitializedRef.current = false;
         setIsLoading(true);
-        window.location.reload(); // Simple reload to refresh everything
+        await refreshSectionsAndQuestions();
       }
     } catch (error) {
       console.error("File upload failed:", error);

@@ -71,11 +71,11 @@ const Navbar = () => {
                     Post Survey
                   </NavLink>
                 </li>
-                <li className="header-w2-item show header-w2-hide">
+                {/* <li className="header-w2-item show header-w2-hide">
                   <NavLink className="header-w2-link" to="/create-form">
                     Create Form
                   </NavLink>
-                </li>
+                </li> */}
               </>
             )}
             {!isAuthenticated && (
@@ -149,15 +149,15 @@ const Navbar = () => {
                 Post a Survey
               </NavLink>
             </li>
-            <li>
+            {/* <li>
               <NavLink
                 to="/create-form"
-                className="menu-item"
+                className="menu-item" 
                 onClick={closeMenu}
               >
                 Create Form
               </NavLink>
-            </li>
+            </li> */}
             {/* LATER, API NOT READY */}
             {/* <li>
               <NavLink to="/withdraw" className="menu-item" onClick={closeMenu}>
