@@ -18,7 +18,6 @@ import config from "../../config/config";
 import useAuthStore from "../../store/useAuthStore";
 import backaro from "../../assets/img/backaro.svg";
 import downloadIcon from "../../assets/img/download.svg";
-import ShareLink from "../../components/sharelink/sharelink";
 import "./forminsights.css";
 
 const FormInsights = () => {
@@ -31,7 +30,7 @@ const FormInsights = () => {
   const [activeTab, setActiveTab] = useState("summary");
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [currentResponseIndex, setCurrentResponseIndex] = useState(0);
-  const [showShareModal, setShowShareModal] = useState(false);
+  const [individualResponses, setIndividualResponses] = useState([]);
   const authToken = useAuthStore((state) => state.authToken);
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
@@ -74,6 +73,10 @@ const FormInsights = () => {
           : responsesJson.responses || [];
 
         setResponses(responsesArray);
+        
+        // Transform responses into individual user responses (similar to survey insights)
+        const userResponses = transformToIndividualResponses(formJson, responsesArray);
+        setIndividualResponses(userResponses);
       } catch (error) {
         toast.error(error.message || "Error fetching insights");
       } finally {
@@ -84,16 +87,54 @@ const FormInsights = () => {
     fetchFormInsights();
   }, [id, authToken]);
 
+  // Function to transform form responses into individual user responses (similar to survey)
+  const transformToIndividualResponses = (form, responsesArray) => {
+    if (!responsesArray || responsesArray.length === 0) return [];
+    
+    return responsesArray.map((response, index) => {
+      const userResponse = {
+        userId: response._id || `user_${index}`,
+        answers: response.answers || [],
+        submittedAt: response.submittedAt || new Date()
+      };
+      return userResponse;
+    });
+  };
+
   const exportToCSV = async () => {
     try {
       setExporting(true);
+      
+      // Try to use API endpoint first (similar to survey insights)
+      try {
+        const response = await fetch(`${config.API_URL}/forms/${id}/export`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.style.display = "none";
+          a.href = url;
+          a.download = `${formData.title || "form"}-export.csv`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          toast.success("Form data exported successfully");
+          return;
+        }
+      } catch (apiError) {
+        // Fall back to client-side export if API endpoint doesn't exist
+      }
 
-      // Handle both old structure (fields) and new structure (sections)
+      // Fallback: Client-side CSV generation
       const allFields = formData.sections
         ? formData.sections.flatMap((section) => section.fields || [])
         : formData.fields || [];
 
-      // Create CSV content
       const headers = [
         "Response ID",
         "Submitted At",
@@ -163,19 +204,20 @@ const FormInsights = () => {
   };
 
   const navigateResponse = (direction) => {
-    if (direction === "next" && currentResponseIndex < responses.length - 1) {
+    if (direction === "next" && currentResponseIndex < individualResponses.length - 1) {
       setCurrentResponseIndex(currentResponseIndex + 1);
     } else if (direction === "prev" && currentResponseIndex > 0) {
       setCurrentResponseIndex(currentResponseIndex - 1);
     }
   };
 
-  // Helper function to get response counts for radio/checkbox fields
+  // Helper function to get response counts for radio/checkbox fields (similar to survey multiple choice)
   const getOptionData = (field) => {
     if (!field.options || field.options.length === 0) return [];
 
     return field.options.map((option) => {
       let count = 0;
+      let customInputs = [];
 
       responses.forEach((response) => {
         const answer = response.answers?.find(
@@ -186,13 +228,29 @@ const FormInsights = () => {
           if (field.type === "checkbox") {
             // For checkbox, value might be an array
             if (Array.isArray(answer.value)) {
-              if (answer.value.includes(option)) count++;
+              answer.value.forEach((item) => {
+                if (typeof item === "object" && item.selectedOption === option) {
+                  count++;
+                  if (item.customInput) {
+                    customInputs.push(item.customInput);
+                  }
+                } else if (item === option) {
+                  count++;
+                }
+              });
             } else if (answer.value === option) {
               count++;
             }
           } else {
-            // For radio, value is a single string
-            if (answer.value === option) count++;
+            // For radio, value is a single string or object
+            if (typeof answer.value === "object" && answer.value.selectedOption === option) {
+              count++;
+              if (answer.value.customInput) {
+                customInputs.push(answer.value.customInput);
+              }
+            } else if (answer.value === option) {
+              count++;
+            }
           }
         }
       });
@@ -200,6 +258,7 @@ const FormInsights = () => {
       return {
         option: option,
         responses: count,
+        customInputs: customInputs,
         percentage:
           responses.length > 0
             ? ((count / responses.length) * 100).toFixed(1)
@@ -223,8 +282,14 @@ const FormInsights = () => {
   }
 
   const currentField = allFields.length > 0 ? allFields[safeFieldIndex] : null;
-  const currentResponse = responses[currentResponseIndex] || null;
+  const currentResponse = individualResponses[currentResponseIndex] || null;
   const totalResponses = responses.length;
+
+  // Calculate participation data (similar to survey insights)
+  const participationData = [
+    { name: 'Completed', value: totalResponses },
+    { name: 'Remaining', value: Math.max(0, (formData.config?.totalRequiredParticipants || 0) - totalResponses) }
+  ];
 
   return (
     <section className="insights">
@@ -244,38 +309,6 @@ const FormInsights = () => {
           </button>
         </div>
 
-        <div
-          className="share-link-section"
-          style={{
-            marginBottom: "2rem",
-            padding: "1rem",
-            background: "#f5f5f5",
-            borderRadius: "8px",
-          }}
-        >
-          <h3 style={{ marginBottom: "1rem" }}>Share Form</h3>
-          <button
-            onClick={() => setShowShareModal(true)}
-            style={{
-              padding: "0.5rem 1rem",
-              background: "#007bff",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Share Link
-          </button>
-          {showShareModal && (
-            <ShareLink
-              type="form"
-              formId={id}
-              onClose={() => setShowShareModal(false)}
-            />
-          )}
-        </div>
-
         <div className="insights-tabs">
           <button
             className={`tab-button ${activeTab === "summary" ? "active" : ""}`}
@@ -284,12 +317,12 @@ const FormInsights = () => {
             Summary
           </button>
           <button
-            className={`tab-button ${activeTab === "field" ? "active" : ""}`}
+            className={`tab-button ${activeTab === "question" ? "active" : ""}`}
             onClick={() => {
-              setActiveTab("field");
+              setActiveTab("question");
             }}
           >
-            Field Analysis
+            Question
           </button>
           <button
             className={`tab-button ${
@@ -299,7 +332,7 @@ const FormInsights = () => {
               setActiveTab("individual");
             }}
           >
-            Individual Responses
+            Individual
           </button>
         </div>
 
@@ -308,23 +341,49 @@ const FormInsights = () => {
             {/* Overview Cards */}
             <div className="overview-cards">
               <div className="card">
-                <h3>Total Responses</h3>
+                <h3>Total Participants</h3>
+                <p>{formData.config?.totalRequiredParticipants || totalResponses}</p>
+              </div>
+              <div className="card">
+                <h3>Responses</h3>
                 <p>{totalResponses}</p>
               </div>
               <div className="card">
-                <h3>Total Fields</h3>
-                <p>{allFields.length}</p>
-              </div>
-              <div className="card">
-                <h3>Form Status</h3>
-                <p>{formData.shares?.type || "public"}</p>
+                <h3>Response Rate</h3>
+                <p>{formData.config?.totalRequiredParticipants 
+                  ? ((totalResponses / formData.config.totalRequiredParticipants) * 100).toFixed(1)
+                  : totalResponses > 0 ? "100.0" : "0.0"}%</p>
               </div>
             </div>
 
+            {/* Participation Chart */}
+            <div className="chart-container">
+              <h3>Participation Overview</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={participationData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    label
+                  >
+                    {participationData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
             {/* Fields Summary */}
-            <div className="fields-summary">
+            <div className="questions-summary">
               <h3>Fields Overview</h3>
-              <div className="fields-grid">
+              <div className="questions-grid">
                 {allFields.map((field, index) => {
                   const fieldResponses = responses.filter((response) => {
                     const answer = response.answers?.find(
@@ -340,13 +399,13 @@ const FormInsights = () => {
                   return (
                     <div
                       key={field._id || field.id}
-                      className="field-summary-card"
+                      className="question-summary-card"
                       onClick={() => {
-                        setActiveTab("field");
+                        setActiveTab("question");
                         setCurrentFieldIndex(index);
                       }}
                     >
-                      <h4>Field {index + 1}</h4>
+                      <h4>F{index + 1}</h4>
                       <p>
                         {(field.label || field.questionText || "").length > 40
                           ? (field.label || field.questionText || "").substring(
@@ -357,7 +416,6 @@ const FormInsights = () => {
                       </p>
                       <div className="response-count">
                         <span>{fieldResponses} responses</span>
-                        <span className="field-type">{field.type}</span>
                       </div>
                     </div>
                   );
@@ -367,9 +425,9 @@ const FormInsights = () => {
           </div>
         )}
 
-        {activeTab === "field" && currentField && allFields.length > 0 && (
-          <div className="field-view">
-            <div className="field-navigation">
+        {activeTab === "question" && currentField && allFields.length > 0 && (
+          <div className="question-view">
+            <div className="question-navigation">
               <button
                 onClick={() => navigateField("prev")}
                 disabled={currentFieldIndex === 0}
@@ -377,7 +435,7 @@ const FormInsights = () => {
               >
                 &lt; Previous
               </button>
-              <div className="field-pagination">
+              <div className="question-pagination">
                 Field {currentFieldIndex + 1} of {allFields.length}
               </div>
               <button
@@ -389,13 +447,21 @@ const FormInsights = () => {
               </button>
             </div>
 
-            <div className="field-detail">
+            <div className="question-detail">
               <h3>
-                Field {currentFieldIndex + 1}: {currentField.label}
+                F{currentFieldIndex + 1}: {currentField.label || currentField.questionText}
               </h3>
-              <div className="field-type">Type: {currentField.type}</div>
+              <div className="question-type">Type: {currentField.type === 'radio' 
+                ? 'Multiple Choice' 
+                : currentField.type === 'checkbox'
+                  ? 'Multiple Selection'
+                  : currentField.type === 'number'
+                    ? 'Number'
+                    : currentField.type === 'text' || currentField.type === 'textarea'
+                      ? 'Fill in'
+                      : currentField.type}</div>
 
-              <div className="field-stats">
+              <div className="question-stats">
                 <div className="stat-box">
                   <h4>Total Responses</h4>
                   <p>
@@ -459,12 +525,7 @@ const FormInsights = () => {
                         tick={{ fontSize: 12 }}
                       />
                       <YAxis />
-                      <Tooltip
-                        formatter={(value, name) => [
-                          `${value}${name === "responses" ? "" : "%"}`,
-                          name === "responses" ? "Responses" : "Percentage",
-                        ]}
-                      />
+                      <Tooltip formatter={(value, name) => [`${value} (${name === 'responses' ? '' : '%'})`, name === 'responses' ? 'Responses' : 'Percentage (%)']} />
                       <Bar
                         dataKey="responses"
                         fill="#8884d8"
@@ -477,6 +538,25 @@ const FormInsights = () => {
                       />
                     </BarChart>
                   </ResponsiveContainer>
+                  
+                  {/* Show custom inputs if any */}
+                  {getOptionData(currentField).some(item => item.customInputs && item.customInputs.length > 0) && (
+                    <div className="custom-inputs-section">
+                      <h4>Custom Inputs</h4>
+                      {getOptionData(currentField).map((item, idx) => 
+                        item.customInputs && item.customInputs.length > 0 && (
+                          <div key={idx} className="custom-input-group">
+                            <h5>{item.option}:</h5>
+                            <ul>
+                              {item.customInputs.map((input, inputIdx) => (
+                                <li key={inputIdx}>"{input}"</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -484,18 +564,14 @@ const FormInsights = () => {
                 currentField.type === "textarea") && (
                 <div className="text-responses">
                   <h4>
-                    Text Responses (
-                    {
-                      responses.filter((r) => {
-                        const answer = r.answers?.find(
-                          (a) =>
-                            a.fieldId === currentField._id ||
-                            a.fieldId === currentField.id
-                        );
-                        return answer && answer.value;
-                      }).length
-                    }
-                    )
+                    Text Responses ({responses.filter((r) => {
+                      const answer = r.answers?.find(
+                        (a) =>
+                          a.fieldId === currentField._id ||
+                          a.fieldId === currentField.id
+                      );
+                      return answer && answer.value;
+                    }).length})
                   </h4>
                   <div className="text-responses-list">
                     {responses.filter((r) => {
@@ -593,18 +669,18 @@ const FormInsights = () => {
 
         {activeTab === "individual" && (
           <div className="individual-view">
-            {responses.length > 0 ? (
+            {individualResponses.length > 0 ? (
               <>
                 <div className="response-navigation">
-                  <div className="response-dropdown">
+                  <div className="email-dropdown">
                     <select
                       value={currentResponseIndex}
                       onChange={(e) =>
                         setCurrentResponseIndex(Number(e.target.value))
                       }
-                      className="response-selector"
+                      className="email-selector"
                     >
-                      {responses.map((response, idx) => (
+                      {individualResponses.map((response, idx) => (
                         <option key={idx} value={idx}>
                           {`Response ${idx + 1}`}
                         </option>
@@ -620,11 +696,11 @@ const FormInsights = () => {
                       &lt;
                     </button>
                     <div className="response-pagination">
-                      {currentResponseIndex + 1} of {responses.length}
+                      {currentResponseIndex + 1} of {individualResponses.length}
                     </div>
                     <button
                       onClick={() => navigateResponse("next")}
-                      disabled={currentResponseIndex === responses.length - 1}
+                      disabled={currentResponseIndex === individualResponses.length - 1}
                       className="nav-button"
                     >
                       &gt;
@@ -636,8 +712,7 @@ const FormInsights = () => {
                   <div className="response-header">
                     <h3>{`Response ${currentResponseIndex + 1}`}</h3>
                     <p className="submission-time">
-                      Submitted:{" "}
-                      {currentResponse?.submittedAt
+                      Submitted: {currentResponse?.submittedAt
                         ? new Date(currentResponse.submittedAt).toLocaleString()
                         : "N/A"}
                     </p>
@@ -651,17 +726,27 @@ const FormInsights = () => {
                       return (
                         <div key={fIdx} className="response-answer-item">
                           <h4>
-                            Field {fIdx + 1}:{" "}
-                            {field.label || field.questionText || ""}
+                            F{fIdx + 1}: {field.label || field.questionText || ""}
                           </h4>
                           <div className="answer">
                             {answer &&
                             answer.value !== undefined &&
                             answer.value !== "" ? (
                               <p className="answer-text">
-                                {Array.isArray(answer.value)
-                                  ? answer.value.join(", ")
-                                  : String(answer.value)}
+                                {field.type === 'number' 
+                                  ? answer.value
+                                  : field.type === 'checkbox' && Array.isArray(answer.value)
+                                    ? answer.value.map(item => {
+                                        if (typeof item === 'object' && item.selectedOption && item.customInput) {
+                                          return `${item.selectedOption}: ${item.customInput}`;
+                                        }
+                                        return typeof item === 'string' ? item : item.selectedOption || item;
+                                      }).join(', ')
+                                    : typeof answer.value === 'object' && answer.value.selectedOption && answer.value.customInput
+                                      ? `${answer.value.selectedOption}: ${answer.value.customInput}`
+                                      : Array.isArray(answer.value)
+                                        ? answer.value.join(", ")
+                                        : String(answer.value)}
                               </p>
                             ) : (
                               <p className="no-answer">No answer provided</p>
@@ -675,7 +760,7 @@ const FormInsights = () => {
               </>
             ) : (
               <div className="no-responses-message">
-                <p>No responses available yet</p>
+                <p>No individual responses available</p>
               </div>
             )}
           </div>
