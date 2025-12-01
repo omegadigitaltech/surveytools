@@ -1,4 +1,4 @@
-import { Link, Form, useActionData, useNavigate } from "react-router-dom";
+import { Link, Form, useActionData, useNavigate, useParams, useLocation } from "react-router-dom";
 import React, { useEffect, useState, useRef } from "react";
 import backaro from "../../assets/img/backaro.svg";
 import del from "../../assets/img/del.svg";
@@ -13,11 +13,15 @@ import "./formquestion.css";
 
 const FormQuestions = () => {
   const navigate = useNavigate();
+  const { id: formId } = useParams();
+  const location = useLocation();
   const data = useActionData();
   const { formDraft, setFormDraft, clearFormDraft } = useAuthStore();
   const [isPosting, setIsPosting] = useState(false);
   const authToken = useAuthStore((state) => state.authToken);
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [existingFormData, setExistingFormData] = useState(null);
 
   // Add new state for delete loading
   const [isDeletingId, setIsDeletingId] = useState(null);
@@ -80,10 +84,157 @@ const FormQuestions = () => {
 
   const sectionsInitializedRef = useRef(false);
 
-  // Load draft data from Zustand on mount
+  // Load existing form data if editing
   useEffect(() => {
-    if (sectionsInitializedRef.current) return;
+    const loadFormForEditing = async () => {
+      if (!formId) return;
 
+      setIsLoading(true);
+      setIsEditing(true);
+      
+      try {
+        // Try to get form data from location state first
+        const stateFormData = location.state?.formData;
+        
+        if (stateFormData) {
+          setExistingFormData(stateFormData);
+          // Load form data into sections
+          const allFields = stateFormData.sections
+            ? stateFormData.sections.flatMap((section) => section.fields || [])
+            : stateFormData.fields || [];
+
+          if (stateFormData.sections && stateFormData.sections.length > 0) {
+            const formattedSections = stateFormData.sections.map((section, sectionIndex) => ({
+              id: `section_${Date.now()}_${sectionIndex}`,
+              sectionId: section._id || section.id,
+              title: section.title || "",
+              description: section.description || "",
+              fields: (section.fields || []).map((field, fieldIndex) => ({
+                id: `field_${Date.now()}_${sectionIndex}_${fieldIndex}`,
+                fieldId: field._id || field.id,
+                label: field.questionText || field.label || "",
+                type: mapBackendTypeToUI(field.type) || "fill_in",
+                required: field.required !== undefined ? field.required : true,
+                options: field.options || [],
+                likert: field.likert || null,
+              })),
+            }));
+            setSections(formattedSections);
+          } else if (allFields.length > 0) {
+            // Create a default section with all fields
+            setSections([
+              {
+                id: `section_${Date.now()}`,
+                title: "",
+                description: "",
+                fields: allFields.map((field, index) => ({
+                  id: `field_${Date.now()}_${index}`,
+                  fieldId: field._id || field.id,
+                  label: field.questionText || field.label || "",
+                  type: mapBackendTypeToUI(field.type) || "fill_in",
+                  required: field.required !== undefined ? field.required : true,
+                  options: field.options || [],
+                  likert: field.likert || null,
+                })),
+              },
+            ]);
+          }
+
+          // Set form draft data
+          setFormDraft({
+            title: stateFormData.title,
+            description: stateFormData.description,
+            backgroundColor: stateFormData.backgroundColor,
+            fontFamily: stateFormData.fontFamily,
+            config: stateFormData.config,
+            shares: stateFormData.shares,
+          });
+        } else {
+          // Fetch form data from API
+          const response = await fetch(`${config.API_URL}/forms/${formId}`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to load form data");
+          }
+
+          const formData = await response.json();
+          setExistingFormData(formData);
+
+          // Load form data into sections
+          const allFields = formData.sections
+            ? formData.sections.flatMap((section) => section.fields || [])
+            : formData.fields || [];
+
+          if (formData.sections && formData.sections.length > 0) {
+            const formattedSections = formData.sections.map((section, sectionIndex) => ({
+              id: `section_${Date.now()}_${sectionIndex}`,
+              sectionId: section._id || section.id,
+              title: section.title || "",
+              description: section.description || "",
+              fields: (section.fields || []).map((field, fieldIndex) => ({
+                id: `field_${Date.now()}_${sectionIndex}_${fieldIndex}`,
+                fieldId: field._id || field.id,
+                label: field.questionText || field.label || "",
+                type: mapBackendTypeToUI(field.type) || "fill_in",
+                required: field.required !== undefined ? field.required : true,
+                options: field.options || [],
+                likert: field.likert || null,
+              })),
+            }));
+            setSections(formattedSections);
+          } else if (allFields.length > 0) {
+            setSections([
+              {
+                id: `section_${Date.now()}`,
+                title: "",
+                description: "",
+                fields: allFields.map((field, index) => ({
+                  id: `field_${Date.now()}_${index}`,
+                  fieldId: field._id || field.id,
+                  label: field.questionText || field.label || "",
+                  type: mapBackendTypeToUI(field.type) || "fill_in",
+                  required: field.required !== undefined ? field.required : true,
+                  options: field.options || [],
+                  likert: field.likert || null,
+                })),
+              },
+            ]);
+          }
+
+          // Set form draft data
+          setFormDraft({
+            title: formData.title,
+            description: formData.description,
+            backgroundColor: formData.backgroundColor,
+            fontFamily: formData.fontFamily,
+            config: formData.config,
+            shares: formData.shares,
+          });
+        }
+      } catch (error) {
+        console.error("Error loading form for editing:", error);
+        toast.error("Failed to load form data");
+        navigate("/dashboard");
+      } finally {
+        setIsLoading(false);
+        sectionsInitializedRef.current = true;
+      }
+    };
+
+    if (formId) {
+      loadFormForEditing();
+      return;
+    }
+
+    // Original logic for creating new form
+    // Skip if already initialized or if we're editing (editing is handled in loadFormForEditing)
+    if (sectionsInitializedRef.current || formId) return;
+
+    // Only require formDraft.title if we're not editing
     if (!formDraft.title) {
       toast.error("Please start by creating a form");
       navigate("/create-form");
@@ -128,11 +279,12 @@ const FormQuestions = () => {
 
     sectionsInitializedRef.current = true;
     setIsLoading(false);
-  }, [formDraft.title, formDraft.sections, formDraft.fields, navigate]);
+  }, [formDraft.title, formDraft.sections, formDraft.fields, navigate, formId]);
 
-  // Save sections to draft whenever they change
+  // Save sections to draft whenever they change (only for new forms, not when editing)
   useEffect(() => {
     if (!sectionsInitializedRef.current) return;
+    if (formId) return; // Don't update formDraft when editing
 
     const sectionsPayload = sections.map((section) => ({
       title: section.title || "",
@@ -159,7 +311,7 @@ const FormQuestions = () => {
     }));
 
     setFormDraft({ sections: sectionsPayload });
-  }, [sections, setFormDraft]);
+  }, [sections, setFormDraft, formId]);
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
@@ -225,20 +377,32 @@ const FormQuestions = () => {
         };
       });
 
-      const uniqueId = generateUniqueId();
+      // Use existing uniqueId when editing, generate new one when creating
+      const uniqueId = isEditing && existingFormData?.uniqueId 
+        ? existingFormData.uniqueId 
+        : generateUniqueId();
+      
       if (!uniqueId || uniqueId === "null" || uniqueId === "undefined") {
         throw new Error("Failed to generate unique ID. Please try again.");
       }
+      
       const userId = useAuthStore.getState().userId;
       const finalPayload = {
         uniqueId: uniqueId,
-        title: formDraft.title,
-        description: formDraft.description,
-        createdBy: userId,
-        createdAt: new Date().toISOString(),
-        backgroundColor: formDraft.backgroundColor || "#ffffff",
-        fontFamily: formDraft.fontFamily || "Arial",
-        config: {
+        title: isEditing ? (existingFormData?.title || formDraft.title) : formDraft.title,
+        description: isEditing ? (existingFormData?.description || formDraft.description) : formDraft.description,
+        createdBy: isEditing ? (existingFormData?.createdBy || userId) : userId,
+        createdAt: isEditing ? (existingFormData?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+        backgroundColor: isEditing ? (existingFormData?.backgroundColor || formDraft.backgroundColor || "#ffffff") : (formDraft.backgroundColor || "#ffffff"),
+        fontFamily: isEditing ? (existingFormData?.fontFamily || formDraft.fontFamily || "Arial") : (formDraft.fontFamily || "Arial"),
+        config: isEditing ? (existingFormData?.config || {
+          time: formDraft.config?.time || "",
+          point: formDraft.config?.point || "",
+          totalRequiredParticipants:
+            formDraft.config?.totalRequiredParticipants || "",
+          preferredParticipants: formDraft.config?.preferredParticipants || "",
+          totalParticipants: formDraft.config?.totalParticipants || "",
+        }) : {
           time: formDraft.config?.time || "",
           point: formDraft.config?.point || "",
           totalRequiredParticipants:
@@ -246,7 +410,11 @@ const FormQuestions = () => {
           preferredParticipants: formDraft.config?.preferredParticipants || "",
           totalParticipants: formDraft.config?.totalParticipants || "",
         },
-        shares: {
+        shares: isEditing ? (existingFormData?.shares || {
+          type: formDraft.shares?.type || "public",
+          emails: formDraft.shares?.emails || [],
+          userIds: formDraft.shares?.userIds || [],
+        }) : {
           type: formDraft.shares?.type || "public",
           emails: formDraft.shares?.emails || [],
           userIds: formDraft.shares?.userIds || [],
@@ -259,8 +427,14 @@ const FormQuestions = () => {
       // console.log("Full payload:", JSON.stringify(finalPayload, null, 2));
       // console.log("============================");
 
-      const response = await fetch(`${config.API_URL}/forms`, {
-        method: "POST",
+      // Use PUT for editing, POST for creating
+      const method = isEditing ? "PUT" : "POST";
+      const url = isEditing 
+        ? `${config.API_URL}/forms/${formId}`
+        : `${config.API_URL}/forms`;
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "application/json",
@@ -293,27 +467,31 @@ const FormQuestions = () => {
         );
       }
 
-      toast.success("Form created successfully!");
+      toast.success(isEditing ? "Form updated successfully!" : "Form created successfully!");
 
-      const formId =
+      const returnedFormId =
         responseData.form?._id ||
         responseData._id ||
         responseData.data?.form?._id ||
-        responseData.data?._id;
+        responseData.data?._id ||
+        formId; // Use existing formId if editing
       const shareLink =
         responseData.form?.shareLink ||
         responseData.shareLink ||
         responseData.data?.shareLink;
 
-      if (formId) {
+      if (returnedFormId) {
         const { setFormId } = useAuthStore.getState();
-        setFormId(formId);
+        setFormId(returnedFormId);
       }
-      clearFormDraft();
+      
+      if (!isEditing) {
+        clearFormDraft();
+      }
 
-      if (formId) {
+      if (returnedFormId) {
         setTimeout(() => {
-          navigate(`/forminsights/${formId}`);
+          navigate(`/forminsights/${returnedFormId}`);
         }, 1500);
       } else {
         setTimeout(() => {
@@ -668,7 +846,7 @@ const FormQuestions = () => {
               <img src={backaro} className="backaro" alt="Back" />
             </Link>
             <div className="form-h">
-              <h3>Add Form Fields</h3>
+              <h3>{isEditing ? "Edit Form Fields" : "Add Form Fields"}</h3>
             </div>
           </div>
 
@@ -936,7 +1114,9 @@ const FormQuestions = () => {
                     className="post-btn"
                     disabled={isPosting}
                   >
-                    {isPosting ? "Creating..." : "Create Form"}
+                    {isPosting 
+                      ? (isEditing ? "Updating..." : "Creating...") 
+                      : (isEditing ? "Update Form" : "Create Form")}
                   </button>
                 </div>
               </Form>

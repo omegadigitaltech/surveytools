@@ -75,6 +75,7 @@ const router = createBrowserRouter(
             action={createFormAction}
           />
           <Route path="formquestions" element={<FormQuestions />} />
+          <Route path="formquestion/:id" element={<FormQuestions />} />
           <Route path="publish" element={<Publish />} />
           <Route path="payment" element={<Payment />} />
           <Route path="pricing" element={<Pricing />} />

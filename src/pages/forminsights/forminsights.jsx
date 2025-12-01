@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   PieChart,
   Pie,
@@ -23,10 +23,12 @@ import "./forminsights.css";
 const FormInsights = () => {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState(location.state?.formData);
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(!formData);
   const [exporting, setExporting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [activeTab, setActiveTab] = useState("summary");
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [currentResponseIndex, setCurrentResponseIndex] = useState(0);
@@ -211,6 +213,44 @@ const FormInsights = () => {
     }
   };
 
+  const handleEditClick = () => {
+    // Navigate to form questions page with form ID for editing
+    navigate(`/formquestion/${id}`, {
+      state: { formId: id, formData: formData }
+    });
+  };
+
+  const handleDeleteClick = async () => {
+    if (!window.confirm("Are you sure you want to delete this form? This action cannot be undone and will delete all associated responses.")) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const response = await fetch(`${config.API_URL}/forms/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.msg || "Failed to delete form");
+      }
+
+      toast.success("Form deleted successfully!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error deleting form:", error);
+      toast.error(error.message || "Error deleting form");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   // Helper function to get response counts for radio/checkbox fields (similar to survey multiple choice)
   const getOptionData = (field) => {
     if (!field.options || field.options.length === 0) return [];
@@ -299,14 +339,48 @@ const FormInsights = () => {
             <img src={backaro} className="backaro" alt="Back" />
           </Link>
           <h2>{formData.title} - Insights</h2>
-          <button
-            className="export-button"
-            onClick={exportToCSV}
-            disabled={exporting}
-          >
-            <img src={downloadIcon} alt="" className="download-icon" />
-            {exporting ? "Exporting..." : "Export to CSV"}
-          </button>
+          <div className="header-actions" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+            <button
+              className="edit-button"
+              onClick={handleEditClick}
+              style={{
+                padding: "0.5rem 1rem",
+                background: "#007bff",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+            >
+              Edit Form
+            </button>
+            <button
+              className="delete-button"
+              onClick={handleDeleteClick}
+              disabled={deleting}
+              style={{
+                padding: "0.5rem 1rem",
+                background: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: deleting ? "not-allowed" : "pointer",
+                fontSize: "14px",
+                opacity: deleting ? 0.6 : 1,
+              }}
+            >
+              {deleting ? "Deleting..." : "Delete Form"}
+            </button>
+            <button
+              className="export-button"
+              onClick={exportToCSV}
+              disabled={exporting}
+            >
+              <img src={downloadIcon} alt="" className="download-icon" />
+              {exporting ? "Exporting..." : "Export to CSV"}
+            </button>
+          </div>
         </div>
 
         <div className="insights-tabs">
