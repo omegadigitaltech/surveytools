@@ -490,8 +490,18 @@ const FormQuestions = () => {
       }
 
       if (returnedFormId) {
+        // Prepare form data for navigation
+        const formDataForNavigation = isEditing 
+          ? existingFormData 
+          : (responseData.form || responseData.data?.form || responseData);
+        
         setTimeout(() => {
-          navigate(`/forminsights/${returnedFormId}`);
+          navigate(`/forminsights/${returnedFormId}`, {
+            state: { 
+              formData: formDataForNavigation,
+              showShareModal: !isEditing // Show share modal only when creating new form
+            }
+          });
         }, 1500);
       } else {
         setTimeout(() => {

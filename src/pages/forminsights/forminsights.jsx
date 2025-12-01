@@ -18,6 +18,7 @@ import config from "../../config/config";
 import useAuthStore from "../../store/useAuthStore";
 import backaro from "../../assets/img/backaro.svg";
 import downloadIcon from "../../assets/img/download.svg";
+import ShareLink from "../../components/sharelink/sharelink";
 import "./forminsights.css";
 
 const FormInsights = () => {
@@ -29,6 +30,7 @@ const FormInsights = () => {
   const [loading, setLoading] = useState(!formData);
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [activeTab, setActiveTab] = useState("summary");
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [currentResponseIndex, setCurrentResponseIndex] = useState(0);
@@ -88,6 +90,23 @@ const FormInsights = () => {
 
     fetchFormInsights();
   }, [id, authToken]);
+
+  // Show share modal automatically if coming from form creation
+  useEffect(() => {
+    if (loading) return;
+    
+    // Check if we should show the share modal (from location state or URL param)
+    const shouldShowShare = location.state?.showShareModal || 
+                           new URLSearchParams(location.search).get('showShare') === 'true';
+    
+    if (shouldShowShare && formData) {
+      setShowShareModal(true);
+      // Clear the state to prevent showing again on refresh
+      if (location.state?.showShareModal) {
+        navigate(location.pathname, { replace: true, state: { formData: location.state.formData || formData } });
+      }
+    }
+  }, [loading, formData, location, navigate]);
 
   // Function to transform form responses into individual user responses (similar to survey)
   const transformToIndividualResponses = (form, responsesArray) => {
@@ -341,6 +360,21 @@ const FormInsights = () => {
           <h2>{formData.title} - Insights</h2>
           <div className="header-actions" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
             <button
+              className="share-button"
+              onClick={() => setShowShareModal(true)}
+              style={{
+                padding: "0.5rem 1rem",
+                background: "#28a745",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+            >
+              Share Link
+            </button>
+            <button
               className="edit-button"
               onClick={handleEditClick}
               style={{
@@ -382,6 +416,14 @@ const FormInsights = () => {
             </button>
           </div>
         </div>
+
+        {showShareModal && (
+          <ShareLink
+            type="form"
+            formId={id}
+            onClose={() => setShowShareModal(false)}
+          />
+        )}
 
         <div className="insights-tabs">
           <button
