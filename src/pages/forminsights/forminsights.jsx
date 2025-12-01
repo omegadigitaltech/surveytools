@@ -354,58 +354,13 @@ const FormInsights = () => {
     <section className="insights">
       <div className="insights-inner wrap">
         <div className="insights-header">
-          <Link to="/dashboard">
-            <img src={backaro} className="backaro" alt="Back" />
-          </Link>
-          <h2>{formData.title} - Insights</h2>
-          <div className="header-actions" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-            <button
-              className="share-button"
-              onClick={() => setShowShareModal(true)}
-              style={{
-                padding: "0.5rem 1rem",
-                background: "#28a745",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-            >
-              Share Link
-            </button>
-            <button
-              className="edit-button"
-              onClick={handleEditClick}
-              style={{
-                padding: "0.5rem 1rem",
-                background: "#007bff",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-            >
-              Edit Form
-            </button>
-            <button
-              className="delete-button"
-              onClick={handleDeleteClick}
-              disabled={deleting}
-              style={{
-                padding: "0.5rem 1rem",
-                background: "#dc3545",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: deleting ? "not-allowed" : "pointer",
-                fontSize: "14px",
-                opacity: deleting ? 0.6 : 1,
-              }}
-            >
-              {deleting ? "Deleting..." : "Delete Form"}
-            </button>
+          <div className="header-top-row ">
+            <div className="header-left-group">
+              <Link to="/dashboard">
+                <img src={backaro} className="backaro" alt="Back" />
+              </Link>
+              <h2>{formData.title} - Insights</h2>
+            </div>
             <button
               className="export-button"
               onClick={exportToCSV}
@@ -413,6 +368,27 @@ const FormInsights = () => {
             >
               <img src={downloadIcon} alt="" className="download-icon" />
               {exporting ? "Exporting..." : "Export to CSV"}
+            </button>
+          </div>
+          <div className="header-bottom-row">
+            <button
+              className="share-button"
+              onClick={() => setShowShareModal(true)}
+            >
+              Share Link
+            </button>
+            <button
+              className="edit-button"
+              onClick={handleEditClick}
+            >
+              Edit Form
+            </button>
+            <button
+              className="delete-button"
+              onClick={handleDeleteClick}
+              disabled={deleting}
+            >
+              {deleting ? "Deleting..." : "Delete Form"}
             </button>
           </div>
         </div>

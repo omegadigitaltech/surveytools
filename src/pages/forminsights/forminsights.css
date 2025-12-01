@@ -1,4 +1,123 @@
 /* Reuse insights.css styles or add form-specific styles */
+
+/* Header layout - two rows for better responsiveness */
+.insights-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.header-top-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.header-left-group {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.header-left-group .backaro {
+  margin-right: 0;
+}
+
+.header-left-group h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--primary);
+}
+
+.header-bottom-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.header-bottom-row button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.share-button {
+  background: #28a745;
+  color: white;
+}
+
+.share-button:hover {
+  background: #218838;
+}
+
+.edit-button {
+  background: #007bff;
+  color: white;
+}
+
+.edit-button:hover {
+  background: #0056b3;
+}
+
+.delete-button {
+  background: #dc3545;
+  color: white;
+}
+
+.delete-button:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-left-group {
+    width: 100%;
+  }
+
+  .header-left-group h2 {
+    font-size: 1.1rem;
+  }
+
+  .header-bottom-row {
+    width: 100%;
+  }
+
+  .header-bottom-row button {
+    flex: 1;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-bottom-row {
+    flex-direction: column;
+  }
+
+  .header-bottom-row button {
+    width: 100%;
+  }
+}
+
 .number-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));

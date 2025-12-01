@@ -125,6 +125,7 @@ input:checked + .slider:before {
 /* Tabs styling */
 .insights-tabs {
   display: flex;
+  flex-wrap: wrap;
   margin-bottom: 2rem;
   border-bottom: 1px solid #ddd;
   position: relative;
