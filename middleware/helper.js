@@ -21,7 +21,7 @@ async function sendNotification(email, owner, text, title) {
   
         <p>Sincerely,</p>
         <p>From Omega.</p>
-        <a class="navbar-brand brand-logo-mini" style="size: 40px;" href=""><img src="https://i.ibb.co/6BH7h6Q/20230904-062051-0000-removebg-preview.png" alt="logo"/></a>
+      
         
     `;
   
