@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const { Survey } = require('../model/survey');
+const Section = require('../model/section');
 const User = require('../model/user');
 const { extractTextFromDocument } = require('../utils/documentProcessor');
 const { processQuestionnaire } = require('../utils/geminiService');
@@ -10,7 +11,6 @@ const mongoose = require('mongoose');
  */
 const uploadQuestionnaire = async (req, res, next) => {
   const session = await mongoose.startSession();
-  session.startTransaction();
   
   try {
     // Check if file was uploaded
@@ -93,79 +93,84 @@ const uploadQuestionnaire = async (req, res, next) => {
       console.log('Sending document to Gemini for processing...');
       const extractedData = await processQuestionnaire(documentData);
       console.log(`Received response from Gemini: ${JSON.stringify(extractedData).substring(0, 300)}...`);
-      
-      // Track how many questions were added
+
       let addedQuestions = 0;
-      
-      // Add questions to the survey
-      if (extractedData && extractedData.questions && Array.isArray(extractedData.questions)) {
-        console.log(`Found ${extractedData.questions.length} questions to add`);
-        
-        for (const question of extractedData.questions) {
-          // Skip questions that don't have required fields
-          if (!question.questionText || !question.questionType) {
-            console.log('Skipping question due to missing required fields');
-            continue;
-          }
-          
-          // Log question data for debugging
-          console.log(`Processing question: ${question.questionText.substring(0, 50)}...`);
-          
-          const questionData = {
-            questionText: question.questionText,
-            questionType: question.questionType,
-            required: question.required || false
-          };
-          
-          // Add options for multiple-choice or multiple-selection questions
-          if ((question.questionType === 'multiple_choice' || question.questionType === 'multiple_selection') && 
-              Array.isArray(question.options)) {
-            questionData.options = question.options.map(opt => {
-              if (typeof opt === 'string') {
-                return { text: opt, allowsCustomInput: false };
-              } else if (typeof opt === 'object' && opt.text) {
-                return {
-                  text: opt.text,
-                  allowsCustomInput: opt.allowsCustomInput || false
-                };
-              } else {
-                throw new Error('Invalid option format');
+      let updatedSurvey;
+      await session.withTransaction(async () => {
+        let sectionIdMap = {};
+        if (extractedData && Array.isArray(extractedData.sections) && extractedData.sections.length > 0) {
+          for (const [index, section] of extractedData.sections.entries()) {
+            if (!section || !section.title) {
+              continue;
+            }
+            const created = await Section.create([
+              {
+                surveyId: survey._id,
+                title: section.title,
+                description: section.description || '',
+                order: typeof section.order === 'number' ? section.order : index + 1
               }
-            });
-            console.log(`Added ${question.options.length} options to ${question.questionType} question`);
+            ], { session });
+            const tempId = section.id || `sec_${index + 1}`;
+            sectionIdMap[tempId] = created[0]._id;
           }
-          
-          survey.questions.push(questionData);
-          addedQuestions++;
         }
-        
-        console.log(`Successfully added ${addedQuestions} questions to the survey`);
-      } else {
-        console.log('No valid questions found in AI response');
-        throw new Error('No valid questions could be extracted from the document');
-      }
-      
-      // Update the survey's last updated timestamp
-      survey.updatedAt = new Date();
-      await survey.save({ session });
-      console.log(`Saved survey with ID: ${survey._id}`);
-      
-      // Clean up the uploaded file
-      await fs.unlink(filePath);
-      console.log(`Deleted temporary file: ${filePath}`);
-      
-      await session.commitTransaction();
+
+        const surveyTxn = await Survey.findById(surveyId).session(session);
+        if (extractedData && extractedData.questions && Array.isArray(extractedData.questions)) {
+          for (const question of extractedData.questions) {
+            if (!question.questionText || !question.questionType) {
+              continue;
+            }
+            const questionData = {
+              questionText: question.questionText,
+              questionType: question.questionType,
+              required: question.required || false,
+              sectionId: (question.sectionId && sectionIdMap[question.sectionId]) ? sectionIdMap[question.sectionId] : null
+            };
+            if ((question.questionType === 'multiple_choice' || question.questionType === 'multiple_selection') && Array.isArray(question.options)) {
+              questionData.options = question.options.map(opt => {
+                if (typeof opt === 'string') {
+                  return { text: opt, allowsCustomInput: false };
+                } else if (typeof opt === 'object' && opt.text) {
+                  return { text: opt.text, allowsCustomInput: opt.allowsCustomInput || false };
+                } else {
+                  throw new Error('Invalid option format');
+                }
+              });
+            }
+            surveyTxn.questions.push(questionData);
+            console.log(`Added question: ${questionData.questionText} (Type: ${questionData.questionType})`);
+            addedQuestions++;
+          }
+        } else {
+          throw new Error('No valid questions could be extracted from the document');
+        }
+        surveyTxn.updatedAt = new Date();
+        await surveyTxn.save({ session });
+        updatedSurvey = surveyTxn;
+      });
+      console.log(`Transaction completed successfully. Added ${addedQuestions} questions to survey ${surveyId}`);
+
       session.endSession();
-      
-      res.status(200).json({
+      console.log(`Survey ${surveyId} updated successfully. ${addedQuestions} questions added.`);
+
+      try {
+        await fs.unlink(filePath);
+      } catch (unlinkError) {
+        console.error('Error deleting uploaded file:', unlinkError);
+      }
+      console.log(`Deleted temporary file after successful processing: ${filePath}`);
+
+      return res.status(200).json({
         status: "success",
         code: 200,
         msg: `${addedQuestions} questions successfully added to survey from uploaded document`,
         survey: {
-          _id: survey._id,
-          title: survey.title,
-          questionsCount: survey.questions.length,
-          questions: survey.questions
+          _id: updatedSurvey._id,
+          title: updatedSurvey.title,
+          questionsCount: updatedSurvey.questions.length,
+          questions: updatedSurvey.questions
         }
       });
     } catch (processingError) {
@@ -220,4 +225,4 @@ const uploadQuestionnaire = async (req, res, next) => {
 
 module.exports = {
   uploadQuestionnaire
-}; 
+};

@@ -36,7 +36,7 @@ async function sendNotification(email, owner, text, title) {
     })
   
     const mailOptions = {
-        from: 'tech.digitalomega@gmail.com',
+        from: process.env.EMAIL,
         to: email,
         subject: title,
         html: htmlContent,

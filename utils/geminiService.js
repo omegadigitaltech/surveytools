@@ -58,62 +58,49 @@ async function uploadFile(buffer, mimeType) {
 async function processQuestionnaire(documentData) {
   try {
     // Use Gemini-1.5-flash model
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // Create a detailed prompt for the AI
     const textPrompt = `
-You are a research assistant tasked with converting a questionnaire document into structured JSON format.
+You are a research assistant tasked with converting a questionnaire document into structured JSON with sections.
 
-Analyze the following document and extract all questions, organizing them by type:
-- For multiple choice questions (select one option only), extract the question text, identify it as "multiple_choice", and list all available options.
-- For multiple selection questions (select multiple options), extract the question text, identify it as "multiple_selection", and list all available options.
-- For scale/rating questions (1-5), identify them as "five_point".
-- For open-ended questions, identify them as "fill_in".
-- Determine if each question is required or optional based on context clues.
+Analyze the document and extract:
+1) A top-level list of sections with temporary IDs
+2) All questions, organized by type, each linked to a section via its temporary ID
 
-IMPORTANT: For multiple_choice and multiple_selection questions, analyze each option and determine if it should allow custom input. Set "allowsCustomInput" to true for options that:
-- Contain words like "Other", "Others", "Specify", "Please specify", "Please explain", "If other", "If yes, please explain"
-- End with phrases like "(please specify)", "(specify)", "(explain)", "(other)"
-- Are clearly meant to capture additional information beyond the standard options
-- Use phrases like "None of the above (please explain)", "Something else", "Additional comments"
+Question types:
+- multiple_choice: select one option only
+- multiple_selection: select multiple options
+- five_point: scale/rating (1-5)
+- fill_in: open-ended
 
-The JSON output should match this structure:
+For multiple_choice and multiple_selection options, set "allowsCustomInput" to true for options that:
+- include words like "Other", "Specify", "Please specify", "Please explain", "If other"
+- end with phrases like "(please specify)", "(specify)", "(explain)", "(other)"
+- clearly capture additional information beyond standard options
+
+Output JSON structure:
 {
+  "sections": [
+    { "id": "sec-1", "title": "Section title", "description": "Optional description", "order": 1 },
+    { "id": "sec-2", "title": "...", "description": "...", "order": 2 }
+  ],
   "questions": [
     {
-      "questionText": "The full text of the question",
+      "questionText": "Full question text",
       "questionType": "multiple_choice | multiple_selection | five_point | fill_in",
       "required": true | false,
+      "sectionId": "sec-1",
       "options": [
-        {
-          "text": "Option text",
-          "allowsCustomInput": true | false
-        }
-      ] // Only for multiple_choice and multiple_selection questions
+        { "text": "Option text", "allowsCustomInput": true | false }
+      ]
     }
   ]
 }
 
-Extract only the questions from the document, and format them according to the structure above.
-Look for context clues to distinguish between single-choice (multiple_choice) and multi-selection (multiple_selection) questions:
-- Words like "select all that apply", "check all appropriate", "select multiple", "choose all", "mark all" suggest multiple_selection
-- Words like "choose one", "select only one", "best option", "most appropriate" suggest multiple_choice
+Detect sections from headings, numbering, or formatting. If sections are not explicit, infer reasonable grouping and assign consistent temporary IDs (e.g., "sec-1", "sec-2").
 
-IMPORTANT: Use your initiative to figure out what type of questions they are and which options need custom input. Be intelligent about detecting:
-1. Question types based on context and instructions
-2. Options that clearly need additional user input (especially those with "Other", "Specify", etc.)
-3. Whether questions are required based on formatting, asterisks (*), or explicit mentions
-
-Examples of options that should have "allowsCustomInput": true:
-- "Other (please specify)"
-- "None of the above - please explain"
-- "Other:"
-- "Something else"
-- "If other, specify"
-- "Additional comments"
-- "Please specify if different"
-
-Be thorough and intelligent in your analysis.
+Only return the JSON described above. Be thorough and intelligent in your analysis.
 `;
 
     let result;
@@ -204,4 +191,4 @@ ${documentData.text}`;
 
 module.exports = {
   processQuestionnaire
-}; 
+};
