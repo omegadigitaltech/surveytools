@@ -30,7 +30,8 @@ async function sendNotification(email, owner, text, title) {
         service: 'gmail',
         auth:{
             user: "tech.digitalomega",
-            pass: process.env.EMAIL_PASSWORD
+            // pass: process.env.EMAIL_PASSWORD
+            pass:"aehe qanw pvhm caix"
         }
     })
   
