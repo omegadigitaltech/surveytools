@@ -8,9 +8,9 @@ const mongoose = require('mongoose');
 const getAllUsers = async (req, res) => {
   try {
     const { page = 1, limit = 50, search = '', sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
-    
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    
+
     // Build search query
     const searchQuery = {};
     if (search) {
@@ -21,17 +21,17 @@ const getAllUsers = async (req, res) => {
         { instituition: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     // Get total count
     const totalUsers = await User.countDocuments(searchQuery);
-    
+
     // Get users with pagination and sorting
     const users = await User.find(searchQuery)
       .select('-password') // Exclude password field
       .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
       .skip(skip)
       .limit(parseInt(limit));
-    
+
     res.status(200).json({
       status: "success",
       code: 200,
@@ -60,11 +60,11 @@ const getAllUsers = async (req, res) => {
 // Get all redemption histories with filters
 const getAllRedemptions = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 50, 
-      status = '', 
-      type = '', 
+    const {
+      page = 1,
+      limit = 50,
+      status = '',
+      type = '',
       network = '',
       userId = '',
       startDate = '',
@@ -72,28 +72,28 @@ const getAllRedemptions = async (req, res) => {
       sortBy = 'createdAt',
       sortOrder = 'desc'
     } = req.query;
-    
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    
+
     // Build filter query
     const filterQuery = {};
-    
+
     if (status && ['pending', 'successful', 'failed'].includes(status)) {
       filterQuery.status = status;
     }
-    
+
     if (type && ['airtime', 'data'].includes(type)) {
       filterQuery.type = type;
     }
-    
+
     if (network) {
       filterQuery.network = { $regex: network, $options: 'i' };
     }
-    
+
     if (userId) {
       filterQuery.userId = userId;
     }
-    
+
     // Date range filter
     if (startDate || endDate) {
       filterQuery.createdAt = {};
@@ -104,10 +104,10 @@ const getAllRedemptions = async (req, res) => {
         filterQuery.createdAt.$lte = new Date(endDate);
       }
     }
-    
+
     // Get total count
     const totalRedemptions = await RedemptionHistory.countDocuments(filterQuery);
-    
+
     // Get redemptions with pagination and sorting
     const redemptions = await RedemptionHistory.find(filterQuery)
       .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
@@ -120,7 +120,7 @@ const getAllRedemptions = async (req, res) => {
         localField: 'userId',
         foreignField: 'id'
       });
-    
+
     res.status(200).json({
       status: "success",
       code: 200,
@@ -158,14 +158,14 @@ const getAllRedemptions = async (req, res) => {
 const getRedemptionStats = async (req, res) => {
   try {
     const { startDate = '', endDate = '', userId = '' } = req.query;
-    
+
     // Build base filter query
     const baseFilter = {};
-    
+
     if (userId) {
       baseFilter.userId = userId;
     }
-    
+
     // Date range filter
     if (startDate || endDate) {
       baseFilter.createdAt = {};
@@ -176,7 +176,7 @@ const getRedemptionStats = async (req, res) => {
         baseFilter.createdAt.$lte = new Date(endDate);
       }
     }
-    
+
     // Get counts for each status
     const [totalRedemptions, successfulCount, pendingCount, failedCount] = await Promise.all([
       RedemptionHistory.countDocuments(baseFilter),
@@ -184,7 +184,7 @@ const getRedemptionStats = async (req, res) => {
       RedemptionHistory.countDocuments({ ...baseFilter, status: 'pending' }),
       RedemptionHistory.countDocuments({ ...baseFilter, status: 'failed' })
     ]);
-    
+
     // Get additional statistics
     const stats = await RedemptionHistory.aggregate([
       { $match: baseFilter },
@@ -198,7 +198,7 @@ const getRedemptionStats = async (req, res) => {
         }
       }
     ]);
-    
+
     // Get breakdown by type
     const typeBreakdown = await RedemptionHistory.aggregate([
       { $match: baseFilter },
@@ -211,7 +211,7 @@ const getRedemptionStats = async (req, res) => {
         }
       }
     ]);
-    
+
     // Get breakdown by network
     const networkBreakdown = await RedemptionHistory.aggregate([
       { $match: baseFilter },
@@ -224,7 +224,7 @@ const getRedemptionStats = async (req, res) => {
         }
       }
     ]);
-    
+
     res.status(200).json({
       status: "success",
       code: 200,
@@ -264,19 +264,19 @@ const getRedemptionStats = async (req, res) => {
 const getUserRedemptionHistory = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { 
-      page = 1, 
-      limit = 50, 
-      status = '', 
-      type = '', 
+    const {
+      page = 1,
+      limit = 50,
+      status = '',
+      type = '',
       startDate = '',
       endDate = '',
       sortBy = 'createdAt',
       sortOrder = 'desc'
     } = req.query;
-    
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    
+
     // Check if user exists
     const user = await User.findOne({ id: userId }).select('fullname email id pointBalance');
     if (!user) {
@@ -286,18 +286,18 @@ const getUserRedemptionHistory = async (req, res) => {
         msg: "User not found"
       });
     }
-    
+
     // Build filter query
     const filterQuery = { userId };
-    
+
     if (status && ['pending', 'successful', 'failed'].includes(status)) {
       filterQuery.status = status;
     }
-    
+
     if (type && ['airtime', 'data'].includes(type)) {
       filterQuery.type = type;
     }
-    
+
     // Date range filter
     if (startDate || endDate) {
       filterQuery.createdAt = {};
@@ -308,16 +308,16 @@ const getUserRedemptionHistory = async (req, res) => {
         filterQuery.createdAt.$lte = new Date(endDate);
       }
     }
-    
+
     // Get total count for this user
     const totalRedemptions = await RedemptionHistory.countDocuments(filterQuery);
-    
+
     // Get user's redemptions with pagination and sorting
     const redemptions = await RedemptionHistory.find(filterQuery)
       .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
       .skip(skip)
       .limit(parseInt(limit));
-    
+
     // Get user-specific stats
     const userStats = await RedemptionHistory.aggregate([
       { $match: { userId } },
@@ -327,19 +327,19 @@ const getUserRedemptionHistory = async (req, res) => {
           totalRedemptions: { $sum: 1 },
           totalPointsRedeemed: { $sum: '$pointsRedeemed' },
           totalValueRedeemed: { $sum: '$valueReceived' },
-          successfulRedemptions: { 
+          successfulRedemptions: {
             $sum: { $cond: [{ $eq: ['$status', 'successful'] }, 1, 0] }
           },
-          pendingRedemptions: { 
+          pendingRedemptions: {
             $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
           },
-          failedRedemptions: { 
+          failedRedemptions: {
             $sum: { $cond: [{ $eq: ['$status', 'failed'] }, 1, 0] }
           }
         }
       }
     ]);
-    
+
     res.status(200).json({
       status: "success",
       code: 200,
@@ -454,17 +454,16 @@ const markSurveyAsPaid = async (req, res) => {
       });
     }
 
-    // Calculate the correct amount using base rate calculation
-    const BASE_RATE = 3000;
-    const QUESTION_RATE = 10;
-    const PARTICIPANT_RATE = 20;
-
     const numQuestions = survey.questions.length;
+
+    // Calculate the correct amount using tiered pricing model from utility
+    const { calculateSurveyPrice } = require('../utils/pricing');
     const numParticipants = survey.no_of_participants;
-    
-    const calculatedAmount = BASE_RATE + 
-        (QUESTION_RATE * numQuestions) + 
-        (PARTICIPANT_RATE * numParticipants);
+
+    const pricingResult = calculateSurveyPrice(numParticipants);
+    const calculatedAmount = pricingResult.calculatedAmount;
+    const points_per_user = pricingResult.pointsPerUser;
+
 
     // Generate reference number
     const referenceNumber = `ADMIN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -487,11 +486,10 @@ const markSurveyAsPaid = async (req, res) => {
     survey.paymentAmount = calculatedAmount;
     survey.paymentDate = new Date();
     survey.amount_to_be_paid = calculatedAmount;
-    
-    // Calculate points per user
-    const points_per_user = Math.ceil((QUESTION_RATE * numQuestions + PARTICIPANT_RATE * numParticipants) / numParticipants);
+
+    // Set points per user from pricing calculation
     survey.point_per_user = points_per_user;
-    
+
     await survey.save();
 
     res.status(200).json({
@@ -503,12 +501,8 @@ const markSurveyAsPaid = async (req, res) => {
         surveyTitle: survey.title,
         amount: calculatedAmount,
         calculationBreakdown: {
-          baseRate: BASE_RATE,
-          questionsCost: QUESTION_RATE * numQuestions,
-          participantsCost: PARTICIPANT_RATE * numParticipants,
-          totalQuestions: numQuestions,
-          totalParticipants: numParticipants,
-          pointsPerUser: points_per_user
+          ...pricingResult.breakdown,
+          totalQuestions: numQuestions
         },
         referenceNumber: referenceNumber,
         paymentDate: payment.datePaid,
@@ -528,9 +522,9 @@ const markSurveyAsPaid = async (req, res) => {
 // Get all surveys with filters for admin
 const getAllSurveysAdmin = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 50, 
+    const {
+      page = 1,
+      limit = 50,
       userId = '',
       published = '',
       paid = '',
@@ -542,12 +536,12 @@ const getAllSurveysAdmin = async (req, res) => {
       sortBy = 'createdAt',
       sortOrder = 'desc'
     } = req.query;
-    
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    
+
     // Build filter query
     const filterQuery = {};
-    
+
     // Filter by user ID
     if (userId) {
       const user = await User.findOne({ id: userId });
@@ -555,12 +549,12 @@ const getAllSurveysAdmin = async (req, res) => {
         filterQuery.user_id = user._id;
       }
     }
-    
+
     // Filter by published status
     if (published !== '') {
       filterQuery.published = published === 'true';
     }
-    
+
     // Date range filter
     if (startDate || endDate) {
       filterQuery.createdAt = {};
@@ -571,7 +565,7 @@ const getAllSurveysAdmin = async (req, res) => {
         filterQuery.createdAt.$lte = new Date(endDate);
       }
     }
-    
+
     // Points range filter
     if (minPoints || maxPoints) {
       filterQuery.points = {};
@@ -582,7 +576,7 @@ const getAllSurveysAdmin = async (req, res) => {
         filterQuery.points.$lte = parseInt(maxPoints);
       }
     }
-    
+
     // Search filter
     if (search) {
       filterQuery.$or = [
@@ -590,7 +584,7 @@ const getAllSurveysAdmin = async (req, res) => {
         { description: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     // Get surveys without payment filter first
     let surveys = await Survey.find(filterQuery)
       .populate({
@@ -598,24 +592,24 @@ const getAllSurveysAdmin = async (req, res) => {
         select: 'fullname email id pointBalance'
       })
       .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 });
-    
+
     // Get payment information for each survey and apply payment filter
     const surveysWithPayments = await Promise.all(
       surveys.map(async (survey) => {
-        const payment = await Payment.findOne({ 
-          surveyId: survey._id, 
-          status: 'paid' 
+        const payment = await Payment.findOne({
+          surveyId: survey._id,
+          status: 'paid'
         }).sort({ datePaid: -1 });
-        
+
         const surveyObj = survey.toObject();
-        
+
         // Calculate participant counts
         const filledCount = surveyObj.questions.reduce((count, question) => {
           return Math.max(count, question.answers ? question.answers.length : 0);
         }, 0);
-        
+
         const remainingSpots = Math.max(0, surveyObj.no_of_participants - filledCount);
-        
+
         return {
           ...surveyObj,
           filledCount,
@@ -629,18 +623,18 @@ const getAllSurveysAdmin = async (req, res) => {
         };
       })
     );
-    
+
     // Filter by payment status if specified
     let filteredSurveys = surveysWithPayments;
     if (paid !== '') {
       const isPaidFilter = paid === 'true';
       filteredSurveys = surveysWithPayments.filter(survey => survey.isPaid === isPaidFilter);
     }
-    
+
     // Apply pagination to filtered results
     const totalSurveys = filteredSurveys.length;
     const paginatedSurveys = filteredSurveys.slice(skip, skip + parseInt(limit));
-    
+
     res.status(200).json({
       status: "success",
       code: 200,
@@ -706,7 +700,7 @@ const unpublishSurvey = async (req, res) => {
     survey.unpublishedAt = new Date();
     survey.unpublishedBy = 'admin';
     survey.unpublishReason = reason || 'Unpublished by admin';
-    
+
     await survey.save();
 
     res.status(200).json({

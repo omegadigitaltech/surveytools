@@ -1,11 +1,11 @@
 const path = require('path')
-const {Survey, Option, Question, Answer} = require('../model/survey')
+const { Survey, Option, Question, Answer } = require('../model/survey')
 const User = require('../model/user')
 const Payment = require('../model/payment')
 const jwt = require('jsonwebtoken')
 const jwtSecret = process.env.JWT_SECRET
 const mongoose = require('mongoose');
-const {calculateSentiment} = require('../middleware/helper')
+const { calculateSentiment } = require('../middleware/helper')
 const { uploadQuestionnaire } = require('./questionnaireUpload');
 const { createCsvString, formatSurveyDataForCsv } = require('../utils/exportService');
 const { addEmailToQueue } = require('../utils/queueService');
@@ -30,12 +30,12 @@ const home = async (req, res) => {
 const createSurvey = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-  
+
   try {
-    const {title, description, no_of_participants, gender, preferred_participants } = req.body;
-    const user = await User.findOne({id: req.userId});
-    
-    if(!user){
+    const { title, description, no_of_participants, gender, preferred_participants } = req.body;
+    const user = await User.findOne({ id: req.userId });
+
+    if (!user) {
       await session.abortTransaction();
       session.endSession();
       return res.status(404).json({
@@ -44,9 +44,9 @@ const createSurvey = async (req, res, next) => {
         msg: "User Not Found"
       });
     }
-  
+
     // check that user has instituition filled
-    if(!user.instituition){
+    if (!user.instituition) {
       await session.abortTransaction();
       session.endSession();
       return res.status(400).json({
@@ -55,7 +55,7 @@ const createSurvey = async (req, res, next) => {
         msg: "To create a survey, fill in your instituition"
       });
     }
-  
+
     // First create the survey
     const survey = await Survey.create([{
       user_id: user._id,
@@ -76,7 +76,7 @@ const createSurvey = async (req, res, next) => {
 
     await session.commitTransaction();
     session.endSession();
-    
+
     res.status(201).json({
       status: "success",
       code: 201,
@@ -124,7 +124,7 @@ const updateAnswer = async (req, res, next) => {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Question not found' });
     }
 
-    if(survey.published == false){
+    if (survey.published == false) {
       return res.status(400).json({ status: "failure", code: 400, msg: 'Survey has not been published' });
     }
 
@@ -144,14 +144,14 @@ const updateAnswer = async (req, res, next) => {
     console.log(response)
     if (response) {
       if (question.questionType === 'five_point') {
-        if (isNaN(parseInt(response, 10)) || parseInt(response, 10)  < 1 || parseInt(response, 10) > 5) {
+        if (isNaN(parseInt(response, 10)) || parseInt(response, 10) < 1 || parseInt(response, 10) > 5) {
           await session.abortTransaction();
           session.endSession();
           return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be between 1 and 5 for five_point question' });
         }
       } else if (question.questionType === 'multiple_choice') {
         const validOptions = question.options.map(opt => opt.text);
-        
+
         // Handle custom input for options that allow it
         if (typeof response === 'object' && response.selectedOption && response.customInput) {
           // This is a response with custom input
@@ -159,31 +159,31 @@ const updateAnswer = async (req, res, next) => {
           if (!selectedOption) {
             await session.abortTransaction();
             session.endSession();
-            return res.status(400).json({ 
-              status: "failure", 
-              code: 400, 
-              msg: `Response contains invalid selected option: ${response.selectedOption}` 
+            return res.status(400).json({
+              status: "failure",
+              code: 400,
+              msg: `Response contains invalid selected option: ${response.selectedOption}`
             });
           }
-          
+
           if (!selectedOption.allowsCustomInput) {
             await session.abortTransaction();
             session.endSession();
-            return res.status(400).json({ 
-              status: "failure", 
-              code: 400, 
-              msg: `Response contains custom input for option that doesn't allow it: ${response.selectedOption}` 
+            return res.status(400).json({
+              status: "failure",
+              code: 400,
+              msg: `Response contains custom input for option that doesn't allow it: ${response.selectedOption}`
             });
           }
-          
+
           // Validate that custom input is provided and not empty
           if (!response.customInput || response.customInput.trim() === '') {
             await session.abortTransaction();
             session.endSession();
-            return res.status(400).json({ 
-              status: "failure", 
-              code: 400, 
-              msg: `Response requires custom input for option: ${response.selectedOption}` 
+            return res.status(400).json({
+              status: "failure",
+              code: 400,
+              msg: `Response requires custom input for option: ${response.selectedOption}`
             });
           }
         } else if (typeof response === 'string') {
@@ -194,24 +194,24 @@ const updateAnswer = async (req, res, next) => {
             session.endSession();
             return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be one of the provided options for multiple_choice question' });
           }
-          
+
           // If the selected option allows custom input, the response MUST be an object
           if (selectedOption.allowsCustomInput) {
             await session.abortTransaction();
             session.endSession();
-            return res.status(400).json({ 
-              status: "failure", 
-              code: 400, 
-              msg: `Option "${response}" requires custom input. Response must be an object with selectedOption and customInput.` 
+            return res.status(400).json({
+              status: "failure",
+              code: 400,
+              msg: `Option "${response}" requires custom input. Response must be an object with selectedOption and customInput.`
             });
           }
         } else {
           await session.abortTransaction();
           session.endSession();
-          return res.status(400).json({ 
-            status: "failure", 
-            code: 400, 
-            msg: 'Response must be either a string or an object with selectedOption and customInput' 
+          return res.status(400).json({
+            status: "failure",
+            code: 400,
+            msg: 'Response must be either a string or an object with selectedOption and customInput'
           });
         }
       } else if (question.questionType === 'multiple_selection') {
@@ -221,7 +221,7 @@ const updateAnswer = async (req, res, next) => {
           session.endSession();
           return res.status(400).json({ status: "failure", code: 400, msg: 'Response must be an array of selected options for multiple_selection question' });
         }
-        
+
         const validOptions = question.options.map(opt => opt.text);
         // Check if all selected options are valid and handle custom input
         for (const responseItem of response) {
@@ -231,21 +231,21 @@ const updateAnswer = async (req, res, next) => {
             if (!selectedOption) {
               await session.abortTransaction();
               session.endSession();
-              return res.status(400).json({ 
-                status: "failure", 
-                code: 400, 
-                msg: `Response contains invalid option: ${responseItem}` 
+              return res.status(400).json({
+                status: "failure",
+                code: 400,
+                msg: `Response contains invalid option: ${responseItem}`
               });
             }
-            
+
             // If the selected option allows custom input, the response MUST be an object
             if (selectedOption.allowsCustomInput) {
               await session.abortTransaction();
               session.endSession();
-              return res.status(400).json({ 
-                status: "failure", 
-                code: 400, 
-                msg: `Option "${responseItem}" for question ${question._id} requires custom input. Response must be an object with selectedOption and customInput.` 
+              return res.status(400).json({
+                status: "failure",
+                code: 400,
+                msg: `Option "${responseItem}" for question ${question._id} requires custom input. Response must be an object with selectedOption and customInput.`
               });
             }
           } else if (typeof responseItem === 'object' && responseItem.selectedOption && responseItem.customInput) {
@@ -254,46 +254,46 @@ const updateAnswer = async (req, res, next) => {
             if (!selectedOption) {
               await session.abortTransaction();
               session.endSession();
-              return res.status(400).json({ 
-                status: "failure", 
-                code: 400, 
-                msg: `Response contains invalid selected option: ${responseItem.selectedOption}` 
+              return res.status(400).json({
+                status: "failure",
+                code: 400,
+                msg: `Response contains invalid selected option: ${responseItem.selectedOption}`
               });
             }
-            
+
             if (!selectedOption.allowsCustomInput) {
               await session.abortTransaction();
               session.endSession();
-              return res.status(400).json({ 
-                status: "failure", 
-                code: 400, 
-                msg: `Response contains custom input for option that doesn't allow it: ${responseItem.selectedOption}` 
+              return res.status(400).json({
+                status: "failure",
+                code: 400,
+                msg: `Response contains custom input for option that doesn't allow it: ${responseItem.selectedOption}`
               });
             }
-            
+
             // Validate that custom input is provided and not empty
             if (!responseItem.customInput || responseItem.customInput.trim() === '') {
               await session.abortTransaction();
               session.endSession();
-              return res.status(400).json({ 
-                status: "failure", 
-                code: 400, 
-                msg: `Response requires custom input for option: ${responseItem.selectedOption}` 
+              return res.status(400).json({
+                status: "failure",
+                code: 400,
+                msg: `Response requires custom input for option: ${responseItem.selectedOption}`
               });
             }
           } else {
             await session.abortTransaction();
             session.endSession();
-            return res.status(400).json({ 
-              status: "failure", 
-              code: 400, 
-              msg: 'Response contains invalid format. Each item must be either a string or an object with selectedOption and customInput' 
+            return res.status(400).json({
+              status: "failure",
+              code: 400,
+              msg: 'Response contains invalid format. Each item must be either a string or an object with selectedOption and customInput'
             });
           }
         }
       }
-  
-  
+
+
       const existingAnswer = question.answers.find(a => a.userId.equals(user._id));
       if (existingAnswer) {
         existingAnswer.response = response;
@@ -342,38 +342,38 @@ const submitAnswers = async (req, res, next) => {
     if (survey.gender !== 'all_genders' && user.gender !== survey.gender) {
       await session.abortTransaction();
       session.endSession();
-      return res.status(400).json({ 
-        status: "failure", 
-        code: 400, 
-        msg: `This survey is only open to ${survey.gender} participants` 
+      return res.status(400).json({
+        status: "failure",
+        code: 400,
+        msg: `This survey is only open to ${survey.gender} participants`
       });
     }
 
     // Check preferred participants requirements
     if (Array.isArray(survey.preferred_participants) && survey.preferred_participants.length > 0) {
       const [faculty, department] = survey.preferred_participants;
-      
+
       // Case 1: If faculty is not "all faculties", check faculty match
       if (faculty.toLowerCase() !== 'all faculties') {
         if (user.faculty.toLowerCase() !== faculty.toLowerCase()) {
           await session.abortTransaction();
           session.endSession();
-          return res.status(400).json({ 
-            status: "failure", 
-            code: 400, 
-            msg: `This survey is only open to participants from ${faculty} faculty` 
+          return res.status(400).json({
+            status: "failure",
+            code: 400,
+            msg: `This survey is only open to participants from ${faculty} faculty`
           });
         }
-        
+
         // Case 2: If department is specified (not "all departments"), check department match
         if (department && department.toLowerCase() !== 'all departments') {
           if (user.department.toLowerCase() !== department.toLowerCase()) {
             await session.abortTransaction();
             session.endSession();
-            return res.status(400).json({ 
-              status: "failure", 
-              code: 400, 
-              msg: `This survey is only open to participants from ${department} department` 
+            return res.status(400).json({
+              status: "failure",
+              code: 400,
+              msg: `This survey is only open to participants from ${department} department`
             });
           }
         }
@@ -415,8 +415,8 @@ const submitAnswers = async (req, res, next) => {
       if (answer && answer.response) {
         // Validate response for five_point and multiple_choice questions
         if (question.questionType === 'five_point') {
-          if (isNaN(parseInt(answer.response, 10)) || parseInt(answer.response, 10)  < 1 || parseInt(answer.response, 10) > 5) {
-          
+          if (isNaN(parseInt(answer.response, 10)) || parseInt(answer.response, 10) < 1 || parseInt(answer.response, 10) > 5) {
+
             await session.abortTransaction();
             session.endSession();
             return res.status(400).json({ status: "failure", code: 400, msg: `Response for question ${question._id} must be between 1 and 5 for five_point question` });
@@ -425,7 +425,7 @@ const submitAnswers = async (req, res, next) => {
           question.analytics.averageRating = (question.analytics.averageRating * question.analytics.totalResponses + parseInt(answer.response)) / (question.analytics.totalResponses + 1);
         } else if (question.questionType === 'multiple_choice') {
           const validOptions = question.options.map(opt => opt.text);
-          
+
           // Handle custom input for options that allow it
           if (typeof answer.response === 'object' && answer.response.selectedOption && answer.response.customInput) {
             // This is a response with custom input
@@ -433,31 +433,31 @@ const submitAnswers = async (req, res, next) => {
             if (!selectedOption) {
               await session.abortTransaction();
               session.endSession();
-              return res.status(400).json({ 
-                status: "failure", 
-                code: 400, 
-                msg: `Response for question ${question._id} contains invalid selected option: ${answer.response.selectedOption}` 
+              return res.status(400).json({
+                status: "failure",
+                code: 400,
+                msg: `Response for question ${question._id} contains invalid selected option: ${answer.response.selectedOption}`
               });
             }
-            
+
             if (!selectedOption.allowsCustomInput) {
               await session.abortTransaction();
               session.endSession();
-              return res.status(400).json({ 
-                status: "failure", 
-                code: 400, 
-                msg: `Response for question ${question._id} contains custom input for option that doesn't allow it: ${answer.response.selectedOption}` 
+              return res.status(400).json({
+                status: "failure",
+                code: 400,
+                msg: `Response for question ${question._id} contains custom input for option that doesn't allow it: ${answer.response.selectedOption}`
               });
             }
-            
+
             // Validate that custom input is provided and not empty
             if (!answer.response.customInput || answer.response.customInput.trim() === '') {
               await session.abortTransaction();
               session.endSession();
-              return res.status(400).json({ 
-                status: "failure", 
-                code: 400, 
-                msg: `Response for question ${question._id} requires custom input for option: ${answer.response.selectedOption}` 
+              return res.status(400).json({
+                status: "failure",
+                code: 400,
+                msg: `Response for question ${question._id} requires custom input for option: ${answer.response.selectedOption}`
               });
             }
           } else if (typeof answer.response === 'string') {
@@ -468,24 +468,24 @@ const submitAnswers = async (req, res, next) => {
               session.endSession();
               return res.status(400).json({ status: "failure", code: 400, msg: `Response for question ${question._id} must be one of the provided options for multiple_choice question` });
             }
-            
+
             // If the selected option allows custom input, the response MUST be an object
             if (selectedOption.allowsCustomInput) {
               await session.abortTransaction();
               session.endSession();
-              return res.status(400).json({ 
-                status: "failure", 
-                code: 400, 
-                msg: `Option "${answer.response}" for question ${question._id} requires custom input. Response must be an object with selectedOption and customInput.` 
+              return res.status(400).json({
+                status: "failure",
+                code: 400,
+                msg: `Option "${answer.response}" for question ${question._id} requires custom input. Response must be an object with selectedOption and customInput.`
               });
             }
           } else {
             await session.abortTransaction();
             session.endSession();
-            return res.status(400).json({ 
-              status: "failure", 
-              code: 400, 
-              msg: `Response for question ${question._id} must be either a string or an object with selectedOption and customInput` 
+            return res.status(400).json({
+              status: "failure",
+              code: 400,
+              msg: `Response for question ${question._id} must be either a string or an object with selectedOption and customInput`
             });
           }
         } else if (question.questionType === 'multiple_selection') {
@@ -495,7 +495,7 @@ const submitAnswers = async (req, res, next) => {
             session.endSession();
             return res.status(400).json({ status: "failure", code: 400, msg: `Response for question ${question._id} must be an array of selected options for multiple_selection question` });
           }
-          
+
           const validOptions = question.options.map(opt => opt.text);
           // Check if all selected options are valid and handle custom input
           for (const responseItem of answer.response) {
@@ -505,21 +505,21 @@ const submitAnswers = async (req, res, next) => {
               if (!selectedOption) {
                 await session.abortTransaction();
                 session.endSession();
-                return res.status(400).json({ 
-                  status: "failure", 
-                  code: 400, 
-                  msg: `Response for question ${question._id} contains invalid option: ${responseItem}` 
+                return res.status(400).json({
+                  status: "failure",
+                  code: 400,
+                  msg: `Response for question ${question._id} contains invalid option: ${responseItem}`
                 });
               }
-              
+
               // If the selected option allows custom input, the response MUST be an object
               if (selectedOption.allowsCustomInput) {
                 await session.abortTransaction();
                 session.endSession();
-                return res.status(400).json({ 
-                  status: "failure", 
-                  code: 400, 
-                  msg: `Option "${responseItem}" for question ${question._id} requires custom input. Response must be an object with selectedOption and customInput.` 
+                return res.status(400).json({
+                  status: "failure",
+                  code: 400,
+                  msg: `Option "${responseItem}" for question ${question._id} requires custom input. Response must be an object with selectedOption and customInput.`
                 });
               }
             } else if (typeof responseItem === 'object' && responseItem.selectedOption && responseItem.customInput) {
@@ -528,40 +528,40 @@ const submitAnswers = async (req, res, next) => {
               if (!selectedOption) {
                 await session.abortTransaction();
                 session.endSession();
-                return res.status(400).json({ 
-                  status: "failure", 
-                  code: 400, 
-                  msg: `Response for question ${question._id} contains invalid selected option: ${responseItem.selectedOption}` 
+                return res.status(400).json({
+                  status: "failure",
+                  code: 400,
+                  msg: `Response for question ${question._id} contains invalid selected option: ${responseItem.selectedOption}`
                 });
               }
-              
+
               if (!selectedOption.allowsCustomInput) {
                 await session.abortTransaction();
                 session.endSession();
-                return res.status(400).json({ 
-                  status: "failure", 
-                  code: 400, 
-                  msg: `Response for question ${question._id} contains custom input for option that doesn't allow it: ${responseItem.selectedOption}` 
+                return res.status(400).json({
+                  status: "failure",
+                  code: 400,
+                  msg: `Response for question ${question._id} contains custom input for option that doesn't allow it: ${responseItem.selectedOption}`
                 });
               }
-              
+
               // Validate that custom input is provided and not empty
               if (!responseItem.customInput || responseItem.customInput.trim() === '') {
                 await session.abortTransaction();
                 session.endSession();
-                return res.status(400).json({ 
-                  status: "failure", 
-                  code: 400, 
-                  msg: `Response for question ${question._id} requires custom input for option: ${responseItem.selectedOption}` 
+                return res.status(400).json({
+                  status: "failure",
+                  code: 400,
+                  msg: `Response for question ${question._id} requires custom input for option: ${responseItem.selectedOption}`
                 });
               }
             } else {
               await session.abortTransaction();
               session.endSession();
-              return res.status(400).json({ 
-                status: "failure", 
-                code: 400, 
-                msg: `Response for question ${question._id} contains invalid format. Each item must be either a string or an object with selectedOption and customInput` 
+              return res.status(400).json({
+                status: "failure",
+                code: 400,
+                msg: `Response for question ${question._id} contains invalid format. Each item must be either a string or an object with selectedOption and customInput`
               });
             }
           }
@@ -581,7 +581,7 @@ const submitAnswers = async (req, res, next) => {
         }
 
         if (question.questionType === 'multiple_choice' || question.questionType === 'five_point') {
-          
+
           // Convert the response to a string before using it as a Map key
           let responseKey;
           if (typeof answer.response === 'object' && answer.response.selectedOption) {
@@ -595,9 +595,9 @@ const submitAnswers = async (req, res, next) => {
               .replace(/\./g, '_') // Replace dots with underscores
               .replace(/\$/g, '_'); // Replace $ with underscores
           }
-          
+
           question.analytics.distribution.set(responseKey, (question.analytics.distribution.get(responseKey) || 0) + 1);
-          
+
           if (question.questionType === 'five_point') {
             question.analytics.averageRating = (question.analytics.averageRating * (question.analytics.totalResponses - 1) + parseInt(answer.response)) / question.analytics.totalResponses;
           }
@@ -648,7 +648,7 @@ const submitAnswers = async (req, res, next) => {
     } else {
       console.log(`Warning: Invalid point_per_user value (${survey.point_per_user}) for survey ${survey._id}`);
     }
-    
+
     await user.save({ session })
 
     await session.commitTransaction();
@@ -755,7 +755,7 @@ const addOrUpdateQuestion = async (req, res, next) => {
       });
     }
 
-  
+
     // Validate sectionId if provided
     if (sectionId) {
       const section = await Section.findOne({ _id: sectionId, surveyId });
@@ -802,45 +802,45 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
     const { surveyId } = req.params;
     const { questions } = req.body;
     console.log(questions)
-    
+
     // Validate input
     if (!Array.isArray(questions) || questions.length === 0) {
-      return res.status(400).json({ 
-        status: "failure", 
-        code: 400, 
-        msg: 'Questions must be provided as a non-empty array' 
+      return res.status(400).json({
+        status: "failure",
+        code: 400,
+        msg: 'Questions must be provided as a non-empty array'
       });
     }
-    
+
     // Get user
     const user = await User.findOne({ id: req.userId });
     if (!user) {
-      return res.status(404).json({ 
-        status: "failure", 
-        code: 404, 
-        msg: "User Not Found" 
+      return res.status(404).json({
+        status: "failure",
+        code: 404,
+        msg: "User Not Found"
       });
     }
-    
+
     // Find the survey
     const survey = await Survey.findById(surveyId);
     if (!survey) {
-      return res.status(404).json({ 
-        status: "failure", 
-        code: 404, 
-        msg: 'Survey not found' 
+      return res.status(404).json({
+        status: "failure",
+        code: 404,
+        msg: 'Survey not found'
       });
     }
-    
+
     // Check user authorization
     if (!survey.user_id.equals(user._id)) {
-      return res.status(403).json({ 
-        status: "failure", 
-        code: 403, 
-        msg: 'User not authorized to modify this survey' 
+      return res.status(403).json({
+        status: "failure",
+        code: 403,
+        msg: 'User not authorized to modify this survey'
       });
     }
-    
+
     // Cannot add questions to a published survey
     // if (survey.published) {
     //   return res.status(400).json({ 
@@ -849,7 +849,7 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
     //     msg: "Cannot add questions to a published survey" 
     //   });
     // }
-    
+
     // Process each question
     const results = {
       added: 0,
@@ -857,15 +857,15 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
       failed: 0,
       details: []
     };
-    
+
     let modifiedQuestionsCount = 0;
-    
+
     for (const question of questions) {
       try {
         // Extract question data
         const { questionId, questionText, questionType, required, options, sectionId } = question;
         console.log(options)
-        
+
         // Validate required fields
         if (!questionText || !questionType) {
           results.failed++;
@@ -876,7 +876,7 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
           });
           continue;
         }
-        
+
         // Validate question type
         const validQuestionTypes = ['multiple_choice', 'five_point', 'fill_in', 'multiple_selection'];
         if (!validQuestionTypes.includes(questionType)) {
@@ -888,10 +888,10 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
           });
           continue;
         }
-        
+
         // Validate options for multiple choice and multiple selection questions
-        if ((questionType === 'multiple_choice' || questionType === 'multiple_selection') && 
-            (!options || !Array.isArray(options) || options.length < 2)) {
+        if ((questionType === 'multiple_choice' || questionType === 'multiple_selection') &&
+          (!options || !Array.isArray(options) || options.length < 2)) {
           results.failed++;
           results.details.push({
             question: questionText,
@@ -900,7 +900,7 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
           });
           continue;
         }
-        
+
         // Format options for multiple-choice and multiple-selection questions
         let formattedOptions = [];
         if ((questionType === 'multiple_choice' || questionType === 'multiple_selection') && Array.isArray(options)) {
@@ -917,7 +917,7 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
             }
           });
         }
-        
+
         // Validate sectionId if provided
         if (sectionId) {
           const section = await Section.findOne({ _id: sectionId, surveyId });
@@ -934,7 +934,7 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
 
         // Find existing question or create new one
         const existingQuestion = questionId ? survey.questions.find(q => q._id.toString() === questionId) : null;
-        
+
         console.log(formattedOptions)
         if (existingQuestion) {
           // Update existing question
@@ -945,14 +945,14 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
           if (sectionId !== undefined) {
             existingQuestion.sectionId = sectionId || null;
           }
-          
+
           results.updated++;
           results.details.push({
             questionId: existingQuestion._id.toString(),
             question: questionText,
             status: 'updated'
           });
-          
+
           modifiedQuestionsCount++;
         } else {
           // Add new question
@@ -971,19 +971,19 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
             },
             sectionId: sectionId || null
           };
-          
+
           survey.questions.push(newQuestion);
-          
+
           // Get the ID of the newly added question (last element in the array)
           const addedQuestionId = survey.questions[survey.questions.length - 1]._id.toString();
-          
+
           results.added++;
           results.details.push({
             questionId: addedQuestionId,
             question: questionText,
             status: 'added'
           });
-          
+
           modifiedQuestionsCount++;
         }
       } catch (questionError) {
@@ -996,17 +996,17 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
         });
       }
     }
-    
+
     // Only save if any questions were modified
     if (modifiedQuestionsCount > 0) {
       // Update survey timestamp
       survey.updatedAt = new Date();
       await survey.save();
     }
-    
-    res.status(200).json({ 
-      status: "success", 
-      code: 200, 
+
+    res.status(200).json({
+      status: "success",
+      code: 200,
       msg: `Questions processed: ${results.added} added, ${results.updated} updated, ${results.failed} failed`,
       results,
       survey: {
@@ -1025,7 +1025,7 @@ const bulkAddOrUpdateQuestions = async (req, res, next) => {
 const editSurveyInfo = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
-    const {title, description, no_of_participants, point_per_user, duration, preferred_participants } = req.body
+    const { title, description, no_of_participants, point_per_user, duration, preferred_participants } = req.body
 
     const user = await User.findOne({ id: req.userId });
 
@@ -1042,9 +1042,10 @@ const editSurveyInfo = async (req, res, next) => {
       return res.status(403).json({ status: "failure", code: 403, msg: 'User not authorized to edit this survey' });
     }
 
-    const survey = await Survey.findByIdAndUpdate(surveyId, 
-      {title, description, no_of_participants, point_per_user, duration, preferred_participants 
-      }, { new: true, runValidators: true});
+    const survey = await Survey.findByIdAndUpdate(surveyId,
+      {
+        title, description, no_of_participants, point_per_user, duration, preferred_participants
+      }, { new: true, runValidators: true });
 
     res.status(200).json({ status: "success", code: 200, msg: 'Survey updated successfully', survey });
   } catch (error) {
@@ -1092,7 +1093,7 @@ const getSurveyInfo = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
     const { userId } = req;
-    
+
     const user = await User.findOne({ id: userId });
     if (!user) {
       return res.status(404).json({ status: "failure", code: 404, msg: 'User not found' });
@@ -1110,7 +1111,7 @@ const getSurveyInfo = async (req, res, next) => {
 
     // Convert survey to object and filter answers
     const surveyObj = survey.toObject();
-    
+
     // Filter answers to remove userId and fullname and include section details
     if (surveyObj.questions) {
       const sections = await Section.find({ surveyId }).lean();
@@ -1140,10 +1141,10 @@ const getSurveyInfo = async (req, res, next) => {
       isCreator: survey.user_id._id.equals(user._id)
     };
 
-    res.status(200).json({ 
-      status: "success", 
-      code: 200, 
-      survey: surveyWithCounts 
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      survey: surveyWithCounts
     });
   } catch (error) {
     next(error);
@@ -1194,24 +1195,22 @@ const publishSurvey = async (req, res, next) => {
     }
 
     const payment = await Payment.findOne({ surveyId }).sort({ createdAt: -1 });
-    if(!payment){
+    if (!payment) {
       return res.status(400).json({ status: "failure", code: 400, msg: 'No payment found' });
     }
 
-    // Calculate expected payment amount
-    const BASE_RATE = 3000;
-    const QUESTION_RATE = 10;
-    const PARTICIPANT_RATE = 20;
+    // Calculate expected payment amount using pricing utility
+    const { calculateSurveyPrice } = require('../utils/pricing');
+    const numParticipants = survey.no_of_participants;
 
-    const expectedAmount = BASE_RATE + 
-      (QUESTION_RATE * survey.questions.length) + 
-      (PARTICIPANT_RATE * survey.no_of_participants);
+    const pricingResult = calculateSurveyPrice(numParticipants);
+    const expectedAmount = pricingResult.calculatedAmount;
 
     // Verify payment amount matches expected amount
     if (payment.amount !== expectedAmount) {
-      return res.status(400).json({ 
-        status: "failure", 
-        code: 400, 
+      return res.status(400).json({
+        status: "failure",
+        code: 400,
         msg: 'Payment amount does not match expected amount.',
         expected: expectedAmount,
         received: payment.amount
@@ -1240,13 +1239,13 @@ const publishSurvey = async (req, res, next) => {
           instituition: populatedSurvey.user_id.instituition
         }
       };
-      
+
       console.log("User data for queue:", surveyForQueue.user_id);
-      
-      const result = await addEmailToQueue('survey-published', { 
+
+      const result = await addEmailToQueue('survey-published', {
         survey: surveyForQueue
       });
-      
+
       if (result && result.status === 'error') {
         console.warn('Email notification queue not available, but survey was published successfully');
       } else {
@@ -1269,7 +1268,7 @@ const unpublishSurvey = async (req, res, next) => {
     const { surveyId } = req.params;
     const survey = await Survey.findById(surveyId);
     const user = await User.findOne({ id: req.userId });
-    
+
     if (!survey) {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
     }
@@ -1300,9 +1299,9 @@ const unpublishSurvey = async (req, res, next) => {
     survey.unpublishedBy = user.fullname;
     await survey.save();
 
-    res.status(200).json({ 
-      status: "success", 
-      code: 200, 
+    res.status(200).json({
+      status: "success",
+      code: 200,
       msg: 'Survey successfully unpublished',
       survey: {
         _id: survey._id,
@@ -1317,19 +1316,19 @@ const unpublishSurvey = async (req, res, next) => {
 
 const getAllSurveys = async (req, res, next) => {
   try {
-    const surveys = await Survey.find({published: true})
+    const surveys = await Survey.find({ published: true })
       .populate({
         path: 'user_id',
         select: 'fullname email instituition pic_url'
       });
-      
+
     const surveysWithCounts = surveys.map(survey => {
       const filledCount = survey.submittedUsers.length;
       const remainingSpots = survey.no_of_participants - filledCount;
-      
+
       // Convert survey to object and filter answers
       const surveyObj = survey.toObject();
-      
+
       // Filter answers to remove userId and fullname
       if (surveyObj.questions) {
         surveyObj.questions = surveyObj.questions.map(question => ({
@@ -1339,7 +1338,7 @@ const getAllSurveys = async (req, res, next) => {
           })) : []
         }));
       }
-      
+
       return {
         ...surveyObj,
         participantCounts: {
@@ -1350,10 +1349,10 @@ const getAllSurveys = async (req, res, next) => {
       };
     });
 
-    res.status(200).json({ 
-      status: "success", 
-      code: 200, 
-      surveys: surveysWithCounts 
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      surveys: surveysWithCounts
     });
   } catch (error) {
     next(error);
@@ -1369,7 +1368,7 @@ const getSurveyAnalytics = async (req, res, next) => {
     if (!survey) {
       return res.status(404).json({ status: "failure", code: 404, msg: 'Survey not found' });
     }
-    if(survey.published == false){
+    if (survey.published == false) {
       return res.status(401).json({ status: "failure", code: 401, msg: 'Unauthorized action, The survey is not published' });
     }
 
@@ -1420,68 +1419,68 @@ const getSurveyQuestions = async (req, res, next) => {
 
 // Modify for later use
 const createOption = async (req, res) => {
-    const option = await Option.create({
-      
-    })
+  const option = await Option.create({
+
+  })
 }
 
 const createAnswer = async (req, res) => {
   const answer = await Answer.create({
-      
+
   })
 }
 
 const createQuestion = async (req, res) => {
 
-  const {questionText, questionType, optionIds, optionTexts} = req.body
+  const { questionText, questionType, optionIds, optionTexts } = req.body
 
-  if(optionIds && optionTexts) {
+  if (optionIds && optionTexts) {
     return res.status(400).json({
       status: "failure",
       code: 400,
       msg: "Only one of optionsIds and optionTexts should be provided"
     })
   }
-  if(optionIds) {
-      //check if it is an array
-      if(!Array.isArray(optionIds)){
-        return res.status(400).json({
-            status: "failure",
-            code: 400,
-            msg: "optionsIds must be an array"
-        })
-      }
-
-      // check if optionsIds exist
-      let exist = true
-      for (const option of optionIds) {
-          const opt = await Option.findById(option)
-          if(!opt){
-            exist = false;
-            break;
-          }
-      }
-
-      if(exist == false) {
-        return res.status(400).json({
-          status: "failure",
-          code: 400,
-          msg: "The optionIds must exist. The options must have been created"
-        })
-      }
-
-      const question = await Question.create({
-        questionText,
-        questionType,
-        options: optionIds
+  if (optionIds) {
+    //check if it is an array
+    if (!Array.isArray(optionIds)) {
+      return res.status(400).json({
+        status: "failure",
+        code: 400,
+        msg: "optionsIds must be an array"
       })
+    }
+
+    // check if optionsIds exist
+    let exist = true
+    for (const option of optionIds) {
+      const opt = await Option.findById(option)
+      if (!opt) {
+        exist = false;
+        break;
+      }
+    }
+
+    if (exist == false) {
+      return res.status(400).json({
+        status: "failure",
+        code: 400,
+        msg: "The optionIds must exist. The options must have been created"
+      })
+    }
+
+    const question = await Question.create({
+      questionText,
+      questionType,
+      options: optionIds
+    })
   } else if (optionTexts) {
     //check if it is an array
-    if(!Array.isArray(optionTexts)){
+    if (!Array.isArray(optionTexts)) {
       return res.status(400).json({
-          status: "failure",
-          code: 400,
-          msg: "optionTexts must be an array"
+        status: "failure",
+        code: 400,
+        msg: "optionTexts must be an array"
       })
     }
 
@@ -1511,9 +1510,9 @@ const createQuestion = async (req, res) => {
     status: "success",
     code: 201,
     msg: "Question successfully created"
-  }) 
+  })
 
- 
+
 }
 
 
@@ -1521,187 +1520,179 @@ const createQuestion = async (req, res) => {
 
 
 const getPrice = async (req, res) => {
-    try {
-        const { userId } = req;
-        const { surveyId } = req.body;
+  try {
+    const { userId } = req;
+    const { surveyId } = req.body;
 
-        const survey = await Survey.findById(surveyId);
-        const user = await User.findOne({ id: userId });
+    const survey = await Survey.findById(surveyId);
+    const user = await User.findOne({ id: userId });
 
-      if (!survey.user_id.equals(user._id)) {
-        return res.status(400).json({error: "No survey Found"})
-      }
-
-        // Constants
-        const BASE_RATE = 3000;
-        const QUESTION_RATE = 10;
-        const PARTICIPANT_RATE = 20;
-
-        // Calculate total price
-        const numQuestions = survey.questions.length;
-        const numParticipants = survey.no_of_participants;
-        
-        const amount_to_be_paid = BASE_RATE + 
-            (QUESTION_RATE * numQuestions) + 
-            (PARTICIPANT_RATE * numParticipants);
-
-        // Calculate points per user
-        const points_per_user = Math.ceil((QUESTION_RATE * numQuestions + PARTICIPANT_RATE * numParticipants) / numParticipants);
-
-        // Update survey with calculated values
-        await Survey.findByIdAndUpdate(surveyId, {
-            amount_to_be_paid: amount_to_be_paid,
-            point_per_user: points_per_user
-        });
-        
-        let responsePayload = {
-            price: amount_to_be_paid,
-            points_per_user: points_per_user,
-            surveyId
-        };
-
-      // Generate a JWT to store this data temporarily
-      const token = jwt.sign(responsePayload, process.env.JWT_SECRET, {
-        expiresIn: "15m",
-      }); // Token expires in 15 minutes
-      return res.status(200).json({ ...responsePayload, token });
-    } catch (error) {
-      console.error("Error in get-price route:", error);
-      res.status(500).json({ error: "Internal server error" });
+    if (!survey.user_id.equals(user._id)) {
+      return res.status(400).json({ error: "No survey Found" })
     }
+
+    // Calculate total price using pricing utility
+    const { calculateSurveyPrice } = require('../utils/pricing');
+    const numParticipants = survey.no_of_participants;
+
+    const pricingResult = calculateSurveyPrice(numParticipants);
+    const amount_to_be_paid = pricingResult.calculatedAmount;
+    const points_per_user = pricingResult.pointsPerUser;
+
+    // Update survey with calculated values
+    await Survey.findByIdAndUpdate(surveyId, {
+      amount_to_be_paid: amount_to_be_paid,
+      point_per_user: points_per_user
+    });
+
+    let responsePayload = {
+      price: amount_to_be_paid,
+      points_per_user: points_per_user,
+      surveyId
+    };
+
+    // Generate a JWT to store this data temporarily
+    const token = jwt.sign(responsePayload, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    }); // Token expires in 15 minutes
+    return res.status(200).json({ ...responsePayload, token });
+  } catch (error) {
+    console.error("Error in get-price route:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 // nearest future , can send those error to the frontend pricing
 const receivePaymentWebhook = async (req, res) => {
-    const DB_KEY = process.env.DB_KEY
-    try {
-      const { db_key } = req.query;
-      if (!db_key) {
-        return res.status(401).json({
-          status: 401,
-          success: false,
-        });
-      }
-      if (db_key != DB_KEY) {
-        return res.status(401).json({
-          status: 401,
-          success: false,
-          error: "check",
-        });
-      }
+  const DB_KEY = process.env.DB_KEY
+  try {
+    const { db_key } = req.query;
+    if (!db_key) {
+      return res.status(401).json({
+        status: 401,
+        success: false,
+      });
+    }
+    if (db_key != DB_KEY) {
+      return res.status(401).json({
+        status: 401,
+        success: false,
+        error: "check",
+      });
+    }
 
-      let id_ = req.body.data.reference;
+    let id_ = req.body.data.reference;
 
-      //validate event
-      // const payload = JSON.stringify(req.body);
+    //validate event
+    // const payload = JSON.stringify(req.body);
 
-      // const hash = crypto.createHmac('sha512', secretKey).update(payload).digest('hex');
+    // const hash = crypto.createHmac('sha512', secretKey).update(payload).digest('hex');
 
-      // console.log(hash)
-      // console.log(req.headers['x-paystack-signature'])
-      //     if (hash == req.headers['x-paystack-signature']) {
-      // Retrieve the request's body
-      const event = req.body;
-      console.log(event);
+    // console.log(hash)
+    // console.log(req.headers['x-paystack-signature'])
+    //     if (hash == req.headers['x-paystack-signature']) {
+    // Retrieve the request's body
+    const event = req.body;
+    console.log(event);
 
-      // check if customer has been proccessed
-      // const check_customer = await Payment.find({ referenceNumber: id_ });
+    // check if customer has been proccessed
+    // const check_customer = await Payment.find({ referenceNumber: id_ });
 
-      // if (check_customer.length > 0) {
-      //   console.log("true proccesed");
-      //   return res.status(400).json({
-      //     status: 400,
-      //     success: false,
-      //     message: "payment processed",
-      //   });;
-      // }
+    // if (check_customer.length > 0) {
+    //   console.log("true proccesed");
+    //   return res.status(400).json({
+    //     status: 400,
+    //     success: false,
+    //     message: "payment processed",
+    //   });;
+    // }
 
-      switch (event.event) {
-        case "charge.create":
-          // Handle successful payment event
-          break;
+    switch (event.event) {
+      case "charge.create":
+        // Handle successful payment event
+        break;
 
-        case "charge.success":
-          const dataToSend = {
-            email: event.data.customer.email,
-            token: event.data.metadata.custom_fields[0].value,
-            amount: event.data.amount,
-          };
-          const { email, token, amount } = dataToSend;
+      case "charge.success":
+        const dataToSend = {
+          email: event.data.customer.email,
+          token: event.data.metadata.custom_fields[0].value,
+          amount: event.data.amount,
+        };
+        const { email, token, amount } = dataToSend;
 
-          const user = await User.findOne({ email });
-          if (!user) {
-            console.log("User not found")
-            return res.status(404).json({ error: "User not found" });
-          }
-          const userId = user.userId;
-          const decoded = jwt.verify(token, process.env.JWT_SECRET);
-          console.log(amount)
-          console.log(decoded.price)
+        const user = await User.findOne({ email });
+        if (!user) {
+          console.log("User not found")
+          return res.status(404).json({ error: "User not found" });
+        }
+        const userId = user.userId;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log(amount)
+        console.log(decoded.price)
 
-          const amountInNaira = Number(amount) / 100; // Convert amount to naira
-          if ( amountInNaira !== decoded.price) {
-            console.log("Invalid plan or amount")
-            const newPayment = new Payment({
-              userId: userId,
-              referenceNumber: id_,
-              surveyId: decoded.surveyId,
-              amount: amountInNaira,            
-              email,
-              datePaid: new Date(),
-              status: "failed"
-            });
-            await newPayment.save();
-            return res.status(400).json({ error: "Invalid plan or amount" });
-            // send notification
-          }
-
+        const amountInNaira = Number(amount) / 100; // Convert amount to naira
+        if (amountInNaira !== decoded.price) {
+          console.log("Invalid plan or amount")
           const newPayment = new Payment({
             userId: userId,
             referenceNumber: id_,
             surveyId: decoded.surveyId,
-            amount: amountInNaira,            
+            amount: amountInNaira,
             email,
             datePaid: new Date(),
-            status: "paid"
+            status: "failed"
           });
           await newPayment.save();
+          return res.status(400).json({ error: "Invalid plan or amount" });
+          // send notification
+        }
 
-          res.status(200).json({
-            message:
-              "Payment collected successfully and plan updated",
-          });
+        const newPayment = new Payment({
+          userId: userId,
+          referenceNumber: id_,
+          surveyId: decoded.surveyId,
+          amount: amountInNaira,
+          email,
+          datePaid: new Date(),
+          status: "paid"
+        });
+        await newPayment.save();
 
-          break;
+        res.status(200).json({
+          message:
+            "Payment collected successfully and plan updated",
+        });
 
-        default:
-          console.log("Unhandled event:", event);
-      }
-    } catch (error) {
-      console.log(error);
-      if (error.name === "JsonWebTokenError") {
-        return res.status(400).json({ error: "Payment Processing timeout" });
-      }
-      res.status(500).json({ error: error.message });
+        break;
+
+      default:
+        console.log("Unhandled event:", event);
     }
+  } catch (error) {
+    console.log(error);
+    if (error.name === "JsonWebTokenError") {
+      return res.status(400).json({ error: "Payment Processing timeout" });
+    }
+    res.status(500).json({ error: error.message });
   }
+}
 
 const mySurveys = async (req, res) => {
-  const {userId} = req;
+  const { userId } = req;
   try {
-    const user = await User.findOne({id: userId})
+    const user = await User.findOne({ id: userId })
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    
-    const surveys = await Survey.find({user_id: user._id}).sort({createdAt: -1});
+
+    const surveys = await Survey.find({ user_id: user._id }).sort({ createdAt: -1 });
     const surveysWithCounts = surveys.map(survey => {
       const filledCount = survey.submittedUsers.length;
       const remainingSpots = survey.no_of_participants - filledCount;
-      
+
       // Convert survey to object and filter answers
       const surveyObj = survey.toObject();
-      
+
       // Filter answers to remove userId and fullname
       if (surveyObj.questions) {
         surveyObj.questions = surveyObj.questions.map(question => ({
@@ -1711,7 +1702,7 @@ const mySurveys = async (req, res) => {
           })) : []
         }));
       }
-      
+
       return {
         ...surveyObj,
         participantCounts: {
@@ -1722,16 +1713,16 @@ const mySurveys = async (req, res) => {
       };
     });
 
-    res.status(200).json({ 
-      status: "success", 
-      code: 200, 
-      mySurveys: surveysWithCounts 
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      mySurveys: surveysWithCounts
     });
   } catch (error) {
-    res.status(500).json({ 
-      status: "failure", 
-      code: 500, 
-      error: "Internal server error" 
+    res.status(500).json({
+      status: "failure",
+      code: 500,
+      error: "Internal server error"
     });
   }
 };
@@ -1742,99 +1733,94 @@ const mySurveys = async (req, res) => {
 
 const testController = async (req, res) => {
 
-    const survey =  await Survey
+  const survey = await Survey
 }
 
 const verifyPayment = async (req, res) => {
-    try {
-        const { surveyId } = req.params;
-        const { userId } = req;
+  try {
+    const { surveyId } = req.params;
+    const { userId } = req;
 
-        const user = await User.findOne({ id: userId });
-        if (!user) {
-            return res.status(404).json({
-                status: "failure",
-                code: 404,
-                msg: "User not found"
-            });
-        }
-
-        const survey = await Survey.findById(surveyId);
-        if (!survey) {
-            return res.status(404).json({
-                status: "failure",
-                code: 404,
-                msg: "Survey not found"
-            });
-        }
-
-        // Check if user owns the survey
-        if (!survey.user_id.equals(user._id)) {
-            return res.status(403).json({
-                status: "failure",
-                code: 403,
-                msg: "Unauthorized access"
-            });
-        }
-
-        // Check if payment exists for this survey
-        const payment = await Payment.findOne({ surveyId }).sort({ createdAt: -1 });
-        
-        if (!payment) {
-            return res.status(400).json({
-                status: "success",
-                code: 400,
-                paid: false,
-                msg: "No payment found for this survey"
-            });
-        }
-
-        // Calculate expected payment amount
-        const BASE_RATE = 3000;
-        const QUESTION_RATE = 10;
-        const PARTICIPANT_RATE = 20;
-
-        const numQuestions = survey.questions.length;
-        const numParticipants = survey.no_of_participants;
-        
-        const expectedAmount = BASE_RATE + 
-            (QUESTION_RATE * numQuestions) + 
-            (PARTICIPANT_RATE * numParticipants);
-
-        // Check if the payment amount matches the expected amount
-        const isCorrectPayment = payment.amount === expectedAmount;
-        if (!isCorrectPayment) {
-          return res.status(400).json({
-            status: "failure",
-            code: 400,
-            msg: "Payment amount does not match expected price"
-          });
-        }
-
-        return res.status(200).json({
-            status: "success",
-            code: 200,
-            paid: true,
-            correctPayment: isCorrectPayment,
-            expectedAmount: expectedAmount,
-            payment: {
-                amount: payment.amount,
-                datePaid: payment.datePaid,
-                referenceNumber: payment.referenceNumber
-            },
-            msg: isCorrectPayment 
-                ? "Payment verified successfully" 
-                : "Payment found but amount does not match expected price"
-        });
-
-    } catch (error) {
-        console.error("Error in verify-payment route:", error);
-        res.status(500).json({
-            status: "failure",
-            code: 500,
-            msg: "Internal server error"
-        });
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      return res.status(404).json({
+        status: "failure",
+        code: 404,
+        msg: "User not found"
+      });
     }
+
+    const survey = await Survey.findById(surveyId);
+    if (!survey) {
+      return res.status(404).json({
+        status: "failure",
+        code: 404,
+        msg: "Survey not found"
+      });
+    }
+
+    // Check if user owns the survey
+    if (!survey.user_id.equals(user._id)) {
+      return res.status(403).json({
+        status: "failure",
+        code: 403,
+        msg: "Unauthorized access"
+      });
+    }
+
+    // Check if payment exists for this survey
+    const payment = await Payment.findOne({ surveyId }).sort({ createdAt: -1 });
+
+    if (!payment) {
+      return res.status(400).json({
+        status: "success",
+        code: 400,
+        paid: false,
+        msg: "No payment found for this survey"
+      });
+    }
+
+    // Calculate expected payment amount using pricing utility
+    const { calculateSurveyPrice } = require('../utils/pricing');
+    const numParticipants = survey.no_of_participants;
+
+    const pricingResult = calculateSurveyPrice(numParticipants);
+    const expectedAmount = pricingResult.calculatedAmount;
+
+    // Check if the payment amount matches the expected amount
+    const isCorrectPayment = payment.amount === expectedAmount;
+    if (!isCorrectPayment) {
+      return res.status(400).json({
+        status: "failure",
+        code: 400,
+        msg: "Payment amount does not match expected price"
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      paid: true,
+      correctPayment: isCorrectPayment,
+      expectedAmount: expectedAmount,
+      payment: {
+        amount: payment.amount,
+        datePaid: payment.datePaid,
+        referenceNumber: payment.referenceNumber
+      },
+      msg: isCorrectPayment
+        ? "Payment verified successfully"
+        : "Payment found but amount does not match expected price"
+    });
+
+  } catch (error) {
+    console.error("Error in verify-payment route:", error);
+    res.status(500).json({
+      status: "failure",
+      code: 500,
+      msg: "Internal server error"
+    });
+  }
 };
 
 // Add this new controller function after the getSurveyAnalytics function
@@ -1879,9 +1865,9 @@ const exportSurveyData = async (req, res, next) => {
     if (format === 'csv') {
       // Process the survey data for CSV format with user emails
       const formattedData = formatSurveyDataForCsv(survey, userMap);
-      
+
       let csvContent;
-      
+
       if (style === 'google') {
         // Use Google Forms style CSV (questions as columns, respondents as rows)
         csvContent = createCsvString(formattedData.googleStyleData);
@@ -1890,7 +1876,7 @@ const exportSurveyData = async (req, res, next) => {
         const surveyInfoCsv = createCsvString([formattedData.surveyInfo]);
         const questionResponsesCsv = createCsvString(formattedData.questionResponses);
         const individualResponsesCsv = createCsvString(formattedData.individualResponses);
-        
+
         // Combine all sections with section headers
         csvContent = [
           '# SURVEY INFORMATION',
@@ -1901,11 +1887,11 @@ const exportSurveyData = async (req, res, next) => {
           individualResponsesCsv
         ].join('\n\n');
       }
-      
+
       // Set headers for file download
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', `attachment; filename="${survey.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_export_${Date.now()}.csv"`);
-      
+
       // Send the CSV content
       return res.status(200).send(csvContent);
     } else {
@@ -1948,7 +1934,7 @@ const createSection = async (req, res, next) => {
 
 module.exports = {
   start,
-  home, 
+  home,
   createSurvey,
   updateAnswer,
   testController,
