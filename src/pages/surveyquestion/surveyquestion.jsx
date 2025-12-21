@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./surveyquestion.css";
 import copy from "../../assets/img/copy.svg";
 import del from "../../assets/img/del.svg";
@@ -41,7 +41,8 @@ const SurveyQuestions = () => {
     { value: 4, label: "Agree" },
     { value: 5, label: "Strongly Agree" },
   ]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarRef = useRef(null);
 
   // Background colors and fonts
   const backgroundColors = [
@@ -70,6 +71,23 @@ const SurveyQuestions = () => {
         questionId: sections[0].questions[0].id,
       });
     }
+  }, []);
+
+  // Close sidebar when clicking outside (mobile only)
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        window.innerWidth <= 768 &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !event.target.closest(".sidebar-toggle")
+      ) {
+        setSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Get currently selected question object
@@ -118,11 +136,10 @@ const SurveyQuestions = () => {
   // delete section
   const deleteSection = (sectionId) => {
     if (sections.length === 1) {
-      toast.error("You must have at least one section");
+      alert("You must have at least one section");
       return;
     }
 
-    setIsDeletingSectionId(sectionId);
     try {
       // Find section by local id
       const section = sections.find((s) => s.id === sectionId);
@@ -139,10 +156,9 @@ const SurveyQuestions = () => {
         const targetSection = remainingSections[0];
         const questionsToMove = section.questions.map((q) => ({
           ...q,
-          sectionId: targetSection.sectionId, // Update sectionId to target section
+          sectionId: targetSection.sectionId,
         }));
 
-        // Update sections: remove deleted section and add questions to target section
         updatedSections = remainingSections.map((s) =>
           s.id === targetSection.id
             ? {
@@ -153,19 +169,15 @@ const SurveyQuestions = () => {
         );
       }
 
-      // Update order of remaining sections
       updatedSections = updatedSections.map((s, index) => ({
         ...s,
         order: index + 1,
       }));
 
       setSections(updatedSections);
-      // toast.success("Section deleted successfully");
     } catch (error) {
       console.error("Error deleting section:", error);
-      toast.error(error.message || "Error deleting section");
-    } finally {
-      setIsDeletingSectionId(null);
+      alert(error.message || "Error deleting section");
     }
   };
 
@@ -441,30 +453,42 @@ const SurveyQuestions = () => {
   const isDarkMode = selectedBgColor === "#000000";
 
   return (
-    <div
-      className={`survey-form ${isDarkMode ? "dark-mode" : ""}`}
-      // style={{ fontFamily: selectedFont, backgroundColor: selectedBgColor }}
-    >
+    <div className={`survey-form ${isDarkMode ? "dark-mode" : ""}`}>
       {/* Top Bar */}
       <div className="top-bar">
         <div className="top-bar-content">
-          <button
-            className="sidebar-toggle"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            ☰
-          </button>
           <h2>Create A Questionnaire</h2>
           <button className="import-btn">Import from files</button>
         </div>
       </div>
 
+      {/* Mobile Toggle Button */}
+      <div className="mobile-toggle-container">
+        <button
+          className="sidebar-toggle"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          ☰ <span>Set question type</span>
+        </button>
+      </div>
+
       <div className="main-layout">
-        
         {/* Left Sidebar - Settings */}
-        <div className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+        <div
+          ref={sidebarRef}
+          className={`sidebar ${sidebarOpen ? "open" : "closed"}`}
+        >
+          <div className="sidebar-header-mobile">
+            <h3>Set question type</h3>
+            <button
+              className="sidebar-close"
+              onClick={() => setSidebarOpen(false)}
+            >
+              ×
+            </button>
+          </div>
           <div className="sidebar-content">
-            <h3>Edit Question</h3>
+            <h3 className="sidebar-title-desktop">Edit Question</h3>
 
             {currentQuestion ? (
               <>
@@ -642,7 +666,31 @@ const SurveyQuestions = () => {
                   {/* Question Header */}
                   <div className="question-header">
                     <div className="question-title-area">
-                      <span className="question-number">Q{qIndex + 1}</span>
+                      <div className="survey-q-btn flex">
+                        <span className="question-number">Q{qIndex + 1}</span>
+                        <div className="question-actions">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              duplicateQuestion(section.id, question.id);
+                            }}
+                            className="icon-btn"
+                            title="Duplicate"
+                          >
+                            <img src={copy} alt="Copy" className="copy-icon" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteQuestion(section.id, question.id);
+                            }}
+                            className="icon-btn delete"
+                            title="Delete"
+                          >
+                            <img src={del} className="delete-icon" />
+                          </button>
+                        </div>
+                      </div>
                       <input
                         type="text"
                         value={question.questionText}
@@ -658,28 +706,6 @@ const SurveyQuestions = () => {
                         placeholder="Untitled Question"
                         className="question-input"
                       />
-                    </div>
-                    <div className="question-actions">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          duplicateQuestion(section.id, question.id);
-                        }}
-                        className="icon-btn"
-                        title="Duplicate"
-                      >
-                        <img src={copy} alt="Copy" className="copy-icon" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteQuestion(section.id, question.id);
-                        }}
-                        className="icon-btn delete"
-                        title="Delete"
-                      >
-                        <img src={del} className="delete-icon" />
-                      </button>
                     </div>
                   </div>
 
@@ -776,7 +802,7 @@ const SurveyQuestions = () => {
           </button>
 
           {/* Action Buttons */}
-          <div className="action-buttons">
+          <div className="action-buttons survey-ques-action">
             <button className="save-btn">Save</button>
             <button className="post-btn">Post</button>
           </div>
