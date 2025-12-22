@@ -1,761 +1,886 @@
-import { Link, Form, useActionData, useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import action from "./action";
+import React, { useState, useEffect, useRef } from "react";
 import "./surveyquestion.css";
-import backaro from "../../assets/img/backaro.svg";
+import copy from "../../assets/img/copy.svg";
 import del from "../../assets/img/del.svg";
 import add from "../../assets/img/add.svg";
 import plus from "../../assets/img/icon-add.svg";
-import dot from "../../assets/img/dot.svg";
-import copy from "../../assets/img/copy.svg";
-import close from "../../assets/img/close.svg";
-import palette from "../../assets/img/palette.svg";
-import add_circle from "../../assets/img/add_circle.svg";
-import useAuthStore from "../../store/useAuthStore";
-import PricingModal from "../../components/pricingmodal/pricingmodal";
-import { toast } from "react-toastify";
-import config from "../../config/config";
-import axios from "axios";
-import verifyPayment from "../../utils/helpers/verifyPayment";
-
-// DRAG & DROP
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-  return result;
-};
 
 const SurveyQuestions = () => {
-  const navigate = useNavigate();
-  const data = useActionData();
-  const { currentSurveyId, hasPaid, setHasPaid } = useAuthStore();
-  const [isPosting, setIsPosting] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [showPricingModal, setShowPricingModal] = useState(false);
-  const authToken = useAuthStore((state) => state.authToken);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
-  const [showTheme, setShowTheme] = useState(false);
-  // Add new state for delete loading
-  const [isDeletingId, setIsDeletingId] = useState(null);
-  const [questions, setQuestions] = useState([
+  // State management
+  const [sections, setSections] = useState([
     {
-      id: Date.now(),
-      questionId: "",
-      questionText: "",
-      questionType: "multiple_choice",
-      required: true,
-      options: [{ text: "", allowsCustomInput: false }],
+      id: "section_1",
+      sectionId: null,
+      title: "Diet And Exercise Survey",
+      description: "",
+      order: 1,
+      questions: [
+        {
+          id: "question_1",
+          questionId: "",
+          questionText: "Have you ever been on a diet before?",
+          questionType: "multiple_choice",
+          required: false,
+          options: [
+            { text: "Option 1", allowsCustomInput: false },
+            { text: "Option 2", allowsCustomInput: false },
+          ],
+          likert: null,
+          sectionId: null,
+        },
+      ],
     },
   ]);
 
-  const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [showLikertModal, setShowLikertModal] = useState(false);
+  const [currentLikertScale, setCurrentLikertScale] = useState([
+    { value: 1, label: "Strongly Disagree" },
+    { value: 2, label: "Disagree" },
+    { value: 3, label: "Neutral" },
+    { value: 4, label: "Agree" },
+    { value: 5, label: "Strongly Agree" },
+  ]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarRef = useRef(null);
 
-  // Track Select questions
-  const [activeQuestionId, setActiveQuestionId] = useState(null);
+  // Background colors and fonts
+  const backgroundColors = [
+    "#FFFFFF",
+    "#FFF9E6",
+    "#FFE6E6",
+    "#E6F3FF",
+    "#F0E6FF",
+    "#000000",
+  ];
+  const [selectedBgColor, setSelectedBgColor] = useState("#FFFFFF");
+  const fontFamilies = [
+    "Roboto",
+    "Arial",
+    "Georgia",
+    "Times New Roman",
+    "Courier New",
+  ];
+  const [selectedFont, setSelectedFont] = useState("Roboto");
 
-  const handleFocusQuestion = (id) => {
-    setActiveQuestionId(id);
-  };
-
-  const handleBlurQuestion = () => {
-    setActiveQuestionId(null);
-  };
-  // THEME
-  const toggleTheme = () => {
-    setShowTheme(!showTheme);
-  };
-
-  // Load existing questions
+  // Select first question by default
   useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const response = await fetch(
-          `${config.API_URL}/surveys/${currentSurveyId}/questions`,
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
+    if (sections.length > 0 && sections[0].questions.length > 0) {
+      setSelectedQuestion({
+        sectionId: sections[0].id,
+        questionId: sections[0].questions[0].id,
+      });
+    }
+  }, []);
 
-        if (response.ok && data.questions.length > 0) {
-          const formattedQuestions = data.questions.map((q) => ({
-            id: Date.now() + Math.random(),
-            questionId: q._id,
-            questionText: q.questionText,
-            questionType: q.questionType,
-            required: q.required,
-            options: q.options.map((opt) => ({
-              text: typeof opt === "string" ? opt : opt.text,
-              allowsCustomInput:
-                typeof opt === "object"
-                  ? opt.allowsCustomInput || false
-                  : false,
-            })),
-          }));
-          setQuestions(formattedQuestions);
-        }
-      } catch (error) {
-        console.error("Error loading questions:", error);
-        toast.error("Error loading existing questions");
-      } finally {
-        setIsLoading(false);
+  // Close sidebar when clicking outside (mobile only)
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        window.innerWidth <= 768 &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !event.target.closest(".sidebar-toggle")
+      ) {
+        setSidebarOpen(false);
       }
     };
 
-    if (currentSurveyId) {
-      fetchQuestions();
-    } else {
-      setIsLoading(false);
-    }
-  }, [currentSurveyId, authToken]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      // Prepare bulk payload
-      const validTypes = [
-        "multiple_choice",
-        "five_point",
-        "fill_in",
-        "multiple_selection",
-      ];
+  // Get currently selected question object
+  const getCurrentQuestion = () => {
+    if (!selectedQuestion) return null;
+    const section = sections.find((s) => s.id === selectedQuestion.sectionId);
+    return section?.questions.find((q) => q.id === selectedQuestion.questionId);
+  };
 
-      const bulkPayload = {
-        questions: questions.map((question) => ({
-          questionId: question.questionId || "", // Keep existing ID or empty for new
-          questionText: question.questionText.trim(), // Trim whitespace
-          questionType: question.questionType,
-          required: Boolean(question.required),
-          // Conditional options handling
-          options:
-            question.questionType === "multiple_choice" ||
-            question.questionType === "multiple_selection"
-              ? question.options
-                  .map((opt) => ({
-                    text:
-                      typeof opt === "string" ? opt.trim() : opt.text.trim(),
-                    allowsCustomInput:
-                      typeof opt === "object"
-                        ? opt.allowsCustomInput || false
-                        : false,
-                  }))
-                  .filter((opt) => opt.text !== "") // Remove empty options
-              : undefined, // Exclude options for non-multiple_choice questions
-        })),
-      };
-
-      const response = await fetch(
-        `${config.API_URL}/surveys/${currentSurveyId}/bulk-questions`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(bulkPayload),
+  // Handle question field changes
+  const handleQuestionChange = (sectionId, questionId, field, value) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            questions: section.questions.map((q) =>
+              q.id === questionId
+                ? {
+                    ...q,
+                    [field]: value,
+                    ...(field === "questionType" && value === "fill_in"
+                      ? { options: [], likert: null }
+                      : {}),
+                    ...(field === "questionType" && value === "likert"
+                      ? { options: [], likert: null }
+                      : {}),
+                    ...(field === "questionType" &&
+                    (value === "multiple_choice" ||
+                      value === "multiple_selection") &&
+                    q.options.length === 0
+                      ? {
+                          options: [{ text: "", allowsCustomInput: false }],
+                          likert: null,
+                        }
+                      : {}),
+                  }
+                : q
+            ),
+          };
         }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("Error response:", data);
-        throw new Error("Failed to save question" || data.msg);
-      }
-      // Update question IDs from response
-      setQuestions((prevQuestions) =>
-        prevQuestions.map((q) => {
-          const serverQuestion = data.results.details.find(
-            (sq) => sq.question === q.questionText
-          );
-          return serverQuestion?.questionId
-            ? { ...q, questionId: serverQuestion.questionId }
-            : q;
-        })
-      );
-
-      toast.success("Questions saved successfully!" || data.msg);
-    } catch (error) {
-      toast.error("Faill to save questions");
-    } finally {
-      setIsSaving(false);
-    }
+        return section;
+      })
+    );
   };
-
-  const handlePostSubmit = async (e) => {
-    e.preventDefault();
-    setIsPosting(true);
-    setIsCheckingPayment(true);
+  // delete section
+  const deleteSection = (sectionId) => {
+    if (sections.length === 1) {
+      alert("You must have at least one section");
+      return;
+    }
 
     try {
-      await handleSave(); // Reuse bulk save logic
+      // Find section by local id
+      const section = sections.find((s) => s.id === sectionId);
 
-      // Check payment status before showing pricing modal
-      const isPaid = await verifyPayment(currentSurveyId, authToken);
-      setHasPaid(isPaid);
-
-      if (isPaid) {
-        // If payment verified, navigate directly to publish page
-        toast.success("Payment already verified!");
-        navigate("/publish");
-      } else {
-        // If not paid, show pricing modal
-        setShowPricingModal(true);
+      if (!section) {
+        throw new Error("Section not found");
       }
+
+      // Move questions from deleted section to the first remaining section
+      const remainingSections = sections.filter((s) => s.id !== sectionId);
+      let updatedSections = remainingSections;
+
+      if (remainingSections.length > 0 && section.questions.length > 0) {
+        const targetSection = remainingSections[0];
+        const questionsToMove = section.questions.map((q) => ({
+          ...q,
+          sectionId: targetSection.sectionId,
+        }));
+
+        updatedSections = remainingSections.map((s) =>
+          s.id === targetSection.id
+            ? {
+                ...s,
+                questions: [...s.questions, ...questionsToMove],
+              }
+            : s
+        );
+      }
+
+      updatedSections = updatedSections.map((s, index) => ({
+        ...s,
+        order: index + 1,
+      }));
+
+      setSections(updatedSections);
     } catch (error) {
-      toast.error("Error saving questions");
-    } finally {
-      setIsPosting(false);
-      setIsCheckingPayment(false);
+      console.error("Error deleting section:", error);
+      alert(error.message || "Error deleting section");
     }
   };
 
-  const addNewQuestion = (id) => {
+  // Add new question
+  const addNewQuestion = (sectionId) => {
     const newQuestion = {
-      id: Date.now(),
-      questionId: currentSurveyId,
+      id: `question_${Date.now()}_${Math.random()}`,
+      questionId: "",
       questionText: "",
       questionType: "multiple_choice",
       required: false,
       options: [{ text: "", allowsCustomInput: false }],
+      likert: null,
+      sectionId: sections.find((s) => s.id === sectionId)?.sectionId || null,
     };
-    setQuestions([...questions, newQuestion]);
+
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? { ...section, questions: [...section.questions, newQuestion] }
+          : section
+      )
+    );
+
+    setSelectedQuestion({ sectionId, questionId: newQuestion.id });
   };
 
-  const deleteQuestion = async (id) => {
-    setIsDeletingId(id); // Show loading state for specific question
-    try {
-      const questionToDelete = questions.find((q) => q.id === id);
-
-      if (questionToDelete.questionId) {
-        const response = await fetch(
-          // here
-          `${config.API_URL}/surveys/${currentSurveyId}/questions/${questionToDelete.questionId}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-              "Content-Type": "application/json",
-            },
+  // Delete question
+  const deleteQuestion = (sectionId, questionId) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          if (section.questions.length === 1) {
+            alert("You must have at least one question in a section");
+            return section;
           }
-        );
+          const newQuestions = section.questions.filter(
+            (q) => q.id !== questionId
+          );
 
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.message || "Failed to delete question");
+          if (selectedQuestion?.questionId === questionId) {
+            setSelectedQuestion({
+              sectionId,
+              questionId: newQuestions[0]?.id,
+            });
+          }
+
+          return { ...section, questions: newQuestions };
         }
-      }
-
-      setQuestions(questions.filter((question) => question.id !== id));
-      toast.success("Question deleted successfully");
-    } catch (error) {
-      toast.error(error.message || "Error deleting question");
-    } finally {
-      setIsDeletingId(null); // Clear loading state
-    }
-  };
-
-  const duplicateQuestion = (id) => {
-    const questionToDuplicate = questions.find((q) => q.id === id);
-    if (questionToDuplicate) {
-      const duplicatedQuestion = {
-        ...questionToDuplicate,
-        id: Date.now(),
-        // id: questions.length + 1,
-      };
-      setQuestions([...questions, duplicatedQuestion]);
-    }
-  };
-
-  const handleQuestionChange = (id, field, value) => {
-    const updatedQuestions = questions.map((q) =>
-      q.id === id
-        ? {
-            ...q,
-            [field]: value,
-            ...(field === "questionType" &&
-            (value === "fill_in" || value === "five_point")
-              ? { options: [] }
-              : {}),
-          }
-        : q
+        return section;
+      })
     );
-    setQuestions(updatedQuestions);
   };
 
-  const addOption = (id) => {
-    const updatedQuestions = questions.map((q) =>
-      q.id === id
-        ? {
-            ...q,
-            options: [...q.options, { text: "", allowsCustomInput: false }],
+  // Duplicate question
+  const duplicateQuestion = (sectionId, questionId) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          const questionToDuplicate = section.questions.find(
+            (q) => q.id === questionId
+          );
+          if (questionToDuplicate) {
+            const duplicatedQuestion = {
+              ...questionToDuplicate,
+              id: `question_${Date.now()}_${Math.random()}`,
+              questionId: "",
+              likert: questionToDuplicate.likert
+                ? { ...questionToDuplicate.likert }
+                : null,
+            };
+            return {
+              ...section,
+              questions: [...section.questions, duplicatedQuestion],
+            };
           }
-        : q
+        }
+        return section;
+      })
     );
-    setQuestions(updatedQuestions);
   };
 
-  const handleOptionChange = (questionId, index, field, value) => {
-    const updatedQuestions = questions.map((q) =>
-      q.id === questionId
-        ? {
-            ...q,
-            options: q.options.map((option, i) =>
-              i === index ? { ...option, [field]: value } : option
+  // Add option
+  const addOption = (sectionId, questionId) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            questions: section.questions.map((q) =>
+              q.id === questionId
+                ? {
+                    ...q,
+                    options: [
+                      ...q.options,
+                      { text: "", allowsCustomInput: false },
+                    ],
+                  }
+                : q
             ),
-          }
-        : q
+          };
+        }
+        return section;
+      })
     );
-    setQuestions(updatedQuestions);
   };
 
-  // Question Upload Function
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // Handle option change
+  const handleOptionChange = (sectionId, questionId, index, field, value) => {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            questions: section.questions.map((q) =>
+              q.id === questionId
+                ? {
+                    ...q,
+                    options: q.options.map((option, i) =>
+                      i === index ? { ...option, [field]: value } : option
+                    ),
+                  }
+                : q
+            ),
+          };
+        }
+        return section;
+      })
+    );
+  };
 
-    if (file.type !== "application/pdf") {
-      toast.error("Please upload a PDF file");
+  // Add new section
+  const addNewSection = () => {
+    const newSection = {
+      id: `section_${Date.now()}`,
+      sectionId: null,
+      title: `Section ${sections.length + 1}`,
+      description: "",
+      order: sections.length + 1,
+      questions: [
+        {
+          id: `question_${Date.now()}_${Math.random()}`,
+          questionId: "",
+          questionText: "",
+          questionType: "multiple_choice",
+          required: false,
+          options: [{ text: "", allowsCustomInput: false }],
+          likert: null,
+          sectionId: null,
+        },
+      ],
+    };
+    setSections([...sections, newSection]);
+  };
+
+  // Handle section change
+  const handleSectionChange = (sectionId, field, value) => {
+    setSections(
+      sections.map((s) => (s.id === sectionId ? { ...s, [field]: value } : s))
+    );
+  };
+
+  // Move question to section
+  const moveQuestionToSection = (
+    currentSectionId,
+    questionId,
+    targetSectionId
+  ) => {
+    if (currentSectionId === targetSectionId) return;
+
+    const currentSection = sections.find((s) => s.id === currentSectionId);
+    const targetSection = sections.find((s) => s.id === targetSectionId);
+    const question = currentSection?.questions.find((q) => q.id === questionId);
+
+    if (!question) return;
+
+    setSections(
+      sections.map((section) => {
+        if (section.id === currentSectionId) {
+          if (section.questions.length === 1) {
+            alert("You must have at least one question in a section");
+            return section;
+          }
+          return {
+            ...section,
+            questions: section.questions.filter((q) => q.id !== questionId),
+          };
+        } else if (section.id === targetSectionId) {
+          return {
+            ...section,
+            questions: [
+              ...section.questions,
+              {
+                ...question,
+                sectionId: targetSection.sectionId,
+              },
+            ],
+          };
+        }
+        return section;
+      })
+    );
+  };
+
+  // Likert scale functions
+  const openLikertModal = () => {
+    const question = getCurrentQuestion();
+    if (question && question.likert && question.likert.scale) {
+      setCurrentLikertScale([...question.likert.scale]);
+    } else {
+      setCurrentLikertScale([
+        { value: 1, label: "Strongly Disagree" },
+        { value: 2, label: "Disagree" },
+        { value: 3, label: "Neutral" },
+        { value: 4, label: "Agree" },
+        { value: 5, label: "Strongly Agree" },
+      ]);
+    }
+    setShowLikertModal(true);
+  };
+
+  const saveLikertScale = () => {
+    if (currentLikertScale.length === 0) {
+      alert("Likert scale must have at least one option");
       return;
     }
-    const formData = new FormData();
-    formData.append("document", file);
 
-    try {
-      setIsUploading(true);
-      setUploadProgress(30);
-
-      // Used Axios for the upload tracking
-      const response = await axios.post(
-        `${config.API_URL}/surveys/${currentSurveyId}/upload-questionnaire`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            setUploadProgress(percentCompleted);
-          },
-        }
+    if (selectedQuestion) {
+      handleQuestionChange(
+        selectedQuestion.sectionId,
+        selectedQuestion.questionId,
+        "likert",
+        { scale: currentLikertScale }
       );
-
-      if (response.data.status === "success") {
-        toast.success(response.data.msg);
-        // Refresh questions after successful upload
-        // here
-        const newQuestionsResponse = await axios.get(
-          `${config.API_URL}/surveys/${currentSurveyId}/questions`,
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-
-        const formattedQuestions = newQuestionsResponse.data.questions.map(
-          (q) => ({
-            id: Date.now() + Math.random(),
-            questionId: q._id,
-            questionText: q.questionText,
-            questionType: q.questionType,
-            required: q.required,
-            options: q.options.map((opt) => ({
-              text: typeof opt === "string" ? opt : opt.text,
-              allowsCustomInput:
-                typeof opt === "object"
-                  ? opt.allowsCustomInput || false
-                  : false,
-            })),
-          })
-        );
-
-        setQuestions(formattedQuestions);
-      }
-    } catch (error) {
-      console.error("File upload failed:", error);
-      toast.error(error.response?.data?.message || "Failed to upload PDF");
-    } finally {
-      setIsUploading(false);
-      setUploadProgress(0);
-      e.target.value = ""; // Reset file input
     }
+    setShowLikertModal(false);
   };
-  // DRAG & DROP
-  const handleDragEnd = (result) => {
-    if (!result.destination) return; // dropped outside
-    const reordered = reorder(
-      questions,
-      result.source.index,
-      result.destination.index
+
+  const addLikertScaleItem = () => {
+    const maxValue = Math.max(
+      ...currentLikertScale.map((item) => item.value),
+      0
     );
-    setQuestions(reordered);
+    setCurrentLikertScale([
+      ...currentLikertScale,
+      { value: maxValue + 1, label: "" },
+    ]);
   };
+
+  const removeLikertScaleItem = (index) => {
+    if (currentLikertScale.length <= 1) {
+      alert("Likert scale must have at least one option");
+      return;
+    }
+    const updatedScale = currentLikertScale
+      .filter((_, i) => i !== index)
+      .map((item, newIndex) => ({
+        ...item,
+        value: newIndex + 1,
+      }));
+    setCurrentLikertScale(updatedScale);
+  };
+
+  const updateLikertScaleItem = (index, field, value) => {
+    setCurrentLikertScale(
+      currentLikertScale.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  const currentQuestion = getCurrentQuestion();
+  const isDarkMode = selectedBgColor === "#000000";
 
   return (
-    <section className="form-page">
-      <div className="wrap">
-        <div className="surveyform-head flex">
-          <h1 className="head">Create Questionnaire</h1>
-          <div className="flex import_style">
-            <label className="import-survey">
-              {isUploading
-                ? `Uploading... ${uploadProgress}%`
-                : "Import from files"}
-              <input
-                type="file"
-                accept=".pdf"
-                name="document"
-                onChange={handleFileUpload}
-                style={{ display: "none" }}
-                disabled={isUploading}
-              />
-            </label>
-            <div className="theme-wrapper">
-              {/* Palette Icon (keep existing positioning in page layout) */}
-              <img
-                src={palette}
-                alt="palette"
-                className="palette-icon"
-                onClick={() => setShowTheme(!showTheme)}
-              />
+    <div className={`survey-form ${isDarkMode ? "dark-mode" : ""}`}>
+      {/* Top Bar */}
+      <div className="top-bar">
+        <div className="top-bar-content">
+          <h2>Create A Questionnaire</h2>
+          <button className="import-btn">Import from files</button>
+        </div>
+      </div>
 
-              {/* Theme side card */}
-              <div className={`form-theme ${showTheme ? "open" : ""}`}>
-                <div className="flex theme-head">
-                  <p>Style</p>
-                  <img
-                    src={close}
-                    alt="close"
-                    onClick={() => setShowTheme(false)}
-                  />
+      {/* Mobile Toggle Button */}
+      <div className="mobile-toggle-container">
+        <button
+          className="sidebar-toggle"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          ☰ <span>Set question type</span>
+        </button>
+      </div>
+
+      <div className="main-layout">
+        {/* Left Sidebar - Settings */}
+        <div
+          ref={sidebarRef}
+          className={`sidebar ${sidebarOpen ? "open" : "closed"}`}
+        >
+          <div className="sidebar-header-mobile">
+            <h3>Set question type</h3>
+            <button
+              className="sidebar-close"
+              onClick={() => setSidebarOpen(false)}
+            >
+              ×
+            </button>
+          </div>
+          <div className="sidebar-content">
+            <h3 className="sidebar-title-desktop">Edit Question</h3>
+
+            {currentQuestion ? (
+              <>
+                {/* Question Type */}
+                <div className="form-group">
+                  <label>Question Type</label>
+                  <select
+                    value={currentQuestion.questionType}
+                    onChange={(e) =>
+                      handleQuestionChange(
+                        selectedQuestion.sectionId,
+                        selectedQuestion.questionId,
+                        "questionType",
+                        e.target.value
+                      )
+                    }
+                  >
+                    <option value="multiple_choice">Multiple Choice</option>
+                    <option value="multiple_selection">
+                      Multiple Selection
+                    </option>
+                    <option value="fill_in">Short Text</option>
+                    <option value="likert">Likert Scale</option>
+                  </select>
                 </div>
 
-                <div className="theme-section">
-                  <p>Background Color</p>
+                {/* Required Question */}
+                <div className="form-group">
+                  <label>Required Question</label>
+                  <select
+                    value={currentQuestion.required ? "Yes" : "No"}
+                    onChange={(e) =>
+                      handleQuestionChange(
+                        selectedQuestion.sectionId,
+                        selectedQuestion.questionId,
+                        "required",
+                        e.target.value === "Yes"
+                      )
+                    }
+                  >
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
                 </div>
 
-                <div className="theme-section">
-                  <p>Font Family</p>
+                {/* Move to Section */}
+                <div className="form-group">
+                  <label>Move to Section</label>
+                  <select
+                    value={selectedQuestion.sectionId}
+                    onChange={(e) =>
+                      moveQuestionToSection(
+                        selectedQuestion.sectionId,
+                        selectedQuestion.questionId,
+                        e.target.value
+                      )
+                    }
+                  >
+                    {sections.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.title || `Section ${sections.indexOf(s) + 1}`}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              </div>
-            </div>
+
+                {/* Likert Scale Config */}
+                {currentQuestion.questionType === "likert" && (
+                  <div className="form-group">
+                    <button onClick={openLikertModal} className="likert-btn">
+                      {currentQuestion.likert && currentQuestion.likert.scale
+                        ? `Edit Scale (${currentQuestion.likert.scale.length} items)`
+                        : "Set Likert Scale"}
+                    </button>
+                  </div>
+                )}
+
+                {/* Background Color */}
+                <div className="form-group">
+                  <label>Background Color</label>
+                  <div className="color-picker">
+                    {backgroundColors.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => setSelectedBgColor(color)}
+                        className={`color-option ${
+                          selectedBgColor === color ? "active" : ""
+                        }`}
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Font Family */}
+                <div className="form-group">
+                  <label>Font Family</label>
+                  <select
+                    value={selectedFont}
+                    onChange={(e) => setSelectedFont(e.target.value)}
+                  >
+                    {fontFamilies.map((font) => (
+                      <option key={font} value={font}>
+                        {font}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            ) : (
+              <p className="no-selection">
+                Select a question to edit its settings
+              </p>
+            )}
           </div>
         </div>
-        <div className="question-box">
-          {isLoading ? (
-            <div className="loading">Loading questions...</div>
-          ) : (
-            <div className="form-container">
-              <Form
-                method="post"
-                action="/surveyquestion"
-                onSubmit={handlePostSubmit}
-              >
-                <h1 form-title>Title of my Survey will appear here</h1>
-                {/* To pass id to action */}
-                <input
-                  type="hidden"
-                  name="currentSurveyId"
-                  value={currentSurveyId}
+
+        {/* Main Content Area */}
+        <div className="content-area">
+          {sections.map((section) => (
+            <div key={section.id} className="section-card">
+              {/* Section Header */}
+              <div className="section-header-input flex">
+                <div className="section-head-box">
+                  <input
+                    type="text"
+                    value={section.title}
+                    onChange={(e) =>
+                      handleSectionChange(section.id, "title", e.target.value)
+                    }
+                    placeholder="Section Title"
+                    className="section-title"
+                  />
+                  {section.description !== undefined && (
+                    <input
+                      type="text"
+                      value={section.description}
+                      onChange={(e) =>
+                        handleSectionChange(
+                          section.id,
+                          "description",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Section Description (optional)"
+                      className="section-description"
+                    />
+                  )}
+                </div>
+                <img
+                  src={del}
+                  className="delete-icon"
+                  alt="Delete Section"
+                  onClick={() => deleteSection(section.id)}
+                  title="Delete Section"
                 />
-                {/* ✅ DragDropContext wrapper */}
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="questions">
-                    {(provided) => (
-                      <div {...provided.droppableProps} ref={provided.innerRef}>
-                        {questions.map((question, index) => {
-                          const isActive = activeQuestionId === question.id;
-                          return (
-                            <Draggable
-                              key={question.id}
-                              draggableId={question.id.toString()}
-                              index={index}
-                            >
-                              {(provided, snapshot) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  className={`oneQuestion ${
-                                    isActive ? "active" : ""
-                                  } ${snapshot.isDragging ? "dragging" : ""}`}
-                                  onClick={() =>
-                                    handleFocusQuestion(question.id)
-                                  }
-                                >
-                                  {/* 🔢 Add numbering */}
-                                  <div className="flex num-drag">
-                                    <div className="question-number">
-                                      Q{index + 1}.
-                                    </div>
-                                    <div
-                                      className="drag-handle"
-                                      {...provided.dragHandleProps}
-                                    >
-                                      <div></div>
-                                      <div></div>
-                                      <div></div>
-                                      <div></div>
-                                      <div></div>
-                                      <div></div>
-                                      {/* <div></div><div></div><div></div> */}
-                                    </div>
-                                  </div>
+              </div>
 
-                                  {/* <div
-      className={`oneQuestion ${isActive ? "active" : ""}`}
-      key={question.id}
-      onClick={() => handleFocusQuestion(question.id)}
-    > */}
+              {/* Questions */}
+              {section.questions.map((question, qIndex) => (
+                <div
+                  key={question.id}
+                  onClick={() =>
+                    setSelectedQuestion({
+                      sectionId: section.id,
+                      questionId: question.id,
+                    })
+                  }
+                  className={`question-card ${
+                    selectedQuestion?.questionId === question.id
+                      ? "selected"
+                      : ""
+                  }`}
+                >
+                  {/* Question Header */}
+                  <div className="question-header">
+                    <div className="question-title-area">
+                      <div className="survey-q-btn flex">
+                        <span className="question-number">Q{qIndex + 1}</span>
+                        <div className="question-actions">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              duplicateQuestion(section.id, question.id);
+                            }}
+                            className="icon-btn"
+                            title="Duplicate"
+                          >
+                            <img src={copy} alt="Copy" className="copy-icon" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteQuestion(section.id, question.id);
+                            }}
+                            className="icon-btn delete"
+                            title="Delete"
+                          >
+                            <img src={del} className="delete-icon" />
+                          </button>
+                        </div>
+                      </div>
+                      <input
+                        type="text"
+                        value={question.questionText}
+                        onChange={(e) =>
+                          handleQuestionChange(
+                            section.id,
+                            question.id,
+                            "questionText",
+                            e.target.value
+                          )
+                        }
+                        onClick={(e) => e.stopPropagation()}
+                        placeholder="Untitled Question"
+                        className="question-input"
+                      />
+                    </div>
+                  </div>
 
-                                  {isActive ? (
-                                    <>
-                                      <div className="question-field flex">
-                                        <input
-                                          className="question-input"
-                                          type="text"
-                                          name="questionText"
-                                          required
-                                          placeholder="Question title"
-                                          value={question.questionText}
-                                          onChange={(e) =>
-                                            handleQuestionChange(
-                                              question.id,
-                                              "questionText",
-                                              e.target.value
-                                            )
-                                          }
-                                          onBlur={handleBlurQuestion}
-                                        />
-                                        <div className="question-actions flex">
-                                          <img
-                                            src={copy}
-                                            className="copy-icon"
-                                            alt="Duplicate"
-                                            onClick={() =>
-                                              duplicateQuestion(question.id)
-                                            }
-                                          />
-                                          {isDeletingId === question.id ? (
-                                            <span className="deleting-spinner">
-                                              Deleting...
-                                            </span>
-                                          ) : (
-                                            <img
-                                              src={del}
-                                              className="delete-icon"
-                                              alt="Delete"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                deleteQuestion(question.id);
-                                              }}
-                                            />
-                                          )}
-                                        </div>
-                                      </div>
+                  {/* Options for multiple choice/selection */}
+                  {(question.questionType === "multiple_choice" ||
+                    question.questionType === "multiple_selection") && (
+                    <div
+                      className="options-area"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {question.options.map((option, optIndex) => (
+                        <div key={optIndex} className="option-row">
+                          <span
+                            className={`option-indicator ${
+                              question.questionType === "multiple_choice"
+                                ? "radio"
+                                : "checkbox"
+                            }`}
+                          />
+                          <input
+                            type="text"
+                            value={option.text}
+                            onChange={(e) =>
+                              handleOptionChange(
+                                section.id,
+                                question.id,
+                                optIndex,
+                                "text",
+                                e.target.value
+                              )
+                            }
+                            placeholder={`Option ${optIndex + 1}`}
+                            className="option-input"
+                          />
+                          <label className="custom-input-label">
+                            <input
+                              type="checkbox"
+                              checked={option.allowsCustomInput}
+                              onChange={(e) =>
+                                handleOptionChange(
+                                  section.id,
+                                  question.id,
+                                  optIndex,
+                                  "allowsCustomInput",
+                                  e.target.checked
+                                )
+                              }
+                            />
+                            <span>Custom input</span>
+                          </label>
+                        </div>
+                      ))}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addOption(section.id, question.id);
+                        }}
+                        className="add-option-btn"
+                      >
+                        + Add option
+                      </button>
+                    </div>
+                  )}
 
-                                      <div className="choice-field custom-dropdown flexx">
-                                        <div className="wrap-icon type-row flex">
-                                          <img
-                                            src={dot}
-                                            className="dot-icon"
-                                            alt="Dot"
-                                          />
-                                          <select
-                                            name="questionType"
-                                            value={question.questionType}
-                                            onChange={(e) =>
-                                              handleQuestionChange(
-                                                question.id,
-                                                "questionType",
-                                                e.target.value
-                                              )
-                                            }
-                                            className="choice-select"
-                                          >
-                                            <option value="multiple_choice">
-                                              Multiple Choice
-                                            </option>
-                                            <option value="multiple_selection">
-                                              Multiple Selection
-                                            </option>
-                                            <option value="fill_in">
-                                              Fill in
-                                            </option>
-                                            <option value="five_point">
-                                              Five Point
-                                            </option>
-                                          </select>
-                                        </div>
-
-                                        {(question.questionType ===
-                                          "multiple_choice" ||
-                                          question.questionType ===
-                                            "multiple_selection") && (
-                                          <div className="options-list flex">
-                                            {question.options.map(
-                                              (option, index) => (
-                                                <div
-                                                  className="option-row flex"
-                                                  key={index}
-                                                >
-                                                  <input
-                                                    type="text"
-                                                    placeholder={`Option ${
-                                                      index + 1
-                                                    }`}
-                                                    value={option.text}
-                                                    onChange={(e) =>
-                                                      handleOptionChange(
-                                                        question.id,
-                                                        index,
-                                                        "text",
-                                                        e.target.value
-                                                      )
-                                                    }
-                                                    className="option-input"
-                                                  />
-                                                  <div className="flex">
-                                                    <label className="custom-input-checkbox switch">
-                                                      <input
-                                                        type="checkbox"
-                                                        checked={
-                                                          option.allowsCustomInput
-                                                        }
-                                                        onChange={(e) =>
-                                                          handleOptionChange(
-                                                            question.id,
-                                                            index,
-                                                            "allowsCustomInput",
-                                                            e.target.checked
-                                                          )
-                                                        }
-                                                      />
-                                                      <span className="slider"></span>
-                                                    </label>
-                                                    <p className="switch-label-txt">
-                                                      Allow custom input
-                                                    </p>
-                                                  </div>
-                                                </div>
-                                              )
-                                            )}
-                                            <button
-                                              className="option-select flex"
-                                              type="button"
-                                              onClick={() =>
-                                                addOption(question.id)
-                                              }
-                                            >
-                                              Add option
-                                            </button>
-                                          </div>
-                                        )}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    //  Collapsed Preview Mode
-                                    <div className="collapsed-preview">
-                                      <p className="preview-question">
-                                        {question.questionText ||
-                                          "Untitled Question"}
-                                      </p>
-                                      {question.options &&
-                                        question.options.length > 0 && (
-                                          <ul className="preview-options">
-                                            {question.options.map((opt, i) => (
-                                              <li key={i}>
-                                                {opt.text ||
-                                                  "Option " + (i + 1)}
-                                              </li>
-                                            ))}
-                                          </ul>
-                                        )}
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </Draggable>
-                          );
-                        })}
-                        {provided.placeholder}
+                  {/* Likert Scale Preview */}
+                  {question.questionType === "likert" &&
+                    question.likert &&
+                    question.likert.scale && (
+                      <div className="likert-preview">
+                        {question.likert.scale.map((item, idx) => (
+                          <span key={idx} className="likert-item">
+                            {item.value}: {item.label}
+                          </span>
+                        ))}
                       </div>
                     )}
-                  </Droppable>
-                </DragDropContext>
-
-                <button className="next-question flex" onClick={addNewQuestion}>
-                  <img src={add_circle} alt="Add" /> Add Question
-                </button>
-
-                <div className="button-group flex">
-                  <button
-                    type="button"
-                    className="save-btn"
-                    onClick={handleSave}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? "Saving..." : "Save"}
-                  </button>
-
-                  <button
-                    type="submit"
-                    className="post-btn"
-                    disabled={isPosting}
-                  >
-                    {isPosting ? "Publishng..." : "Publish"}
-                  </button>
                 </div>
-              </Form>
+              ))}
+              {/* Add Question Button */}
+              <div className="add-new-btn flex">
+                <button
+                  onClick={() => addNewQuestion(section.id)}
+                  className="add-question-btn flex"
+                >
+                  <img src={plus} /> Add Question
+                </button>
+              </div>
             </div>
-          )}
+          ))}
 
-          <div className="form-theme">
-            <div className="flex theme-head">
-              <p>Style</p>
-              <img src={close} alt="" />
-            </div>
-            <div>
-              <p>Background Color</p>
-            </div>
-            <div>
-              <p>Font Family</p>
-            </div>
+          {/* Add Section Button */}
+          <button onClick={addNewSection} className="add-section-btn flex">
+            <img src={plus} /> <p>Add Section</p>
+          </button>
+
+          {/* Action Buttons */}
+          <div className="action-buttons survey-ques-action">
+            <button className="save-btn">Save</button>
+            <button className="post-btn">Post</button>
           </div>
         </div>
       </div>
 
-      {showPricingModal && (
-        <PricingModal onClose={() => setShowPricingModal(false)} />
-      )}
+      {/* Likert Scale Modal */}
+      {showLikertModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowLikertModal(false)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Configure Likert Scale</h3>
+              <button
+                onClick={() => setShowLikertModal(false)}
+                className="modal-close"
+              >
+                ×
+              </button>
+            </div>
 
-      {showSaveSuccessModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Success!</h3>
-            <p>Your questions have been saved successfully.</p>
-            <button
-              className="modal-btn"
-              onClick={() => setShowSaveSuccessModal(false)}
-            >
-              Continue Editing
-            </button>
+            <div className="modal-body">
+              {currentLikertScale.map((item, index) => (
+                <div key={index} className="likert-scale-item">
+                  <input
+                    type="number"
+                    value={item.value}
+                    onChange={(e) =>
+                      updateLikertScaleItem(
+                        index,
+                        "value",
+                        parseInt(e.target.value) || 0
+                      )
+                    }
+                    className="likert-value-input"
+                    placeholder="Value"
+                  />
+                  <input
+                    type="text"
+                    value={item.label}
+                    onChange={(e) =>
+                      updateLikertScaleItem(index, "label", e.target.value)
+                    }
+                    className="likert-label-input"
+                    placeholder="Label"
+                  />
+                  {currentLikertScale.length > 1 && (
+                    <button
+                      onClick={() => removeLikertScaleItem(index)}
+                      className="remove-likert-btn"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button onClick={addLikertScaleItem} className="add-likert-btn">
+                Add Scale Item
+              </button>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                onClick={() => setShowLikertModal(false)}
+                className="modal-cancel-btn"
+              >
+                Cancel
+              </button>
+              <button onClick={saveLikertScale} className="modal-save-btn">
+                Save Scale
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 };
 
