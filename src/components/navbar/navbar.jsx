@@ -110,7 +110,7 @@ const Navbar = () => {
                 <li className="header-w2-item hide header-w2-main">
                   <NavLink className="header-w2-link" to="/signup">
                     Sign Up
-                  </NavLink>
+                  </NavLink>P
                 </li> */}
               </>
             )}
