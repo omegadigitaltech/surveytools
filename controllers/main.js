@@ -63,7 +63,8 @@ const createSurvey = async (req, res, next) => {
       description,
       preferred_participants,
       gender,
-      no_of_participants
+      no_of_participants,
+      max_faculty_participants: req.body.max_faculty_participants // Add this line
     }], { session });
 
     // Then populate the user data
@@ -138,6 +139,26 @@ const updateAnswer = async (req, res, next) => {
       await session.abortTransaction();
       session.endSession();
       return res.status(400).json({ status: "failure", code: 400, msg: 'Survey has reached maximum participants' });
+    }
+
+    // Check max_faculty_participants limit
+    if (survey.max_faculty_participants && survey.max_faculty_participants > 0) {
+      if (!survey.faculty_participants) {
+        survey.faculty_participants = new Map();
+      }
+
+      const userFaculty = user.faculty;
+      const currentFacultyCount = survey.faculty_participants.get(userFaculty) || 0;
+
+      if (currentFacultyCount >= survey.max_faculty_participants) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(400).json({
+          status: "failure",
+          code: 400,
+          msg: `Maximum number of participants for faculty '${userFaculty}' has been reached`
+        });
+      }
     }
 
     // Validate response for five_point and multiple_choice questions
@@ -347,6 +368,31 @@ const submitAnswers = async (req, res, next) => {
         code: 400,
         msg: `This survey is only open to ${survey.gender} participants`
       });
+    }
+
+    // Check max_faculty_participants limit
+    if (survey.max_faculty_participants && survey.max_faculty_participants > 0) {
+      // Ensure faculty_participants is initialized
+      if (!survey.faculty_participants) {
+        survey.faculty_participants = new Map();
+      }
+
+      const userFaculty = user.faculty;
+      // Get current count, considering case-insensitivity if needed, but Map keys are case-sensitive.
+      // Assuming faculty names are standardized or we rely on exact match. 
+      // Ideally should normalize, but following existing patterns if any. 
+      // User model uses "faculty" string.
+      const currentFacultyCount = survey.faculty_participants.get(userFaculty) || 0;
+
+      if (currentFacultyCount >= survey.max_faculty_participants) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(400).json({
+          status: "failure",
+          code: 400,
+          msg: `Maximum number of participants for faculty '${userFaculty}' has been reached`
+        });
+      }
     }
 
     // Check preferred participants requirements
@@ -640,6 +686,15 @@ const submitAnswers = async (req, res, next) => {
     survey.participants += 1;
     survey.submittedUsers.push(user._id);
 
+    // Update faculty count
+    if (user.faculty) {
+      if (!survey.faculty_participants) {
+        survey.faculty_participants = new Map();
+      }
+      const currentCount = survey.faculty_participants.get(user.faculty) || 0;
+      survey.faculty_participants.set(user.faculty, currentCount + 1);
+    }
+
     await survey.save({ session });
 
     // Add points to user's balance only if point_per_user is a valid number
@@ -700,6 +755,19 @@ const checkSurveyMaxParticipants = async (req, res, next) => {
 
     if (survey.participants >= survey.no_of_participants) {
       return res.status(200).json({ status: "success", code: 200, maxReached: true });
+    }
+
+    // Check faculty limit if user is logged in
+    if (req.userId) {
+      const user = await User.findOne({ id: req.userId });
+      if (user && survey.max_faculty_participants && survey.max_faculty_participants > 0) {
+        const userFaculty = user.faculty;
+        const currentFacultyCount = (survey.faculty_participants && survey.faculty_participants.get(userFaculty)) || 0;
+
+        if (currentFacultyCount >= survey.max_faculty_participants) {
+          return res.status(200).json({ status: "success", code: 200, maxReached: true, reason: 'faculty_limit' });
+        }
+      }
     }
 
     res.status(200).json({ status: "success", code: 200, maxReached: false });

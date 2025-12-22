@@ -10,8 +10,8 @@ const { Schema } = mongoose;
 const answerSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   fullname: { type: String, required: [true, "Username is required"] },
-  response: { 
-    type: Schema.Types.Mixed, 
+  response: {
+    type: Schema.Types.Mixed,
     required: [true, "Response field is required"],
     // Can be either a string (for single responses) or an array of strings (for multiple_selection)
   }
@@ -19,23 +19,25 @@ const answerSchema = new Schema({
 
 // Define the schema for survey options
 const optionSchema = new Schema({
-  text: { type: String,  required: [true, "Option text is required"]},
+  text: { type: String, required: [true, "Option text is required"] },
   allowsCustomInput: { type: Boolean, default: false } // New field to indicate if this option allows custom text input
 });
 
 // Define the schema for survey questions
 const questionSchema = new Schema({
   questionText: { type: String, required: [true, "Quest≥ion Text is required"] },
-  questionType: { type: String, required: [true, "Question Type is required"], enum: {
-    values: ['multiple_choice', 'five_point', 'fill_in', 'multiple_selection'],
-    message: 'Question type must be either "multiple_choice", "five_point", "fill_in", or "multiple_selection"'
-  }},
+  questionType: {
+    type: String, required: [true, "Question Type is required"], enum: {
+      values: ['multiple_choice', 'five_point', 'fill_in', 'multiple_selection'],
+      message: 'Question type must be either "multiple_choice", "five_point", "fill_in", or "multiple_selection"'
+    }
+  },
   required: { type: Boolean, default: false },
   sectionId: { type: Schema.Types.ObjectId, ref: 'Section', default: null },
   options: {
-    type:[optionSchema], // Only for multiple_choice and multiple_selection questions
+    type: [optionSchema], // Only for multiple_choice and multiple_selection questions
     validate: {
-      validator: function(options) {
+      validator: function (options) {
         if (this.questionType === 'multiple_choice' || this.questionType === 'multiple_selection') {
           return options && options.length > 0;
         }
@@ -64,51 +66,62 @@ const questionSchema = new Schema({
 
 // Define the schema for the survey
 const surveySchema = new Schema({
-    user_id:{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: [true, "User ID is required"]
-    },
-    title: {
-     type: String,
-     required: [true, "Title field is required"]
-    },
-    no_of_participants: {
-     type: Number,
-     default: 0
-    },
-    gender: {
-     type: String,
-     required: [true, "Gender is required"]
-    },
-    preferred_participants: {
-     type: Array,
-     required: [true, "Preferred participants is required"]
-    },
-    amount_to_be_paid: {
-     type: Number,
-    },
-    point_per_user: {
-      type:Number,
-    },
-    description: { type: String, required: [true, "Description Field is required"]},
-    submittedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Track users who submitted the survey
-    questions: [questionSchema],// reference question documents
-    published: { type: Boolean, default: false },
-    link: { type: String, default: '' },
-    
-    // Payment tracking fields
-    isPaid: { type: Boolean, default: false },
-    paymentAmount: { type: Number },
-    paymentDate: { type: Date },
-    
-    // Unpublish tracking fields
-    unpublishedAt: { type: Date },
-    unpublishedBy: { type: String }, // 'admin' or 'user'
-    unpublishReason: { type: String },
-    
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, "User ID is required"]
+  },
+  title: {
+    type: String,
+    required: [true, "Title field is required"]
+  },
+  no_of_participants: {
+    type: Number,
+    default: 0
+  },
+  max_faculty_participants: {
+    type: Number,
+    default: 0
+    // Optional: if not set (undefined or null), no limit per faculty
+  },
+  // Track count per faculty: e.g. { "Engineering": 10, "Science": 5 }
+  faculty_participants: {
+    type: Map,
+    of: Number,
+    default: {}
+  },
+  gender: {
+    type: String,
+    required: [true, "Gender is required"]
+  },
+  preferred_participants: {
+    type: Array,
+    required: [true, "Preferred participants is required"]
+  },
+  amount_to_be_paid: {
+    type: Number,
+  },
+  point_per_user: {
+    type: Number,
+  },
+  description: { type: String, required: [true, "Description Field is required"] },
+  submittedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Track users who submitted the survey
+  questions: [questionSchema],// reference question documents
+  published: { type: Boolean, default: false },
+  link: { type: String, default: '' },
+
+  // Payment tracking fields
+  isPaid: { type: Boolean, default: false },
+  paymentAmount: { type: Number },
+  paymentDate: { type: Date },
+
+  // Unpublish tracking fields
+  unpublishedAt: { type: Date },
+  unpublishedBy: { type: String }, // 'admin' or 'user'
+  unpublishReason: { type: String },
+
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
 // Create an index on questions.questionId
@@ -117,4 +130,4 @@ surveySchema.index({ 'questions.questionId': 1 });
 const Survey = mongoose.model('Survey', surveySchema);
 
 
-module.exports = {Survey};
+module.exports = { Survey };
