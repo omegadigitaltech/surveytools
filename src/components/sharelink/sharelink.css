@@ -1,62 +1,231 @@
-.share-box {
-  border: 1px solid rgb(209, 209, 209);
-  /* max-width: 400px; */
-  width: 60%;
-  padding: 2.75rem;
-  border-radius: 1rem;
-  text-align: center;
+/* CHeck this later */
+.logout-box {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(22, 28, 36, 0.45);
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 1.5rem 0;
+}
+
+/* ===== Modal ===== */
+.share-box.publish-modal {
+  border: none;
+  max-width: 560px;
+  width: 92%;
+  padding: 2rem 2.25rem;
+  border-radius: 12px;
   background: #fff;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  position: relative;
+  display: flex;
   flex-direction: column;
-  align-items: flex-start !important;
   gap: 1rem;
-  z-index: 1001;
+  align-items: center;
+  max-height: none;
 }
-.share-box h2 {
-  font-size: 1rem;
-  font-weight: 500;
+
+.close-share-btn {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #666;
 }
-/* .share-box p {
-    font-size: 1rem;
-    font-weight: 500;
-    margin-bottom: 1.5rem;
-} */
-.share-link {
+
+.publish-icon-wrap {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #f6fffa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.publish-done-icon {
+  width: 60px;
+  height: 60px;
+}
+
+.publish-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #111;
+  text-align: center;
+}
+
+.share-section {
   width: 100%;
-  justify-content: space-between;
-  border: 1px solid rgb(209, 209, 209);
-  padding: 0.5rem;
-  border-radius: 0.5rem;
 }
-.link-in {
-  width: 2.6rem;
+
+.share-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.4rem;
+  display: block;
 }
+
+.share-link-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  border: 1px solid #e0e0e0;
+  padding: 0.55rem;
+  border-radius: 8px;
+}
+
+.gen-link {
+  flex: 1;
+  word-break: break-all;
+  font-size: 0.9rem;
+}
+
+.share-link-row .icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.embed-code {
+  width: 100%;
+  resize: none;
+  border: 1px solid #e6e6e6;
+  padding: 0.6rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: #fafafa;
+  font-family: monospace;
+}
+.share-textarea-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.copy-embed-btn {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  background: white;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  padding: 0.3rem 0.4rem;
+
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-embed-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.share-via {
+  width: 100%;
+}
+
+.share-via-text {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
 .share-icons {
-  gap: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.share-icons img,svg {
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+  cursor: pointer;
+}
+
+
+.publish-footer {
+  width: 100%;
+}
+
+.share-done-btn {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--base) !important;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.share-done-btn:hover {
+  background: var(--secondary-blue) !important;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @media (max-width: 900px) {
-  .share-box {
-    width: 90%;
+  .logout-box {
+    align-items: flex-start;
+    padding-top: 2rem;
   }
-}
-@media (max-width: 580px) {
-  .share-box {
+
+  .share-box.publish-modal {
     width: 95%;
-    padding: 1rem;
-  }
-  .share-box h2 {
-    font-size: .9rem;
-  }
-  .share-box p {
-    font-size: .85rem;
-  }
-  .share-link {
-    font-size: .85rem;
-  }
-  .share-box img{
-    width: 1rem;
-  }
-  .link-in {
-    width: 2rem !important;
+    padding: 1.5rem;
   }
 }
+
+@media (max-width: 600px) {
+  .logout-box {
+    padding: 1rem 0.5rem;
+  }
+
+  .share-box.publish-modal {
+    padding: 1.25rem;
+    border-radius: 10px;
+  }
+
+  .publish-icon-wrap {
+    width: 72px;
+    height: 72px;
+  }
+
+  .publish-done-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .publish-title {
+    font-size: 1rem;
+  }
+
+  .share-icons img {
+    width: 32px;
+    height: 32px;
+  }
+}
+@media (max-width: 480px) {
+    .share-box.publish-modal {
+     width: 100%;
+    }
+    .close-share-btn {
+font-size: 1.4rem;
+    }
+.share-done-btn {
+  font-size: .8rem;
+}
+  }
