@@ -9,6 +9,8 @@ import backaro from "../../assets/img/backaro.svg";
 import dept from "../../assets/img/blu-dept.svg";
 import partps from "../../assets/img/partps.svg";
 import members from "../../assets/img/members.svg";
+import responsehero from "../../assets/img/responsehero.png";
+import clock from "../../assets/img/clock.svg";
 
 import "./expandsurvey.css"
 
@@ -146,115 +148,87 @@ const expandsurvey = () => {
 
   return (
     <section className="expand">
-      <div className="expand_inner wrap">
-        <Link to="/dashboard"> <img src={backaro} className="backaro" /></Link>
-        <div className="post_time flex">
-          <p className="posted">Posted {new Date(survey.createdAt).toLocaleString()}</p>
-          <p className="duration">points to earn</p>
-        </div>
-        <div className="survey_details expand_info flex">
-          <h3 className="survey_title expand_title">{survey.title}</h3>
-          <h4 className="point">{survey.point_per_user || 0} points</h4>
-        </div>
-        <div className="description">
-          <h4>Description</h4>
-          <p>{survey.description}
-          </p>
-        </div>
-        <div className="pre_participants">
-          <h4>Preferred participants</h4>
-          <ul>
-            {survey.preferred_participants}
-          </ul>
-        </div>
-        <div className="activities">
-          <h4>Activities on this survey</h4>
-          <div className="activity_row center flex">
-            <li className="">Total participant required</li>
-            <p className="required_no"> <span className="participant_no">{survey.no_of_participants}</span> <span className="exp-mobile">Participants</span> </p>
-          </div>
-          <div className="activity_row center flex">
-            <li className="">Participated</li>
-            <p className="required_no"><span className="participant_no">{survey.participantCounts.filled || 0}</span> <span className="exp-mobile">Participated</span> </p>
-          </div>
-          <div className="activity_row center flex">
-            <li className="">No. of participants left</li>
-            <p className="required_no"> <span className="participant_no"> {survey.participantCounts.remaining|| 0}</span>{" "}</p>
-          </div>
-        </div>
+  <div className="expand_inner wrap">
 
-        <div className="expand_class flex">
-          <div className="dept flex">
-            <img src={dept} alt="" />
-            <h4 className="department"><span className="dept">{survey.institution || "N/A"}</span></h4>
-          </div>
-          <div className="participants flex">
-            <img src={members} alt="" />
-            <p> <span className="num_participant">{survey.participantCounts.filled  || 0}</span> Participants</p>
-          </div>
-        </div>
-        <div className="flex btn_div">
-          {isOwnSurvey ? (
-            <>
-              {survey.published ? (
-                <div className="published-buttons-container">
-                  <div className="published-buttons flex">
-                    <button 
-                      className="edit-btn btn"
-                      onClick={handleEditClick}
-                    >
-                      Edit Survey
-                    </button>
-                    <button 
-                      className="insights-btn btn"
-                      onClick={handleInsightsClick}
-                    >
-                      View Insights
-                    </button>
-                  </div>
-                  <button 
-                    className="unpublish-btn btn"
-                    onClick={handleUnpublishClick}
-                    disabled={isUnpublishing}
-                  >
-                    {isUnpublishing ? "Unpublishing..." : "Unpublish Survey"}
-                  </button>
-                </div>
-              ) : (
-                <button 
-                  className="start-btn btn"
-                  onClick={handleActionClick}
-                >
-                  Edit Survey
-                </button>
-              )}
-            </>
-          ) : (
-            <button 
-              className="start-btn btn" 
-              onClick={async () => {
-                try {
-                  await validateSurveyAccess(survey, userDetails?.id, userDetails, authToken);
-                  navigate(`/answersurvey/${id}`, {
-                    state: {
-                      title: survey.title,
-                      createdAt: survey.createdAt,
-                      points: survey.point_per_user,
-                    }
-                  });
-                } catch (error) {
-                  toast.error(error.message);
-                }
-              }}
-            >
-              Start Survey
-            </button>
-          )}
-        </div>
-        
+   <div className="sur-details-top flex">
+<Link to="/dashboard" className="back-link">
+      <img src={backaro} className="backaro" alt="Back" />
+    </Link>
+    <h2 className="page-title">Survey Details</h2>
+   </div>
+    
+    <div className="survey-hero">
+      <img src={responsehero} alt="Survey hero" />
+    </div>
+    <h3 className="survey-title">{survey.title}</h3>
 
+    <div className="survey-meta flex">
+      <div className="expand-chip">
+        {/* <img src={partps} alt="" /> */}
+        <span>{survey.point_per_user || 0}pts</span>
       </div>
-    </section>
+      <div className="expand-chip expand-clock">
+        <img src={clock} alt="" />
+        <span>7mins</span>
+      </div>
+    </div>
+
+    <p className="survey-description">
+      {survey.description}
+    </p>
+
+    <div className="survey-stats">
+      <div className="flex survey-stats-info">
+        <h4>Preferred Participants</h4>
+        <p className="fw-5h">{survey.institution || "N/A"}</p>
+      </div>
+
+      <div className="flex survey-stats-info">
+        <h4>Total Participants required</h4>
+        <p className="fw-5h">{survey.no_of_participants}</p>
+      </div>
+
+      <div className="flex survey-stats-info">
+        <h4>Total Participated</h4>
+        <p className="fw-5h">{survey.participantCounts?.filled || 0}</p>
+      </div>
+    </div>
+    <div className="btn_div">
+      {isOwnSurvey ? (
+        <button className="start-btn btn" onClick={handleEditClick}>
+          Edit Survey
+        </button>
+      ) : (
+        <button
+          className="start-btn btn"
+          onClick={async () => {
+            try {
+              await validateSurveyAccess(
+                survey,
+                userDetails?.id,
+                userDetails,
+                authToken
+              );
+              navigate(`/answersurvey/${id}`, {
+                state: {
+                  title: survey.title,
+                  createdAt: survey.createdAt,
+                  points: survey.point_per_user,
+                },
+              });
+            } catch (error) {
+              toast.error(error.message);
+            }
+          }}
+        >
+          Start Survey
+        </button>
+      )}
+    </div>
+
+  </div>
+</section>
+
   )
 }
 export default expandsurvey;
