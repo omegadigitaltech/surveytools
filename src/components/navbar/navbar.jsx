@@ -1,3 +1,4 @@
+
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import iconBell from "../../assets/img/icon-bell.svg";
@@ -66,7 +67,7 @@ const Navbar = () => {
                 Blog
               </NavLink>
             </li>
-            
+
             {/* <li className="header-w2-item hide">
               <NavLink className="header-w2-link" to="/">
                 About Us
