@@ -1,418 +1,143 @@
-.loading_survey {
-    text-align: center;
-    font-size: 1.2rem;
-    font-style: italic;
-    margin: 3rem 0;
-}
-.survey_details{
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-}
-.expand_class {
-    flex-wrap: wrap;
-}
-
-.expand p {
-    margin-bottom: 0rem;
-}
-
-.center {
-    align-items: center;
-    justify-content: space-between;
-}
-
 .expand {
-    margin-bottom: 4rem;
+  padding-bottom: 4rem;
+}
+.sur-details-top {
+  position: relative;
+  margin: 2rem 0;
+}
+.expand .back-link {
+  display: inline-block;
+  z-index: 2;
+}
+.expand .page-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  font-weight: 600;
+  left: 50%;
 }
 
-.backaro {
-    width: .7rem;
-    margin: 2.5rem 0;
+.expand .back-link img {
+  width: 10px;
+}
+.survey-hero img {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-bottom: 1.5rem;
 }
 
-.description {
-    margin-right: 6rem;
+.expand .survey-title {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
 }
 
-.description h4 {
-    font-style: italic;
-    text-decoration: underline;
-    margin-bottom: 1rem;
+.survey-meta {
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
-.description p {
-    font-size: .9rem;
-    margin-bottom: 2rem;
-    overflow-wrap: break-word;
-    word-break: break-word;
+.expand-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--blue-border);
+  padding: 0.4rem 1rem;
+  border-radius: 3px;
+  font-size: 0.9rem;
+}
+.expand-clock {
+  background: none;
+}
+.expand-chip img {
+  width: 18px;
 }
 
-.pre_participants h4 {
-    margin-bottom: 1rem;
-    font-style: italic;
-    text-decoration: underline;
+.survey-description {
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 1.5rem auto 2.5rem;
+  max-width: 700px;
 }
 
-.pre_participants ul {
-    list-style: inside;
-    font-size: .9rem;
+.survey-stats {
+  gap: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto 1rem;
+}
+.survey-stats-info {
+  justify-content: space-between;
+  margin-top: 0.5rem;
 }
 
-.pre_participants li {
-    margin-bottom: .5rem;
-    font-size: .8rem;
+.survey-stats h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
-.activities {
-    margin-bottom: 4rem;
+.survey-stats p {
+  font-size: 0.95rem;
+  color: #444;
 }
-
-.activities .activity_row {
-    margin-bottom: 2rem;
+.expand .total-p {
+  font-weight: 500;
 }
-
-.activities h4 {
-    margin: 2rem 0;
-    font-style: italic;
-    text-decoration: underline;
-}
-
-.activity_row li {
-    list-style: inside;
-}
-
-.activity_row .required_no {
-    text-align: left;
-}
-
-.activities .participant_no {
-    font-weight: 600;
-}
-
-.expand_class img {
-    width: 1.5rem;
-}
-
-.expand_class {
-    justify-content: space-between;
-}
-
-.expand_class .dept,
-.participants {
-    color: var(--gray)
+.change-lang {
+  background: none;
+  border: none;
+  display: block;
+  margin: 1rem auto 2.5rem;
+  text-decoration: underline;
+  font-size: 0.9rem;
+  cursor: pointer;
 }
 
 .btn_div {
-    justify-content: center;
-    margin-top: 2rem;
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.start-btn:hover {
-    cursor: pointer;
-}
-
-.published-buttons {
-    gap: 1.2rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    width: 100%;
-    max-width: 500px;
-}
-
-.published-buttons-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.2rem;
-    padding: 1rem;
-    animation: fadeInUp 0.6s ease-out;
-    background: rgba(248, 249, 250, 0.5);
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    margin: 0 0.5rem;
-}
-
-.edit-btn, .insights-btn {
-    flex: 1;
-    min-width: 140px;
-    max-width: 200px;
-    padding: 0.9em 1.5em;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border: none;
-    position: relative;
-    overflow: hidden;
-}
-
-.edit-btn {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    color: #0587FF;
-    border: 2px solid #0587FF;
-}
-
-.edit-btn:hover {
-    background: linear-gradient(135deg, #0587FF 0%, #0471d9 100%);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(5, 135, 255, 0.3);
-}
-
-.insights-btn {
-    background: linear-gradient(135deg, #0587FF 0%, #0471d9 100%);
-    color: white;
-    border: 2px solid #0587FF;
-}
-
-.insights-btn:hover {
-    background: linear-gradient(135deg, #0471d9 0%, #0356b8 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(5, 135, 255, 0.4);
-}
-
-.unpublish-btn {
-    animation: fadeInUp 0.6s ease-out 0.3s both;
-    padding: 0.9em 2em;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    border: 2px solid #dc3545;
-    min-width: 180px;
-    max-width: 300px;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
-    position: relative;
-    overflow: hidden;
-}
-
-.unpublish-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
-}
-
-.unpublish-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+  display: flex;
+  justify-content: center;
 }
 
 .start-btn {
-    padding: 0.9em 2em;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, #0587FF 0%, #0471d9 100%);
-    color: white;
-    border: 2px solid #0587FF;
-    min-width: 160px;
-    box-shadow: 0 2px 8px rgba(5, 135, 255, 0.2);
+  width: 100%;
+  max-width: 520px;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 1rem;
 }
 
-.start-btn:hover {
-    background: linear-gradient(135deg, #0471d9 0%, #0356b8 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(5, 135, 255, 0.3);
+/* 📱 Mobile */
+@media (max-width: 600px) {
+  .survey-stats {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .survey-hero img {
+    max-height: 200px;
+  }
+
+  .survey-description {
+    font-size: 0.9rem;
+    padding: 0 0.5rem;
+  }
 }
-
-/* Add ripple effect for button interactions */
-.edit-btn::before,
-.insights-btn::before,
-.unpublish-btn::before,
-.start-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.edit-btn:active::before,
-.insights-btn:active::before,
-.unpublish-btn:active::before,
-.start-btn:active::before {
-    width: 300px;
-    height: 300px;
-}
-
-/* Animation keyframes */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Stagger animation for buttons inside published-buttons */
-.published-buttons .edit-btn {
-    animation: fadeInUp 0.6s ease-out 0.1s both;
-}
-
-.published-buttons .insights-btn {
-    animation: fadeInUp 0.6s ease-out 0.2s both;
-}
-
-@media (max-width: 512px) {
-    .expand_inner .backaro{
-        margin: 1.4rem 0;
-    }
-    .expand_class h4 {
-        font-size: .8rem;
-    }
-    .description {
-        margin-right: 1.5rem;
-    }
-    .expand_class img {
-        width: 1.2rem;
-    }
-
-    .published-buttons {
-        flex-direction: column;
-        gap: 1rem;
-        max-width: 100%;
-    }
-
-    .published-buttons-container {
-        gap: 1rem;
-        padding: 0.8rem;
-        margin: 0;
-    }
-
-    .edit-btn, .insights-btn {
-        min-width: 100%;
-        max-width: 100%;
-        padding: 0.8em 1.2em;
-        font-size: 0.9rem;
-    }
-
-    .unpublish-btn {
-        min-width: 100%;
-        max-width: 100%;
-        padding: 0.8em 1.2em;
-        font-size: 0.9rem;
-    }
-
-    .start-btn {
-        min-width: 100%;
-        max-width: 280px;
-        padding: 0.8em 1.2em;
-        font-size: 0.9rem;
-    }
-}
-
-@media (max-width: 385px) {
-    .loading_survey {
-        font-size: 1rem;
-    }
-
-    .expand_title {
-        font-size: .9rem;
-    }
-
-    .expand_info {
-        font-size: .9rem;
-    }
-    .description {
-        margin-right: 0rem;
-    }
-
-    .description h4 {
-        font-size: .85rem;
-    }
-
-    .description p {
-        font-size: .85rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .pre_participants {
-        font-size: .85rem;
-    }
-
-    .expand_class {
-        gap: .5rem;
-    }
-
-    .expand_class img {
-        width: 15px
-    }
-
-    .activities {
-        margin: 0 1rem;
-    }
-
-    .activities h4 {
-        font-size: .85rem;
-    }
-
-    .activities li {
-        font-size: .85rem;
-    }
-
-    .exp-mobile {
-        display: none;
-    }
-    .expand_class{
-        margin-top: 2rem;
-    }
-    .expand_class h4,
-    p {
-        font-size: .85rem;
-    }
-
-    .published-buttons {
-        flex-direction: column;
-        gap: 0.8rem;
-        width: 100%;
-    }
-
-    .published-buttons-container {
-        gap: 1rem;
-        width: 100%;
-        padding: 0.8rem;
-        margin: 0;
-    }
-
-    .edit-btn, .insights-btn {
-        font-size: 0.85rem;
-        padding: 0.7em 1em;
-        min-width: 100%;
-        max-width: 100%;
-    }
-
-    .unpublish-btn {
-        font-size: 0.85rem;
-        padding: 0.7em 1em;
-        min-width: 100%;
-        max-width: 100%;
-    }
-
-    .start-btn {
-        font-size: 0.85rem;
-        padding: 0.7em 1em;
-        min-width: 100%;
-        max-width: 100%;
-    }
+@media (max-width: 480px) {
+  .expand .page-title {
+    font-size: 1.2rem;
+  }
+  .expand .survey-title {
+    font-size: 1rem;
+  }
+  .survey-description {
+    font-size: 0.85rem;
+  }
+  .survey-stats-info {
+    flex-wrap: wrap;
+  }
 }

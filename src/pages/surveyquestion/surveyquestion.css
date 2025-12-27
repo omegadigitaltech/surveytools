@@ -190,6 +190,7 @@
   overflow-y: auto;
   max-width: 900px;
   margin: 0 1rem;
+  margin-bottom: 3rem;
   width: 100%;
 }
 
@@ -435,7 +436,7 @@
 .add-section-btn {
   width: 100%;
   padding: 0.5rem;
-  background-color: #0587ff;
+  background-color: var(--base);
   color: white;
   border: none;
   border-radius: 8px;
@@ -461,8 +462,8 @@
 .save-btn {
   padding: 0.8rem 3rem;
   background-color: #fff;
-  color: #0587ff;
-  border: 2px solid #0587ff;
+  color: var(--base);
+  border: 2px solid var(--base);
   border-radius: 6px;
   cursor: pointer;
   font-size: 1rem;
@@ -480,7 +481,7 @@
 
 .post-btn {
   padding: 0.8rem 3rem;
-  background-color: #0587ff;
+  background-color: var(--base);
   color: white;
   border: none;
   border-radius: 6px;
