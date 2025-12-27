@@ -24,27 +24,33 @@ const Sidebar = () => {
       {/* Navigation */}
       <nav className="sidebar-nav mt-12">
         <NavLink to="/dashboard" className="sidebar-link">
-          Dashboard
+          <span><img src="/Widget-2.svg" alt="Widget 2" /></span>
+          <span>Dashboard</span>
         </NavLink>
 
         <NavLink to="/my-forms" className="sidebar-link">
-          My Forms
+          <span><img src="/Folder-With-Files.svg" alt="Folder-With-FIles" /></span>
+          <span>My Forms</span>
         </NavLink>
 
         <NavLink to="/analytics" className="sidebar-link">
-          Analytics
+          <span><img src="/Chat-Square-2.svg" alt="Chat-Square" /></span>
+          <span>Analytics</span>
         </NavLink>
 
         <NavLink to="/responses" className="sidebar-link">
-          Responses
+          <span><img src="/Checklist-Minimalistic.svg" alt="Checklist-Minimalistic" /></span>
+          <span>Responses</span>
         </NavLink>
 
         <NavLink to="/help" className="sidebar-link">
-          Help & Support
+          <span><img src="/Help.svg" alt="Help" /></span>
+          <span>Help & Support</span>
         </NavLink>
 
         <NavLink to="/settings" className="sidebar-link">
-          Settings
+          <span><img src="/Settings-Minimalistic.svg" alt="Settings" /></span>
+          <span>Settings</span>
         </NavLink>
       </nav>
 
