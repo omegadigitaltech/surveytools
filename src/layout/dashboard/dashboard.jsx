@@ -3,15 +3,17 @@ import DashNavbar from "./dashNavbar";
 import Footer from "../../components/footer/footer";
 
 const DashboardLayout = () => {
-    return (
-        <div className="home-layout">
-            <DashNavbar />
-            <main className="main-content">
-                <Outlet />
-            </main>
-            <Footer />
-        </div>
-    )
-}
+  return (
+    <>
+      <div className="dashboard-layout flex ">
+        <DashNavbar />
+        <main className="main-content">
+          <Outlet />
+        </main>
+      </div>
+      <Footer />
+    </>
+  );
+};
 
 export default DashboardLayout;

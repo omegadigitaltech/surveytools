@@ -1,5 +1,11 @@
+.dashboard-layout.flex {
+  display: flex;
+  align-items: flex-start;
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
 .sidebar-container {
-  position: fixed;
+  position: static;
   top: 0;
   left: 0;
   width: 260px;
