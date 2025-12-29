@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Preloader from "./components/Preloader/Preloader.jsx";
 import HomeLayout from "./layout/home/home";
 import AuthLayout from "./layout/auth/auth";
+import DashboardLayout from "./layout/dashboard/dashboard";
 import StoreProvider from "./store/StoreProvider";
 import ProtectRoute from "./components/protectroute/protectroute";
 import useAuthStore from "./store/useAuthStore.js";
@@ -36,7 +37,7 @@ import Publish from "./pages/publish/publish";
 import Payment from "./components/payment/payment";
 import Pricing from "./pages/pricing/pricing";
 import CreateForm from "./pages/createform/createform.jsx";
-import FormQuestions from "./pages/formquestions/formquestion.jsx"
+import FormQuestions from "./pages/formquestions/formquestion.jsx";
 // import Payment from "./pages/payment/payment";
 import Notifications from "./pages/notifications/notifications";
 import Withdraw from "./pages/withdraw/withdraw";
@@ -52,24 +53,24 @@ const router = createBrowserRouter(
       <Route element={<HomeLayout />}>
         <Route index element={<Home />} />
         {/* WILL BE ADDED TO PROTECT ROUTE LATER */}
-        <Route path="start-survey" element={<StartSurvey/>} />
+        <Route path="start-survey" element={<StartSurvey />} />
         <Route path="formquestions" element={<FormQuestions />} />
         <Route
-            path="postsurvey"
-            element={<PostSurvey />}
-            action={surveyAction}
-          />
-            <Route
-            path="surveyquestion"
-            element={<SurveyQuestion />}
-            action={postAction}
-          />
-          {/* //////// */}
-        <Route element={<ProtectRoute />}>
+          path="postsurvey"
+          element={<PostSurvey />}
+          action={surveyAction}
+        />
+        <Route
+          path="surveyquestion"
+          element={<SurveyQuestion />}
+          action={postAction}
+        />
+      </Route>
+      {/* //////// */}
+      <Route element={<ProtectRoute />}>
+        <Route element={<DashboardLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
-          
-        
           <Route path="create-form" element={<CreateForm />} />
           <Route path="publish" element={<Publish />} />
           <Route path="payment" element={<Payment />} />
@@ -83,7 +84,6 @@ const router = createBrowserRouter(
           <Route path="insights/:id" element={<Insights />} />
         </Route>
       </Route>
-
       <Route element={<AuthLayout />}>
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />

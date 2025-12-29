@@ -21,6 +21,7 @@ import RedeemModal from "./RedeemModal";
 import ConfirmDetails from "./ConfirmDetails";
 import Report from "./Report";
 import useAppStore from "../../store/useAppStore";
+import DashboardMain from "./DashboardMain";
 // import ContestModal from "../../components/ContestModal";
 
 const Dashboard = () => {
@@ -165,6 +166,7 @@ const Dashboard = () => {
 
   return (
     <>
+      <DashboardMain />
       {/* <ContestModal /> */}
       <section className="dashboard">
         <div className="dashboard_inner wrap">
@@ -236,15 +238,17 @@ const Dashboard = () => {
               {activeTab === "available" ? (
                 filteredSurveys.length > 0 ? (
                   filteredSurveys.map((survey, index) => (
-                      <div
-                        className={`survey_post ${
-                          index === 0 ? "first_post" : ""
-                        }`}
-                        key={survey._id}
-                        onClick={() => window.location = `/expandsurvey/${survey._id}`}
-                      >
-                        {/* new div new */}
-                          <div className="survey-card-content">
+                    <div
+                      className={`survey_post ${
+                        index === 0 ? "first_post" : ""
+                      }`}
+                      key={survey._id}
+                      onClick={() =>
+                        (window.location = `/expandsurvey/${survey._id}`)
+                      }
+                    >
+                      {/* new div new */}
+                      <div className="survey-card-content">
                         <div className="post_time flex">
                           <p className="posted">
                             Posted{" "}
@@ -267,7 +271,9 @@ const Dashboard = () => {
                         </div>
                         <p className="survey_info">
                           {survey.description}
-                          <span href="" className="see-more">...see more</span>
+                          <span href="" className="see-more">
+                            ...see more
+                          </span>
                         </p>
                         <div className="survey_class flex">
                           <div className="dept flex">
@@ -290,8 +296,8 @@ const Dashboard = () => {
                             <p> Participants</p>
                           </div>
                         </div>
-                        </div>
                       </div>
+                    </div>
                   ))
                 ) : (
                   <p className="no_result">Please wait. Survey is loading...</p>

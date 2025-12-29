@@ -58,10 +58,9 @@ const SignUp = () => {
 
   return (
     <div className="auth-w4 flex">
-      <div className="signup-col signup-image">
-        <img src={features} alt="" />
-      </div>
       <div className="form-col">
+        <h1 className="h1">Create An Account</h1>
+        <p className="text-gray-600 mb-4">Signup as a student, start taking surveys, earn rewards, and learn through research</p>
         <Form className="auth-w4-form" method="post" action="/signup" onSubmit={handleSubmit}>
           <div className="auth-w4-grid">
             <div className="auth-w4-field">
@@ -225,12 +224,15 @@ const SignUp = () => {
             {loading ? "Loading..." : "Sign up"}
           </button>
         </Form>
-        <div className="auth-w4-">
+        <div className="auth-w4- text-center">
           Already have an account?&nbsp;
           <Link className="auth-w4-" to="/signin">
             Sign in
           </Link>
         </div>
+      </div>
+      <div className="absolute top-0 right-0 h-screen w-[50%] flex justify-center items-center signup-col signup-image">
+        <img src={features} alt="" />
       </div>
     </div>
   );

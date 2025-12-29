@@ -1,3 +1,4 @@
+
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import iconBell from "../../assets/img/icon-bell.svg";
@@ -92,7 +93,7 @@ const Navbar = () => {
             {!isAuthenticated && (
               <>
                 <li className="header-w2-item hide">
-                  <NavLink className="header-w2-link button text-white px-[2.5rem] py-[1rem] rounded-md" to="/signin">
+                  <NavLink className="header-w2-link button text-white px-[2.5rem] py-[1rem] rounded-md" to="/signup">
                     Get Started
                   </NavLink>
                 </li>
