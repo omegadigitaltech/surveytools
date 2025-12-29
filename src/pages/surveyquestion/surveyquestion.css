@@ -258,7 +258,7 @@
 }
 
 .question-card.selected {
-  border: 2px solid #0587ff;
+  border: 2px solid var(--base);
 }
 
 .question-header {
@@ -380,7 +380,7 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.85rem;
-  color: #0587ff;
+  color: var(--secondary-blue);
   transition: background-color 0.2s;
 }
 
@@ -828,6 +828,9 @@
   }
   .question-input {
     font-size: 0.9rem;
+  }
+  .add-option-btn {
+    padding: 0.4rem 0.5rem;
   }
   .custom-input-label input[type="checkbox"] {
     width: 12px;

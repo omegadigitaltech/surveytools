@@ -5,11 +5,6 @@
     background: #f9f9f9;
   }
   
-  /* Top Bar */
-  /* .top-bar {
-    z-index: 100;
-  }
-   */
   .form-builder.dark-mode .top-bar {
     background-color: #000;
     color: #fff;
@@ -22,12 +17,6 @@
     padding: 1rem 2rem;
     max-width: 100%;
   }
-  
-  /* .form-builder .top-bar h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-  } */
   
   .form-builder .publish-btn {
     padding: 0.6rem 2.5rem;
@@ -62,67 +51,11 @@
     justify-content: center;
   }
   
-  /* Sidebar */
-  /* .sidebar {
-    width: 300px;
-    background-color: #fff;
-    overflow-y: auto;
-    transition: transform 0.3s ease;
-    position: sticky;
-    top: 4rem;
-    height: 100vh;
-  } */
-  
   .form-builder.dark-mode .sidebar {
     background-color: #000;
     border-right-color: #333;
     color: #fff;
   }
-  
-  /* .sidebar-header-mobile {
-    display: none;
-  } 
-
-  .sidebar-title-desktop {
-    display: block;
-  }
-  
-  .sidebar-close {
-    display: none;
-  }
-  
-  .sidebar-content {
-    padding: 1.5rem;
-  }
-  
-  .sidebar h3 {
-    margin-top: 0;
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-  }
-  
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-  
-  .form-group select,
-  .form-group input {
-    width: 100%;
-    padding: 0.6rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 0.9rem;
-    background-color: #fff;
-    color: #000;
-  } */
   
   .form-builder.dark-mode .form-group select,
   .form-builder.dark-mode .form-group input {
@@ -130,66 +63,14 @@
     border-color: #555;
     color: #fff;
   }
-  
-  /* .no-selection {
-    color: #666;
-    font-size: 0.9rem;
-    font-style: italic;
-  }
-   */
+
   .form-builder.dark-mode .no-selection {
     color: #aaa;
   }
   
-  /* Color Picker */
-  /* .color-picker {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  } */
-  
-  /* .color-option {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2px solid #ddd;
-    cursor: pointer;
-    transition: border-color 0.2s;
-    
-    } 
-    .color-option.active {
-        border-color: #0587ff;
-        border-width: 3px;
-    }
-    */
   .form-builder.dark-mode .color-option {
     border-color: #555;
   }
-/*   
-  .likert-btn {
-    width: 100%;
-    padding: 0.6rem;
-    background-color: #0587ff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: opacity 0.2s;
-  }
-  
-  .likert-btn:hover {
-    opacity: 0.9;
-  }
-  .content-area {
-    flex: 1;
-    overflow-y: auto;
-    max-width: 900px;
-    margin: 0 1rem;
-    width: 100%;
-}
-*/
-  /* Form Meta Section */
   .form-meta-section {
     margin-bottom: 1.5rem;
     padding: 1rem;
@@ -241,203 +122,38 @@
     color: #aaa;
   }
   
-  /* Section Card */
-  /* .section-card {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fff;
-  }
-   */
   .form-builder.dark-mode .section-card {
     background-color: #0a0a0a;
     border-color: #333;
   }
   
-  /* .section-header-input {
-    margin-bottom: 1.5rem;
-    width: 100%;
-    justify-content: space-between;
-  } 
-  
-  .section-head-box {
-    width: 100%;
-  }
-  
-  .section-title {
-    width: 100%;
-    font-size: 1.3rem;
-    font-weight: 600;
-    border: none;
-    outline: none;
-    margin-bottom: 0.5rem;
-    padding: 0.3rem;
-    background-color: transparent;
-    color: inherit;
-  }
-  
-  .section-description {
-    width: 100%;
-    font-size: 0.9rem;
-    border-bottom: 0.5px solid #e0e0e0;
-    outline: none;
-    padding: 0.3rem;
-    background-color: transparent;
-    color: #585858;
-  }
-  */
   .form-builder.dark-mode .section-description {
     color: #aaa;
   }
   
-  /* Question Card */
-  /* .question-card {
-    margin-bottom: 1.5rem;
-    padding: 1.2rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-   */
   .form-builder.dark-mode .question-card {
     background-color: #1a1a1a;
     border-color: #333;
   }
   
-  .question-card.selected {
-    border: 2px solid #0587ff;
-  }
-  
-  /* .question-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-  }
-  
-  .question-title-area {
-    flex: 1;
-  }
-  
-  .question-number {
-    font-size: 0.9rem;
-    font-weight: 600;
-    display: block;
-    margin-bottom: 0.3rem;
-  }
-  
-  .question-input {
-    width: 100%;
-    font-size: 1rem;
-    border: none;
-    outline: none;
-    padding: 0.3rem;
-    background-color: transparent;
-    color: inherit;
-    font-weight: 500;
-  }
-  
-  .question-actions {
-    display: flex;
-    gap: 1.5rem;
-  }
-   */
-  .form-q-btn {
+   .form-q-btn {
     justify-content: space-between;
   }
-  
-  /* .icon-btn .copy-icon {
-    width: 1.8rem;
-  }
-  
-  .icon-btn .delete-icon {
-    width: 1.2rem;
-  }
-  .options-area {
-    margin-top: 1rem;
-}
-
-.option-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.option-indicator {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #ccc;
-    display: inline-block;
-    flex-shrink: 0;
-}
-
-.option-indicator.radio {
-    border-radius: 50%;
-}
-
-.option-indicator.checkbox {
-    border-radius: 3px;
-}
-*/
 
   .form-builder.dark-mode .option-indicator {
     border-color: #555;
   }
-  
-  /* .option-input {
-    flex: 1;
-    padding: 0.4rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    background-color: #fff;
-    color: #000;
-  }
-   */
+
   .form-builder.dark-mode .option-input {
     background-color: #0a0a0a;
     border-color: #555;
     color: #fff;
   }
   
-  .add-option-btn {
-    margin-top: 0.5rem;
-    padding: 0.4rem 1rem;
-    background-color: transparent;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: #0587ff;
-    transition: background-color 0.2s;
-  }
-  
-  .add-option-btn:hover {
-    background-color: rgba(5, 135, 255, 0.1);
-  }
-  
   .form-builder.dark-mode .add-option-btn {
     border-color: #555;
   }
   
-  /* .likert-preview {
-    margin-top: 1rem;
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-  
-  .likert-item {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.6rem;
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-   */
   .form-builder.dark-mode .likert-item {
     background-color: #0a0a0a;
     border-color: #333;
@@ -463,25 +179,7 @@
   .form-builder.dark-mode .add-question-btn {
     border-color: #555;
   }
-  
-  /* .add-section-btn {
-    width: 100%;
-    padding: 0.5rem;
-    background-color: #0587ff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-bottom: 2rem;
-    transition: opacity 0.2s;
-    justify-content: center;
-  }
-  
-  .add-section-btn:hover {
-    opacity: 0.9;
-  }
-   */
+
   /* Modal Styles */
   .form-builder .modal-overlay {
     position: fixed;
@@ -540,103 +238,6 @@
   .form-builder .modal-body {
     margin-bottom: 1.5rem;
   }
-  
-  /* .likert-scale-item {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    margin-bottom: 0.8rem;
-  }
-  
-  .likert-value-input {
-    width: 80px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9rem;
-  }
-  
-  .likert-label-input {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9rem;
-  }
-  
-  .remove-likert-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #ff4444;
-    padding: 0 0.5rem;
-    line-height: 1;
-    transition: color 0.2s;
-  }
-  
-  .remove-likert-btn:hover {
-    color: #cc0000;
-  }
-  
-  .add-likert-btn {
-    padding: 10px 20px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    width: 100%;
-    margin-top: 0.5rem;
-    transition: background-color 0.2s;
-  }
-  
-  .add-likert-btn:hover {
-    background-color: #e0e0e0;
-  }
-  
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #ddd;
-  }
-  
-  .modal-cancel-btn,
-  .modal-save-btn {
-    padding: 10px 24px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    border: none;
-    transition: opacity 0.2s;
-  }
-  
-  .modal-cancel-btn {
-    background-color: #f0f0f0;
-    color: #333;
-  }
-  
-  .modal-cancel-btn:hover {
-    background-color: #e0e0e0;
-  }
-  
-  .modal-save-btn {
-    background-color: #0587ff;
-    color: white;
-  }
-  
-  .modal-save-btn:hover {
-    opacity: 0.9;
-  }
-   */
-  /* Responsive Styles */
-  /* @media (max-width: 1024px) {
-    .sidebar {
-      width: 280px;
-    }
-  } */
   
   @media (max-width: 768px) {
     .mobile-toggle-container {
@@ -779,7 +380,7 @@
     }
   
     .top-bar h2 {
-      font-size: 1rem;
+      font-size: .9rem;
     }
   
     .form-builder .publish-btn {
@@ -843,7 +444,7 @@
     padding: .5rem;
   }
     .form-title-input {
-      font-size: 1rem;
+      font-size: .9rem;
       margin-bottom: 0rem;
     }
   
