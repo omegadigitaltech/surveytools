@@ -155,11 +155,10 @@ jobs:
               sudo systemctl start docker
             fi
             
-            if ! command -v docker-compose &> /dev/null; then
-              echo "Installing Docker Compose..."
-              sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
-            fi
+            # Install Docker Compose (Force update to match Docker Engine API)
+            echo "Installing/Updating Docker Compose to v2.29.0..."
+            sudo curl -L "https://github.com/docker/compose/releases/download/v2.29.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
             
             # Pull the latest images
             sudo docker-compose pull
