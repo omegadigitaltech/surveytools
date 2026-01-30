@@ -36,6 +36,7 @@ const FormInsights = () => {
   const [currentResponseIndex, setCurrentResponseIndex] = useState(0);
   const [individualResponses, setIndividualResponses] = useState([]);
   const authToken = useAuthStore((state) => state.authToken);
+  const [goToFieldValue, setGoToFieldValue] = useState("");
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
@@ -223,6 +224,27 @@ const FormInsights = () => {
       setCurrentFieldIndex(currentFieldIndex - 1);
     }
   };
+  const handleGoToField = () => {
+    const fieldNumber = Number(goToFieldValue);
+  
+    if (
+      !fieldNumber ||
+      fieldNumber < 1 ||
+      fieldNumber > allFields.length
+    ) {
+      toast.error(`Enter a number between 1 and ${allFields.length}`);
+      return;
+    }
+  
+    setCurrentFieldIndex(fieldNumber - 1);
+    setGoToFieldValue("");
+  };
+  const handleGoToKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleGoToField();
+    }
+  };
+    
 
   const navigateResponse = (direction) => {
     if (direction === "next" && currentResponseIndex < individualResponses.length - 1) {
@@ -525,17 +547,39 @@ const FormInsights = () => {
                 disabled={currentFieldIndex === 0}
                 className="nav-button"
               >
-                &lt; Previous
+                 Previous
               </button>
-              <div className="question-pagination">
-                Field {currentFieldIndex + 1} of {allFields.length}
+              <div className="question-pagination flex">
+             <div>
+              Field {currentFieldIndex + 1} of {allFields.length}
+              </div>   
+                <div className="go-to-field">
+    <button
+      onClick={handleGoToField}
+      className="go-button"
+    >
+      Go
+    </button>
+    <input
+      type="number"
+      min="1"
+      max={allFields.length}
+      value={goToFieldValue}
+      onChange={(e) => setGoToFieldValue(e.target.value)}
+      onKeyDown={handleGoToKeyDown}
+      placeholder="5"
+      className="go-to-input"
+    />
+    
+            </div>
               </div>
+             
               <button
                 onClick={() => navigateField("next")}
                 disabled={currentFieldIndex === allFields.length - 1}
                 className="nav-button"
               >
-                Next &gt;
+                Next 
               </button>
             </div>
 

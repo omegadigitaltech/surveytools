@@ -554,3 +554,18 @@ input:checked + .slider:before {
   padding: 2rem;
   color: var(--gray);
 } 
+@media (max-width: 380px) {
+.insights {
+  padding: .2rem;
+}
+.question-view {
+  padding: 1rem;
+}
+.question-navigation .nav-button {
+  padding: 0.3rem .6rem;
+  font-size: .85rem;
+}
+.go-to-input {
+  padding: 3px 8px
+}
+}

@@ -1,6 +1,4 @@
-/* Reuse insights.css styles or add form-specific styles */
 
-/* Header layout - two rows for better responsiveness */
 .insights-header {
   display: flex;
   flex-direction: column;
@@ -148,3 +146,23 @@
   margin-top: 0.5rem;
 }
 
+.question-pagination{
+  flex-direction: column;
+  gap: .2rem;
+}
+
+.go-to-input {
+  /* width: 60px; */
+  padding: 3px 18px;
+  text-align: center;
+  border: var(--border);
+}
+
+.go-button {
+  padding: 4px 8px;
+  cursor: pointer;
+  margin-right: .3rem;
+  background: var(--btns);
+  color: var(--wht);
+  border-radius: 4px;
+}

@@ -24,6 +24,7 @@ const Insights = () => {
   const [individualResponses, setIndividualResponses] = useState([]);
   const [currentView, setCurrentView] = useState("question"); // "question" or "individual"
   const authToken = useAuthStore((state) => state.authToken);
+  const [goToQuestionValue, setGoToQuestionValue] = useState("");
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -152,7 +153,30 @@ const Insights = () => {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
-
+  const handleGoToQuestion = () => {
+    const questionNumber = Number(goToQuestionValue);
+  
+    if (
+      !questionNumber ||
+      questionNumber < 1 ||
+      questionNumber > surveyData.questions.length
+    ) {
+      toast.error(
+        `Enter a number between 1 and ${surveyData.questions.length}`
+      );
+      return;
+    }
+  
+    setCurrentQuestionIndex(questionNumber - 1);
+    setGoToQuestionValue("");
+  };
+  
+  const handleGoToKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleGoToQuestion();
+    }
+  };
+  
   const navigateResponse = (direction) => {
     if (direction === 'next' && currentResponseIndex < individualResponses.length - 1) {
       setCurrentResponseIndex(currentResponseIndex + 1);
@@ -371,17 +395,38 @@ const Insights = () => {
                 disabled={currentQuestionIndex === 0}
                 className="nav-button"
               >
-                &lt; Previous
+                 Previous
               </button>
-              <div className="question-pagination">
+              <div className="question-pagination flex">
+                <div>
                 Question {currentQuestionIndex + 1} of {surveyData.questions.length}
+                </div>
+                <div className="go-to-field">
+      <button
+        onClick={handleGoToQuestion}
+        className="go-button"
+      >
+        Go
+      </button>
+
+      <input
+        type="number"
+        min="1"
+        max={surveyData.questions.length}
+        value={goToQuestionValue}
+        onChange={(e) => setGoToQuestionValue(e.target.value)}
+        onKeyDown={handleGoToKeyDown}
+        placeholder="5"
+        className="go-to-input"
+      />
+    </div>
               </div>
               <button 
                 onClick={() => navigateQuestion('next')} 
                 disabled={currentQuestionIndex === surveyData.questions.length - 1}
                 className="nav-button"
               >
-                Next &gt;
+                Next 
               </button>
             </div>
             
