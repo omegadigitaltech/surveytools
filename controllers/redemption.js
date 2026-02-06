@@ -5,6 +5,7 @@ const axios = require('axios');
 const { generateID_users } = require('../middleware/helper');
 const FormData = require('form-data');
 const mongoose = require('mongoose');
+const { disburseTelecom } = require('../utils/redemption');
 
 /**
  * Get available data plans
@@ -105,343 +106,210 @@ const getDataPlans = async () => {
   }
 };
 
-// Redeem points for airtime
-const redeemAirtime = async (req, res) => {
-  let redemptionid;
+
+/**
+ * Unified redemption handler for airtime or data
+ * @param {Object} params
+ * @param {string} params.userId
+ * @param {"airtime" | "data"} params.type
+ * @param {number} [params.amount] - for airtime
+ * @param {string} [params.planId] - for data
+ * @param {string} params.network
+ * @param {string} params.phoneNumber
+ * @param {Object} params.session - mongoose session
+ * @returns {Promise<{ success: boolean, message: string, data?: any, statusCode?: number }>}
+ */
+async function redeemTelecom({
+  userId,
+  type,
+  amount,
+  planId,
+  network,
+  phoneNumber,
+  session,
+}) {
+  let redemption;
+
   try {
-    // Get session from the request object and start transaction
-    const session = req.dbSession;
-    await req.startTransaction();
-    
-    const { amount, network, phoneNumber } = req.body;
-    const userId = req.userId;
-
-    // Validate request
-    if (!amount || !network || !phoneNumber) {
-      await req.abortTransaction();
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        message: "Please provide amount, network, and phone number"
-      });
-    }
-
-    // Minimum amount validation
-    if (amount < 10) {
-      await req.abortTransaction();
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        message: "Minimum airtime amount is 100"
-      });
-    }
-
-    // Find user within transaction
     const user = await User.findOne({ id: userId }).session(session);
     if (!user) {
-      await req.abortTransaction();
-      return res.status(StatusCodes.NOT_FOUND).json({
-        success: false,
-        message: "User not found"
-      });
+      return { success: false, message: "User not found", statusCode: 404 };
     }
 
-    // Direct conversion - 1 point = 1 naira
-    const pointsRequired = Number(amount);
+    let pointsRequired;
+    let valueReceived;
+    let planDetails = null;
 
-    // Check if user has enough points
+    if (type === "airtime") {
+      if (!amount || amount < 100) {
+        return { success: false, message: "Minimum airtime is ₦100", statusCode: 400 };
+      }
+      pointsRequired = Number(amount);
+      valueReceived = amount;
+    } else if (type === "data") {
+      if (!planId) {
+        return { success: false, message: "planId required for data", statusCode: 400 };
+      }
+
+      // Fetch plans (keep your getDataPlans or make it cached)
+      const plans = await getDataPlans(); // assume this returns array
+      const selected = plans.find(p => p.planid === planId && p.network === network);
+      if (!selected) {
+        return { success: false, message: "Invalid data plan", statusCode: 404 };
+      }
+
+      pointsRequired = Number(selected.price);
+      valueReceived = Number(selected.price);
+      planDetails = {
+        name: selected.name,
+        size: selected.plan || selected.size,
+        planId: selected.planid,
+      };
+    } else {
+      return { success: false, message: "Invalid type", statusCode: 400 };
+    }
+
     if (user.pointBalance < pointsRequired) {
-      await req.abortTransaction();
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        message: "Insufficient points balance"
-      });
+      return { success: false, message: "Insufficient points", statusCode: 400 };
     }
 
-    // Generate transaction reference
-    const transactionRef = `AIR${generateID_users(12)}`;
+    const transactionRef = `${type.toUpperCase().slice(0, 4)}${generateID_users(12)}`;
 
-    // Create redemption record OUTSIDE transaction to persist even on failure
-    const redemption = await RedemptionHistory.create({
+    // Create redemption record first (persists even if API fails)
+    redemption = await RedemptionHistory.create([{
       userId,
-      type: "airtime",
+      type,
       network,
       phoneNumber,
       pointsRedeemed: pointsRequired,
-      valueReceived: amount,
+      valueReceived,
       status: "pending",
-      transactionReference: transactionRef
-    });
-    redemptionid = redemption._id;
+      transactionReference: transactionRef,
+      ...(type === "data" ? {
+        planName: planDetails.name,
+        planId: planDetails.planId,
+      } : {}),
+    }], { session });
 
-    // Deduct points from user within transaction
+    const redemptionId = redemption[0]._id;
+
+    // Deduct points
     user.pointBalance -= pointsRequired;
     await user.save({ session });
 
-    // Make API call to purchase airtime
-    try {
-      const formData = new FormData();
-      formData.append('amount', amount);
-      formData.append('network', network);
-      formData.append('phoneNumber', phoneNumber);
-      formData.append('reference', transactionRef);
-
-      const airtimeUrl = process.env.AIRTIME_API_URL || 'https://api.cardri.ng/api/v1/merchant/airtime/';
-      const airtimeResponse = await axios.post(
-        airtimeUrl, 
-        formData,
-        {
-          headers: {
-            ...formData.getHeaders(),
-            'Authorization': `Bearer ${process.env.CARDRI_API_KEY}`
-          }
-        }
-      );
-
-      // Check API response
-      if (airtimeResponse.data && airtimeResponse.status == 200 && airtimeResponse.data.status != false) {
-        // Update redemption status to successful within transaction
-        await RedemptionHistory.findByIdAndUpdate(
-          redemptionid,
-          { status: "successful" }
-        );
-
-        // Commit the transaction
-        await req.commitTransaction();
-
-        return res.status(StatusCodes.OK).json({
-          success: true,
-          message: "Airtime purchase successful",
-          data: {
-            phoneNumber,
-            amount,
-            pointsRedeemed: pointsRequired,
-            transactionReference: transactionRef
-          }
-        });
-      } else {
-        // If API call failed, abort transaction (this automatically rolls back changes)
-        await req.abortTransaction();
-        await RedemptionHistory.findByIdAndUpdate(
-          redemptionid,
-          { status: "failed", errorMessage: airtimeResponse.data || "Unknown error" }
-        );
-
-        return res.status(StatusCodes.BAD_REQUEST).json({
-          success: false,
-          message: "Airtime purchase failed",
-          error: airtimeResponse.data || "Unknown error"
-        });
-      }
-    } catch (apiError) {
-      // Log the full error response to understand the structure
-      console.log("Full API Error Response:", apiError.response?.data);
-      await RedemptionHistory.findByIdAndUpdate(
-        redemptionid,
-        { status: "failed", errorMessage: apiError.response?.data || "Unknown error" }
-      );
-      // If API call throws an error, abort transaction
-      await req.abortTransaction();
-
-      // console.error("API Error:", apiError);
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Failed to process airtime purchase",
-        error: apiError.response?.data?.message || apiError.message,
-        details: apiError.response?.data?.data || null
-      });
-    }
-  } catch (error) {
-    // If any error occurs, transaction will be aborted by middleware
-    console.error("Error redeeming airtime:", error);
-    if (redemptionid) { 
-      await RedemptionHistory.findByIdAndUpdate(
-        redemptionid,
-        { status: "failed", errorMessage: error.message, errorData:  error.response?.data}
-      );
-    }
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "Failed to redeem airtime",
-      error: error.message
+    // Attempt disbursement via flexible adapter
+    const telecomResult = await disburseTelecom({
+      phone: phoneNumber,
+      type,
+      amount: type === "airtime" ? amount : undefined,
+      productCode: type === "data" ? planId : undefined,
+      network,
+      reference: transactionRef,
     });
+
+    if (telecomResult.success) {
+      // Success → update status
+      await RedemptionHistory.findByIdAndUpdate(redemptionId, {
+        status: "successful",
+      }, { session });
+
+      return {
+        success: true,
+        message: `${type === "airtime" ? "Airtime" : "Data"} redeemed successfully`,
+        data: {
+          phoneNumber,
+          ...(type === "airtime" ? { amount } : {
+            planName: planDetails.name,
+            planSize: planDetails.size,
+          }),
+          pointsRedeemed: pointsRequired,
+          transactionReference: transactionRef,
+          provider: telecomResult.provider,
+        },
+      };
+    } else {
+      // Failure → mark failed (but transaction still commits partial state if you want rollback → keep abort logic)
+      await RedemptionHistory.findByIdAndUpdate(redemptionId, {
+        status: "failed",
+        errorMessage: telecomResult.message,
+        errorData: telecomResult.data,
+      }, { session });
+
+      return {
+        success: false,
+        message: "Provider failed to deliver service",
+        error: telecomResult.message,
+        statusCode: 502, // Bad Gateway - upstream failure
+      };
+    }
+  } catch (err) {
+    console.error(`[${type.toUpperCase()}] Redemption error:`, err);
+
+    if (redemption?._id) {
+      await RedemptionHistory.findByIdAndUpdate(redemption._id, {
+        status: "failed",
+        errorMessage: err.message,
+        errorData: err.response?.data,
+      }, { session }).catch(console.error);
+    }
+
+    return {
+      success: false,
+      message: `Failed to redeem ${type}`,
+      error: err.message,
+      statusCode: 500,
+    };
+  }
+}
+
+// Controller wrappers (keep separate routes if you want)
+const redeemAirtime = async (req, res) => {
+  await req.startTransaction();
+  try {
+    const result = await redeemTelecom({
+      userId: req.userId,
+      type: "airtime",
+      amount: req.body.amount,
+      network: req.body.network,
+      phoneNumber: req.body.phoneNumber,
+      session: req.dbSession,
+    });
+
+    if (result.success) {
+      await req.commitTransaction();
+      return res.status(200).json(result);
+    } else {
+      await req.abortTransaction();
+      return res.status(result.statusCode || 400).json(result);
+    }
+  } catch (err) {
+    await req.abortTransaction();
+    return res.status(500).json({ success: false, message: "Server error", error: err.message });
   }
 };
 
-// Redeem points for data
 const redeemData = async (req, res) => {
-  let redemptionid;
+  await req.startTransaction();
   try {
-    // Get session from the request object and start transaction
-    const session = req.dbSession;
-    await req.startTransaction();
-    
-    const { planId, network, phoneNumber } = req.body;
-    const userId = req.userId;
-
-    // Validate request
-    if (!planId || !network || !phoneNumber) {
-      await req.abortTransaction();
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        message: "Please provide planId, network, and phone number"
-      });
-    }
-
-    // Find user within transaction
-    const user = await User.findOne({ id: userId }).session(session);
-    if (!user) {
-      await req.abortTransaction();
-      return res.status(StatusCodes.NOT_FOUND).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
-    // Fetch current plans from API to get the price
-    let plans;
-    try {
-      plans = await getDataPlans();
-    } catch (error) {
-      await req.abortTransaction();
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        message: "Failed to fetch data plans",
-        error: error.message
-      });
-    }
-
-    // Find the selected plan
-    const selectedPlan = plans.find(plan => plan.planid === planId && plan.network === network);
-    
-    if (!selectedPlan) {
-      await req.abortTransaction();
-      return res.status(StatusCodes.NOT_FOUND).json({
-        success: false,
-        message: "Data plan not found or not available for selected network"
-      });
-    }
-
-    // Direct conversion - 1 point = 1 naira
-    const pointsRequired = Number(selectedPlan.price);
-
-    // Check if user has enough points
-    if (user.pointBalance < pointsRequired) {
-      await req.abortTransaction();
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        message: "Insufficient points balance"
-      });
-    }
-
-    // Generate transaction reference
-    const transactionRef = `DATA${generateID_users(12)}`;
-
-    // Create redemption record within transaction
-    const redemption = await RedemptionHistory.create({
-        userId,
-        type: "data",
-        network,
-        phoneNumber,
-        pointsRedeemed: pointsRequired,
-        valueReceived: Number(selectedPlan.price),
-        planName: selectedPlan.name,
-        planId: selectedPlan.planid,
-        status: "pending",
-        transactionReference: transactionRef
+    const result = await redeemTelecom({
+      userId: req.userId,
+      type: "data",
+      planId: req.body.planId,
+      network: req.body.network,
+      phoneNumber: req.body.phoneNumber,
+      session: req.dbSession,
     });
-    redemptionid = redemption._id;
 
-
-    // Deduct points from user within transaction
-    user.pointBalance -= pointsRequired;
-    await user.save({ session });
-
-    // Make API call to purchase data
-    try {
-      const formData = new FormData();
-      formData.append('plan', planId);
-      formData.append('network', network);
-      formData.append('phoneNumber', phoneNumber);
-      formData.append('reference', transactionRef);
-
-      const dataUrl = process.env.DATA_PURCHASE_API_URL || 'https://api.cardri.ng/api/v1/merchant/data';
-      const dataResponse = await axios.post(
-        dataUrl, 
-        formData,
-        {
-          headers: {
-            ...formData.getHeaders(),
-            'Authorization': `Bearer ${process.env.CARDRI_API_KEY}`
-          }
-        }
-      );
-
-      // Check API response
-      if (dataResponse.data && dataResponse.status == 200 && dataResponse.data.status != false) {
-        // Update redemption status to successful within transaction
-        await RedemptionHistory.findByIdAndUpdate(
-          redemptionid,
-          { status: "successful" }
-        );
-
-        // Commit the transaction
-        await req.commitTransaction();
-
-        return res.status(StatusCodes.OK).json({
-          success: true,
-          message: "Data purchase successful",
-          data: {
-            phoneNumber,
-            planName: selectedPlan.name,
-            planSize: selectedPlan.plan,
-            pointsRedeemed: pointsRequired,
-            transactionReference: transactionRef
-          }
-        });
-      } else {
-        // If API call failed, abort transaction
-        await req.abortTransaction();
-        await RedemptionHistory.findByIdAndUpdate(
-          redemptionid,
-          { status: "failed", errorMessage: dataResponse.data || "Unknown error" }
-        );
-
-        return res.status(StatusCodes.BAD_REQUEST).json({
-          success: false,
-          message: "Data purchase failed",
-          error: dataResponse.data || "Unknown error"
-        });
-      }
-    } catch (apiError) {
-      // If API call throws an error, abort transaction
-      console.error("API Error:", apiError.response?.data);
-
+    if (result.success) {
+      await req.commitTransaction();
+      return res.status(200).json(result);
+    } else {
       await req.abortTransaction();
-      await RedemptionHistory.findByIdAndUpdate(
-        redemptionid,
-        { status: "failed", errorMessage: apiError.response?.data || "Unknown error" }
-      );
-      
-
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Failed to process data purchase",
-        error: apiError.message
-      });
+      return res.status(result.statusCode || 400).json(result);
     }
-  } catch (error) {
-    // If any error occurs, transaction will be aborted by middleware
-    console.error("Error redeeming data plan:", error.response?.data);
-    if (redemptionid) {
-      await RedemptionHistory.findByIdAndUpdate(
-        redemptionid,
-        { status: "failed", errorMessage: error.response?.data || "Unknown error", errorData: error.response?.data }
-      );
-    }
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "Failed to redeem data plan",
-      error: error.message
-    });
+  } catch (err) {
+    await req.abortTransaction();
+    return res.status(500).json({ success: false, message: "Server error", error: err.message });
   }
 };
 
