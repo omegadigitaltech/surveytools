@@ -13,12 +13,12 @@ const serviceProviders = [
   { name: "9MOBILE", logo: "./9mobile.svg" },
   { name: "GLO", logo: "./glo-logo.svg" },
 ];
-const NETWORK_CODES = {
-  0: "1", // MTN
-  1: "2", // Airtel
-  2: "3", // 9mobile
-  3: "4"  // Glo
-};
+// const NETWORK_CODES = {
+//   0: "1", // MTN
+//   1: "2", // Airtel
+//   2: "3", // 9mobile
+//   3: "4"  // Glo
+// };
 export default function ConfirmDetails() {
   const apiUrl = import.meta.env.VITE_API_URL;
   const API_URL = config.API_URL
@@ -78,34 +78,32 @@ export default function ConfirmDetails() {
         return;
       }
 
-      const payload = redeemModalState === "data"
-        ? {
-          planId: selectedPlan.planid,
-          network: NETWORK_CODES[providerIndex],
-          phoneNumber: formattedPhone
-        } : {
-          amount: Number(selectedPlanPrice),
-          network: NETWORK_CODES[providerIndex],
-          phoneNumber: formattedPhone
-        }
+      const payload = {
+        amount: Number(selectedPlanPrice),
+        network: serviceProviders[providerIndex].name,
+        phoneNumber: formattedPhone
+      };
+      
       const endpoint = redeemModalState === "data"
         ? "/redemption/data"
         : "/redemption/airtime";
 
-      if (!NETWORK_CODES[providerIndex]) {
+
+      if (!serviceProviders[providerIndex]?.name) {
         toast.error("Select a network provider");
         return;
       }
+
       if (redeemModalState === "airtime") {
         if (selectedPlanPrice < 100) {
           toast.error("Minimum airtime amount is 100");
           return;
         }
       }
-      if (redeemModalState === "data" && !selectedPlan?.planid) {
-        toast.error("Please select a valid data plan");
-        return;
-      }
+      // if (redeemModalState === "data" && !selectedPlan?.planid) {
+      //   toast.error("Please select a valid data plan");
+      //   return;
+      // }
       const response = await axios.post(
         `${API_URL}${endpoint}`,
         payload,
