@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/useAuthStore";
 import iconUser from "../../assets/img/icon-user.svg";
@@ -6,18 +7,21 @@ import "./navbar.css";
 
 const Sidebar = () => {
   const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   if (!isAuthenticated) return null;
 
   return (
-    <aside className="sidebar-container">
+    <>
+    
+     <aside className="sidebar-container fixed md:static">
       {/* Logo */}
       <NavLink className="header-w1-logo" to="/">
         <img
           src="/Blue-logo-1.svg"
           alt="Blue Logo"
-          className="md:w-[10rem] h-[2.5rem] md:h-auto"
+          className="md:w-40 h-10 md:h-auto"
         />
       </NavLink>
 
@@ -67,6 +71,8 @@ const Sidebar = () => {
         </button>
       </div>
     </aside>
+    </>
+   
   );
 };
 
