@@ -23,7 +23,9 @@ const redemptionRouter = require('./routes/redemption')
 const adminRouter = require('./routes/admin')
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const uploadErrorHandler = require('./middleware/errorHandler')
-const notFoundMiddleware = require('./middleware/not-found')
+const notFoundMiddleware = require('./middleware/not-found');
+const { loadTelecomCatalog } = require("./services/telecom/catalogCache");
+const { syncTelecomCatalog } = require("./services/flutterwave/syncCatalog");
 
 const app = express();
 require('./middleware/passport');
@@ -76,6 +78,7 @@ if (!fs.existsSync(tempFilesDir)) {
   fs.mkdirSync(tempFilesDir, { recursive: true });
 }
 
+
 // Check Redis connection
 const checkRedisConnection = async () => {
   try {
@@ -126,6 +129,10 @@ const checkRedisConnection = async () => {
   }
 };
 
+
+
+
+
 app.use('/', mainRouter)
 app.use('/', authRouter)
 app.use('/', redemptionRouter)
@@ -140,11 +147,31 @@ app.use(notFoundMiddleware);
 console.log(process.env.MONGODB_URI)
 
 
-const port = process.env.PORT || 5000;
-app.listen(port, async () => {
-  //connect DB
-  await connectDB();
-  // Check Redis connection for queue service
-  await checkRedisConnection();
-  console.log(`Server is running on port ${port}\n\nhttp://localhost:${port}`);
-});
+
+const bootstrap = async () => {
+  try {
+    // Sync & load telecom catalog
+    // await syncTelecomCatalog();
+    // await loadTelecomCatalog();
+
+    // Connect DB
+    await connectDB();
+
+    // Check Redis
+    await checkRedisConnection();
+
+    const port = process.env.PORT || 5000;
+    app.listen(port, () => {
+      console.log(
+        `🚀 Server running on port ${port}\nhttp://localhost:${port}`
+      );
+    });
+  } catch (err) {
+    console.error("❌ Server startup failed:", err);
+    process.exit(1);
+  }
+};
+
+bootstrap();
+
+
