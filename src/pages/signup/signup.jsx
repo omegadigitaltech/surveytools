@@ -59,34 +59,40 @@ const SignUp = () => {
   return (
     <div className="auth-w4 flex">
       <div className="form-col">
-        <h1 className="h1">Create An Account</h1>
-        <p className="text-gray-600 mb-4">Signup as a student, start taking surveys, earn rewards, and learn through research</p>
+        <h1 className="auth-w5-heading">Create An Account</h1>
+        <p className="text-gray-600 mb-4 auth-w5-subtitle">Sign up, start taking surveys, earn rewards and learn through research.</p>
+
         <Form className="auth-w4-form" method="post" action="/signup" onSubmit={handleSubmit}>
           <div className="auth-w4-grid">
+            {/* Name fields - side by side */}
             <div className="auth-w4-field">
               <label className="auth-w4-label" htmlFor="firstname">
-                First name
+                Name
               </label>
               <input
                 className="auth-w4-input"
                 type="text"
                 name="firstname"
                 id="firstname"
+                placeholder="First name"
                 required
               />
             </div>
             <div className="auth-w4-field">
               <label className="auth-w4-label" htmlFor="lastname">
-                Last name
+                Last Name
               </label>
               <input
                 className="auth-w4-input"
                 type="text"
                 name="lastname"
                 id="lastname"
+                placeholder="Last name"
                 required
               />
             </div>
+
+            {/* Email - full width */}
             <div className="auth-w4-field auth-w4-full">
               <label className="auth-w4-label" htmlFor="email">
                 Email
@@ -96,21 +102,26 @@ const SignUp = () => {
                 type="email"
                 name="email"
                 id="email"
+                placeholder="Enter your email address"
                 required
               />
             </div>
+
+            {/* Institution - full width */}
             <div className="auth-w4-field auth-w4-full">
-              <label className="auth-w4-label" htmlFor="department">
+              <label className="auth-w4-label" htmlFor="institution">
                 Institution
               </label>
               <input
                 className="auth-w4-input"
                 type="text"
                 name="institution"
-                id="department"
+                id="institution"
+                placeholder="Enter your institution name"
                 required
               />
             </div>
+
             <div className="auth-w4-field auth-w4-full">
               <label className="auth-w4-label" htmlFor="gender">
                 Gender
@@ -128,6 +139,7 @@ const SignUp = () => {
                 <option value="female">Female</option>
               </select>
             </div>
+
             <div className="auth-w4-field auth-w4-full">
               <label className="auth-w4-label" htmlFor="faculty">
                 Faculty
@@ -148,6 +160,8 @@ const SignUp = () => {
                 ))}
               </select>
             </div>
+
+            {/* Department - conditional rendering */}
             {faculty && (
               <div className="auth-w4-field auth-w4-full">
                 <label className="auth-w4-label" htmlFor="department">
@@ -178,59 +192,70 @@ const SignUp = () => {
               </label>
               <div className="auth-w4-wrap">
                 <input
-                  className="auth-w4-input pw-toggle"
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  id="password"
+                 className="auth-w4-input"
+                 type={showPassword ? "text" : "password"}
+                 name="password"
+                 id="password"
+                 placeholder="Create a password"
                   required
-                />
+                 />
                 <img
                   className="signin-icon"
                   src={iconPass}
                   onClick={handleToggle}
-                  alt=""
+                  alt="Toggle Password Visibility"
                 />
               </div>
             </div>
+
+            {/* Confirm Password - full width */}
             <div className="auth-w4-field auth-w4-full">
               <label className="auth-w4-label" htmlFor="confirm">
                 Confirm Password
               </label>
               <div className="auth-w4-wrap">
                 <input
-                  className="auth-w4-input pw-toggle"
+                  className="auth-w4-input "
                   type={showPassword ? "text" : "password"}
                   name="confirm"
                   id="confirm"
+                  placeholder="Confirm password"
+                  required
                 />
                 <img
                   className="signin-icon"
                   src={iconPass}
                   onClick={handleToggle}
-                  alt=""
+                  alt="Toggle Password Visibility"
                 />
               </div>
             </div>
           </div>
-          <label className="auth-w4-block" htmlFor="">
-            <input className="check" type="checkbox" required />
-            Agree to{" "}
-            <Link className="" to="">
+
+          {/* Terms & Conditions checkbox */}
+          <label className="auth-w4-block agree-terms" htmlFor="terms">
+            <input className="check" type="checkbox" id="terms" required />
+            Agree to{" "} 
+            <Link to="">
               terms & condition
             </Link>
           </label>
-          <button className="auth-w4-btn" disabled={loading}>
-            {/* {isLoading ? <AiOutlineLoading3Quarters size={24} /> : "Sign up"} */}
-            {loading ? "Loading..." : "Sign up"}
+
+          {/* Submit button */}
+          <button className="auth-w4-btn" type="submit" disabled={loading}>
+            {loading ? "Loading..." : "Create an Account"}
           </button>
         </Form>
+
+        {/* Sign in link */}
         <div className="auth-w4- text-center">
-          Already have an account?&nbsp;
+          Have an account already?&nbsp;
           <Link className="auth-w4-" to="/signin">
-            Sign in
+            Login
           </Link>
         </div>
       </div>
+
       <div className="absolute top-0 right-0 h-screen w-[50%] flex justify-center items-center signup-col signup-image">
         <img src={features} alt="" />
       </div>
