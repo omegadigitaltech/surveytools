@@ -16,7 +16,7 @@ const getDataPlansHandler = async (req, res) => {
   try {
     // Fetch data plans from the API
     const response = await getDataPlans();
-    
+
     // Return the transformed data plans
     return res.status(200).json({
       success: true,
@@ -39,67 +39,30 @@ const getDataPlansHandler = async (req, res) => {
  */
 const getDataPlans = async () => {
   try {
-    // Fetch data plans from the API
-    const apiUrl = process.env.DATA_PLANS_API_URL || 'https://api.cardri.ng/api/v1/data/plans';
-    const response = await axios.get(apiUrl, {
-      headers: {
-        'Authorization': `Bearer ${process.env.CARDRI_API_KEY}`
-      }
+    const TelecomService = require('../services/telecom/TelecomService');
+    const provider = TelecomService.getProvider();
+
+    const networks = ['MTN', 'AIRTEL', 'GLO', '9MOBILE'];
+    let allPlans = [];
+
+    // Fetch plans for all networks in parallel
+    const plansPromises = networks.map(async (net) => {
+      const netPlans = await provider.getDataPlans(net);
+      return netPlans.map(plan => ({
+        ...plan,
+        network: net.toUpperCase(), // Using name directly as requested
+        networkName: net.toUpperCase(),
+        // Ensure compatibility with frontend expected fields if they differ
+        // Frontend likely expects: planid, name, price, network, networkName
+        planid: plan.planId, // mapping back to lowercase if frontend expects it
+      }));
     });
-    
-    // Check if response is valid
-    if (!response.data || !response.data) {
-      throw new Error('Invalid response from data plans API');
-    }
-    
-    const newPlans = response.data;
-    const transformedPlans = [];
-    
-    // Process MTN plans
-    if (newPlans.mtn && Array.isArray(newPlans.mtn)) {
-      newPlans.mtn.forEach(plan => {
-        transformedPlans.push({
-          ...plan,
-          network: "1", // MTN network identifier
-          networkName: 'MTN'
-        });
-      });
-    }
-    
-    // Process GLO plans
-    if (newPlans.glo && Array.isArray(newPlans.glo)) {
-      newPlans.glo.forEach(plan => {
-        transformedPlans.push({
-          ...plan,
-          network: "4", // GLO network identifier
-          networkName: 'GLO'
-        });
-      });
-    }
-    
-    // Process Airtel plans
-    if (newPlans.airtel && Array.isArray(newPlans.airtel)) {
-      newPlans.airtel.forEach(plan => {
-        transformedPlans.push({
-          ...plan,
-          network: "2", // Airtel network identifier
-          networkName: 'Airtel'
-        });
-      });
-    }
-    
-    // Process 9mobile plans
-    if (newPlans['9mobile'] && Array.isArray(newPlans['9mobile'])) {
-      newPlans['9mobile'].forEach(plan => {
-        transformedPlans.push({
-          ...plan,
-          network: "3", // 9mobile network identifier
-          networkName: '9mobile'
-        });
-      });
-    }
-    
-    return transformedPlans;
+
+    const results = await Promise.all(plansPromises);
+    allPlans = results.flat();
+
+    return allPlans;
+
   } catch (error) {
     console.error('Error in getDataPlans function:', error);
     throw error;
@@ -147,19 +110,44 @@ async function redeemTelecom({
       pointsRequired = Number(amount);
       valueReceived = amount;
     } else if (type === "data") {
-      if (!planId) {
-        return { success: false, message: "planId required for data", statusCode: 400 };
-      }
-
-      // Fetch plans (keep your getDataPlans or make it cached)
+      let selected;
       const plans = await getDataPlans(); // assume this returns array
-      const selected = plans.find(p => p.planid === planId && p.network === network);
-      if (!selected) {
-        return { success: false, message: "Invalid data plan", statusCode: 404 };
+
+      if (planId) {
+        selected = plans.find(p => p.planid === planId && p.network === network);
+      } else if (amount) {
+        // Find suitable plan based on amount
+        // Filter plans for this network
+        const netPlans = plans.filter(p => p.network === network);
+
+        // Find plans that we can afford with this amount
+        // Sort by price descending to get the best (biggest) plan possible
+        const affordablePlans = netPlans
+          .filter(p => Number(p.price) <= Number(amount))
+          .sort((a, b) => Number(b.price) - Number(a.price));
+
+        if (affordablePlans.length > 0) {
+          selected = affordablePlans[0];
+          // Determine actual cost used
+          // "if it doesnt use everything it will only deducrt the amkount it sused"
+          // So pointsRequired will be the plan price, not original amount (unless user wants to burn extra?)
+          // Logic usually implies user pays for the specific plan price.
+        } else {
+          return { success: false, message: `Amount ₦${amount} is insufficient for any data plan on ${network}`, statusCode: 400 };
+        }
+      } else {
+        return { success: false, message: "Either planId or amount is required for data", statusCode: 400 };
       }
 
+      if (!selected) {
+        return { success: false, message: "Invalid data plan or plan not found", statusCode: 404 };
+      }
+
+      // Use the plan's price as the points required
       pointsRequired = Number(selected.price);
       valueReceived = Number(selected.price);
+      planId = selected.planid; // Ensure planId is set for downstream logic
+
       planDetails = {
         name: selected.name,
         size: selected.plan || selected.size,
@@ -298,6 +286,7 @@ const redeemData = async (req, res) => {
       network: req.body.network,
       phoneNumber: req.body.phoneNumber,
       session: req.dbSession,
+      amount: req.body.amount,
     });
 
     if (result.success) {
@@ -318,7 +307,7 @@ const getRedemptionHistory = async (req, res) => {
   try {
     const userId = req.userId;
     console.log(userId)
-    
+
     const history = await RedemptionHistory.find({ userId })
       .sort({ createdAt: -1 });
 

@@ -1,0 +1,254 @@
+Here is a complete and cleanly organized documentation of the VTU.ng API v2 (latest API) — including airtime and data (VTU) integration, with full details, endpoints, parameters, examples, error codes, authentication & best-practices. All content is based on the official VTU.ng API documentation.
+
+📘 VTU.ng API Documentation
+
+Virtual Top-Up, Airtime, Data Plans, Cable TV, Electricity, Betting Funding, ePINs
+Base URL:
+
+https://vtu.ng/wp-json
+
+All API requests use this base URL.
+
+⚙️ 1. Authentication
+➤ JWT Token Authentication
+
+Most VTU API v2 endpoints require authentication using a JWT Bearer token.
+You must first login with your reseller credentials and receive a token which you include in subsequent requests.
+
+📌 Obtain Access Token
+
+Endpoint
+
+POST /jwt-auth/v1/token
+
+Purpose:
+Generate a JWT token for authenticated requests.
+
+Required Parameters (JSON)
+
+Field	Type	Required	Description
+username	string	✅	Your VTU.ng account username or email
+password	string	✅	Your VTU.ng account password
+
+Sample cURL
+
+curl -X POST https://vtu.ng/wp-json/jwt-auth/v1/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "your_email_or_username",
+    "password": "your_password"
+  }'
+
+Success Response
+
+{
+  "token": "your_jwt_token",
+  "user_email": "you@example.com",
+  "user_display_name": "Your Name"
+}
+
+Notes
+
+The token is valid for ~7 days.
+
+🪙 2. Check Wallet Balance
+
+Endpoint
+
+GET /api/v2/balance
+
+Headers
+
+Authorization: Bearer your_jwt_token
+
+Description:
+Checks your VTU wallet balance.
+
+Response
+
+{
+  "code": "success",
+  "message": "Wallet balance retrieved successfully!",
+  "data": {
+    "balance": 5000.00,
+    "currency": "NGN"
+  }
+}
+
+Errors if token missing, invalid or insufficient.
+
+📡 3. Purchase Airtime (VTU)
+
+Endpoint
+
+POST /api/v2/airtime
+
+Headers
+
+Authorization: Bearer your_jwt_token
+Content-Type: application/json
+
+Request Body
+
+Field	Type	Required	Description
+request_id	string	✅	Unique Reference for this transaction
+phone	string	✅	Customer phone number (e.g., 08012345678)
+service_id	string	✅	Network provider (e.g., mtn, glo)
+amount	integer	✅	Amount of airtime in NGN
+
+Example
+
+curl -X POST https://vtu.ng/wp-json/api/v2/airtime \
+  -H "Authorization: Bearer your_jwt_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request_id": "req_123ABC",
+    "phone": "08012345678",
+    "service_id": "mtn",
+    "amount": 100
+  }'
+
+Sample Success Response
+
+{
+  "code": "success",
+  "message": "ORDER COMPLETED",
+  "data": {
+    "order_id": 12345,
+    "status": "completed-api",
+    "product_name": "Airtime",
+    "amount": 100,
+    "amount_charged": "97.50",
+    "final_balance": "X"
+  }
+}
+
+Order may be “processing-api” and later change status.
+
+📶 4. Get Data Plan Variations
+
+Endpoint
+
+GET /api/v2/variations/data
+
+Query Parameters
+
+Field	Type	Required	Description
+service_id	string	❌	Provider filter (mtn, airtel, glo, 9mobile, smile)
+
+Description:
+Returns available data plans for networks.
+
+Example
+
+GET https://vtu.ng/wp-json/api/v2/variations/data
+
+Sample Response (trimmed)
+
+{
+  "code": "success",
+  "product": "Data",
+  "data": [{
+      "variation_id": 244542,
+      "data_plan": "2GB + 2 mins",
+      "price": "1599"
+  }]
+}
+📊 5. Purchase Data Bundle
+
+Endpoint
+
+POST /api/v2/data
+
+Headers
+
+Authorization: Bearer your_jwt_token
+Content-Type: application/json
+
+Request Body
+
+Field	Type	Required
+request_id	string	✅
+phone	string	✅
+service_id	string	✅
+variation_id	string	✅
+
+Description:
+Purchase a data bundle (variation_id from /variations/data).
+
+Example
+
+curl -X POST https://vtu.ng/wp-json/api/v2/data \
+  -H "Authorization: Bearer your_jwt_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request_id": "req_data_001",
+    "phone": "08012345678",
+    "service_id": "mtn",
+    "variation_id": "244542"
+  }'
+
+Response
+Returns order status (processing / completed / refunded).
+
+🔄 6. Order Requery
+
+Endpoint
+
+POST /api/v2/requery
+
+Request Body
+
+Field	Type	Required
+request_id	string	✅
+
+Use:
+Check status of an existing order (Airtime, Data, etc.) — useful if webhook or callback status is unknown.
+
+🧠 7. Error Codes & Meanings
+
+The API returns specific error codes and HTTP statuses. Examples include:
+
+HTTP Code	Error Code	Meaning
+400	missing_fields	Required parameter missing
+400	invalid_service_id	Wrong network/service
+402	insufficient_funds	Wallet has low balance
+403	jwt_auth_failed	Token or credentials invalid
+404	no_product	Variation not found
+409	duplicate_request_id	Request ID was reused
+429	rate_limit_exceeded	Too many requests
+🛠️ 8. Best Practices
+
+✔ Use unique request_id for every transaction
+✔ Fetch data variations once, cache locally
+✔ Requery transactions on failure or webhook delay
+✔ Validate phone formats (080... or +23480...)
+✔ Complete KYC for higher limits
+
+⚠️ Notes on Data & Airtime (VTU)
+📌 Variations vs Purchase
+
+Use GET variations endpoint before purchase to ensure correct plans exist.
+
+Variation IDs change over time — treat them as dynamic data.
+
+🧾 Order Lifecycle
+
+Order status often starts processing-api
+
+Final completion happens later (webhook or requery)
+
+📌 What’s Not Covered
+
+This doc only includes airtime/data and order flows. VTU.ng also supports:
+
+Electricity bill payments
+
+Cable TV subscriptions
+
+Betting account top-ups
+
+ePIN generation
+These have similar patterns: verify customer → purchase → webhook → status.
+
+If you want sample code in Node.js, Python or PHP based on this API (including webhook setup), just let me know!
