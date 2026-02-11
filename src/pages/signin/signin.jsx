@@ -50,47 +50,69 @@ const SignIn = () => {
 
   return (
     <div className="auth-w5 flex">
+      <Link to="/signup" className="auth-w5-top-cta">
+        New here? Create an account
+      </Link>
+
       <div className="form-col">
-    
-        <Form className="auth-w5-form" method="post" action="/signin" onSubmit={handleSubmit} >
+        <h1 className="auth-w5-heading">Welcome Back</h1>
+        <p className="auth-w5-subtitle">
+          Login to continue taking surveys, gathering insights.
+        </p>
+
+        <Form className="auth-w5-form" method="post" action="/signin" onSubmit={handleSubmit}>
           <div className="auth-w5-field">
             <label className="auth-w5-label" htmlFor="email">Email</label>
-            <input className="auth-w5-input" type="text" name="email" id="email" required />
+            <input
+              className="auth-w5-input"
+              type="text"
+              name="email"
+              id="email"
+              placeholder="Enter your email address"
+              required
+            />
           </div>
           <div className="auth-w5-field">
             <label className="auth-w5-label" htmlFor="password">Password</label>
             <div className="auth-w5-wrap">
-              <input className="auth-w5-input" type={showPassword ? "text" : "password"} name="password" id="password" required />
+              <input
+                className="auth-w5-input"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                id="password"
+                placeholder="Create a password"
+                required
+              />
               <img className="signin-icon pw-toggle" src={iconPass} alt="Toggle Password Visibility" onClick={handleToggle} />
             </div>
           </div>
           <div className="auth-w5-third">
-            {/* <label className="auth-w5-block" htmlFor="remember">
-              <input className="auth-w5-check" type="checkbox" name="checkbox" /> Remember me
-            </label> */}
-            <Link to='/forgotpassword' className="auth-w5-reset">Forgot password?</Link>
+            <Link to='/forgotpassword' className="auth-w5-reset">Forgot Password?</Link>
           </div>
 
-          {/* Show spinner if loading, otherwise show Sign In button */}
+          {/* Show spinner if loading, otherwise show Login button */}
           <button className="auth-w5-btn" type="submit" disabled={loading}>
-            {loading ? "Loading..." : "Sign in"}
+            {loading ? "Loading..." : "Login"}
           </button>
         </Form>
-           {/*GOOGLE LATER */}
+
+        {/*GOOGLE LATER */}
         {/* <div className="auth-w3">
           <div className="auth-w3-line">Or login with</div>
           <div className="google-div">
-            <button className=" signin-google">
+            <button className="signin-google">
               <img className="auth-w3-icon" src={iconGL} alt="Google Login" />
               Continue with Google
             </button>
           </div>
         </div> */}
+
         <div className="auth-w5- no-acct">
-          Don't have an account?&nbsp;
-          <Link className="auth-w5-" to="/signup">Sign up</Link>
+          New here?&nbsp;
+          <Link className="auth-w5-" to="/signup">Create an account</Link>
         </div>
       </div>
+
       <div className="signin-col signin-image">
         <img src={features} alt="Sign in Features" />
       </div>

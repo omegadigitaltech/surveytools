@@ -67,15 +67,9 @@ const Navbar = () => {
                 Blog
               </NavLink>
             </li>
-
-            {/* <li className="header-w2-item hide">
-              <NavLink className="header-w2-link" to="/">
-                About Us
-              </NavLink>
-            </li> */}
           </ul>
         </div>
-        <div className="header-w2">
+        <div className="header-w2 header-auth">
           <ul className="header-w2-list">
             {isAuthenticated && (
               <>
@@ -90,7 +84,7 @@ const Navbar = () => {
                   </NavLink>
                 </li>
                 <li className="header-w2-item show header-w2-hide">
-                  <NavLink className="header-w2-link" to="/create-form">
+                  <NavLink className="header-w2-link" to="/formquestions">
                     Create Form
                   </NavLink>
                 </li>
@@ -103,16 +97,6 @@ const Navbar = () => {
                     Get Started
                   </NavLink>
                 </li>
-                {/* <li className="header-w2-item hide">
-                  <NavLink className="header-w2-link" to="/signin">
-                    Log In
-                  </NavLink>
-                </li>
-                <li className="header-w2-item hide header-w2-main">
-                  <NavLink className="header-w2-link" to="/signup">
-                    Sign Up
-                  </NavLink>P
-                </li> */}
               </>
             )}
           </ul>
@@ -174,7 +158,7 @@ const Navbar = () => {
             </li>
             <li>
               <NavLink
-                to="/create-form"
+                to="/formquestions"
                 className="menu-item"
                 onClick={closeMenu}
               >

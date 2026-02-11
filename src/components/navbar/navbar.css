@@ -43,7 +43,8 @@ body.has-navbar {
 }
 
 .header-w2 {
-    flex: 1;
+    /* flex: 1; */
+    flex: 0 0 auto;
 }
 
 .header-w3 {

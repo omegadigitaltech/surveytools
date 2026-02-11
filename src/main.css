@@ -9,7 +9,8 @@
   /* Colors */
   /* --base: #1D8C9C; */
   --base: #2095d3;
-  --btns: #149bba;
+  /* --btns: #149bba; */
+  --btns: #2793CD;
   --blue-border: #bfe9f3;
   --wht: #fff;
   --fade: #e6e6e6;
@@ -20,7 +21,8 @@
   --green: rgb(53, 143, 53);
   --border: 0.5px solid rgb(167, 167, 167);
   --primary: #2095d3;
-  --secondary-blue: #35c6f4;
+  --secondary-blue: #50B4E9;
+  
   --lemon: #14fe19;
   --greytxt: #6b7280;
   --greyborder: #dbdbdb;

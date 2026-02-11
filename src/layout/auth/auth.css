@@ -1,5 +1,6 @@
 .auth {
     padding: 3em 0;
+    background: linear-gradient(135deg, #e8f0fe 0%, #f0e8ff 50%, #c3ccdb 100%);
 }
 .auth-w1-lead {
     color: var(--cl-lead);
@@ -7,7 +8,11 @@
     font-size: 1.5rem;
     font-weight: 700;
 }
-
+.header-w1-logo {
+    display: inline-block;
+    width: fit-content;
+  }
+  
 .auth-w1-circ {
     --len: 5px;
     width: var(--len);
@@ -70,6 +75,9 @@
 
 /* MEDIA QUERY */
 @media(max-width: 585px){
+    .auth {
+        min-height: 100vh;
+    }
     .auth-wrap{
         width: 90% !important;
     }

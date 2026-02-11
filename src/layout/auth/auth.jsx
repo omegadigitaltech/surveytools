@@ -6,7 +6,7 @@ const Auth = () => {
   return (
     <section className="auth">
       <div className="auth-wrap wrap">
-        <nav className="pb-[3em]">
+        <nav className="">
         <NavLink className="header-w1-logo " to="/">
           <img
             src="/Blue-logo-1.svg"
