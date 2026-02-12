@@ -1,20 +1,28 @@
-import { Flame, Trophy, Star, FileText, Clock, CheckCircle, TrendingUp } from "lucide-react";
+import {
+  Flame,
+  Trophy,
+  Star,
+  FileText,
+  Clock,
+  CheckCircle,
+  TrendingUp,
+} from "lucide-react";
 import useDashboardStore from "../../store/useDashboardStore";
 
 export default function DashboardMain() {
- const {menuOpen, setMenuOpen} = useDashboardStore();
+  const { menuOpen, setMenuOpen } = useDashboardStore();
   return (
     <div className="p-6 space-y-6 bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between">
-         <button
-            className={`header-w1-menu ${menuOpen ? "menu-open" : ""}`}
-            onClick={() => setMenuOpen(true)}
-          >
-            <div className="header-w1-line" aria-hidden></div>
-            <div className="header-w1-line" aria-hidden></div>
-            <div className="header-w1-line" aria-hidden></div>
-          </button>
+      <div className="flex items-center gap-4">
+        <button
+          className={`header-w1-menu ${menuOpen ? "menu-open" : ""}`}
+          onClick={() => setMenuOpen(true)}
+        >
+          <div className="header-w1-line" aria-hidden></div>
+          <div className="header-w1-line" aria-hidden></div>
+          <div className="header-w1-line" aria-hidden></div>
+        </button>
         <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
         {/* <div className="flex gap-4">
           
@@ -49,7 +57,10 @@ export default function DashboardMain() {
           <div className="flex items-center justify-between mt-4">
             <div className="flex gap-1">
               {[1, 2, 3, 4].map((i) => (
-                <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                <Star
+                  key={i}
+                  className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                />
               ))}
               <Star className="w-4 h-4 text-white/50" />
             </div>

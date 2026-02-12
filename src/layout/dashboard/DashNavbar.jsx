@@ -9,7 +9,7 @@ import useDashboardStore from "../../store/useDashboardStore";
 
 const Sidebar = () => {
   const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
-  const [menuOpen, setMenuOpen] = useDashboardStore();
+  const {menuOpen, setMenuOpen} = useDashboardStore();
   const sidebar = useRef(null);
   const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ const Sidebar = () => {
     <>
       {menuOpen && <div className="overlay fixed inset-0 block md:hidden"></div>}
 
-      <aside ref={sidebar} className={`sidebar-container fixed md:static z-600 ${menuOpen ? "translate-x-0" : "-translate-x-full"} duration-300 ease-in-out`}>
+      <aside ref={sidebar} className={`sidebar-container fixed md:static z-600 ${menuOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 duration-300 ease-in-out`}>
         {/* Logo */}
         <NavLink className="header-w1-logo" to="/">
           <img

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 const useDashboardStore = create((set) => ({
-  menuOpen: null,
+  menuOpen: false,
   setMenuOpen: (value) => set(() => ({ menuOpen: value })),
 }));
 
