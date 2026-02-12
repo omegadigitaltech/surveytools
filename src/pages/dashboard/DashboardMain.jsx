@@ -1,19 +1,25 @@
 import { Flame, Trophy, Star, FileText, Clock, CheckCircle, TrendingUp } from "lucide-react";
+import useDashboardStore from "../../store/useDashboardStore";
 
 export default function DashboardMain() {
+ const {menuOpen, setMenuOpen} = useDashboardStore();
   return (
     <div className="p-6 space-y-6 bg-gray-50">
       {/* Header */}
       <div className="flex items-center justify-between">
+         <button
+            className={`header-w1-menu ${menuOpen ? "menu-open" : ""}`}
+            onClick={() => setMenuOpen(true)}
+          >
+            <div className="header-w1-line" aria-hidden></div>
+            <div className="header-w1-line" aria-hidden></div>
+            <div className="header-w1-line" aria-hidden></div>
+          </button>
         <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
-        <div className="flex gap-4">
-          <button className="text-sm text-green-600 hover:underline">
-            Create a Form
-          </button>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm shadow hover:bg-blue-700">
-            Create Questionnaire
-          </button>
-        </div>
+        {/* <div className="flex gap-4">
+          
+         
+        </div> */}
       </div>
 
       {/* Top cards */}

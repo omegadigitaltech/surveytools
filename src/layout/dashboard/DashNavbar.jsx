@@ -1,78 +1,109 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/useAuthStore";
 import iconUser from "../../assets/img/icon-user.svg";
 import iconLogOut from "../../assets/img/icon-logout.svg";
+import useOutsideClick from "../../hooks/useOutsideClick";
 import "./navbar.css";
+import useDashboardStore from "../../store/useDashboardStore";
 
 const Sidebar = () => {
   const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useDashboardStore();
+  const sidebar = useRef(null);
   const navigate = useNavigate();
 
   if (!isAuthenticated) return null;
 
+  // Setup clickOutside function for sidebar
+  useOutsideClick(sidebar, () => setMenuOpen(false));
+
   return (
     <>
-    
-     <aside className="sidebar-container fixed md:static">
-      {/* Logo */}
-      <NavLink className="header-w1-logo" to="/">
-        <img
-          src="/Blue-logo-1.svg"
-          alt="Blue Logo"
-          className="md:w-40 h-10 md:h-auto"
-        />
-      </NavLink>
+      {menuOpen && <div className="overlay fixed inset-0 block md:hidden"></div>}
 
-      {/* Navigation */}
-      <nav className="sidebar-nav mt-12">
-        <NavLink to="/dashboard" className="sidebar-link">
-          <span><img src="/Widget-2.svg" alt="Widget 2" /></span>
-          <span>Dashboard</span>
+      <aside ref={sidebar} className={`sidebar-container fixed md:static z-600 ${menuOpen ? "translate-x-0" : "-translate-x-full"} duration-300 ease-in-out`}>
+        {/* Logo */}
+        <NavLink className="header-w1-logo" to="/">
+          <img
+            src="/Blue-logo-1.svg"
+            alt="Blue Logo"
+            className="md:w-40 h-10 md:h-auto"
+          />
         </NavLink>
 
-        <NavLink to="/my-forms" className="sidebar-link">
-          <span><img src="/Folder-With-Files.svg" alt="Folder-With-FIles" /></span>
-          <span>My Forms</span>
-        </NavLink>
+        {/* Navigation */}
+        <nav className="sidebar-nav mt-12">
+          <NavLink to="/dashboard" className="sidebar-link">
+            <span>
+              <img src="/Widget-2.svg" alt="Widget 2" />
+            </span>
+            <span>Dashboard</span>
+          </NavLink>
 
-        <NavLink to="/analytics" className="sidebar-link">
-          <span><img src="/Chat-Square-2.svg" alt="Chat-Square" /></span>
-          <span>Analytics</span>
-        </NavLink>
+          <NavLink to="/my-forms" className="sidebar-link">
+            <span>
+              <img src="/Folder-With-Files.svg" alt="Folder-With-FIles" />
+            </span>
+            <span>My Forms</span>
+          </NavLink>
 
-        <NavLink to="/responses" className="sidebar-link">
-          <span><img src="/Checklist-Minimalistic.svg" alt="Checklist-Minimalistic" /></span>
-          <span>Responses</span>
-        </NavLink>
+          <NavLink to="/analytics" className="sidebar-link">
+            <span>
+              <img src="/Chat-Square-2.svg" alt="Chat-Square" />
+            </span>
+            <span>Analytics</span>
+          </NavLink>
 
-        <NavLink to="/help" className="sidebar-link">
-          <span><img src="/Help.svg" alt="Help" /></span>
-          <span>Help & Support</span>
-        </NavLink>
+          <NavLink to="/responses" className="sidebar-link">
+            <span>
+              <img
+                src="/Checklist-Minimalistic.svg"
+                alt="Checklist-Minimalistic"
+              />
+            </span>
+            <span>Responses</span>
+          </NavLink>
 
-        <NavLink to="/settings" className="sidebar-link">
-          <span><img src="/Settings-Minimalistic.svg" alt="Settings" /></span>
-          <span>Settings</span>
-        </NavLink>
-      </nav>
+          <NavLink to="/help" className="sidebar-link">
+            <span>
+              <img src="/Help.svg" alt="Help" />
+            </span>
+            <span>Help & Support</span>
+          </NavLink>
 
-      {/* Bottom user section */}
-      <div className="sidebar-footer">
-        <button className="sidebar-user" onClick={() => navigate("/profile")}>
-          <img src={iconUser} alt="User" />
-          <span>{userName}</span>
-        </button>
+          <NavLink to="/settings" className="sidebar-link">
+            <span>
+              <img src="/Settings-Minimalistic.svg" alt="Settings" />
+            </span>
+            <span>Settings</span>
+          </NavLink>
+          <NavLink to="/create-form" className="sidebar-link">
+            <button className="text-sm text-green-600 hover:underline">
+            Create a Form
+          </button>
+          </NavLink>
+          <NavLink to="/create-questionnaire" className="sidebar-link">
+           <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm shadow hover:bg-blue-700">
+            Create Questionnaire
+          </button>
+          </NavLink>
+        </nav>
 
-        <button className="sidebar-logout" onClick={showLogoutConfirmation}>
-          <img src={iconLogOut} alt="Logout" />
-          Logout
-        </button>
-      </div>
-    </aside>
+        {/* Bottom user section */}
+        <div className="sidebar-footer">
+          <button className="sidebar-user" onClick={() => navigate("/profile")}>
+            <img src={iconUser} alt="User" />
+            <span>{userName}</span>
+          </button>
+
+          <button className="sidebar-logout" onClick={showLogoutConfirmation}>
+            <img src={iconLogOut} alt="Logout" />
+            Logout
+          </button>
+        </div>
+      </aside>
     </>
-   
   );
 };
 
