@@ -64,7 +64,7 @@ export default function DashboardMain() {
               ))}
               <Star className="w-4 h-4 text-white/50" />
             </div>
-            <button className="text-xs underline">Leaderboard</button>
+            {/* <button className="text-xs underline">Leaderboard</button> */}
           </div>
         </div>
 
@@ -101,12 +101,12 @@ export default function DashboardMain() {
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {/* <div className="dash-stats-card grid grid-cols-2 md:grid-cols-4 gap-6">
         <StatCard title="Available Surveys" value="12" icon={FileText} />
         <StatCard title="Active Surveys" value="6" icon={Clock} />
         <StatCard title="Completed Surveys" value="12" icon={CheckCircle} />
         <StatCard title="Trending Surveys" value="2" icon={TrendingUp} />
-      </div>
+      </div> */}
     </div>
   );
 }

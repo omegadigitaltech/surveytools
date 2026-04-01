@@ -55,7 +55,7 @@ const Sidebar = () => {
             <span>Analytics</span>
           </NavLink>
 
-          <NavLink to="/responses" className="sidebar-link">
+          {/* <NavLink to="/responses" className="sidebar-link">
             <span>
               <img
                 src="/Checklist-Minimalistic.svg"
@@ -63,7 +63,7 @@ const Sidebar = () => {
               />
             </span>
             <span>Responses</span>
-          </NavLink>
+          </NavLink> 
 
           <NavLink to="/help" className="sidebar-link">
             <span>
@@ -71,7 +71,7 @@ const Sidebar = () => {
             </span>
             <span>Help & Support</span>
           </NavLink>
-
+*/}
           <NavLink to="/settings" className="sidebar-link">
             <span>
               <img src="/Settings-Minimalistic.svg" alt="Settings" />
@@ -79,12 +79,12 @@ const Sidebar = () => {
             <span>Settings</span>
           </NavLink>
           <NavLink to="/create-form" className="sidebar-link">
-            <button className="text-sm text-green-600 hover:underline">
+            <button className="text-sm text-red-600 hover:underline">
             Create a Form
           </button>
           </NavLink>
           <NavLink to="/create-questionnaire" className="sidebar-link">
-           <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm shadow hover:bg-blue-700">
+           <button className="crt-quest text-white px-4 py-2 rounded-lg text-sm shadow hover:bg-blue-700">
             Create Questionnaire
           </button>
           </NavLink>

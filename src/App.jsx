@@ -36,15 +36,19 @@ import SurveyQuestion from "./pages/surveyquestion/surveyquestion";
 import Publish from "./pages/publish/publish";
 import Payment from "./components/payment/payment";
 import Pricing from "./pages/pricing/pricing";
-import CreateForm from "./pages/createform/createform.jsx";
+// import CreateForm from "./pages/createform/createform.jsx";
 import FormQuestions from "./pages/formquestions/formquestion.jsx";
 // import Payment from "./pages/payment/payment";
 import Notifications from "./pages/notifications/notifications";
 import Withdraw from "./pages/withdraw/withdraw";
 import Profile from "./pages/profile/profile";
 import AnswerSurvey from "./pages/answersurvey/answersurvey";
+import AnswerForm from "./pages/answerform/answerform";
+import MyForms from "./pages/myforms/myForm.jsx";
 import Settings from "./pages/settings/settings";
 import Insights from "./pages/insights/insights";
+import FormInsights from "./pages/forminsights/forminsights";
+import Analytics from "./pages/analytics/Analytics.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
 
 const router = createBrowserRouter(
@@ -54,7 +58,8 @@ const router = createBrowserRouter(
         <Route index element={<Home />} />
         {/* WILL BE ADDED TO PROTECT ROUTE LATER */}
         <Route path="start-survey" element={<StartSurvey />} />
-        <Route path="formquestions" element={<FormQuestions />} />
+        <Route path="create-form" element={<FormQuestions />} />
+        <Route path="formquestion/:id" element={<FormQuestions />} />
         <Route
           path="postsurvey"
           element={<PostSurvey />}
@@ -65,13 +70,15 @@ const router = createBrowserRouter(
           element={<SurveyQuestion />}
           action={postAction}
         />
-      </Route>
-      {/* //////// */}
-      <Route element={<ProtectRoute />}>
-        <Route element={<DashboardLayout />}>
+         </Route>
+
+        <Route path="answerform/:id" element={<AnswerForm />} />
+         {/* //////// */}
+         <Route element={<ProtectRoute />}>
+         <Route element={<DashboardLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
-          <Route path="create-form" element={<CreateForm />} />
+          {/* <Route path="create-form" element={<CreateForm />} /> */}
           <Route path="publish" element={<Publish />} />
           <Route path="payment" element={<Payment />} />
           {/* <Route path="pricing" element={<Pricing />} /> */}
@@ -82,9 +89,12 @@ const router = createBrowserRouter(
           <Route path="answersurvey/:id" element={<AnswerSurvey />} />
           <Route path="settings" element={<Settings />} />
           <Route path="insights/:id" element={<Insights />} />
+          <Route path="/my-forms" element={<MyForms />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="forminsights/:id" element={<FormInsights />} />
         </Route>
-      </Route>
-      <Route element={<AuthLayout />}>
+       </Route>
+       <Route element={<AuthLayout />}>
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />
         <Route path="verify" element={<Verify />} action={verifyAction} />

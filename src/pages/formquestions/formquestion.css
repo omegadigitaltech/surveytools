@@ -160,7 +160,7 @@
   }
   
   /* Add Buttons */
-  .add-new-btn {
+  /* .add-new-btn {
     justify-content: right;
     width: 100%;
   }
@@ -174,7 +174,7 @@
     color: #fff;
     background-color: var(--base);
     margin-top: 1rem;
-  }
+  } */
   
   .form-builder.dark-mode .add-question-btn {
     border-color: #555;

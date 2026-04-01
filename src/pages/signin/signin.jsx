@@ -57,7 +57,7 @@ const SignIn = () => {
       <div className="form-col">
         <h1 className="auth-w5-heading">Welcome Back</h1>
         <p className="auth-w5-subtitle">
-          Login to continue taking surveys, gathering insights.
+          Continue taking surveys & gather insights.
         </p>
 
         <Form className="auth-w5-form" method="post" action="/signin" onSubmit={handleSubmit}>

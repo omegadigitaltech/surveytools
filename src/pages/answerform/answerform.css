@@ -1,0 +1,380 @@
+/* Answer Form Styles - Matching AnswerSurvey Design */
+
+.fillform {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 0;
+}
+
+.fillform_inner {
+  width: 90%;
+  margin: 0 auto;
+  background-color: #fff;
+}
+
+.fillform-header-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 2.5rem;
+}
+
+.fillform-headright {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.fillform .backaro {
+  width: 0.7rem;
+}
+
+.fillform .back-link:hover {
+  color: #0587ff;
+}
+
+.fillform-header-info {
+  flex: 1;
+  min-width: 250px;
+}
+
+.fillform-title {
+  font-size: 1rem;
+  font-weight: 600;
+  /* margin: 0 0 0.5rem 0; */
+  color: #212529;
+}
+
+.fillform-description {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.fillform .ans-form {
+  padding: 0.5rem 2rem;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.required-star {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.fillform input[type="radio"]:focus,
+.fillform input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* RADIO / CHECKBOX */
+.fillform .option-input {
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+  accent-color: #0587ff;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.fillform .option-input.checkbox {
+  border-radius: 4px;
+}
+
+/* OPTION TEXT */
+.fillform .option-text {
+  font-size: 0.9rem;
+  color: #1f2937;
+  line-height: 1.5;
+}
+
+/* LIKERT SCALE */
+.fillform .likert-scale {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.fillform .likert-option {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fillform .likert-option:hover {
+  border-color: #0587ff;
+  background: rgba(5, 135, 255, 0.04);
+}
+
+.fillform .likert-input {
+  width: 18px;
+  height: 18px;
+  accent-color: #0587ff;
+}
+
+.fillform .likert-label {
+  font-size: 0.95rem;
+  color: #1f2937;
+}
+
+.form-email-input {
+  min-height: 30px !important;
+  padding: .4rem;
+}
+
+textarea.fill-text-input {
+  min-height: 100px;
+}
+
+/* Submit Button */
+.fillform .submit-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0 3rem 0;
+}
+
+.submit-form-btn {
+  margin: 2rem 0;
+  width: 50%;
+  display: block;
+  background-color: var(--base);
+  padding: 0.8em;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: var(--secondary-blue);
+  transform: translateY(-1px);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading Message */
+.ans-msg {
+  font-size: 1.2rem;
+  font-style: italic;
+  text-align: center;
+  margin: 4rem 0;
+  color: #6c757d;
+}
+
+.no-options {
+  color: #999;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 951px) {
+  .fillform-header-content {
+    flex-wrap: nowrap;
+  }
+}
+
+@media (max-width: 788px) {
+  .fillform_inner {
+    width: 100%;
+  }
+
+  .fillform-header {
+    padding: 0.1rem 1rem 0rem;
+  }
+
+  .fillform-header-content {
+    gap: 1rem;
+  }
+
+  .fillform-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0 0 0rem;
+  }
+
+  .fillform-description {
+    font-size: 0.75rem;
+  }
+
+  .fillform .backaro {
+    width: 0.5rem;
+  }
+
+  .progress-container {
+    padding: 0.4rem;
+    margin-top: 0;
+  }
+
+  .progress-bar {
+    height: 4px;
+  }
+
+  .progress-text {
+    font-size: 0.8rem;
+  }
+
+  .fillquestion-text {
+    font-size: 0.85rem;
+    color: #212529;
+    margin-bottom: 0.3rem;
+  }
+
+  .ans-form {
+    padding: 1rem;
+  }
+
+  .fillform .option-text {
+    font-size: 0.85rem;
+  }
+
+  .fillform .option-input {
+    width: 15px;
+    height: 15px;
+  }
+
+  .fillform .likert-label {
+    font-size: 0.85rem;
+  }
+
+  .fillform .likert-input {
+    width: 15px;
+    height: 15px;
+  }
+
+  .fill-text-input {
+    font-size: 0.85rem;
+  }
+
+  .submit-button {
+    padding: 0.9rem 2.5rem;
+    font-size: 0.95rem;
+    width: 100%;
+  }
+
+  .ans-msg {
+    font-size: 1rem;
+    margin: 3rem 1rem;
+  }
+}
+
+@media (max-width: 550px) {
+  .fillform-header-content {
+    flex-direction: column;
+  }
+
+  .fillform-header {
+    padding: 1rem;
+    margin-top: 0;
+  }
+
+  .fillform-header-content {
+    gap: 1rem;
+  }
+
+  .fillform .back-link {
+    font-size: 1.25rem;
+  }
+
+  .fillform .ans-form {
+    padding: 0.5rem 0.5rem;
+  }
+
+  .fillform .likert-scale {
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .fillform .likert-option {
+    flex-direction: row;
+  }
+
+  .fillform .option-label,
+  .fillform .likert-option {
+    padding: 12px;
+  }
+
+  .fillform .option-text,
+  .fillform .likert-label {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .fillform-header {
+    padding: 1rem 0.75rem;
+  }
+
+  .progress-container {
+    padding: 0.5rem;
+  }
+
+  .fillquestion-text {
+    font-size: 0.9rem;
+  }
+
+  .filloption-label {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .option-text {
+    font-size: 0.8rem;
+  }
+
+  .fillform .likert-label {
+    font-size: 0.8rem;
+  }
+
+  .submit-button {
+    padding: 0.8rem 2rem;
+    font-size: 0.9rem;
+  }
+}
+
+.option-input:focus,
+.likert-input:focus {
+  outline: 2px solid #0587ff;
+  outline-offset: 2px;
+}
+
+/* Animation for Progress Bar */
+@keyframes progressAnimation {
+  from {
+    width: 0;
+  }
+}
+
+.progress-bar-fill {
+  animation: progressAnimation 0.5s ease-out;
+}
+
+/* Print Styles */
+@media print {
+
+  .back-link,
+  .submit-container {
+    display: none;
+  }
+
+  .fillform_inner {
+    max-width: 100%;
+  }
+
+  .response-question-card {
+    break-inside: avoid;
+  }
+}

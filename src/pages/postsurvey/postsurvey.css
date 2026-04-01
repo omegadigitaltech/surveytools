@@ -3,6 +3,7 @@
 }
 .post-head {
   gap: 4rem;
+  margin-bottom: 1rem ;
 }
 .postsurvey_wrap {
   border-radius: 0.8rem;
@@ -13,7 +14,7 @@
 }
 
 .post-head h1 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 500;
   /* margin-bottom: 1rem; */
 }
@@ -94,6 +95,10 @@ form {
   display: inline-block;
   width: 50%;
 }
+.ps-custom-dropdown{
+  width: 100%;
+
+}
 .num_partp-input {
   padding: 10px;
   padding-right: 50px;
@@ -101,7 +106,7 @@ form {
   border-radius: 4px;
   font-size: 1rem;
   border: 1px solid var(--fade);
-  width: 100%;
+  width: 93%;
 }
 .num_partp-input::placeholder {
   color: var(--greytxt);
@@ -145,7 +150,7 @@ form {
 }
 
 #range-dropdown {
-  width: 50%;
+  width: 90%;
   border-radius: 4px;
 }
 
@@ -198,7 +203,12 @@ form {
     display: flex !important;
     flex-wrap: wrap;
   }
-
+   .post-gend-part{
+    flex-wrap: wrap;
+   }
+   .custom-dropdown {
+    width: 100%;
+}
   .custom-select {
     font-size: 0.85rem;
   }

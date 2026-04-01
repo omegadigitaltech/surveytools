@@ -60,7 +60,7 @@ const SignUp = () => {
     <div className="auth-w4 flex">
       <div className="form-col">
         <h1 className="auth-w5-heading">Create An Account</h1>
-        <p className="text-gray-600 mb-4 auth-w5-subtitle">Sign up, start taking surveys, earn rewards and learn through research.</p>
+        <p className="text-gray-600 mb-4 auth-w5-subtitle">Start taking surveys, earn rewards and learn through research.</p>
 
         <Form className="auth-w4-form" method="post" action="/signup" onSubmit={handleSubmit}>
           <div className="auth-w4-grid">

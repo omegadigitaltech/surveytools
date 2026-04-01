@@ -13,7 +13,6 @@ const FormQuestions = () => {
   const { id: formId } = useParams();
   const location = useLocation();
   const authToken = useAuthStore((state) => state.authToken);
-  const { clearFormDraft } = useAuthStore();
   
   const [isPosting, setIsPosting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -569,16 +568,26 @@ const FormQuestions = () => {
 
       const returnedFormId = responseData.form?._id || responseData._id;
       
-      if (returnedFormId) {
-        const { setFormId } = useAuthStore.getState();
-        setFormId(returnedFormId);
+      // Clear form draft from store if it exists
+      const { clearFormDraft } = useAuthStore.getState();
+      if (clearFormDraft) {
+        clearFormDraft();
       }
 
-      clearFormDraft();
-
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1500);
+      if (returnedFormId) {
+        setTimeout(() => {
+          navigate(`/forminsights/${returnedFormId}`, {
+            state: { 
+              formData: responseData.form || responseData,
+              showShareModal: true
+            }
+          });
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
+      }
     } catch (error) {
       console.error("Error creating form:", error);
       toast.error(error.message || "Error creating form");

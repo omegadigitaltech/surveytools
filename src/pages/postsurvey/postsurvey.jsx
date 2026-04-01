@@ -87,7 +87,7 @@ const PostSurvey = () => {
               ></textarea>
             </div>
             <div className="participants-fields grid">
-              <div className="postsurvey-field custom-dropdown">
+              <div className="postsurvey-field ps-custom-dropdown">
                 <label className="required-label" htmlFor="range-dropdown">
                   <h4>Preferred number of participants</h4>
                 </label>
@@ -104,6 +104,7 @@ const PostSurvey = () => {
                 />
               </div>
             </div>
+            <div className="post-gend-part flex">
             <div className="postsurvey-field gender-area custom-dropdown">
               <label className="required-label" htmlFor="range-dropdown">
                 <h4>preferred gender of participants</h4>
@@ -138,6 +139,7 @@ const PostSurvey = () => {
                   </option>
                 ))}
               </select>
+            </div>
             </div>
             {/* Where users can select department if they choose a particular faculty */}
             <div className="postsurvey-field custom-dropdown">

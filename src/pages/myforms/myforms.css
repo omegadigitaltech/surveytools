@@ -1,0 +1,29 @@
+
+.form-no-result  {
+    height: 60vh;              /* full screen height */
+    display: flex;
+    justify-content: center;    /* horizontal center */
+    align-items: center;        /* vertical center */
+    text-align: center;
+  }
+  
+  .form-no-result .no-result-inner {
+    max-width: 400px;
+  }
+  
+  .form-no-result .no-result-inner h3 {
+    margin-bottom: 1rem;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+  
+  .no-result-inner p {
+    margin-bottom: 2rem;
+  }
+  
+  .form-no-result .button-main {
+    display: inline-block;
+    margin-top: 2rem;
+    color: #fff;
+    padding: .6rem 1rem;
+  }

@@ -3,7 +3,7 @@ import "./surveyquestion.css";
 import copy from "../../assets/img/copy.svg";
 import del from "../../assets/img/del.svg";
 import plus from "../../assets/img/icon-add.svg";
-import ShareLink from "../../components/sharelink/sharelink";
+// import ShareLink from "../../components/sharelink/sharelink";
 
 const SurveyQuestions = () => {
   // State management
@@ -454,7 +454,7 @@ const SurveyQuestions = () => {
 
   return (
     <>
-      <ShareLink />
+      {/* <ShareLink /> */}
       <div className={`survey-form ${isDarkMode ? "dark-mode" : ""}`}>
         {/* Top Bar */}
         <div className="top-bar">

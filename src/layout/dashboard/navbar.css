@@ -52,6 +52,9 @@
 .sidebar-link:hover {
   background: #f3f4f6;
 }
+.sidebar-link .crt-quest{
+background: var(--btns);
+}
 
 .sidebar-footer {
   margin-top: auto;

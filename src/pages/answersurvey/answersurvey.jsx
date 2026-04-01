@@ -291,7 +291,7 @@ const AnswerSurvey = () => {
         <section className="fillsurvey">
           <div className="fillsurvey_inner">
             {/* Survey Header - Sticky */}
-            <div className="fillsurvey-header">
+            <div className="answer-header">
               <div className="fillsurvey-header-content">
                 <Link to={`/expandsurvey/${id}`} className="back-link">
                   <img src={backaro} className="backaro" alt="Back" />
