@@ -56,45 +56,41 @@ const router = createBrowserRouter(
     <Route>
       <Route element={<HomeLayout />}>
         <Route index element={<Home />} />
-        {/* WILL BE ADDED TO PROTECT ROUTE LATER */}
-        <Route path="start-survey" element={<StartSurvey />} />
-        <Route path="create-form" element={<FormQuestions />} />
-        <Route path="formquestion/:id" element={<FormQuestions />} />
-        <Route
-          path="postsurvey"
-          element={<PostSurvey />}
-          action={surveyAction}
-        />
-        <Route
-          path="surveyquestion"
-          element={<SurveyQuestion />}
-          action={postAction}
-        />
-         </Route>
+      </Route>
 
-        <Route path="answerform/:id" element={<AnswerForm />} />
-         {/* //////// */}
-         <Route element={<ProtectRoute />}>
-         <Route element={<DashboardLayout />}>
+      <Route path="answerform/:id" element={<AnswerForm />} />
+
+      <Route element={<ProtectRoute />}>
+      {/* NO DASHBOARD LAYOUT FOR THEM */}
+        <Route path="answersurvey/:id" element={<AnswerSurvey />} />
+        <Route element={<HomeLayout />}>
+          <Route path="surveyquestion" element={<SurveyQuestion />} action={postAction} />
+          <Route path="create-form" element={<FormQuestions />} />
+        </Route>
+       {/*--- */}
+       
+        <Route element={<DashboardLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="start-survey" element={<StartSurvey />} />
+          <Route path="postsurvey" element={<PostSurvey />}  action={surveyAction} />
           <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
-          {/* <Route path="create-form" element={<CreateForm />} /> */}
           <Route path="publish" element={<Publish />} />
+          <Route path="insights/:id" element={<Insights />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="/my-forms" element={<MyForms />} />
+          <Route path="formquestion/:id" element={<FormQuestions />} />
+          <Route path="forminsights/:id" element={<FormInsights />} />
           <Route path="payment" element={<Payment />} />
-          {/* <Route path="pricing" element={<Pricing />} /> */}
           <Route path="verify-payment" element={<VerifyPayment />} />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="withdraw" element={<Withdraw />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="answersurvey/:id" element={<AnswerSurvey />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="insights/:id" element={<Insights />} />
-          <Route path="/my-forms" element={<MyForms />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="forminsights/:id" element={<FormInsights />} />
+          <Route path="withdraw" element={<Withdraw />} />
+          {/* <Route path="pricing" element={<Pricing />} /> */}
+
         </Route>
-       </Route>
-       <Route element={<AuthLayout />}>
+      </Route>
+      <Route element={<AuthLayout />}>
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />
         <Route path="verify" element={<Verify />} action={verifyAction} />

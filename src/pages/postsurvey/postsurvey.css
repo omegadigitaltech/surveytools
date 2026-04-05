@@ -24,7 +24,7 @@ form {
   max-width: 1050px;
 }
 .postsurvey-field h4 {
-  margin-bottom: 1rem;
+  margin-bottom: .9rem;
   font-weight: 500;
   font-size: 1rem;
 }
@@ -189,12 +189,18 @@ form {
   }
 }
 @media (max-width: 450px) {
+  .postsurvey_wrap {
+    padding: 1rem;
+  }
+  .post-head h1 {
+    font-size: 1rem;
+}
   .post-head h3 {
     font-size: 1rem;
   }
 
   .postsurvey_div h4 {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
   .postsurvey-field h4 {
     font-weight: 500;

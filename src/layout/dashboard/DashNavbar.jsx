@@ -28,7 +28,7 @@ const Sidebar = () => {
           <img
             src="/Blue-logo-1.svg"
             alt="Blue Logo"
-            className="md:w-40 h-10 md:h-auto"
+            className="md:w-30 h-10 md:h-auto"
           />
         </NavLink>
 
@@ -40,21 +40,36 @@ const Sidebar = () => {
             </span>
             <span>Dashboard</span>
           </NavLink>
-
-          <NavLink to="/my-forms" className="sidebar-link">
+          <NavLink to="/postsurvey" className="sidebar-link ">
             <span>
-              <img src="/Folder-With-Files.svg" alt="Folder-With-FIles" />
+              <img src="/survey.svg" alt="Chat-Square" />
             </span>
-            <span>My Forms</span>
+            <span className="text-red-600">Create a survey</span>
           </NavLink>
-
           <NavLink to="/analytics" className="sidebar-link">
             <span>
               <img src="/Chat-Square-2.svg" alt="Chat-Square" />
             </span>
             <span>Analytics</span>
           </NavLink>
-
+          <NavLink to="/my-forms" className="sidebar-link">
+            <span>
+              <img src="/Folder-With-Files.svg" alt="Folder-With-FIles" />
+            </span>
+            <span>My Forms</span>
+          </NavLink>
+          <NavLink to="/create-form" className="sidebar-link">
+            <span>
+              <img src="/form.svg" alt="Chat-Square" />
+            </span>
+            <span>Create a form</span>
+          </NavLink>
+          <NavLink to="/settings" className="sidebar-link">
+            <span>
+              <img src="/Settings-Minimalistic.svg" alt="Settings" />
+            </span>
+            <span>Settings</span>
+          </NavLink>
           {/* <NavLink to="/responses" className="sidebar-link">
             <span>
               <img
@@ -71,23 +86,16 @@ const Sidebar = () => {
             </span>
             <span>Help & Support</span>
           </NavLink>
-*/}
-          <NavLink to="/settings" className="sidebar-link">
-            <span>
-              <img src="/Settings-Minimalistic.svg" alt="Settings" />
-            </span>
-            <span>Settings</span>
-          </NavLink>
-          <NavLink to="/create-form" className="sidebar-link">
+           <NavLink to="/create-form" className="sidebar-link">
             <button className="text-sm text-red-600 hover:underline">
             Create a Form
           </button>
           </NavLink>
-          <NavLink to="/create-questionnaire" className="sidebar-link">
+          <NavLink to="/create-questionnaire" className="sidebar-link sidebar-createques">
            <button className="crt-quest text-white px-4 py-2 rounded-lg text-sm shadow hover:bg-blue-700">
-            Create Questionnaire
+            Create a Survey
           </button>
-          </NavLink>
+          </NavLink> */}
         </nav>
 
         {/* Bottom user section */}

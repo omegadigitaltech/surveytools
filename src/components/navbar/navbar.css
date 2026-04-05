@@ -12,7 +12,7 @@
     width: 100%;
 }
 body.has-navbar {
-    padding-top: 5rem; /* Matches header height */
+    padding-top: 3.5rem; /* Matches header height */
 }
 .header.scrolled {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -20,13 +20,15 @@ body.has-navbar {
     backdrop-filter: blur(10px);
 }
 .header-wrap {
-    height: 5rem;
+    height: 3.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 2rem;
 }
-
+/* .header-w2-link,.menu-username{
+    font-size: .9rem;
+} */
 .header-w1,
 .header-w3 {
     display: flex;
@@ -120,6 +122,7 @@ span.tools {
 
 .header-w2-link {
     /* color: var(--text-dark); */
+    font-size: .85rem;
 }
 .button.header-w2-link {
    background-color: var(--base);

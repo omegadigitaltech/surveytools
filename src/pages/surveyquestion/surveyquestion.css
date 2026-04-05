@@ -799,7 +799,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 500px) {
   .top-bar-content {
     margin-top: 4rem;
     flex-wrap: wrap;

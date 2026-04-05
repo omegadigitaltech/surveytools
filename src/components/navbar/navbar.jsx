@@ -41,7 +41,7 @@ const Navbar = () => {
           </button>
 
           <NavLink className="header-w1-logo" to="/">
-            <img src="/Blue-logo-1.svg" alt="Blue Logo" className="md:w-[10rem] h-[2.5rem] md:h-auto" />
+            <img src="/Blue-logo-1.svg" alt="Blue Logo" className="md:w-[6rem] h-[2.2rem] md:h-auto" />
           </NavLink>
         </div>
 
@@ -84,7 +84,7 @@ const Navbar = () => {
                   </NavLink>
                 </li>
                 <li className="header-w2-item show header-w2-hide">
-                  <NavLink className="header-w2-link" to="/formquestions">
+                  <NavLink className="header-w2-link" to="/create-form">
                     Create Form
                   </NavLink>
                 </li>
@@ -116,7 +116,7 @@ const Navbar = () => {
               <div className="header-w3-user">
                 <img className="header-w3-icon" src={iconUser} alt="user" />
               </div>
-              <span className="username">{userName}</span>
+              {/* <span className="username">{userName}</span> */}
             </button>
             <button className="header-w3-link" onClick={showLogoutConfirmation}>
               <img className="header-w3-icon" src={iconLogOut} alt="logout" />
@@ -176,7 +176,7 @@ const Navbar = () => {
                 Settings
               </NavLink>
             </li> */}
-            <li>
+            {/* <li>
               <NavLink
                 to=""
                 className="menu-item"
@@ -186,7 +186,7 @@ const Navbar = () => {
               >
                 Contact Us
               </NavLink>
-            </li>
+            </li> */}
             <li>
               <button className="menu-item" onClick={showLogoutConfirmation}>
                 Log Out
