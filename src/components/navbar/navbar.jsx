@@ -111,7 +111,7 @@ const Navbar = () => {
             </button>
             <button
               className="header-w3-chip"
-              onClick={() => navigate("/profile")}
+              onClick={() => navigate("#")}
             >
               <div className="header-w3-user">
                 <img className="header-w3-icon" src={iconUser} alt="user" />
@@ -126,74 +126,122 @@ const Navbar = () => {
       </div>
       {/* Menu */}
       {menuOpen && (
-        <div className="menu">
-          <ul className="menu-list">
-            <li>
-              <NavLink
-                to="/profile"
-                className="menu-item menu-username flex"
-                onClick={closeMenu}
-              >
-                <img className="header-w3-icon" src={iconUser} alt="user" />
-                {userName}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/dashboard"
-                className="menu-item"
-                onClick={closeMenu}
-              >
-                Dashboard
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/postsurvey"
-                className="menu-item"
-                onClick={closeMenu}
-              >
-                Post a Survey
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/formquestions"
-                className="menu-item"
-                onClick={closeMenu}
-              >
-                Create Form
-              </NavLink>
-            </li>
-            {/* LATER, API NOT READY */}
-            {/* <li>
-              <NavLink to="/withdraw" className="menu-item" onClick={closeMenu}>
-                Withdrawal
-              </NavLink>
-            </li> */}
-            {/* <li>
-              <NavLink to="/settings" className="menu-item" onClick={closeMenu}>
-                Settings
-              </NavLink>
-            </li> */}
-            {/* <li>
-              <NavLink
-                to=""
-                className="menu-item"
-                onClick={() => {
-                  closeMenu;
-                }}
-              >
-                Contact Us
-              </NavLink>
-            </li> */}
-            <li>
-              <button className="menu-item" onClick={showLogoutConfirmation}>
-                Log Out
-              </button>
-            </li>
-          </ul>
+        
+           <nav className="mobile-sidednav sidebar-nav mt-12">
+           <NavLink to="/dashboard" className="sidebar-link">
+             <span>
+               <img src="/dashboard.svg" alt="Widget 2" />
+             </span>
+             <span>Dashboard</span>
+           </NavLink>
+           <NavLink to="/postsurvey" className="sidebar-link ">
+             <span>
+               <img src="/survey.svg" alt="Chat-Square" />
+             </span>
+             <span className="text-black-600">Create a survey</span>
+           </NavLink>
+           <NavLink to="/analytics" className="sidebar-link">
+             <span>
+               <img src="/Chat-Square-2.svg" alt="Chat-Square" />
+             </span>
+             <span>Analytics</span>
+           </NavLink>
+           <NavLink to="/my-forms" className="sidebar-link">
+             <span>
+               <img src="/Folder-With-Files.svg" alt="Folder-With-FIles" />
+             </span>
+             <span>My Forms</span>
+           </NavLink>
+           <NavLink to="/create-form" className="sidebar-link">
+             <span>
+               <img src="/form.svg" alt="Chat-Square" />
+             </span>
+             <span>Create a form</span>
+           </NavLink>
+           {/* <NavLink to="#" className="sidebar-link">
+             <span>
+               <img src="/Settings-Minimalistic.svg" alt="Settings" />
+             </span>
+             <span>Settings</span>
+           </NavLink> */}
+           <div className="sidebar-footer">
+          <button className="sidebar-logout pl-3" onClick={showLogoutConfirmation}>
+            <img src={iconLogOut} alt="Logout" />
+            Logout
+          </button>
         </div>
+         </nav>
+
+
+        
+        // <div className="menu">
+        //   <ul className="menu-list">
+        //     <li>
+        //       <NavLink
+        //         to="/profile"
+        //         className="menu-item menu-username flex"
+        //         onClick={closeMenu}
+        //       >
+        //         <img className="header-w3-icon" src={iconUser} alt="user" />
+        //         {userName}
+        //       </NavLink>
+        //     </li>
+        //     <li>
+        //       <NavLink
+        //         to="/dashboard"
+        //         className="menu-item"
+        //         onClick={closeMenu}
+        //       >
+        //         Dashboard
+        //       </NavLink>
+        //     </li>
+        //     <li>
+        //       <NavLink
+        //         to="/postsurvey"
+        //         className="menu-item"
+        //         onClick={closeMenu}
+        //       >
+        //         Post a Survey
+        //       </NavLink>
+        //     </li>
+        //     <li>
+        //       <NavLink
+        //         to="/create-form"
+        //         className="menu-item"
+        //         onClick={closeMenu}
+        //       >
+        //         Create Form
+        //       </NavLink>
+        //     </li>
+        //     {/* LATER, API NOT READY */}
+        //     {/* <li>
+        //       <NavLink to="/withdraw" className="menu-item" onClick={closeMenu}>
+        //         Withdrawal
+        //       </NavLink>
+        //     </li> */}
+        //     {/* <li>
+        //       <NavLink to="/settings" className="menu-item" onClick={closeMenu}>
+        //         Settings
+        //       </NavLink>
+        //     </li> */}
+        //     {/* <li>
+        //       <NavLink
+        //         to=""
+        //         className="menu-item"
+        //         onClick={() => {
+        //           closeMenu;
+        //         }}
+        //       >
+        //         Contact Us
+        //       </NavLink>
+        //     </li> */}
+        //     <li>
+        //       <button className="menu-item" onClick={showLogoutConfirmation}>
+        //         Log Out
+        //       </button>
+        //     </li>
+        //   </ul>
+        // </div>
       )}
     </header>
   );

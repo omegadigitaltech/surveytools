@@ -4,7 +4,7 @@ import config from "../../config/config";
 import useAuthStore from "../../store/useAuthStore";
 import { validateSurveyAccess } from "../../utils/helpers/surveyChecks";
 import { toast } from "react-toastify";
-
+import Loader from "../../components/loader/loader";
 import backaro from "../../assets/img/backaro.svg";
 import dept from "../../assets/img/blu-dept.svg";
 import partps from "../../assets/img/partps.svg";
@@ -74,7 +74,7 @@ const expandsurvey = () => {
 
   // Show loading state while fetching
   if (loading) {
-    return <p className="loading_survey">Loading survey details...</p>;
+    return <Loader text="Loading survey details..." />
   }
 
   // Show error message if survey data is not available

@@ -40,7 +40,7 @@ const TestimonialSection = () => {
   },
 ];
   return (
-    <section className="py-16 bg-gray-50">
+    <section className=" testimonial py-16 bg-gray-50">
       <div className="text-center mb-12">
         <h4 className="font-[500] text-black tracking-wide">
           Testimonials
@@ -64,7 +64,7 @@ const TestimonialSection = () => {
             </div>
 
             {/* Quote */}
-            <p className="text-black font-[500] mb-6">
+            <p className=" test-quote text-black font-[500] mb-6">
               “{t.text}”
             </p>
 
@@ -76,7 +76,7 @@ const TestimonialSection = () => {
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <h4 className="text-sm font-semibold text-gray-900">{t.name}</h4>
+                <h4 className="test-name text-sm font-semibold text-gray-900">{t.name}</h4>
                 <p className="text-xs">{t.role}</p>
               </div>
             </div>

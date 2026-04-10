@@ -1,13 +1,13 @@
 import React from 'react'
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 
 const Hero = () => {
   return (
-   <section className="home hero bg-white flex flex-col md:flex-row overflow-hidden pt-[2rem] md:pt-0">
-      <div className="content flex flex-col items-center md:max-w-[40%] p-[5%] md:p-[2%] lg:p-auto md:ml-[2%] lg:ml-[8%] md:mt-[8%]">
-        <div>
-          <h1 className="text-3xl/10 md:text-4xl/10 lg:text-5xl/14 font-[500] ">
+    <section className="home hero bg-white flexx flex-col md:flex-row overflow-hidden pt-[2rem] md:pt-0">
+      <div className="content opacity-0 animate-[slideInLeft_0.8s_ease-out_forwards] flex flex-col items-center md:max-w-[40%] p-[5%] md:p-[2%] lg:p-auto md:ml-[2%] lg:ml-[8%] md:mt-[0%]">
+        <div className="hero-box">
+          <h1 className="text-3xl/10 md:text-4xl/10 lg:text-4xl/14 font-[600] ">
             Create Smart Surveys <br /> Simply for Everyone
           </h1>
           <p className="md:max-w-[90%] my-4">
@@ -18,18 +18,18 @@ const Hero = () => {
           <div>
             <div className="flex gap-2">
               <img src="/users-avatars.png" alt="" className="" />
-              <div className="">1k+ satisfied users</div>
+              <div className="">1k+ satisfied researchers</div>
             </div>
           </div>
-          <div className="flex gap-4 lg:gap-8 mt-4">
-            <Link className="button-filled px-5 py-3 lg:px-10 lg:py-4 rounded-md">Get Started</Link>
-            <Link className="px-5 py-3 lg:px-10 lg:py-4 rounded-md border-[1px]">How it Works</Link>
+          <div className="hero-btns flex gap-4 lg:gap-8 mt-4 relative z-50">
+            <NavLink className="button-filled px-5 py-3 lg:px-7 lg:py-2 rounded-md" to="/signup">Get Started</NavLink>
+            <NavLink className="px-5 py-3 lg:px-7 lg:py-2 rounded-md border-[1px]">How it Works</NavLink>
           </div>
         </div>
       </div>
-      <div className="illustration relative mr-[8%]">
+      <div className="illustration relative mr-[8%] opacity-0 animate-[slideInRight_0.8s_ease-out_forwards]">
         <div className="mt-[-10%]">
-          <img src="/handsome-man.png" alt="handsome-man" className="" />
+          <img src="/handsome-man.png" alt="handsome-man" className="hero-img" />
           <img
             src="/blue-text-box.svg"
             className="absolute top-[15%] right-[-10%]"

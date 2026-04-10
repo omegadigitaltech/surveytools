@@ -189,7 +189,7 @@
   flex: 1;
   overflow-y: auto;
   max-width: 900px;
-  margin: 0 1rem;
+  margin: 0 .5rem;
   margin-bottom: 3rem;
   width: 100%;
 }
@@ -441,7 +441,7 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: .9rem;
   margin-bottom: 2rem;
   transition: opacity 0.2s;
   justify-content: center;
@@ -660,7 +660,7 @@
     background-color: #fff;
     border-bottom: 1px solid #e0e0e0;
     position: fixed;
-    top: 80px;
+    top: 43px;
     left: 0;
     right: 0;
     z-index: 150;
@@ -800,11 +800,7 @@
 }
 
 @media (max-width: 500px) {
-  .top-bar-content {
-    margin-top: 4rem;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-  }
+
   .top-bar h2 {
     font-size: 1rem;
   }
@@ -852,7 +848,7 @@
     width: 90%;
   }
   .sidebar-toggle {
-    padding: 0.5rem;
+    padding: 0.25rem;
   }
   .sidebar-toggle span {
     font-size: 0.8rem;
@@ -875,4 +871,13 @@
   .likert-value-input {
     width: 40px;
   }
+}
+
+@media (max-width: 380px) {
+.form-group select, .form-group input {
+  font-size: 0.8rem;
+}
+.sidebar-header-mobile h3 {
+  font-size: 1rem;
+}
 }

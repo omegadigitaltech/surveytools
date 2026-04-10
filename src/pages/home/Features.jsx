@@ -29,7 +29,7 @@ const Features = () => {
         {features.map((feature) => {
           const { title, content } = feature;
           return (
-            <div className="bg-white rounded-2xl p-6 shadow-sm flex flex-col items-start hover:shadow-md transition-shadow justify-self-center max-w-[90%]">
+            <div className="bg-white rounded-2xl p-6 shadow-sm flex flex-col items-start hover:shadow-md transition-shadow justify-self-center max-w-[100%]">
               <div className="h-12 w-12 rounded-full bg-gray-300"></div>
               <h3 className="text-lg md:text-xl font-semibold mb-2 mt-6">{title}</h3>
               <p className="text-sm">{content}</p>

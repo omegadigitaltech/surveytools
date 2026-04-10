@@ -9,7 +9,7 @@ import useDashboardStore from "../../store/useDashboardStore";
 
 const Sidebar = () => {
   const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
-  const {menuOpen, setMenuOpen} = useDashboardStore();
+  const { menuOpen, setMenuOpen } = useDashboardStore();
   const sidebar = useRef(null);
   const navigate = useNavigate();
 
@@ -22,7 +22,28 @@ const Sidebar = () => {
     <>
       {menuOpen && <div className="overlay fixed inset-0 block md:hidden"></div>}
 
-      <aside ref={sidebar} className={`sidebar-container fixed md:static z-600 ${menuOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 duration-300 ease-in-out`}>
+      {/* <aside ref={sidebar} className={`sidebar-container  ${menuOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 duration-300 ease-in-out`}> */}
+      <aside
+        ref={sidebar}
+        className={`
+    sidebar-container
+    fixed
+    top-[3.5rem]
+    left-0
+    h-[calc(100vh-3.5rem)]
+    w-64
+    bg-white
+    border-r
+    overflow-y-auto
+    z-600
+    transform
+    ${menuOpen ? "translate-x-0" : "-translate-x-full"}
+    md:translate-x-0
+    transition-transform
+    duration-300
+    ease-in-out
+  `}
+      >
         {/* Logo */}
         <NavLink className="header-w1-logo" to="/">
           <img
@@ -36,7 +57,7 @@ const Sidebar = () => {
         <nav className="sidebar-nav mt-12">
           <NavLink to="/dashboard" className="sidebar-link">
             <span>
-              <img src="/Widget-2.svg" alt="Widget 2" />
+              <img src="/dashboard.svg" alt="Widget 2" />
             </span>
             <span>Dashboard</span>
           </NavLink>
@@ -44,7 +65,7 @@ const Sidebar = () => {
             <span>
               <img src="/survey.svg" alt="Chat-Square" />
             </span>
-            <span className="text-red-600">Create a survey</span>
+            <span className="text-black-600">Create a survey</span>
           </NavLink>
           <NavLink to="/analytics" className="sidebar-link">
             <span>
@@ -64,12 +85,23 @@ const Sidebar = () => {
             </span>
             <span>Create a form</span>
           </NavLink>
-          <NavLink to="/settings" className="sidebar-link">
+          {/* <NavLink to="/settings" className="sidebar-link">
             <span>
               <img src="/Settings-Minimalistic.svg" alt="Settings" />
             </span>
             <span>Settings</span>
-          </NavLink>
+          </NavLink> */}
+          <a
+            href="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sidebar-link"
+          >
+            <span>
+              <img src="/Help.svg" alt="Help" />
+            </span>
+            <span>Help & Support</span>
+          </a>
           {/* <NavLink to="/responses" className="sidebar-link">
             <span>
               <img
@@ -100,7 +132,7 @@ const Sidebar = () => {
 
         {/* Bottom user section */}
         <div className="sidebar-footer">
-          <button className="sidebar-user" onClick={() => navigate("/profile")}>
+          <button className="sidebar-user" onClick={() => navigate("#")}>
             <img src={iconUser} alt="User" />
             <span>{userName}</span>
           </button>

@@ -190,6 +190,11 @@ button:hover {
     cursor: pointer;
 }
 
+@media (min-width: 768px){
+    .mobile-topbar{
+        display: none !important;
+    }
+}
 
 @media (max-width: 768px) {
     .header-w1-menu {
@@ -338,16 +343,18 @@ button:hover {
     }
 }
 
-@media (max-width: 512px) {
+@media (max-width: 552px) {
     .header-w3 .username {
         display: none;
     }
-
     .menu .menu-username img {
         width: 1.2rem;
     }
     .menu {
         width: 95%;
+    }
+    .mobile-sidednav{
+        padding-bottom: 1rem;
     }
 }
 

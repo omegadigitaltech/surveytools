@@ -13,7 +13,6 @@ import unview from "../../assets/img/uneye.svg";
 import nextaro from "../../assets/img/nextaro.svg";
 import useModalStore from "../../store/useModalStore";
 import useOutsideClick from "../../hooks/useOutsideClick";
-
 import "./dashboard.css";
 
 // components
@@ -300,7 +299,11 @@ const Dashboard = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="no_result">Please wait. Survey is loading...</p>
+                  // <p className="no_result loader">Please wait. Survey is loading...</p>
+                  <div className="loader-container">
+                  <div className="loader"></div>
+                  <p>Loading surveys...</p>
+                </div>
                 )
               ) : isLoading ? (
                 <div className="loader-container">

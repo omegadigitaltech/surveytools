@@ -13,26 +13,14 @@ export default function DashboardMain() {
   const { menuOpen, setMenuOpen } = useDashboardStore();
   return (
     <div className="p-6 space-y-6 bg-gray-50">
-      {/* Header */}
       <div className="flex items-center gap-4">
-        <button
-          className={`header-w1-menu ${menuOpen ? "menu-open" : ""}`}
-          onClick={() => setMenuOpen(true)}
-        >
-          <div className="header-w1-line" aria-hidden></div>
-          <div className="header-w1-line" aria-hidden></div>
-          <div className="header-w1-line" aria-hidden></div>
-        </button>
-        <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
-        {/* <div className="flex gap-4">
-          
-         
-        </div> */}
+        <h1 className="text-2xl font-semibold text-gray-800">
+          Dashboard
+        </h1>
       </div>
 
       {/* Top cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Level card */}
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="rounded-2xl p-6 text-white bg-linear-to-r from-green-700 to-green-400 shadow">
           <div className="flex justify-between items-start">
             <div>
@@ -64,11 +52,10 @@ export default function DashboardMain() {
               ))}
               <Star className="w-4 h-4 text-white/50" />
             </div>
-            {/* <button className="text-xs underline">Leaderboard</button> */}
+            <button className="text-xs underline">Leaderboard</button>
           </div>
         </div>
 
-        {/* Streak card */}
         <div className="rounded-2xl p-6 bg-sky-500 text-white shadow">
           <div className="flex justify-between">
             <div>
@@ -98,7 +85,7 @@ export default function DashboardMain() {
             Complete a survey today to keep your streak alive!
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Stats cards */}
       {/* <div className="dash-stats-card grid grid-cols-2 md:grid-cols-4 gap-6">
