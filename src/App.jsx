@@ -50,6 +50,8 @@ import Insights from "./pages/insights/insights";
 import FormInsights from "./pages/forminsights/forminsights";
 import Analytics from "./pages/analytics/Analytics.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
+import Rewards from "./pages/rewards/rewards";
+import MissionsPage from "./pages/missions/missions";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -86,6 +88,8 @@ const router = createBrowserRouter(
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
           <Route path="withdraw" element={<Withdraw />} />
+          <Route path="rewards" element={<Rewards />} />
+          <Route path="missions" element={<MissionsPage />} />
           {/* <Route path="pricing" element={<Pricing />} /> */}
 
         </Route>

@@ -9,7 +9,7 @@ import useDashboardStore from "../../store/useDashboardStore";
 
 const Sidebar = () => {
   const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
-  const { menuOpen, setMenuOpen } = useDashboardStore();
+  const { menuOpen, setMenuOpen, setSpinOpen } = useDashboardStore();
   const sidebar = useRef(null);
   const navigate = useNavigate();
 
@@ -91,8 +91,14 @@ const Sidebar = () => {
             </span>
             <span>Settings</span>
           </NavLink> */}
+          <NavLink to="/rewards" className="sidebar-link">
+            <span>
+              <img src="/rewards.svg" alt="Rewards" />
+            </span>
+            <span>Rewards</span>
+          </NavLink>
           <a
-            href="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt" 
+            href="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt"
             target="_blank"
             rel="noopener noreferrer"
             className="sidebar-link"
@@ -102,6 +108,11 @@ const Sidebar = () => {
             </span>
             <span>Help & Support</span>
           </a>
+
+          <button className="dailyspin-btn" onClick={() => setSpinOpen(true)}>
+            <img src="/spinmenu.svg" alt="spin" />
+            <span>Daily Spin</span>
+          </button>
           {/* <NavLink to="/responses" className="sidebar-link">
             <span>
               <img
