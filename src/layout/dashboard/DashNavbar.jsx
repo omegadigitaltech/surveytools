@@ -6,12 +6,14 @@ import iconLogOut from "../../assets/img/icon-logout.svg";
 import useOutsideClick from "../../hooks/useOutsideClick";
 import "./navbar.css";
 import useDashboardStore from "../../store/useDashboardStore";
+import DailySpinModal from "../../components/DailySpinModal/DailySpinModal";
 
 const Sidebar = () => {
   const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
   const { menuOpen, setMenuOpen } = useDashboardStore();
   const sidebar = useRef(null);
   const navigate = useNavigate();
+  const [showSpinModal, setShowSpinModal] = useState(false);
 
   if (!isAuthenticated) return null;
 
@@ -85,12 +87,23 @@ const Sidebar = () => {
             </span>
             <span>Create a form</span>
           </NavLink>
-          {/* <NavLink to="/settings" className="sidebar-link">
+          <NavLink to="/responses" className="sidebar-link">
             <span>
-              <img src="/Settings-Minimalistic.svg" alt="Settings" />
+              <img
+                src="/Checklist-Minimalistic.svg"
+                alt="Checklist-Minimalistic"
+              />
             </span>
-            <span>Settings</span>
-          </NavLink> */}
+            <span>Responses</span>
+          </NavLink> 
+          
+          <NavLink to="/rewards" className="sidebar-link">
+            <span>
+              <span className="material-icons text-xl">card_giftcard</span>
+            </span>
+            <span>Rewards</span>
+          </NavLink>
+
           <a
             href="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt" 
             target="_blank"
@@ -102,33 +115,23 @@ const Sidebar = () => {
             </span>
             <span>Help & Support</span>
           </a>
-          {/* <NavLink to="/responses" className="sidebar-link">
-            <span>
-              <img
-                src="/Checklist-Minimalistic.svg"
-                alt="Checklist-Minimalistic"
-              />
-            </span>
-            <span>Responses</span>
-          </NavLink> 
 
-          <NavLink to="/help" className="sidebar-link">
+          <NavLink to="/settings" className="sidebar-link">
             <span>
-              <img src="/Help.svg" alt="Help" />
+              <img src="/Settings-Minimalistic.svg" alt="Settings" />
             </span>
-            <span>Help & Support</span>
+            <span>Settings</span>
           </NavLink>
-           <NavLink to="/create-form" className="sidebar-link">
-            <button className="text-sm text-red-600 hover:underline">
-            Create a Form
-          </button>
-          </NavLink>
-          <NavLink to="/create-questionnaire" className="sidebar-link sidebar-createques">
-           <button className="crt-quest text-white px-4 py-2 rounded-lg text-sm shadow hover:bg-blue-700">
-            Create a Survey
-          </button>
-          </NavLink> */}
         </nav>
+
+        <div className="px-4 mt-6">
+          <button 
+            onClick={() => setShowSpinModal(true)}
+            className="w-full bg-[#00A5B5] text-white py-2 rounded-lg font-bold flex items-center justify-center gap-2 shadow hover:bg-[#008F9C] transition-colors"
+          >
+            <span className="material-icons">auto_awesome</span> Daily Spin
+          </button>
+        </div>
 
         {/* Bottom user section */}
         <div className="sidebar-footer">
@@ -143,6 +146,8 @@ const Sidebar = () => {
           </button>
         </div>
       </aside>
+
+      {showSpinModal && <DailySpinModal onClose={() => setShowSpinModal(false)} />}
     </>
   );
 };

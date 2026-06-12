@@ -34,6 +34,8 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPoints, setIsLoadingPoints] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [dashboardMissions, setDashboardMissions] = useState([]);
 
   // zustand
   const {
@@ -151,6 +153,37 @@ const Dashboard = () => {
   }, [authToken]);
 
   useEffect(() => {
+    const fetchGamificationData = async () => {
+      try {
+        const statsRes = await fetch(`${config.API_URL}/gamification/dashboard`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        const missionsRes = await fetch(`${config.API_URL}/gamification/missions`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        
+        if (statsRes.ok) {
+          const statsJson = await statsRes.json();
+          setDashboardStats(statsJson.data);
+        }
+        
+        if (missionsRes.ok) {
+          const missionsJson = await missionsRes.json();
+          // Get only daily missions for the dashboard widget
+          const daily = (missionsJson.data || []).filter(m => m.type === 'daily').slice(0, 3);
+          setDashboardMissions(daily);
+        }
+      } catch (err) {
+        console.error("Error fetching gamification data:", err);
+      }
+    };
+
+    if (authToken) {
+      fetchGamificationData();
+    }
+  }, [authToken]);
+
+  useEffect(() => {
     if (redeemModalOpen === true) {
       setOpenModalAnimate(true);
     }
@@ -165,43 +198,10 @@ const Dashboard = () => {
 
   return (
     <>
-      <DashboardMain />
-      {/* <ContestModal /> */}
-      <section className="dashboard">
-        <div className="dashboard_inner wrap">
-          <div className="points-board ">
-            <div className="points-main">
-              <div className="points-label flex">
-                Points Balance:
-                <img src={iconPass} onClick={pointToggle} alt="View Points" />
-              </div>
-              <div className="points-value">
-                {isLoadingPoints ? (
-                  <div className="points-loader"></div>
-                ) : showPoint ? (
-                  pointBalance?.toFixed(2) || "0.00"
-                ) : (
-                  "****"
-                )}
-              </div>
-            </div>
-            <div className="points-side">
-              <div className="transactions-history">
-                {/* <Link href="">
-                  Transactions History <img src={nextaro} alt="" />{" "}
-                </Link> */}
-              </div>
-              <button
-                className="redeem-button"
-                type="button"
-                onClick={handleModalOpen}
-              >
-                Redeem
-              </button>
-            </div>
-          </div>
-
-          <div className="dash_head flex">
+      <section className="dashboard px-6">
+        <div className="dashboard_inner wrap pt-0">
+          <DashboardMain pointBalance={pointBalance} stats={dashboardStats} />
+          <div className="dash_head flex mt-8">
             <Form className="classForm">
               <div className="search desktop flex">
                 <button className="flex" type={"submit"}>
@@ -379,6 +379,75 @@ const Dashboard = () => {
               )}
             </div>
           </div>
+          
+          {/* Bottom Widgets */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 mb-8">
+            {/* Daily Missions */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <div className="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 className="font-bold text-gray-800 flex items-center gap-2">
+                  <span className="material-icons text-[#00A5B5] text-sm">track_changes</span> Daily Missions
+                </h3>
+                <Link to="/rewards" className="text-[#00A5B5] text-xs font-semibold hover:underline flex items-center">
+                  View All <span className="material-icons text-[14px]">chevron_right</span>
+                </Link>
+              </div>
+              
+              <div className="space-y-4">
+                {dashboardMissions.length === 0 ? (
+                  <div className="py-6 text-center text-gray-500 border border-dashed border-gray-200 rounded-xl">
+                    <span className="material-icons text-3xl mb-1 opacity-50">track_changes</span>
+                    <p className="font-semibold text-sm">No daily missions available.</p>
+                    <p className="text-xs mt-1">Check back later!</p>
+                  </div>
+                ) : (
+                  dashboardMissions.map((mission, idx) => {
+                    const percent = Math.min(((mission.currentValue || 0) / mission.targetValue) * 100, 100);
+                    const isComplete = percent >= 100;
+                    return (
+                      <div key={mission._id || idx} className={`border ${isComplete ? 'border-green-400 bg-green-50/20' : 'border-gray-200'} rounded-xl p-4 relative overflow-hidden`}>
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-bold w-1/2 leading-tight">{mission.title}</h4>
+                          <span className="bg-blue-50 text-blue-500 font-bold text-xs px-2 py-1 rounded flex items-center gap-1"><span className="material-icons text-[12px]">toll</span> + {mission.pointsReward}</span>
+                        </div>
+                        <div className={`flex justify-between text-xs ${isComplete ? 'text-green-600' : 'text-gray-500'} font-semibold mb-1 mt-4`}>
+                          <span>Progress</span>
+                          <span>{mission.currentValue || 0}/{mission.targetValue}</span>
+                        </div>
+                        <div className={`h-1.5 ${isComplete ? 'bg-green-200' : 'bg-gray-100'} rounded-full overflow-hidden`}>
+                          <div className={`h-full ${isComplete ? 'bg-green-500' : 'bg-[#00A5B5]'} rounded-full`} style={{ width: `${percent}%` }}></div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm h-min">
+               <h3 className="font-bold text-gray-800 mb-4 border-b pb-2">Quick Stats</h3>
+               <div className="grid grid-cols-2 gap-4">
+                 <div className="border border-[#00A5B5]/20 rounded-xl p-4 bg-blue-50/30">
+                   <p className="text-sm font-semibold text-[#00A5B5] mb-2 leading-tight w-2/3">Available Surveys</p>
+                   <p className="text-3xl font-bold text-gray-800">12</p>
+                 </div>
+                 <div className="border border-green-200 rounded-xl p-4 bg-green-50/30">
+                   <p className="text-sm font-semibold text-green-600 mb-2 leading-tight w-2/3">Pending Surveys</p>
+                   <p className="text-3xl font-bold text-gray-800">12</p>
+                 </div>
+                 <div className="border border-blue-200 rounded-xl p-4 bg-blue-50/30">
+                   <p className="text-sm font-semibold text-blue-600 mb-2 leading-tight w-2/3">Active Surveys</p>
+                   <p className="text-3xl font-bold text-gray-800">6</p>
+                 </div>
+                 <div className="border border-gray-200 rounded-xl p-4">
+                   <p className="text-sm font-semibold text-gray-600 mb-2 leading-tight w-2/3">Completed Surveys</p>
+                   <p className="text-3xl font-bold text-gray-800">6</p>
+                 </div>
+               </div>
+            </div>
+          </div>
+          
         </div>
       </section>
       {redeemModalOpen ? <RedeemModal /> : ""}

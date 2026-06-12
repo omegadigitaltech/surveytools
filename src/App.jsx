@@ -50,6 +50,8 @@ import Insights from "./pages/insights/insights";
 import FormInsights from "./pages/forminsights/forminsights";
 import Analytics from "./pages/analytics/Analytics.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
+import Admin from "./pages/admin/Admin";
+import Rewards from "./pages/rewards/Rewards";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -59,6 +61,7 @@ const router = createBrowserRouter(
       </Route>
 
       <Route path="answerform/:id" element={<AnswerForm />} />
+      <Route path="admin" element={<Admin />} />
 
       <Route element={<ProtectRoute />}>
       {/* NO DASHBOARD LAYOUT FOR THEM */}
@@ -78,6 +81,7 @@ const router = createBrowserRouter(
           <Route path="insights/:id" element={<Insights />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="/my-forms" element={<MyForms />} />
+          <Route path="rewards" element={<Rewards />} />
           <Route path="formquestion/:id" element={<FormQuestions />} />
           <Route path="forminsights/:id" element={<FormInsights />} />
           <Route path="payment" element={<Payment />} />
