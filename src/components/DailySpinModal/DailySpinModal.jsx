@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import useAuthStore from '../../store/useAuthStore';
+import config from '../../config/config';
 
 const DailySpinModal = ({ onClose }) => {
   const [spinning, setSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [spinRemaining, setSpinRemaining] = useState(1);
-  const { token } = useAuthStore();
+  const { authToken } = useAuthStore();
 
   const handleSpin = async () => {
     if (spinRemaining <= 0) {
@@ -22,7 +23,7 @@ const DailySpinModal = ({ onClose }) => {
 
     try {
       const res = await axios.post(`${config.API_URL}/gamification/spin`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${authToken}` }
       });
       
       setTimeout(() => {

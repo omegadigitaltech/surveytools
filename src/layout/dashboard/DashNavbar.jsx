@@ -10,7 +10,7 @@ import DailySpinModal from "../../components/DailySpinModal/DailySpinModal";
 
 const Sidebar = () => {
   const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
-  const { menuOpen, setMenuOpen, setSpinOpen } = useDashboardStore();
+  const { menuOpen, setMenuOpen } = useDashboardStore();
   const sidebar = useRef(null);
   const navigate = useNavigate();
   const [showSpinModal, setShowSpinModal] = useState(false);
