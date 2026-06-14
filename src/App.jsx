@@ -52,6 +52,7 @@ import Analytics from "./pages/analytics/Analytics.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
 import Rewards from "./pages/rewards/rewards";
 import MissionsPage from "./pages/missions/missions";
+import Admin from "./pages/admin/Admin";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -61,6 +62,7 @@ const router = createBrowserRouter(
       </Route>
 
       <Route path="answerform/:id" element={<AnswerForm />} />
+      <Route path="admin" element={<Admin />} />
 
       <Route element={<ProtectRoute />}>
       {/* NO DASHBOARD LAYOUT FOR THEM */}

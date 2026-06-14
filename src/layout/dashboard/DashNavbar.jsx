@@ -6,13 +6,14 @@ import iconLogOut from "../../assets/img/icon-logout.svg";
 import useOutsideClick from "../../hooks/useOutsideClick";
 import "./navbar.css";
 import useDashboardStore from "../../store/useDashboardStore";
+import DailySpinModal from "../../components/DailySpinModal/DailySpinModal";
 
 const Sidebar = () => {
   const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
   const { menuOpen, setMenuOpen, setSpinOpen } = useDashboardStore();
   const sidebar = useRef(null);
   const navigate = useNavigate();
-
+  const [showSpinModal, setShowSpinModal] = useState(false);
   if (!isAuthenticated) return null;
 
   // Setup clickOutside function for sidebar
@@ -109,7 +110,7 @@ const Sidebar = () => {
             <span>Help & Support</span>
           </a>
 
-          <button className="dailyspin-btn" onClick={() => setSpinOpen(true)}>
+          <button className="dailyspin-btn" onClick={() =>  setShowSpinModal(true)}>
             <img src="/spinmenu.svg" alt="spin" />
             <span>Daily Spin</span>
           </button>
@@ -140,7 +141,6 @@ const Sidebar = () => {
           </button>
           </NavLink> */}
         </nav>
-
         {/* Bottom user section */}
         <div className="sidebar-footer">
           <button className="sidebar-user" onClick={() => navigate("#")}>
@@ -154,6 +154,7 @@ const Sidebar = () => {
           </button>
         </div>
       </aside>
+      {showSpinModal && <DailySpinModal onClose={() => setShowSpinModal(false)} />}
     </>
   );
 };

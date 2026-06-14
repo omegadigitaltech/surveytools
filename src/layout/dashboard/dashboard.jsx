@@ -2,7 +2,6 @@ import { Outlet } from "react-router-dom";
 import DashNavbar from "./DashNavbar";
 import Footer from "../../components/footer/footer";
 import MobileNavBar from "../../components/navbar/MobileNavBar";
-import DailyWheelSpin from "../../components/dailyspin/dailyspin";
 import useDashboardStore from "../../store/useDashboardStore";
 
 const DashboardLayout = () => {
