@@ -23,6 +23,7 @@
   --border: 0.5px solid rgb(167, 167, 167);
   --primary: #2095d3;
   --secondary-blue: #50B4E9;
+  --grad-bg: linear-gradient(135deg, #22C55E 0%, #16A34A 50%, #0D9488 100%);
   
   --lemon: #14fe19;
   --greytxt: #6b7280;

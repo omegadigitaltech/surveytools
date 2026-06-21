@@ -51,8 +51,9 @@ import FormInsights from "./pages/forminsights/forminsights";
 import Analytics from "./pages/analytics/Analytics.jsx";
 import GraphAnalyticsDashboard from "./pages/graph-analytics/GraphAnalyticsDashboard.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
+import Rewards from "./pages/rewards/rewards";
+import MissionsPage from "./pages/missions/missions";
 import Admin from "./pages/admin/Admin";
-import Rewards from "./pages/rewards/Rewards";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -65,18 +66,18 @@ const router = createBrowserRouter(
       <Route path="admin" element={<Admin />} />
 
       <Route element={<ProtectRoute />}>
-      {/* NO DASHBOARD LAYOUT FOR THEM */}
+        {/* NO DASHBOARD LAYOUT FOR THEM */}
         <Route path="answersurvey/:id" element={<AnswerSurvey />} />
         <Route element={<HomeLayout />}>
           <Route path="surveyquestion" element={<SurveyQuestion />} action={postAction} />
           <Route path="create-form" element={<FormQuestions />} />
         </Route>
-       {/*--- */}
-       
+        {/*--- */}
+
         <Route element={<DashboardLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="start-survey" element={<StartSurvey />} />
-          <Route path="postsurvey" element={<PostSurvey />}  action={surveyAction} />
+          <Route path="postsurvey" element={<PostSurvey />} action={surveyAction} />
           <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
           <Route path="publish" element={<Publish />} />
           <Route path="insights/:id" element={<Insights />} />
@@ -86,12 +87,14 @@ const router = createBrowserRouter(
           <Route path="rewards" element={<Rewards />} />
           <Route path="formquestion/:id" element={<FormQuestions />} />
           <Route path="forminsights/:id" element={<FormInsights />} />
-          <Route path="payment" element={<Payment />} />
+          <Route path="payment" element={<Pxayment />} />
           <Route path="verify-payment" element={<VerifyPayment />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
           <Route path="withdraw" element={<Withdraw />} />
+          <Route path="rewards" element={<Rewards />} />
+          <Route path="missions" element={<MissionsPage />} />
           {/* <Route path="pricing" element={<Pricing />} /> */}
 
         </Route>

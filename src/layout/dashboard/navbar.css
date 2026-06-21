@@ -69,7 +69,20 @@ background: var(--btns);
   padding-top: 1rem;
   border-top: 1px solid #e5e7eb;
 }
-
+.dailyspin-btn{
+  display: flex;
+  align-items: center;
+  justify-content:space-evenly;
+  padding: 0.5rem .8rem;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 500;
+  font-size: .85rem;
+  background: linear-gradient(135deg, #22C55E 0%, #16A34A 50%, #0D9488 100%);
+}
+.dailyspin-btn img{
+width: 1.5rem;
+}
 .sidebar-user {
   display: flex;
   align-items: flex-start;

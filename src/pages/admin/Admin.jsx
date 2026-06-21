@@ -53,31 +53,28 @@ const Admin = () => {
         <div className="flex gap-4 mb-8">
           <button
             onClick={() => setActiveTab("missions")}
-            className={`px-4 py-2 rounded ${
-              activeTab === "missions"
+            className={`px-4 py-2 rounded ${activeTab === "missions"
                 ? "bg-[#00A5B5] text-white"
                 : "bg-white text-gray-700 shadow"
-            }`}
+              }`}
           >
             Create Mission
           </button>
           <button
             onClick={() => setActiveTab("levels")}
-            className={`px-4 py-2 rounded ${
-              activeTab === "levels"
+            className={`px-4 py-2 rounded ${activeTab === "levels"
                 ? "bg-[#00A5B5] text-white"
                 : "bg-white text-gray-700 shadow"
-            }`}
+              }`}
           >
             Create Level
           </button>
           <button
             onClick={() => setActiveTab("marketplace")}
-            className={`px-4 py-2 rounded ${
-              activeTab === "marketplace"
+            className={`px-4 py-2 rounded ${activeTab === "marketplace"
                 ? "bg-[#00A5B5] text-white"
                 : "bg-white text-gray-700 shadow"
-            }`}
+              }`}
           >
             Create Listing
           </button>
@@ -108,7 +105,7 @@ const CreateMissionForm = ({ token }) => {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:5000/admin/gamification/missions",
+        "http://localhost:1574/admin/gamification/missions",
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -205,7 +202,7 @@ const CreateLevelForm = ({ token }) => {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:5000/admin/gamification/levels",
+        "http://localhost:1574/admin/gamification/levels",
         {
           ...formData,
           benefits: formData.benefits.split(",").map((b) => b.trim()),
@@ -293,7 +290,7 @@ const CreateListingForm = ({ token }) => {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:5000/admin/marketplace/listings",
+        "http://localhost:1574/admin/marketplace/listings",
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },

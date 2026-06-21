@@ -14,7 +14,6 @@ const Sidebar = () => {
   const sidebar = useRef(null);
   const navigate = useNavigate();
   const [showSpinModal, setShowSpinModal] = useState(false);
-
   if (!isAuthenticated) return null;
 
   // Setup clickOutside function for sidebar
@@ -94,18 +93,16 @@ const Sidebar = () => {
                 alt="Checklist-Minimalistic"
               />
             </span>
-            <span>Responses</span>
-          </NavLink> 
-          
+            <span>Settings</span>
+          </NavLink> */}
           <NavLink to="/rewards" className="sidebar-link">
             <span>
-              <span className="material-icons text-xl">card_giftcard</span>
+              <img src="/rewards.svg" alt="Rewards" />
             </span>
             <span>Rewards</span>
           </NavLink>
-
           <a
-            href="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt" 
+            href="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt"
             target="_blank"
             rel="noopener noreferrer"
             className="sidebar-link"
@@ -116,6 +113,20 @@ const Sidebar = () => {
             <span>Help & Support</span>
           </a>
 
+          <button className="dailyspin-btn" onClick={() => setShowSpinModal(true)}>
+            <img src="/spinmenu.svg" alt="spin" />
+            <span>Daily Spin</span>
+          </button>
+          {/* <NavLink to="/responses" className="sidebar-link">
+            <span>
+              <img
+                src="/Checklist-Minimalistic.svg"
+                alt="Checklist-Minimalistic"
+              />
+            </span>
+            <span>Responses</span>
+          </NavLink> 
+
           <NavLink to="/settings" className="sidebar-link">
             <span>
               <img src="/Settings-Minimalistic.svg" alt="Settings" />
@@ -123,30 +134,19 @@ const Sidebar = () => {
             <span>Settings</span>
           </NavLink>
         </nav>
-
-        <div className="px-4 mt-6">
-          <button 
-            onClick={() => setShowSpinModal(true)}
-            className="w-full bg-[#00A5B5] text-white py-2 rounded-lg font-bold flex items-center justify-center gap-2 shadow hover:bg-[#008F9C] transition-colors"
-          >
-            <span className="material-icons">auto_awesome</span> Daily Spin
-          </button>
-        </div>
-
         {/* Bottom user section */}
-        <div className="sidebar-footer">
-          <button className="sidebar-user" onClick={() => navigate("#")}>
-            <img src={iconUser} alt="User" />
-            <span>{userName}</span>
-          </button>
+          <div className="sidebar-footer">
+            <button className="sidebar-user" onClick={() => navigate("#")}>
+              <img src={iconUser} alt="User" />
+              <span>{userName}</span>
+            </button>
 
-          <button className="sidebar-logout" onClick={showLogoutConfirmation}>
-            <img src={iconLogOut} alt="Logout" />
-            Logout
-          </button>
-        </div>
+            <button className="sidebar-logout" onClick={showLogoutConfirmation}>
+              <img src={iconLogOut} alt="Logout" />
+              Logout
+            </button>
+          </div>
       </aside>
-
       {showSpinModal && <DailySpinModal onClose={() => setShowSpinModal(false)} />}
     </>
   );
