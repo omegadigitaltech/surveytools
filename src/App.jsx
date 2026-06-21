@@ -44,7 +44,7 @@ import Withdraw from "./pages/withdraw/withdraw";
 import Profile from "./pages/profile/profile";
 import AnswerSurvey from "./pages/answersurvey/answersurvey";
 import AnswerForm from "./pages/answerform/answerform";
-import MyForms from "./pages/myforms/myForm.jsx";
+import MyForms from "./pages/myforms/MyForm.jsx";
 import Settings from "./pages/settings/settings";
 import Insights from "./pages/insights/insights";
 import FormInsights from "./pages/forminsights/forminsights";
