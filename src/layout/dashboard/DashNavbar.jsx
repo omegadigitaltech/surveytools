@@ -86,15 +86,7 @@ const Sidebar = () => {
             </span>
             <span>Create a form</span>
           </NavLink>
-          <NavLink to="/responses" className="sidebar-link">
-            <span>
-              <img
-                src="/Checklist-Minimalistic.svg"
-                alt="Checklist-Minimalistic"
-              />
-            </span>
-            <span>Settings</span>
-          </NavLink> */}
+
           <NavLink to="/rewards" className="sidebar-link">
             <span>
               <img src="/rewards.svg" alt="Rewards" />
@@ -125,7 +117,7 @@ const Sidebar = () => {
               />
             </span>
             <span>Responses</span>
-          </NavLink> 
+          </NavLink> */}
 
           <NavLink to="/settings" className="sidebar-link">
             <span>
