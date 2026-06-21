@@ -87,7 +87,7 @@ const router = createBrowserRouter(
           <Route path="rewards" element={<Rewards />} />
           <Route path="formquestion/:id" element={<FormQuestions />} />
           <Route path="forminsights/:id" element={<FormInsights />} />
-          <Route path="payment" element={<Pxayment />} />
+          <Route path="payment" element={<Payment />} />
           <Route path="verify-payment" element={<VerifyPayment />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="profile" element={<Profile />} />
