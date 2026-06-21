@@ -49,6 +49,7 @@ import Settings from "./pages/settings/settings";
 import Insights from "./pages/insights/insights";
 import FormInsights from "./pages/forminsights/forminsights";
 import Analytics from "./pages/analytics/Analytics.jsx";
+import GraphAnalyticsDashboard from "./pages/graph-analytics/GraphAnalyticsDashboard.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
 import Admin from "./pages/admin/Admin";
 import Rewards from "./pages/rewards/Rewards";
@@ -79,7 +80,8 @@ const router = createBrowserRouter(
           <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
           <Route path="publish" element={<Publish />} />
           <Route path="insights/:id" element={<Insights />} />
-          <Route path="analytics" element={<Analytics />} />
+          <Route path="analytics" element={<GraphAnalyticsDashboard />} />
+          <Route path="analytics/:surveyId" element={<GraphAnalyticsDashboard />} />
           <Route path="/my-forms" element={<MyForms />} />
           <Route path="rewards" element={<Rewards />} />
           <Route path="formquestion/:id" element={<FormQuestions />} />
