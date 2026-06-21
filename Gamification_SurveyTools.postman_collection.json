@@ -1,0 +1,120 @@
+{
+  "info": {
+    "_postman_id": "40fbd682-1a42-494b-97c7-5ea087084de1",
+    "name": "Gamification SurveyTools",
+    "description": "API endpoints for the gamification features in SurveyTools",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Gamification Dashboard",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": { "raw": "{{base_url}}/gamification/dashboard", "host": ["{{base_url}}"], "path": ["gamification", "dashboard"] }
+      }
+    },
+    {
+      "name": "Daily Spin",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": { "raw": "{{base_url}}/gamification/spin", "host": ["{{base_url}}"], "path": ["gamification", "spin"] }
+      }
+    },
+    {
+      "name": "Get Missions",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": { "raw": "{{base_url}}/gamification/missions", "host": ["{{base_url}}"], "path": ["gamification", "missions"] }
+      }
+    },
+    {
+      "name": "Claim Mission Reward",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": { "raw": "{{base_url}}/gamification/missions/{{missionProgressId}}/claim", "host": ["{{base_url}}"], "path": ["gamification", "missions", "{{missionProgressId}}", "claim"] }
+      }
+    },
+    {
+      "name": "Get Leaderboard",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": { "raw": "{{base_url}}/gamification/leaderboard?period=all_time", "host": ["{{base_url}}"], "path": ["gamification", "leaderboard"], "query": [{ "key": "period", "value": "all_time" }] }
+      }
+    },
+    {
+      "name": "Get VIP Status",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": { "raw": "{{base_url}}/gamification/vip-status", "host": ["{{base_url}}"], "path": ["gamification", "vip-status"] }
+      }
+    },
+    {
+      "name": "Get Marketplace Listings",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": { "raw": "{{base_url}}/marketplace/listings", "host": ["{{base_url}}"], "path": ["marketplace", "listings"] }
+      }
+    },
+    {
+      "name": "Convert Points to Voucher",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pointsToConvert\": 500\n}"
+        },
+        "url": { "raw": "{{base_url}}/marketplace/convert", "host": ["{{base_url}}"], "path": ["marketplace", "convert"] }
+      }
+    },
+    {
+      "name": "Get Voucher Wallet",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": { "raw": "{{base_url}}/marketplace/wallet", "host": ["{{base_url}}"], "path": ["marketplace", "wallet"] }
+      }
+    },
+    {
+      "name": "Get Transaction Summary",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": { "raw": "{{base_url}}/marketplace/transactions", "host": ["{{base_url}}"], "path": ["marketplace", "transactions"] }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000" },
+    { "key": "token", "value": "YOUR_AUTH_TOKEN_HERE" },
+    { "key": "missionProgressId", "value": "MISSION_PROGRESS_ID_HERE" }
+  ]
+}

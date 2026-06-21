@@ -1,0 +1,78 @@
+*Basic level graphs* 
+1. Bar chart 
+2. Pie chart
+3. Histogram 
+4. Line chart
+
+*Intermediate Level graph* 
+1. Stacked Bar Chart
+2. Clustered/Grouped Bar Chart
+3. Area Chart
+4. Box Plot
+5. Scatter Plot
+6. Heatmap
+
+ *Advanced Chart* 
+1. Treemap
+2. Cluster Dendrogram
+3. Map visualization as well(if possible) 
+4. Network Graph
+
+*Intermediate Level Graph* 
+1. Stacked Bar Chart
+Shows composition of categories within groups.
+
+2. Clustered/Grouped Bar Chart
+Compares multiple groups side-by-side.
+
+3. Area Chart
+Shows cumulative trends over time.
+
+4. Box Plot
+Displays distribution, median, spread, and outliers.
+
+5. Scatter Plot
+Shows relationship/correlation between two variables.
+
+6. Heatmap
+Displays intensity or concentration of responses using colors.
+
+*Advanced Level Charts* 
+
+1. Treemap
+
+2. Cluster Dendrogram
+Used in hierarchical clustering analysis.
+
+3. Map visualization as well(if possible) 
+
+4. Network Graph
+Shows relationships and connections between variables/entities.
+
+
+
+
+
+
+
+1. The Graph Types (From Basic to Advanced)
+Here is the complete breakdown of every visualization graph type available and exactly what it is best used for:
+
+Level 1: Basic (Single Question Distribution) These graphs look at exactly one question and count how many times each answer was picked.
+
+bar (Bar Chart): The gold standard. Best for multiple-choice questions or 5-point scales. It clearly shows the frequency of each option side-by-side.
+pie (Pie Chart): Best for questions with only a few distinct choices (like Yes/No, or Gender) to visually represent the "share" of the total responses.
+line / area (Line & Area Charts): Best for ordered scales (like a rating from 1 to 10) to visually see if the trend is skewing positive or negative.
+treemap: A beautiful alternative to a pie chart. It displays choices as nested colored rectangles, where the size of the rectangle represents how popular the answer was.
+Level 2: Intermediate (Cross-Tabulation) These graphs compare two questions against each other (e.g., comparing "Course Satisfaction" across different "Genders" or "Departments").
+
+stacked_bar & clustered_bar: Takes a standard bar chart and splits each bar by a demographic. (e.g., You can see exactly how many Males vs. Females voted "Strongly Agree").
+heatmap: A colored matrix/grid that shows the intensity of responses between two variables. Darker colors represent heavy overlaps.
+scatter (Scatter Plot): Plots individual responses as dots on an X/Y axis. Excellent for spotting correlation between two numerical questions (e.g., Age vs. Income).
+Level 3: Statistical Analysis
+
+box_plot (Box & Whisker): Strictly for numerical data. It automatically calculates the minimum, average, median, and maximum values, and highlights any weird "outliers" (people who voted drastically differently than everyone else).
+Level 4: Advanced Machine Learning
+
+dendrogram (Hierarchical Clustering): Powered by the Python microservice. It uses the Ward clustering algorithm to build a "family tree" of your survey data.
+network: Visualizes how closely related certain answers or respondents are, drawing lines (links) between connected nodes.

@@ -20,7 +20,8 @@ const User = require('./model/user')
 const authRouter = require('./routes/auth')
 const mainRouter = require('./routes/main')
 const redemptionRouter = require('./routes/redemption')
-const adminRouter = require('./routes/admin')
+const adminRouter = require('./routes/admin');
+const gamificationRouter = require('./routes/gamification');
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const uploadErrorHandler = require('./middleware/errorHandler')
 const notFoundMiddleware = require('./middleware/not-found');
@@ -136,7 +137,15 @@ const checkRedisConnection = async () => {
 app.use('/', mainRouter)
 app.use('/', authRouter)
 app.use('/', redemptionRouter)
-app.use('/', adminRouter)
+const marketplaceRouter = require('./routes/marketplace');
+const visualizationRouter = require('./routes/visualization');
+const analyticsRouter = require('./routes/analytics');
+
+app.use('/', adminRouter);
+app.use('/', gamificationRouter);
+app.use('/', marketplaceRouter);
+app.use('/', visualizationRouter);
+app.use('/', analyticsRouter);
 
 
 // Use the new error handler for file uploads
@@ -159,6 +168,10 @@ const bootstrap = async () => {
 
     // Check Redis
     await checkRedisConnection();
+
+    // Start Cron Jobs
+    const initGamificationCron = require('./services/gamificationCron');
+    initGamificationCron();
 
     const port = process.env.PORT || 5000;
     app.listen(port, () => {

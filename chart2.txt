@@ -1,0 +1,27 @@
+What's up,
+
+I just made a finding that a lot of our customers need their results in a specific format for their thesis or report.
+
+Like... actual statistical test output (test statistic, degrees of freedom, p-value) that they can cite directly in their results chapter. 
+
+What I'd like us to add: together with the existing visualizations you're currently working on, generate a statistical results summary using standard inferential tests. 
+
+In order of priority:
+
+1. Chi-square test of independence (categorical × categorical) → χ², df, p-value, Cramér's V
+2. Independent samples t-test (2 groups, continuous outcome) → t-statistic, df, p-value
+3. One-way ANOVA (3+ groups, continuous outcome) → F-statistic, df, p-value
+4. Pearson/Spearman correlation (two continuous/ordinal variables) → r or rho, p-value
+5. Cronbach's alpha (reliability of multi-item scales)
+6. Nice-to-have: simple linear regression → coefficients, R², p-value
+
+Output requirements:
+• Present results in APA format (e.g. "χ²(2) = 8.32, p = .016") so they're directly citable
+
+• Add a one-line plain-language interpretation per test ("There is a statistically significant association between X and Y")
+
+• Include these in the exportable report alongside the existing charts
+
+From what I know, the trickiest part is probably the test-selection logic, which is auto-detecting which test applies based on the variable types being compared (categorical vs continuous, number of groups, etc.). 
+
+These are standard stats library functions (scipy.stats or equivalent), let me know your thoughts on this pls... Scope and possible delivery date.

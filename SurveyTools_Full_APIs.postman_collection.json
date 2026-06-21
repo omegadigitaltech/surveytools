@@ -1,0 +1,241 @@
+{
+  "info": {
+    "name": "SurveyTools Comprehensive API Collection",
+    "description": "Collection featuring Auth, Admin Gamification, Gamification, Marketplace/Vouchers, and Visualizations APIs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "missionProgressId", "value": "ID_HERE", "type": "string" },
+    { "key": "surveyId", "value": "SURVEY_ID_HERE", "type": "string" },
+    { "key": "questionId", "value": "PRIMARY_QUESTION_ID", "type": "string" },
+    { "key": "crossQuestionId", "value": "SECONDARY_QUESTION_ID", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login (Auto-Saves Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"token\", jsonData.token);",
+                  "    console.log('Token saved to collection variables');",
+                  "} else if (jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set(\"token\", jsonData.data.token);",
+                  "    console.log('Token saved to collection variables');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"yourpassword\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Admin Controls (Gamification & Marketplace)",
+      "item": [
+        {
+          "name": "Create Mission",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Survey Master\",\n  \"description\": \"Complete 5 surveys today.\",\n  \"type\": \"daily\",\n  \"category\": \"surveys\",\n  \"targetValue\": 5,\n  \"xpReward\": 200,\n  \"pointsReward\": 50\n}"
+            },
+            "url": { "raw": "{{base_url}}/admin/gamification/missions", "host": ["{{base_url}}"], "path": ["admin", "gamification", "missions"] }
+          }
+        },
+        {
+          "name": "Create Marketplace Listing",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"10% Amazon Gift Card\",\n  \"description\": \"Get 10% off your next Amazon purchase.\",\n  \"type\": \"gift_card\",\n  \"pointsCost\": 500,\n  \"value\": \"10% Off\",\n  \"partnerName\": \"Amazon\",\n  \"stock\": 100\n}"
+            },
+            "url": { "raw": "{{base_url}}/admin/marketplace/listings", "host": ["{{base_url}}"], "path": ["admin", "marketplace", "listings"] }
+          }
+        },
+        {
+          "name": "Create Level Config",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": 2,\n  \"name\": \"Explorer\",\n  \"minXP\": 1000,\n  \"maxXP\": 2500,\n  \"benefits\": [\"Extra spin wheel attempt\"]\n}"
+            },
+            "url": { "raw": "{{base_url}}/admin/gamification/levels", "host": ["{{base_url}}"], "path": ["admin", "gamification", "levels"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Gamification",
+      "item": [
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/gamification/dashboard", "host": ["{{base_url}}"], "path": ["gamification", "dashboard"] }
+          }
+        },
+        {
+          "name": "Spin Wheel",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/gamification/spin", "host": ["{{base_url}}"], "path": ["gamification", "spin"] }
+          }
+        },
+        {
+          "name": "Get Missions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/gamification/missions", "host": ["{{base_url}}"], "path": ["gamification", "missions"] }
+          }
+        },
+        {
+          "name": "Claim Mission Reward",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/gamification/missions/{{missionProgressId}}/claim", "host": ["{{base_url}}"], "path": ["gamification", "missions", "{{missionProgressId}}", "claim"] }
+          }
+        },
+        {
+          "name": "Get Leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/gamification/leaderboard?period=all_time", "host": ["{{base_url}}"], "path": ["gamification", "leaderboard"], "query": [{ "key": "period", "value": "all_time" }] }
+          }
+        },
+        {
+          "name": "Get VIP Status",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/gamification/vip-status", "host": ["{{base_url}}"], "path": ["gamification", "vip-status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Marketplace & Vouchers",
+      "item": [
+        {
+          "name": "Get Listings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/marketplace/listings", "host": ["{{base_url}}"], "path": ["marketplace", "listings"] }
+          }
+        },
+        {
+          "name": "Convert Points / Buy Voucher",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pointsToConvert\": 500\n}"
+            },
+            "url": { "raw": "{{base_url}}/marketplace/convert", "host": ["{{base_url}}"], "path": ["marketplace", "convert"] }
+          }
+        },
+        {
+          "name": "Get Voucher Wallet",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/marketplace/wallet", "host": ["{{base_url}}"], "path": ["marketplace", "wallet"] }
+          }
+        },
+        {
+          "name": "Get Transaction Summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/marketplace/transactions", "host": ["{{base_url}}"], "path": ["marketplace", "transactions"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Graph Visualizations",
+      "item": [
+        {
+          "name": "Get Basic Graph Data",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/surveys/{{surveyId}}/visualizations?graphType=bar&questionId={{questionId}}", "host": ["{{base_url}}"], "path": ["surveys", "{{surveyId}}", "visualizations"], "query": [{ "key": "graphType", "value": "bar" }, { "key": "questionId", "value": "{{questionId}}" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Analytics",
+      "item": [
+        {
+          "name": "Get Survey Analytics Overview",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/surveys/{{surveyId}}/analytics/overview", "host": ["{{base_url}}"], "path": ["surveys", "{{surveyId}}", "analytics", "overview"] }
+          }
+        },
+        {
+          "name": "Get User Engagement Analytics",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/analytics/engagement", "host": ["{{base_url}}"], "path": ["analytics", "engagement"] }
+          }
+        },
+        {
+          "name": "Get Response Trends Analytics",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/surveys/{{surveyId}}/analytics/trends?timeframe=weekly", "host": ["{{base_url}}"], "path": ["surveys", "{{surveyId}}", "analytics", "trends"], "query": [{ "key": "timeframe", "value": "weekly" }] }
+          }
+        }
+      ]
+    }
+  ]
+}
