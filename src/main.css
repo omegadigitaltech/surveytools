@@ -7,12 +7,10 @@
   --ff-text: "Inter", sans-serif;
 
   /* Colors */
-  /* --base: #1D8C9C; */
   --base: #2095d3;
-  /* --btns: #149bba; */
-  --btns: #2793CD;
+  --btns: #2793cd;
   --blue-border: #bfe9f3;
-  --maroon:#961B1E;
+  --maroon: #961b1e;
   --wht: #fff;
   --fade: #e6e6e6;
   --blk: #000;
@@ -22,13 +20,17 @@
   --green: rgb(53, 143, 53);
   --border: 0.5px solid rgb(167, 167, 167);
   --primary: #2095d3;
-  --secondary-blue: #50B4E9;
-  --grad-bg: linear-gradient(135deg, #22C55E 0%, #16A34A 50%, #0D9488 100%);
-  
+  --secondary-blue: #50b4e9;
+  --grad-bg: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #0d9488 100%);
+  --grad-bg: linear-gradient(
+    135deg,
+    #22c55e 0%,
+    rgb(0, 131, 3) 50%,
+    rgb(0, 150, 184) 100%
+  );
   --lemon: #14fe19;
   --greytxt: #6b7280;
   --greyborder: #dbdbdb;
-  /* --green: #196332; */
 
   /* Font-Sizes */
   --fs-3xl: 1.5rem;
@@ -69,7 +71,7 @@ body {
 .h1 {
   font-size: 3rem;
   font-weight: 600;
-  margin-bottom: 2rem; 
+  margin-bottom: 2rem;
 }
 
 a {
@@ -79,7 +81,7 @@ a {
 ul {
   list-style: none;
 }
-.head{
+.head {
   font-size: 2rem;
   font-weight: 500;
 }
@@ -90,13 +92,6 @@ img {
 .greytxt {
   color: var(--greytxt);
 }
-/* input,
-button {
-  font: inherit;
-  border: none;
-  outline-style: none;
-  background-color: transparent;
-} */
 
 img,
 button {
@@ -194,11 +189,10 @@ button.inactive {
 
 /* MEDIA QUERY */
 @media (max-width: 668px) {
-.head {
-  font-size: 1.2rem;
+  .head {
+    font-size: 1.2rem;
+  }
 }
-}
-
 
 @media (max-width: 550px) {
   .wrap {

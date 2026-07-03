@@ -1,50 +1,48 @@
-import React from 'react'
+import React from "react";
 
 const TestimonialSection = () => {
-    const testimonials = [
-  {
-    name: "Derrick Mundane",
-    role: "Final year student",
-    image: "/derrick.png",
-    text: "The AI questionnaire builder saved me tons of work on my thesis research. The insights were exactly what I needed.",
-  },
-  {
-    name: "Ralph Edwards",
-    role: "Final year student",
-    image: "/ralph.png",
-    text: "The AI questionnaire builder saved me tons of work on my thesis research. The insights were exactly what I needed.",
-  },
-  {
-    name: "Annette Black",
-    role: "Final year student",
-    image: "/annette.png",
-    text: "The AI questionnaire builder saved me tons of work on my thesis research. The insights were exactly what I needed.",
-  },
-  {
-    name: "Darlene Robertson",
-    role: "Final year student",
-    image: "/darlene.png",
-    text: "The AI questionnaire builder saved me tons of work on my thesis research. The insights were exactly what I needed.",
-  },
-  {
-    name: "Floyd Miles",
-    role: "Final year student",
-    image: "/floyd.png",
-    text: "The AI questionnaire builder saved me tons of work on my thesis research. The insights were exactly what I needed.",
-  },
-  {
-    name: "Jenny Wilson",
-    role: "Final year student",
-    image: "/jenny.png",
-    text: "The AI questionnaire builder saved me tons of work on my thesis research. The insights were exactly what I needed.",
-  },
-];
+  const testimonials = [
+    {
+      name: "David Aderoke",
+      role: "Final year student",
+      image: "/ava3.png",
+      text: "The AI questionnaire builder saved me tons of work on my thesis research. The insights were exactly what I needed.",
+    },
+    {
+      name: "Ruth Eze",
+      role: "Researcher",
+      image: "/ava2.png",
+      text: "Creating surveys is now so much faster. I had my form ready in minutes instead of spending hours.",
+    },
+    {
+      name: "Anna Yusuf",
+      role: "300 level student",
+      image: "/ava1.png",
+      text: "The response analytics made it easy to understand my audience. Everything was clear and well organized.",
+    },
+    {
+      name: "Daniel Johnson",
+      role: "400 level student",
+      image: "/ava4.png",
+      text: "SurveyTools helped me collect quality responses for my market research without any hassle.",
+    },
+    {
+      name: "Floyd Miles",
+      role: "Final year student",
+      image: "/ava5.png",
+      text: "The interface is simple and intuitive. Even as a first-time user, I created a professional survey with ease.",
+    },
+    {
+      name: "Racheal Wilson",
+      role: "Student Researcher",
+      image: "/ava6.png",
+      text: "I love how quickly I can build surveys and review the results. It has become an essential tool for my projects.",
+    },
+  ];
   return (
     <section className=" testimonial py-16 bg-gray-50">
       <div className="text-center mb-12">
-        <h4 className="font-[500] text-black tracking-wide">
-          Testimonials
-        </h4>
+        <h4 className="font-[600] text-black tracking-wide">Testimonials</h4>
         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-2 py-2">
           Our Trusted Users
         </h2>
@@ -64,9 +62,7 @@ const TestimonialSection = () => {
             </div>
 
             {/* Quote */}
-            <p className=" test-quote text-black font-[500] mb-6">
-              “{t.text}”
-            </p>
+            <p className=" test-quote text-black font-[500] mb-6">“{t.text}”</p>
 
             {/* User info */}
             <div className="flex items-center gap-3">
@@ -76,7 +72,9 @@ const TestimonialSection = () => {
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <h4 className="test-name text-sm font-semibold text-gray-900">{t.name}</h4>
+                <h4 className="test-name text-sm font-semibold text-gray-900">
+                  {t.name}
+                </h4>
                 <p className="text-xs">{t.role}</p>
               </div>
             </div>
@@ -84,7 +82,7 @@ const TestimonialSection = () => {
         ))}
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default TestimonialSection
+export default TestimonialSection;

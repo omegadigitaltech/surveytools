@@ -31,14 +31,16 @@ const Navbar = () => {
     <header className={`header${isAuthenticated ? " header-logged" : ""}`}>
       <div className="header-wrap wrap">
         <div className="header-w1">
-          <button
-            className={`header-w1-menu ${menuOpen ? "menu-open" : ""}`}
-            onClick={toggleMenu}
-          >
-            <div className="header-w1-line" aria-hidden></div>
-            <div className="header-w1-line" aria-hidden></div>
-            <div className="header-w1-line" aria-hidden></div>
-          </button>
+        {isAuthenticated && (
+  <button
+    className={`header-w1-menu ${menuOpen ? "menu-open" : ""}`}
+    onClick={toggleMenu}
+  >
+    <div className="header-w1-line" aria-hidden></div>
+    <div className="header-w1-line" aria-hidden></div>
+    <div className="header-w1-line" aria-hidden></div>
+  </button>
+    )}
 
           <NavLink className="header-w1-logo" to="/">
             <img src="/Blue-logo-1.svg" alt="Blue Logo" className="md:w-[6rem] h-[2.2rem] md:h-auto" />
@@ -54,17 +56,7 @@ const Navbar = () => {
             </li>
             <li className="header-w2-item hide">
               <NavLink className="header-w2-link" to="/">
-                Pricing
-              </NavLink>
-            </li>
-            <li className="header-w2-item hide">
-              <NavLink className="header-w2-link" to="/">
                 Services
-              </NavLink>
-            </li>
-            <li className="header-w2-item hide">
-              <NavLink className="header-w2-link" to="/">
-                Blog
               </NavLink>
             </li>
           </ul>
@@ -93,8 +85,8 @@ const Navbar = () => {
             {!isAuthenticated && (
               <>
                 <li className="header-w2-item hide">
-                  <NavLink className="header-w2-link button text-white px-10 py-4 rounded-md" to="/signup">
-                    Get Started
+                  <NavLink className="header-w2-link button navsignup-btn text-white px-5 py-2 rounded-md" to="/signup">
+                    Sign up
                   </NavLink>
                 </li>
               </>

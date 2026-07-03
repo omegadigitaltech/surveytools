@@ -15,7 +15,6 @@
   
   /* Brand column */
   .footer-brand {
-    /* flex: 1 1 240px; */
     max-width: 320px;
     display: flex;
     flex-direction: column;
@@ -130,17 +129,6 @@
   /* Responsive */
   @media (min-width: 800px) {
   
-.footer-inner{
-    /* padding-left: 230px; */
-    /* flex: 1;
-    flex-direction: column;
-    min-width: 0; */
-  }
-  /* .footer-inner {
-    flex: 1;
-    padding: 2rem;      
-    overflow-y: auto;
-} */
 }
 
   @media (max-width: 600px) {

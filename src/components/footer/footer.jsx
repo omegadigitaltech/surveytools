@@ -11,29 +11,44 @@ const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-inner">
-
         {/* Brand column */}
         <div className="footer-brand">
           <Link to="/">
-            <img src="/White-logo.png" className="footer-logo" alt="SurveyTools logo" />
+            <img
+              src="/wht-logo.svg"
+              className="footer-logo"
+              alt="SurveyTools logo"
+            />
           </Link>
           <p className="footer-tagline">
-            Making it simple to design surveys, reach the right audience,
-            and collect results you can trust.
+            Making it simple to design surveys, reach the right audience, and
+            collect results you can trust.
           </p>
           <div className="footer-socials">
             <span className="footer-socials-label">Follow Us</span>
             <div className="footer-socials-icons">
-              <a href="https://www.linkedin.com/company/surveyproapp/" target="_blank" rel="noreferrer">
+              <a
+                href="https://www.linkedin.com/company/surveyproapp/"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <img src={iconLk} alt="LinkedIn" />
               </a>
-              <a href="https://x.com/SurveyTools_App?s=09" target="_blank" rel="noreferrer">
+              <a
+                href="https://x.com/SurveyTools_App?s=09"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <img src={iconX} alt="X (Twitter)" className="tw-x" />
               </a>
               <a href="#">
                 <img src={iconFb} alt="Facebook" />
               </a>
-              <a href="https://www.instagram.com/surveytools_?igsh=c2trNGRtMTZ6MjU1" target="_blank" rel="noreferrer">
+              <a
+                href="https://www.instagram.com/surveytools_?igsh=c2trNGRtMTZ6MjU1"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <img src={iconIg} alt="Instagram" className="icon-ig" />
               </a>
             </div>
@@ -45,19 +60,43 @@ const Footer = () => {
           <div className="footer-nav-col">
             <h3 className="footer-nav-heading">Products</h3>
             <ul className="footer-nav-list">
-              <li><Link to="/postsurvey">Create Surveys</Link></li>
-              <li><Link to="create-form">Create Form</Link></li>
-              <li><Link to="/dashboard">Fill Surveys</Link></li>
-              <li><Link to="/signup">Sign Up</Link></li>
+              <li>
+                <Link to="/postsurvey">Create Surveys</Link>
+              </li>
+              <li>
+                <Link to="create-form">Create Form</Link>
+              </li>
+              <li>
+                <Link to="/dashboard">Fill Surveys</Link>
+              </li>
+              <li>
+                <Link to="/signup">Sign Up</Link>
+              </li>
             </ul>
           </div>
 
           <div className="footer-nav-col">
             <h3 className="footer-nav-heading">Support</h3>
             <ul className="footer-nav-list">
-              <li><Link to="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt" target="blank">Help Center</Link></li>
-              <li><Link to="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt" target="blank">Community</Link></li>
-              <li><Link to="#">Services</Link></li>
+              <li>
+                <Link
+                  to="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt"
+                  target="blank"
+                >
+                  Help Center
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt"
+                  target="blank"
+                >
+                  Community
+                </Link>
+              </li>
+              <li>
+                <Link to="#">Services</Link>
+              </li>
               <li>
                 <a href="mailto:help.surveytools@gmail.com">Contact Us</a>
               </li>
@@ -72,7 +111,6 @@ const Footer = () => {
             </ul>
           </div> */}
         </div>
-
       </div>
 
       {/* Bottom bar */}

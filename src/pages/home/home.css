@@ -1,224 +1,217 @@
 .home {
-    position: relative;
-    margin-bottom: 4rem;
+  position: relative;
+  /* margin-bottom: 2rem; */
 }
 
 .hero {
-    display: flex;
+  display: flex;
 }
 
 .hero .content {
-    margin-top: 5%;
+  margin-top: 5%;
 }
 
 .home::after {
-    content: "";
-    width: 80%;
-    height: 100%;
-    /* background-color: var(--primary); */
-    /* background-image: url("../../assets/img/home-blob.svg"); */
-    background-size: contain;
-    background-position: bottom right;
-    background-repeat: no-repeat;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 0;
+  content: "";
+  width: 80%;
+  height: 100%;
+  background-size: contain;
+  background-position: bottom right;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
 }
 
 .home-inner {
-    height: 300px;
-    display: flex;
-    align-items: start;
-    justify-content: center;
-    flex-direction: column;
-    position: relative;
-    z-index: 1;
+  height: 300px;
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 .home-title {
-    max-width: 384px;
-    margin-bottom: var(--mb-sm);
-    font-size: var(--fs-2xl);
-    font-weight: 700;
-    color: white;
-    min-height: 150px;
+  max-width: 384px;
+  margin-bottom: var(--mb-sm);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  color: white;
+  min-height: 150px;
 }
 
 .home-text {
-    color: white;
-    grid-area: 1 / -1;
+  color: white;
+  grid-area: 1 / -1;
 }
 
 .home-text-2 {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .home-text-3 {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .home-link {
-    padding: 0.8em 1.5em;
-    border-radius: 7px;
-    background-color: var(--wht);
-    color: var(--text-dark);
-    font-weight: 600;
-
+  padding: 0.8em 1.5em;
+  border-radius: 7px;
+  background-color: var(--wht);
+  color: var(--text-dark);
+  font-weight: 600;
 }
 
 .button-filled {
-    background-color: var(--base);
-    color: white;
+  background-color: var(--base);
+  color: white;
 }
 
 /* TYPE ANIMATION */
 
 .typing-container {
-    line-height: 1.6;
-    display: block !important;
+  line-height: 1.6;
+  display: block !important;
 }
 
 .typing-container span {
-    display: block;
-    animation: textFade 0.3s ease-out;
-    color: inherit;
+  display: block;
+  animation: textFade 0.3s ease-out;
+  color: inherit;
 }
 
 .typing-container::after {
-    content: "▌";
-    margin-left: 4px;
-    animation: cursorBlink 1s infinite;
-    color: white;
+  content: "▌";
+  margin-left: 4px;
+  animation: cursorBlink 1s infinite;
+  color: white;
 }
+/* CTA */
 
 @keyframes textFade {
-    0% {
-        opacity: 0;
-        transform: translateY(10px);
-    }
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes cursorBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
 
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0;
-    }
+  50% {
+    opacity: 0;
+  }
 }
 
 @keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-60px);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(60px);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @media (min-width: 800px) {
-    .hero .illustration .hero-img {
-        width: 85%;
-    }
+  .hero .illustration .hero-img {
+    width: 85%;
+  }
 }
 
 @media (min-width: 768px) {
-    .home::after {
-        width: 60%;
-    }
+  .home::after {
+    width: 60%;
+  }
 }
 
 @media (max-width: 512px) {
-    .hero-box {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+  .hero-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .hero-box p,
-    h1 {
-        text-align: center;
-    }
+  .hero-box p,
+  h1 {
+    text-align: center;
+  }
 
-    .home-title {
-        max-width: 256px;
-        font-weight: 600;
-        font-size: var(--fs-lg);
-        min-height: 120px;
-    }
+  .home-title {
+    max-width: 256px;
+    font-weight: 600;
+    font-size: var(--fs-lg);
+    min-height: 120px;
+  }
 
-    .typing-container {
-        font-size: var(--fs-lg) !important;
-    }
+  .typing-container {
+    font-size: var(--fs-lg) !important;
+  }
 
-    .home-link {
-        padding: 0.6em 1.5em;
-        font-size: var(--fs-sm);
-    }
+  .home-link {
+    padding: 0.6em 1.5em;
+    font-size: var(--fs-sm);
+  }
 
-    .hero-btns a {
-        padding: .4rem .6rem;
-        font-size: .8rem;
-    }
+  .hero-btns a {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
 
-    .features h3 {
-        font-size: 1rem;
-    }
+  .utilities h2 {
+    font-size: 1.7rem;
+  }
 
-    .utilities h2 {
-        font-size: 1.7rem;
-    }
+  .testimonial h2 {
+    font-size: 1.5rem;
+  }
 
-    .testimonial h2 {
-        font-size: 1.5rem;
-    }
+  .testimonial .test-quote {
+    font-size: 0.8rem;
+  }
 
-    .testimonial .test-quote {
-        font-size: .8rem;
-    }
+  .testimonial .test-name {
+    font-size: 0.8rem;
+  }
 
-    .testimonial .test-name {
-        font-size: .8rem;
-    }
+  .CTA {
+    height: 50vh;
+  }
 
-    .CTA {
-        height: 50vh;
-    }
+  .CTA h1 {
+    font-size: 1.3rem;
+  }
 
-    .CTA h1 {
-        font-size: 1.3rem;
-    }
+  .CTA p {
+    font-size: 0.9rem;
+  }
 
-    .CTA p {
-        font-size: .9rem;
-    }
-
-    .CTA .button-filled {
-        font-size: .9rem;
-        padding: .6rem;
-    }
+  .CTA .button-filled {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+  }
 }
