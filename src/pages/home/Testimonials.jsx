@@ -1,6 +1,9 @@
 import React from "react";
+import useScrollReveal from "../../hooks/useScrollReveal";
 
 const TestimonialSection = () => {
+  const headerRef = useScrollReveal();
+  const gridRef = useScrollReveal({ threshold: 0.08 });
   const testimonials = [
     {
       name: "David Aderoke",
@@ -41,18 +44,18 @@ const TestimonialSection = () => {
   ];
   return (
     <section className=" testimonial py-16 bg-gray-50">
-      <div className="text-center mb-12">
-        <h4 className="font-[600] text-black tracking-wide">Testimonials</h4>
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-2 py-2">
+      <div ref={headerRef} className="stagger-grid text-center mb-12">
+        <h4 className="reveal-item font-[600] text-black tracking-wide">Testimonials</h4>
+        <h2 className="reveal-item text-4xl md:text-5xl font-bold text-gray-900 mt-2 py-2">
           Our Trusted Users
         </h2>
       </div>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+      <div ref={gridRef} className="stagger-grid max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
         {testimonials.map((t, index) => (
           <div
             key={index}
-            className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition"
+            className="reveal-item bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition"
           >
             {/* Stars */}
             <div className="flex gap-1 mb-4 text-yellow-400">

@@ -1,6 +1,9 @@
 import React from "react";
+import useScrollReveal from "../../hooks/useScrollReveal";
 
 const Utilities = () => {
+  const headingRef = useScrollReveal();
+  const gridRef = useScrollReveal({ threshold: 0.1 });
   const categories = [
     {
       title: "Students",
@@ -26,15 +29,15 @@ const Utilities = () => {
   ];
   return (
     <section className="utilities pt-[3rem] pb-[5rem] md:pb-[10rem] bg-white">
-      <h2 className="text-4xl md:text-5xl text-center font-[600] py-10">
+      <h2 ref={headingRef} className="reveal text-4xl md:text-5xl text-center font-[600] py-10">
         Built For Every Research Need
       </h2>
       <div className="flex justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-3 justify-center gap-6 mt-8 max-w-[90%] lg:max-w-[75%]">
+        <div ref={gridRef} className="stagger-grid grid grid-cols-1 md:grid-cols-3 justify-center gap-6 mt-8 max-w-[90%] lg:max-w-[75%]">
           {categories.map((item, index) => (
             <div
               key={index}
-              className={`p-6 rounded-2xl shadow-sm ${item.bgColor} hover:shadow-md transition`}
+              className={`reveal-item p-6 rounded-2xl shadow-sm ${item.bgColor} hover:shadow-md transition`}
             >
               <img className="mb-4 h-[3rem] md:h-auto " src={item.icon} alt={item.title} />
               <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
