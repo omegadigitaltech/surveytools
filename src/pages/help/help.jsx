@@ -105,7 +105,7 @@ const Help = () => {
     <div className="min-h-screen ">
       {/* Hero / Search Header */}
       <section
-        className="text-white text-center px-4 py-12"
+        className="text-white text-center px-4 py-12 "
         style={{
           background: "linear-gradient(to right, #008303, #0096B8)",
         }}
@@ -131,10 +131,10 @@ const Help = () => {
         </div>
       </section>
 
-      <div className="max-w-2xl mx-auto px-4">
+      <div className="w-full px-4">
         {/* Category Cards */}
         <section className="py-8">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {categories.map((cat, i) => (
               <button
                 key={i}
@@ -209,9 +209,9 @@ const Help = () => {
                 className="flex items-center gap-4 py-1 hover:opacity-80 transition"
               >
                 <div
-                  className={`w-11 h-11 rounded-full border-2 ${item.borderColor} flex items-center justify-center flex-shrink-0`}
+                  className={`w-8 h-8 sm:w-11 sm:h-11 rounded-full border-2 ${item.borderColor} flex items-center justify-center flex-shrink-0`}
                 >
-                  <span className={`material-icons text-xl ${item.iconColor}`}>
+                  <span className={`material-icons text-base sm:text-xl ${item.iconColor}`}>
                     {item.icon}
                   </span>
                 </div>

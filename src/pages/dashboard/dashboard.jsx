@@ -199,7 +199,7 @@ const Dashboard = () => {
   return (
     <>
       <section className="dashboard px-6">
-        <div className="dashboard_inner wrap pt-0">
+        <div className="dashboard_inner pt-0">
           <DashboardMain pointBalance={pointBalance} stats={dashboardStats} />
           <div className="dash_head flex mt-8">
             <Form className="classForm">
@@ -425,24 +425,24 @@ const Dashboard = () => {
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm h-min">
+            <div className="quick-stats bg-white rounded-2xl p-6 border border-gray-100 shadow-sm h-min">
                <h3 className="font-bold text-gray-800 mb-4 border-b pb-2">Quick Stats</h3>
                <div className="grid grid-cols-2 gap-4">
                  <div className="border border-[#00A5B5]/20 rounded-xl p-4 bg-blue-50/30">
-                   <p className="text-sm font-semibold text-[#00A5B5] mb-2 leading-tight w-2/3">Available Surveys</p>
-                   <p className="text-3xl font-bold text-gray-800">12</p>
+                   <p className="text-xs sm:text-sm  font-semibold text-[#00A5B5] mb-2 leading-tight w-2/3">Available Surveys</p>
+                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">12</p>
                  </div>
                  <div className="border border-green-200 rounded-xl p-4 bg-green-50/30">
-                   <p className="text-sm font-semibold text-green-600 mb-2 leading-tight w-2/3">Pending Surveys</p>
-                   <p className="text-3xl font-bold text-gray-800">12</p>
+                   <p className="text-xs sm:text-sm  font-semibold text-green-600 mb-2 leading-tight w-2/3">Pending Surveys</p>
+                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">12</p>
                  </div>
                  <div className="border border-blue-200 rounded-xl p-4 bg-blue-50/30">
-                   <p className="text-sm font-semibold text-blue-600 mb-2 leading-tight w-2/3">Active Surveys</p>
-                   <p className="text-3xl font-bold text-gray-800">6</p>
+                   <p className="text-xs sm:text-sm  font-semibold text-blue-600 mb-2 leading-tight w-2/3">Active Surveys</p>
+                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">6</p>
                  </div>
                  <div className="border border-gray-200 rounded-xl p-4">
-                   <p className="text-sm font-semibold text-gray-600 mb-2 leading-tight w-2/3">Completed Surveys</p>
-                   <p className="text-3xl font-bold text-gray-800">6</p>
+                   <p className="text-xs sm:text-sm  font-semibold text-gray-600 mb-2 leading-tight w-2/3">Completed Surveys</p>
+                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">6</p>
                  </div>
                </div>
             </div>

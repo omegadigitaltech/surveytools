@@ -9,7 +9,7 @@ export default function DashboardMain({ pointBalance, stats }) {
           <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
           <p className="text-sm text-gray-500">Respond to surveys and earn rewards</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           <Link to="/create-form" className="text-red-500 hover:underline text-sm font-semibold">
             Create A Form
           </Link>
@@ -19,9 +19,9 @@ export default function DashboardMain({ pointBalance, stats }) {
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-[#0B9453] to-[#097241] rounded-2xl p-6 text-white flex flex-col md:flex-row justify-between items-center shadow-lg relative overflow-hidden">
+      <div className="point-boost bg-gradient-to-r from-[#008303] to-[#0096B8] rounded-2xl p-10 text-white flex flex-col md:flex-row justify-between items-center shadow-lg relative overflow-hidden">
         <div className="flex items-center gap-4 z-10 relative">
-          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+          <div className="boost-icon w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
             <span className="material-icons text-white text-2xl">bolt</span>
           </div>
           <div>

@@ -897,11 +897,30 @@ form ::placeholder {
 }
 
 @media (max-width: 385px) {
+.dashboard{
+  padding: 0 1rem;
+}
+
   .dash_head {
     flex-wrap: wrap;
     gap: 0rem;
   }
-
+.point-boost{
+  padding: .8rem;
+}
+.point-boost h2{
+font-size: .9rem;
+}
+.point-boost .boost-icon{
+  width: 2.5rem;
+  height: 1.8rem;
+  }
+  .point-boost .material-icons{
+   font-size: 1.2rem;
+    }
+.point-boost p{
+  font-size: .7rem;
+  }
   .points-board {
     height: auto;
   }
@@ -1006,6 +1025,10 @@ form ::placeholder {
   .participants p {
     font-size: 0.7rem;
   }
+  .quick-stats{
+    padding: 1rem;
+  }
+
 }
 
 
