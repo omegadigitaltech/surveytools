@@ -98,17 +98,13 @@ const Sidebar = () => {
             </span>
             <span>Rewards</span>
           </NavLink>
-          <a
-            href="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="sidebar-link"
+          <NavLink to="/help" className="sidebar-link"
           >
             <span>
               <img src="/Help.svg" alt="Help" />
             </span>
             <span>Help & Support</span>
-          </a>
+          </NavLink>
 
           <button className="dailyspin-btn" onClick={() =>  setShowSpinModal(true)}>
             <img src="/spinmenu.svg" alt="spin" />

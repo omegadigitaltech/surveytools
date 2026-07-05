@@ -22,12 +22,7 @@
   --primary: #2095d3;
   --secondary-blue: #50b4e9;
   --grad-bg: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #0d9488 100%);
-  --grad-bg: linear-gradient(
-    135deg,
-    #22c55e 0%,
-    rgb(0, 131, 3) 50%,
-    rgb(0, 150, 184) 100%
-  );
+   --fade-bg: #f8f8f8;
   --lemon: #14fe19;
   --greytxt: #6b7280;
   --greyborder: #dbdbdb;

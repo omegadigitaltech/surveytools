@@ -16,6 +16,7 @@ import StoreProvider from "./store/StoreProvider";
 import ProtectRoute from "./components/protectroute/protectroute";
 import useAuthStore from "./store/useAuthStore.js";
 import Logout from "./components/logout/logout";
+import setupAuthInterceptor from "./utils/setupAuthInterceptor";
 
 import Home from "./pages/home/home";
 import SignIn from "./pages/signin/signin";
@@ -52,6 +53,7 @@ import Analytics from "./pages/analytics/Analytics.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
 import Rewards from "./pages/rewards/rewards";
 import MissionsPage from "./pages/missions/missions";
+import Help from "./pages/help/help";
 import Admin from "./pages/admin/Admin";
 
 const router = createBrowserRouter(
@@ -92,6 +94,7 @@ const router = createBrowserRouter(
           <Route path="withdraw" element={<Withdraw />} />
           <Route path="rewards" element={<Rewards />} />
           <Route path="missions" element={<MissionsPage />} />
+          <Route path="help" element={<Help />} />
           {/* <Route path="pricing" element={<Pricing />} /> */}
 
         </Route>
@@ -116,6 +119,9 @@ const App = () => {
     } else {
       document.body.classList.remove("preload-active");
     }
+
+    const cleanupInterceptor = setupAuthInterceptor(router);
+    return cleanupInterceptor;
   }, []);
   return (
     <>
