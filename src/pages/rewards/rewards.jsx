@@ -8,7 +8,7 @@ import config from "../../config/config";
 // ── auth helper ────────────────────────────────────────────────────────────────
 const authHeader = (token) => ({ Authorization: `Bearer ${token}` });
 
-// ── Root page ──────────────────────────────────────────────────────────────────
+// ── Roooot page ──────────────────────────────────────────────────────────────────
 const Rewards = () => {
   const [activeTab, setActiveTab] = useState("missions");
   const { authToken } = useAuthStore();
