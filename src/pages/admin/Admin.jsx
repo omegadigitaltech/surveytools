@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import useAuthStore from "../../store/useAuthStore";
+import config from "../../config/config";
 
 const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -108,7 +109,7 @@ const CreateMissionForm = ({ token }) => {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:1574/admin/gamification/missions",
+        `${config.API_URL}/admin/gamification/missions`,
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -205,7 +206,7 @@ const CreateLevelForm = ({ token }) => {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:1574/admin/gamification/levels",
+        `${config.API_URL}/admin/gamification/levels`,
         {
           ...formData,
           benefits: formData.benefits.split(",").map((b) => b.trim()),
@@ -293,7 +294,7 @@ const CreateListingForm = ({ token }) => {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:1574/admin/marketplace/listings",
+        `${config.API_URL}/admin/marketplace/listings`,
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },

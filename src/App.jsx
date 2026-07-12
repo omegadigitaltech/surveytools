@@ -36,7 +36,6 @@ import PostSurvey from "./pages/postsurvey/postsurvey";
 import SurveyQuestion from "./pages/surveyquestion/surveyquestion";
 import Publish from "./pages/publish/publish";
 import Payment from "./components/payment/payment";
-import Pricing from "./pages/pricing/pricing";
 // import CreateForm from "./pages/createform/createform.jsx";
 import FormQuestions from "./pages/formquestions/formquestion.jsx";
 // import Payment from "./pages/payment/payment";
@@ -50,6 +49,7 @@ import Settings from "./pages/settings/settings";
 import Insights from "./pages/insights/insights";
 import FormInsights from "./pages/forminsights/forminsights";
 import Analytics from "./pages/analytics/Analytics.jsx";
+// import GraphAnalyticsDashboard from "./pages/graph-analytics/GraphAnalyticsDashboard.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
 import Rewards from "./pages/rewards/rewards";
 import MissionsPage from "./pages/missions/missions";
@@ -82,7 +82,8 @@ const router = createBrowserRouter(
           <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
           <Route path="publish" element={<Publish />} />
           <Route path="insights/:id" element={<Insights />} />
-          <Route path="analytics" element={<Analytics />} />
+          {/* <Route path="analytics" element={<GraphAnalyticsDashboard />} />
+          <Route path="analytics/:surveyId" element={<GraphAnalyticsDashboard />} /> */}
           <Route path="/my-forms" element={<MyForms />} />
           <Route path="formquestion/:id" element={<FormQuestions />} />
           <Route path="forminsights/:id" element={<FormInsights />} />
@@ -95,7 +96,6 @@ const router = createBrowserRouter(
           <Route path="rewards" element={<Rewards />} />
           <Route path="missions" element={<MissionsPage />} />
           <Route path="help" element={<Help />} />
-          {/* <Route path="pricing" element={<Pricing />} /> */}
 
         </Route>
       </Route>

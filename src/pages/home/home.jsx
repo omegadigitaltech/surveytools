@@ -4,7 +4,7 @@ import "./home.css";
 import Features from "./Features";
 import Utilities from "./Utilities";
 import TestimonialSection from "./Testimonials";
-import Pricing from "../pricing/pricing";
+import Pricing from "./Pricing";
 import CTA from "./CTA";
 
 const Home = () => {
@@ -14,7 +14,7 @@ const Home = () => {
       <Utilities />
       <Features />
       <TestimonialSection />
-      {/* <Pricing /> */}
+      <Pricing />
       <CTA />
     </>
   );
