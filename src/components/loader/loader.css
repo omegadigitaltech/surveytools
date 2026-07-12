@@ -1,0 +1,25 @@
+.pageloader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 1rem;
+    color: #6b7280;
+  }
+  
+  .pageloader-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid #e5e7eb;
+    /* You can switch to your brand color if needed */
+    border-top-color: #2793CD;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }

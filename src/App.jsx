@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Preloader from "./components/Preloader/Preloader.jsx";
 import HomeLayout from "./layout/home/home";
 import AuthLayout from "./layout/auth/auth";
+import DashboardLayout from "./layout/dashboard/dashboard";
 import StoreProvider from "./store/StoreProvider";
 import ProtectRoute from "./components/protectroute/protectroute";
 import useAuthStore from "./store/useAuthStore.js";
@@ -29,56 +30,75 @@ import signUpAction from "./pages/signup/action";
 import postAction from "./pages/surveyquestion/action";
 import surveyAction from "./pages/postsurvey/action";
 import ExpandSurvey from "./pages/expandsurvey/expandsurvey";
+import StartSurvey from "./pages/postsurvey/startsurvey.jsx";
 import PostSurvey from "./pages/postsurvey/postsurvey";
 import SurveyQuestion from "./pages/surveyquestion/surveyquestion";
 import Publish from "./pages/publish/publish";
 import Payment from "./components/payment/payment";
 import Pricing from "./pages/pricing/pricing";
-import CreateForm from "./pages/createform/createform.jsx";
-import FormQuestions from "./pages/formquestions/formquestion.jsx"
+// import CreateForm from "./pages/createform/createform.jsx";
+import FormQuestions from "./pages/formquestions/formquestion.jsx";
 // import Payment from "./pages/payment/payment";
 import Notifications from "./pages/notifications/notifications";
 import Withdraw from "./pages/withdraw/withdraw";
 import Profile from "./pages/profile/profile";
 import AnswerSurvey from "./pages/answersurvey/answersurvey";
+import AnswerForm from "./pages/answerform/answerform";
+import MyForms from "./pages/myforms/MyForm.jsx";
 import Settings from "./pages/settings/settings";
 import Insights from "./pages/insights/insights";
+import FormInsights from "./pages/forminsights/forminsights";
+import Analytics from "./pages/analytics/Analytics.jsx";
+import GraphAnalyticsDashboard from "./pages/graph-analytics/GraphAnalyticsDashboard.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
+import Rewards from "./pages/rewards/rewards";
+import MissionsPage from "./pages/missions/missions";
+import Admin from "./pages/admin/Admin";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
       <Route element={<HomeLayout />}>
         <Route index element={<Home />} />
-
-        <Route element={<ProtectRoute />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
-          <Route
-            path="postsurvey"
-            element={<PostSurvey />}
-            action={surveyAction}
-          />
-          <Route
-            path="surveyquestion"
-            element={<SurveyQuestion />}
-            action={postAction}
-          />
-          <Route path="create-form" element={<CreateForm />} />
-          <Route path="formquestions" element={<FormQuestions />} />
-          <Route path="publish" element={<Publish />} />
-          <Route path="payment" element={<Payment />} />
-          <Route path="pricing" element={<Pricing />} />
-          <Route path="verify-payment" element={<VerifyPayment />} />
-          <Route path="notifications" element={<Notifications />} />
-          <Route path="withdraw" element={<Withdraw />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="answersurvey/:id" element={<AnswerSurvey />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="insights/:id" element={<Insights />} />
-        </Route>
       </Route>
 
+      <Route path="answerform/:id" element={<AnswerForm />} />
+      <Route path="admin" element={<Admin />} />
+
+      <Route element={<ProtectRoute />}>
+        {/* NO DASHBOARD LAYOUT FOR THEM */}
+        <Route path="answersurvey/:id" element={<AnswerSurvey />} />
+        <Route element={<HomeLayout />}>
+          <Route path="surveyquestion" element={<SurveyQuestion />} action={postAction} />
+          <Route path="create-form" element={<FormQuestions />} />
+        </Route>
+        {/*--- */}
+
+        <Route element={<DashboardLayout />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="start-survey" element={<StartSurvey />} />
+          <Route path="postsurvey" element={<PostSurvey />} action={surveyAction} />
+          <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
+          <Route path="publish" element={<Publish />} />
+          <Route path="insights/:id" element={<Insights />} />
+          <Route path="analytics" element={<GraphAnalyticsDashboard />} />
+          <Route path="analytics/:surveyId" element={<GraphAnalyticsDashboard />} />
+          <Route path="/my-forms" element={<MyForms />} />
+          <Route path="rewards" element={<Rewards />} />
+          <Route path="formquestion/:id" element={<FormQuestions />} />
+          <Route path="forminsights/:id" element={<FormInsights />} />
+          <Route path="payment" element={<Payment />} />
+          <Route path="verify-payment" element={<VerifyPayment />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="withdraw" element={<Withdraw />} />
+          <Route path="rewards" element={<Rewards />} />
+          <Route path="missions" element={<MissionsPage />} />
+          {/* <Route path="pricing" element={<Pricing />} /> */}
+
+        </Route>
+      </Route>
       <Route element={<AuthLayout />}>
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />

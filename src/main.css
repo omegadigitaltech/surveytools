@@ -8,9 +8,11 @@
 
   /* Colors */
   /* --base: #1D8C9C; */
-  --base: #2095D3;
-  --btns: #149BBA;
+  --base: #2095d3;
+  /* --btns: #149bba; */
+  --btns: #2793CD;
   --blue-border: #bfe9f3;
+  --maroon:#961B1E;
   --wht: #fff;
   --fade: #e6e6e6;
   --blk: #000;
@@ -19,9 +21,13 @@
   --ltgray: #e7e7e73d;
   --green: rgb(53, 143, 53);
   --border: 0.5px solid rgb(167, 167, 167);
-  --primary: #2095D3;
-  --secondary-blue: #35C6F4;
-  --lemon: #14FE19;
+  --primary: #2095d3;
+  --secondary-blue: #50B4E9;
+  --grad-bg: linear-gradient(135deg, #22C55E 0%, #16A34A 50%, #0D9488 100%);
+  
+  --lemon: #14fe19;
+  --greytxt: #6b7280;
+  --greyborder: #dbdbdb;
   /* --green: #196332; */
 
   /* Font-Sizes */
@@ -29,7 +35,7 @@
   --fs-2xl: 1.5rem;
   --fs-xl: 1.375rem;
   --fs-lg: 1.125rem;
-  --fs-md: 0.925rem;
+  --fs-md: 0.92rem;
   --fs-sm: 0.85rem;
 
   /* Margin */
@@ -43,7 +49,6 @@
   --bp-md: 768px;
   --bp-sm: 512px;
   --bp-xs: 384px;
-
 }
 
 *,
@@ -57,6 +62,14 @@
 body {
   font-size: var(--fs-md);
   font-family: var(--ff-body);
+  background: #f7f5fa;
+  overflow-x: hidden;
+}
+
+.h1 {
+  font-size: 3rem;
+  font-weight: 600;
+  margin-bottom: 2rem; 
 }
 
 a {
@@ -66,12 +79,17 @@ a {
 ul {
   list-style: none;
 }
-
+.head{
+  font-size: 2rem;
+  font-weight: 500;
+}
 img {
   display: block;
   max-width: 100%;
 }
-
+.greytxt {
+  color: var(--greytxt);
+}
 /* input,
 button {
   font: inherit;
@@ -103,6 +121,9 @@ button.inactive {
   display: flex;
   align-items: center;
 }
+.flex.items-start {
+  align-items: flex-start;
+}
 
 .grid {
   display: grid;
@@ -119,13 +140,13 @@ button.inactive {
   border-radius: 5px;
 }
 
-.fw-5h{
-font-weight: 500;
+.fw-5h {
+  font-weight: 500;
 }
-.fw-6h{
+.fw-6h {
   font-weight: 600;
-  }
-  
+}
+
 /* SPIN EFFECT */
 .spin-btn {
   background: var(--base);
@@ -141,7 +162,6 @@ font-weight: 500;
   justify-content: center;
   font-weight: bold;
 }
-
 .spinner {
   width: 20px;
   height: 20px;
@@ -173,6 +193,13 @@ font-weight: 500;
 /* SPIN EFFECT */
 
 /* MEDIA QUERY */
+@media (max-width: 668px) {
+.head {
+  font-size: 1.2rem;
+}
+}
+
+
 @media (max-width: 550px) {
   .wrap {
     width: 95%;
@@ -188,4 +215,3 @@ font-weight: 500;
     font-size: 0.9rem;
   }
 }
-

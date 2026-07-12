@@ -1,17 +1,21 @@
 import { Link, Outlet } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./auth.css";
 
 const Auth = () => {
   return (
     <section className="auth">
       <div className="auth-wrap wrap">
-        <h1 className="auth-w1-lead">
-          <span className="survey">Survey</span>
-          <span className="tools">Tools</span>{" "}
-          <span className="watermark subscript text-[.6rem] font-medium text-black/90">
-            BETA
-          </span>
-        </h1>
+        <nav className="">
+        <NavLink className="header-w1-logo " to="/">
+          <img
+            src="/Blue-logo-1.svg"
+            alt="Blue Logo"
+            className="md:w-[10rem] h-[2.5rem] md:h-auto"
+          />
+        </NavLink>
+
+        </nav>
         <Outlet />
       </div>
     </section>

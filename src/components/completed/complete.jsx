@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./complete.css";
-import tick from "../../assets/img/tick.svg";
 
 const Complete = ({ points, onDone }) => {
     return (

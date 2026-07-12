@@ -1,18 +1,22 @@
 .home {
     position: relative;
-    background-image: url("../../assets/img/home-bg.jpg");
-    background-size: cover;
-    background-position: top left;
-    background-repeat: no-repeat;
     margin-bottom: 4rem;
+}
+
+.hero {
+    display: flex;
+}
+
+.hero .content {
+    margin-top: 5%;
 }
 
 .home::after {
     content: "";
     width: 80%;
     height: 100%;
-    background-color: var(--primary);
-    background-image: url("../../assets/img/home-blob.svg");
+    /* background-color: var(--primary); */
+    /* background-image: url("../../assets/img/home-blob.svg"); */
     background-size: contain;
     background-position: bottom right;
     background-repeat: no-repeat;
@@ -33,14 +37,12 @@
 }
 
 .home-title {
-    /* display: grid; */
     max-width: 384px;
     margin-bottom: var(--mb-sm);
     font-size: var(--fs-2xl);
     font-weight: 700;
     color: white;
-    min-height: 150px; 
-    /* display: block; */
+    min-height: 150px;
 }
 
 .home-text {
@@ -51,6 +53,7 @@
 .home-text-2 {
     visibility: hidden;
 }
+
 .home-text-3 {
     visibility: hidden;
 }
@@ -61,53 +64,85 @@
     background-color: var(--wht);
     color: var(--text-dark);
     font-weight: 600;
-    
+
 }
+
+.button-filled {
+    background-color: var(--base);
+    color: white;
+}
+
 /* TYPE ANIMATION */
-  
-  .typing-container {
+
+.typing-container {
     line-height: 1.6;
     display: block !important;
-    /* grid-area: 1 / -1; */
+}
 
-  }
-  
-  .typing-container span {
+.typing-container span {
     display: block;
     animation: textFade 0.3s ease-out;
     color: inherit;
-  }
-  
-  .typing-container::after {
+}
+
+.typing-container::after {
     content: "▌";
     margin-left: 4px;
     animation: cursorBlink 1s infinite;
     color: white;
-  }
-  
-  @keyframes textFade {
-    0% { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-  
-  @keyframes cursorBlink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-  
-@media (max-width: 512px) {
-    .home-title {
-        max-width: 256px;
-        font-weight: 600;
-        font-size: var(--fs-lg);
-        min-height: 120px;
+}
+
+@keyframes textFade {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
     }
-    .typing-container {
-        font-size: var(--fs-lg) !important;
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
     }
-    .home-link{
-    padding: 0.6em 1.5em;
-    font-size: var(--fs-sm);
+}
+
+@keyframes cursorBlink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-60px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(60px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (min-width: 800px) {
+    .hero .illustration .hero-img {
+        width: 85%;
     }
 }
 
@@ -115,7 +150,75 @@
     .home::after {
         width: 60%;
     }
-    /* .home-title {
-        min-height: 200px;  Larger screens 
-    } */
+}
+
+@media (max-width: 512px) {
+    .hero-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-box p,
+    h1 {
+        text-align: center;
+    }
+
+    .home-title {
+        max-width: 256px;
+        font-weight: 600;
+        font-size: var(--fs-lg);
+        min-height: 120px;
+    }
+
+    .typing-container {
+        font-size: var(--fs-lg) !important;
+    }
+
+    .home-link {
+        padding: 0.6em 1.5em;
+        font-size: var(--fs-sm);
+    }
+
+    .hero-btns a {
+        padding: .4rem .6rem;
+        font-size: .8rem;
+    }
+
+    .features h3 {
+        font-size: 1rem;
+    }
+
+    .utilities h2 {
+        font-size: 1.7rem;
+    }
+
+    .testimonial h2 {
+        font-size: 1.5rem;
+    }
+
+    .testimonial .test-quote {
+        font-size: .8rem;
+    }
+
+    .testimonial .test-name {
+        font-size: .8rem;
+    }
+
+    .CTA {
+        height: 50vh;
+    }
+
+    .CTA h1 {
+        font-size: 1.3rem;
+    }
+
+    .CTA p {
+        font-size: .9rem;
+    }
+
+    .CTA .button-filled {
+        font-size: .9rem;
+        padding: .6rem;
+    }
 }

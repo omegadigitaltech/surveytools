@@ -6,76 +6,78 @@ import iconIg from "../../assets/img/icon-ig.svg";
 import "./footer.css";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="footer">
-      <div className="footer-wrap wrap">
-        <div className="footer-w1">
-          <Link className="footer-w1-logo">
-            SurveyTools{" "}
-            <span className="watermark subscript text-[.5rem] font-semibold text-white/70">
-              BETA
-            </span>
+      <div className="footer-inner">
+
+        {/* Brand column */}
+        <div className="footer-brand">
+          <Link to="/">
+            <img src="/White-logo.png" className="footer-logo" alt="SurveyTools logo" />
           </Link>
-          <ul className="footer-w1-list">
-            {/* <li className="footer-w1-item">
-                            <Link className="footer-w1-link">
-                                About Us
-                            </Link>
-                        </li> */}
-            {/* <li className="footer-w1-item">
-                            <Link className="footer-w1-link">
-                                Privacy Policy
-                            </Link>
-                        </li> */}
-            <li className="footer-w1-item">
-              <a
-                href="mailto:help.surveytools@gmail.com"
-                className="footer-w1-link"
-              >
-                Help & Support
+          <p className="footer-tagline">
+            Making it simple to design surveys, reach the right audience,
+            and collect results you can trust.
+          </p>
+          <div className="footer-socials">
+            <span className="footer-socials-label">Follow Us</span>
+            <div className="footer-socials-icons">
+              <a href="https://www.linkedin.com/company/surveyproapp/" target="_blank" rel="noreferrer">
+                <img src={iconLk} alt="LinkedIn" />
               </a>
-            </li>
-            <li className="footer-w1-item">
-              <a
-                href="mailto:help.surveytools@gmail.com"
-                className="footer-w1-link"
-              >
-                Feedback
+              <a href="https://x.com/SurveyTools_App?s=09" target="_blank" rel="noreferrer">
+                <img src={iconX} alt="X (Twitter)" className="tw-x" />
               </a>
-            </li>
-            {/* <li className="footer-w1-item">
-                            <Link className="footer-w1-link">
-                                Terms of Service
-                            </Link>
-                        </li> */}
-          </ul>
-        </div>
-        <div className="footer-w2 flex">
-          <div className="footer-w2-copy">SurveyTools &copy; 2025</div>
-          <div className="footer-w2-list">
-            <a
-              href=" https://www.linkedin.com/company/surveyproapp/"
-              className="footer-w2-link"
-            >
-              <img className="footer-w2-icon" src={iconLk} alt="" />
-            </a>
-            <a
-              href=" https://x.com/SurveyTools_App?s=09"
-              className="footer-w2-link"
-            >
-              <img className="footer-w2-icon tw-x" src={iconX} alt="" />
-            </a>
-            <a href="" className="footer-w2-link">
-              <img className="footer-w2-icon" src={iconFb} alt="" />
-            </a>
-            <a
-              href="https://www.instagram.com/surveytools_?igsh=c2trNGRtMTZ6MjU1"
-              className="footer-w2-link"
-            >
-              <img className="footer-w2-icon icon-ig" src={iconIg} alt="" />
-            </a>
+              <a href="#">
+                <img src={iconFb} alt="Facebook" />
+              </a>
+              <a href="https://www.instagram.com/surveytools_?igsh=c2trNGRtMTZ6MjU1" target="_blank" rel="noreferrer">
+                <img src={iconIg} alt="Instagram" className="icon-ig" />
+              </a>
+            </div>
           </div>
         </div>
+
+        {/* Nav columns */}
+        <div className="footer-nav">
+          <div className="footer-nav-col">
+            <h3 className="footer-nav-heading">Products</h3>
+            <ul className="footer-nav-list">
+              <li><Link to="/postsurvey">Create Surveys</Link></li>
+              <li><Link to="create-form">Create Form</Link></li>
+              <li><Link to="/dashboard">Fill Surveys</Link></li>
+              <li><Link to="/signup">Sign Up</Link></li>
+            </ul>
+          </div>
+
+          <div className="footer-nav-col">
+            <h3 className="footer-nav-heading">Support</h3>
+            <ul className="footer-nav-list">
+              <li><Link to="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt" target="blank">Help Center</Link></li>
+              <li><Link to="https://chat.whatsapp.com/DZDnDKI87qJAVrJZHqRjQN?mode=wwt" target="blank">Community</Link></li>
+              <li><Link to="#">Services</Link></li>
+              <li>
+                <a href="mailto:help.surveytools@gmail.com">Contact Us</a>
+              </li>
+            </ul>
+          </div>
+
+          {/* <div className="footer-nav-col">
+            <h3 className="footer-nav-heading">Legal</h3>
+            <ul className="footer-nav-list">
+              <li><Link to="#">Privacy Policy</Link></li>
+              <li><Link to="#">Terms of Service</Link></li>
+            </ul>
+          </div> */}
+        </div>
+
+      </div>
+
+      {/* Bottom bar */}
+      <div className="footer-bottom">
+        <span>&copy; {currentYear} SurveyTools. All Rights Reserved.</span>
       </div>
     </footer>
   );

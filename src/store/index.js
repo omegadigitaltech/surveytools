@@ -4,4 +4,5 @@ import uiSlice from "./uiSlice";
 
 export const store = configureStore({
   reducer: { ui: uiSlice.reducer },
+  reducer: { ui: uiSlice },
 });

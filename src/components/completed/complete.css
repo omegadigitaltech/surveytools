@@ -22,24 +22,24 @@
 }
 
 .complete-title {
-  font-size: 24px;
+  font-size: 18px;
   color: #333;
   margin-bottom: 1rem;
   font-weight: 600;
 }
 
 .points-text {
-  font-size: 18px;
+  font-size: 15px;
   color: #666;
   margin-bottom: 2rem;
 }
 
 .done-btn {
-  background-color: #26A69A;
+  background-color: var(--btns);
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 0.8rem 3rem;
+  padding: 0.6rem 1.5rem;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -49,6 +49,11 @@
 .done-btn:hover {
   background-color: #2196F3;
 }
+
+.formcomplete a {
+  text-decoration: underline;
+}
+
 
 /* Mobile responsiveness */
 @media (max-width: 480px) {
