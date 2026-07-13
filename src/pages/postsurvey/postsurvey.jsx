@@ -113,9 +113,9 @@ const PostSurvey = () => {
                 name="gender"
                 id="range-dropdown"
                 className="custom-select"
-              >
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
+              >
                 <option value="all_genders">All genders</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>

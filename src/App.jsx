@@ -3,6 +3,8 @@ import {
   createRoutesFromElements,
   RouterProvider,
   Route,
+  Outlet,
+  useLocation,
 } from "react-router-dom";
 import { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
@@ -56,9 +58,17 @@ import MissionsPage from "./pages/missions/missions";
 import Help from "./pages/help/help";
 import Admin from "./pages/admin/Admin";
 
+const RootLayout = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return <Outlet />;
+};
+
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route>
+    <Route element={<RootLayout />}>
       <Route element={<HomeLayout />}>
         <Route index element={<Home />} />
       </Route>

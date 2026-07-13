@@ -29,10 +29,9 @@ const action = async ({ request }) => {
   const survey = {
     title: formData.get("title"),
     description: formData.get("description"),
-    no_of_participants: formData.get("participant_num"),
+    no_of_participants: parseInt(formData.get("participant_num"), 10),
     gender: formData.get("gender"),
     preferred_participants: preferredParticipants,
-    amount_to_be_paid: formData.get("amount"),
   }
 
   const API_URL = `${config.API_URL}/surveys`;
