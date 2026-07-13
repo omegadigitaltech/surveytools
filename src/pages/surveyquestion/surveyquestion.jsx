@@ -1,12 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./surveyquestion.css";
 import copy from "../../assets/img/copy.svg";
 import del from "../../assets/img/del.svg";
 import plus from "../../assets/img/icon-add.svg";
+import useAuthStore from "../../store/useAuthStore";
+import { toast } from "react-toastify";
+import config from "../../config/config";
+import Loader from "../../components/loader/loader";
 // import ShareLink from "../../components/sharelink/sharelink";
 
 const SurveyQuestions = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const authToken = useAuthStore((state) => state.authToken);
+  const currentSurveyId = useAuthStore((state) => state.currentSurveyId);
+
   // State management
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isPosting, setIsPosting] = useState(false);
   const [sections, setSections] = useState([
     {
       id: "section_1",
@@ -72,6 +85,88 @@ const SurveyQuestions = () => {
       });
     }
   }, []);
+
+  // Fetch existing questions when in edit mode (surveyId passed via navigation state)
+  useEffect(() => {
+    const editSurveyId = location.state?.surveyId;
+    if (!editSurveyId) return;
+
+    const fetchExistingQuestions = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          `${config.API_URL}/surveys/${editSurveyId}/questions`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+        const json = await response.json();
+        if (!response.ok)
+          throw new Error(json.msg || "Failed to fetch survey questions");
+
+        const backendQuestions = json.questions || json.survey?.questions || [];
+        if (backendQuestions.length === 0) return;
+
+        // Group questions by sectionId, preserving backend section metadata
+        const sectionMap = new Map();
+        backendQuestions.forEach((q) => {
+          const key = q.sectionId || "_none";
+          if (!sectionMap.has(key)) {
+            sectionMap.set(key, {
+              backendSectionId: q.sectionId || null,
+              title: q.section?.title || "Section 1",
+              questions: [],
+            });
+          }
+          sectionMap.get(key).questions.push(q);
+        });
+
+        const rebuiltSections = Array.from(sectionMap.entries()).map(
+          ([, sec], index) => {
+            const localId = `section_${index + 1}`;
+            const mappedQuestions = sec.questions.map((q) => ({
+              id: `question_${q._id}`,
+              questionId: q._id || "",
+              questionText: q.questionText || "",
+              questionType: q.questionType || "multiple_choice",
+              required: Boolean(q.required),
+              options: (q.options || []).map((opt) =>
+                typeof opt === "string"
+                  ? { text: opt, allowsCustomInput: false }
+                  : { text: opt.text || "", allowsCustomInput: opt.allowsCustomInput || false }
+              ),
+              likert: null,
+              sectionId: sec.backendSectionId,
+            }));
+            return {
+              id: localId,
+              sectionId: sec.backendSectionId,
+              title: sec.title,
+              description: "",
+              order: index + 1,
+              questions: mappedQuestions,
+            };
+          }
+        );
+
+        setSections(rebuiltSections);
+        setSelectedQuestion({
+          sectionId: rebuiltSections[0].id,
+          questionId: rebuiltSections[0].questions[0].id,
+        });
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+        toast.error(error.message || "Error loading survey questions");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchExistingQuestions();
+  }, [location.state?.surveyId, authToken]);
 
   // Close sidebar when clicking outside (mobile only)
   useEffect(() => {
@@ -449,8 +544,179 @@ const SurveyQuestions = () => {
     );
   };
 
+  const handleSave = async (shouldNavigate = false) => {
+    const activeSurveyId = location.state?.surveyId || currentSurveyId;
+
+    if (!activeSurveyId) {
+      toast.error("No survey ID found. Please create a survey first.");
+      return;
+    }
+
+    // Validate: each section needs at least one non-empty question
+    for (const section of sections) {
+      const valid = section.questions.filter((q) => q.questionText.trim() !== "");
+      if (valid.length === 0) {
+        toast.error(
+          `Section "${section.title || "Untitled"}" must have at least one question`
+        );
+        return;
+      }
+    }
+
+    if (shouldNavigate) {
+      setIsPosting(true);
+    } else {
+      setIsSaving(true);
+    }
+
+    try {
+      // Step 1: Create any sections that don't yet have a backend ID
+      const resolvedSections = [];
+      for (let i = 0; i < sections.length; i++) {
+        const section = sections[i];
+        if (section.sectionId) {
+          resolvedSections.push(section);
+          continue;
+        }
+        const res = await fetch(
+          `${config.API_URL}/surveys/${activeSurveyId}/sections`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({
+              title: section.title.trim() || `Section ${i + 1}`,
+              description: section.description?.trim() || undefined,
+              order: section.order || i + 1,
+            }),
+          }
+        );
+        const sectionJson = await res.json();
+        if (!res.ok)
+          throw new Error(
+            sectionJson.msg || sectionJson.message || "Failed to create section"
+          );
+        resolvedSections.push({ ...section, sectionId: sectionJson.section._id });
+      }
+
+      // Step 2: Build flat questions array for bulk-questions endpoint
+      const allQuestions = resolvedSections.flatMap((section) =>
+        section.questions
+          .filter((q) => q.questionText.trim() !== "")
+          .map((q) => {
+            const questionData = {
+              questionText: q.questionText.trim(),
+              // likert has no API equivalent — map to five_point
+              questionType: q.questionType === "likert" ? "five_point" : q.questionType,
+              required: Boolean(q.required),
+            };
+            // Include questionId for existing questions so the API updates instead of creates
+            if (q.questionId) questionData.questionId = q.questionId;
+            if (section.sectionId) questionData.sectionId = section.sectionId;
+            if (
+              q.questionType === "multiple_choice" ||
+              q.questionType === "multiple_selection"
+            ) {
+              questionData.options = q.options
+                .map((opt) => (typeof opt === "string" ? opt : opt.text || ""))
+                .filter((t) => t.trim() !== "");
+            }
+            return questionData;
+          })
+      );
+
+      // Step 3: Bulk save via the correct endpoint
+      const response = await fetch(
+        `${config.API_URL}/surveys/${activeSurveyId}/bulk-questions`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ questions: allQuestions }),
+        }
+      );
+
+      const json = await response.json();
+      if (!response.ok) {
+        throw new Error(json.msg || json.message || "Failed to save questions");
+      }
+
+      // Step 4: Re-fetch questions to sync backend-assigned IDs into local state,
+      // preventing duplicate creation on the next save
+      const refetchRes = await fetch(
+        `${config.API_URL}/surveys/${activeSurveyId}/questions`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      if (refetchRes.ok) {
+        const refetchJson = await refetchRes.json();
+        const backendQs = refetchJson.questions || [];
+
+        // Group backend questions by sectionId for efficient lookup
+        const questionsBySectionId = {};
+        backendQs.forEach((bq) => {
+          const key = bq.sectionId || "_none";
+          if (!questionsBySectionId[key]) questionsBySectionId[key] = [];
+          questionsBySectionId[key].push(bq);
+        });
+
+        setSections(
+          resolvedSections.map((section) => {
+            const sectionKey = section.sectionId || "_none";
+            const sectionBackendQs = questionsBySectionId[sectionKey] || [];
+            return {
+              ...section,
+              questions: section.questions
+                .filter((q) => q.questionText.trim() !== "")
+                .map((q) => {
+                  // Already has an ID — keep as-is
+                  if (q.questionId) return q;
+                  // New question — match by text within the same section
+                  const match = sectionBackendQs.find(
+                    (bq) => bq.questionText === q.questionText.trim()
+                  );
+                  return match ? { ...q, questionId: match._id } : q;
+                }),
+            };
+          })
+        );
+      } else {
+        // Refetch failed — at least persist the resolved section IDs
+        setSections(resolvedSections);
+      }
+
+      toast.success(json.msg || "Questions saved successfully!");
+
+      if (shouldNavigate) {
+        navigate("/publish");
+      }
+    } catch (error) {
+      console.error("Error saving questions:", error);
+      toast.error(error.message || "Error saving questions");
+    } finally {
+      if (shouldNavigate) {
+        setIsPosting(false);
+      } else {
+        setIsSaving(false);
+      }
+    }
+  };
+
   const currentQuestion = getCurrentQuestion();
   const isDarkMode = selectedBgColor === "#000000";
+
+  if (isLoading) {
+    return <Loader text="Loading survey questions..." />;
+  }
 
   return (
     <>
@@ -809,8 +1075,20 @@ const SurveyQuestions = () => {
 
             {/* Action Buttons */}
             <div className="action-buttons survey-ques-action">
-              <button className="save-btn">Save</button>
-              <button className="post-btn">Post</button>
+              <button
+                className="save-btn"
+                onClick={() => handleSave(false)}
+                disabled={isSaving || isPosting}
+              >
+                {isSaving ? "Saving..." : "Save"}
+              </button>
+              <button
+                className="post-btn"
+                onClick={() => handleSave(true)}
+                disabled={isSaving || isPosting}
+              >
+                {isPosting ? "Posting..." : "Post"}
+              </button>
             </div>
           </div>
         </div>
