@@ -1,10 +1,14 @@
-
+import { useState } from "react";
 import check from "../../assets/img/check.svg";
 import "./pricing.css"
 import { NavLink } from "react-router-dom";
 
 
 const Pricing = () => {
+    const [billing, setBilling] = useState("monthly");
+
+    const basicPrice = billing === "yearly" ? 25000 * 12 : 25000;
+
     return (
         <section className="pricing">
             <div className="pricing-container">
@@ -15,14 +19,20 @@ const Pricing = () => {
                </div>
                
                 <div className="bill-period">
-                    <button className="active">Monthly</button>
-                    <button>Yearly</button>
+                    <button
+                        className={billing === "monthly" ? "active" : ""}
+                        onClick={() => setBilling("monthly")}
+                    >Monthly</button>
+                    <button
+                        className={billing === "yearly" ? "active" : ""}
+                        onClick={() => setBilling("yearly")}
+                    >Yearly</button>
                 </div>
                 <div className="price-plans">
     <div className="price-plan first-plan">
         <h3>Basic Plan</h3>
         <p>For undergraduates</p>
-        <h4><span className="price-sign">₦25,000</span> starting</h4>
+        <h4><span className="price-sign">₦{basicPrice.toLocaleString()}</span> starting</h4>
         <div className="price-feature">Features</div>
         <ul>
             <li className="flex price-tick"><img src={check} alt=""/>24 - 72hr data collection</li>
@@ -42,12 +52,12 @@ const Pricing = () => {
         {/* <h4><span className="price-sign">₦</span> contact for pricing</h4> */}
         <div className="price-feature">Features</div>
         <ul>
-            <li className="flex price-tick"><img src={check} alt=""/>24 - 72hr data collection</li>
-            <li className="flex price-tick"><img src={check} alt=""/>Full data visualization</li>
-            <li className="flex price-tick"><img src={check} alt=""/>Full data analysis</li>
-            <li className="flex price-tick"><img src={check} alt=""/>Exportable data in any format</li>
-            <li className="flex price-tick"><img src={check} alt=""/>100% cleaned data</li>
-            <li className="flex price-tick"><img src={check} alt=""/>Zero additional data entry costs</li>
+            <li className="flex price-tick"><img src="./wht-tick.svg" alt=""/>24 - 72hr data collection</li>
+            <li className="flex price-tick"><img src="./wht-tick.svg" alt=""/>Full data visualization</li>
+            <li className="flex price-tick"><img src="./wht-tick.svg" alt=""/>Full data analysis</li>
+            <li className="flex price-tick"><img src="./wht-tick.svg" alt=""/>Exportable data in any format</li>
+            <li className="flex price-tick"><img src="./wht-tick.svg" alt=""/>100% cleaned data</li>
+            <li className="flex price-tick"><img src="./wht-tick.svg" alt=""/>Zero additional data entry costs</li>
         </ul>
         <NavLink to="/signup">
         <button>Get Started</button>
@@ -64,7 +74,7 @@ const Pricing = () => {
             <li className="flex price-tick"><img src={check} alt=""/>Flexible scope and turnaround</li>
             <li className="flex price-tick"><img src={check} alt=""/>Dedicated support</li>
         </ul>
-        <a href="">
+        <a href="mailto:help.surveytools@gmail.com">
         <button>Request a Quote</button>
         </a>
     </div>
