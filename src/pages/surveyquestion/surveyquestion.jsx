@@ -118,6 +118,7 @@ const SurveyQuestions = () => {
             sectionMap.set(key, {
               backendSectionId: q.sectionId || null,
               title: q.section?.title || "Section 1",
+              description: q.section?.description || "",
               questions: [],
             });
           }
@@ -145,7 +146,7 @@ const SurveyQuestions = () => {
               id: localId,
               sectionId: sec.backendSectionId,
               title: sec.title,
-              description: "",
+              description: sec.description || "",
               order: index + 1,
               questions: mappedQuestions,
             };
