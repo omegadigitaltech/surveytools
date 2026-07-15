@@ -10,6 +10,73 @@ import config from "../../config/config";
 import Loader from "../../components/loader/loader";
 // import ShareLink from "../../components/sharelink/sharelink";
 
+const DEFAULT_LIKERT_SCALE = [
+  { value: 1, label: "Strongly Disagree" },
+  { value: 2, label: "Disagree" },
+  { value: 3, label: "Neutral" },
+  { value: 4, label: "Agree" },
+  { value: 5, label: "Strongly Agree" },
+];
+
+const mapBackendQuestionTypeToUi = (type) =>
+  type === "five_point" ? "likert" : type;
+
+const mapUiQuestionTypeToBackend = (type) =>
+  type === "likert" ? "five_point" : type;
+
+const mapBackendOptions = (options) =>
+  (options || []).map((opt) =>
+    typeof opt === "string"
+      ? { text: opt, allowsCustomInput: false }
+      : { text: opt.text || "", allowsCustomInput: opt.allowsCustomInput || false }
+  );
+
+const buildQuestionFromBackend = (q, sectionBackendId) => {
+  const uiType = mapBackendQuestionTypeToUi(q.questionType) || "multiple_choice";
+  return {
+    id: `question_${q._id}`,
+    questionId: q._id || "",
+    questionText: q.questionText || "",
+    questionType: uiType,
+    required: Boolean(q.required),
+    options: mapBackendOptions(q.options),
+    likert: uiType === "likert" ? { scale: [...DEFAULT_LIKERT_SCALE] } : null,
+    sectionId: sectionBackendId,
+  };
+};
+
+const buildSectionsFromBackendQuestions = (backendQuestions) => {
+  if (!backendQuestions.length) return null;
+
+  const sectionMap = new Map();
+  backendQuestions.forEach((q) => {
+    const key = q.sectionId || "_none";
+    if (!sectionMap.has(key)) {
+      sectionMap.set(key, {
+        backendSectionId: q.sectionId || null,
+        title: q.section?.title || "Section 1",
+        description: q.section?.description || "",
+        questions: [],
+      });
+    }
+    sectionMap.get(key).questions.push(q);
+  });
+
+  return Array.from(sectionMap.entries()).map(([, sec], index) => {
+    const localId = `section_${index + 1}`;
+    return {
+      id: localId,
+      sectionId: sec.backendSectionId,
+      title: sec.title,
+      description: sec.description || "",
+      order: index + 1,
+      questions: sec.questions.map((q) =>
+        buildQuestionFromBackend(q, sec.backendSectionId)
+      ),
+    };
+  });
+};
+
 const SurveyQuestions = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,13 +113,10 @@ const SurveyQuestions = () => {
   ]);
 
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [deletedQuestionIds, setDeletedQuestionIds] = useState([]);
   const [showLikertModal, setShowLikertModal] = useState(false);
   const [currentLikertScale, setCurrentLikertScale] = useState([
-    { value: 1, label: "Strongly Disagree" },
-    { value: 2, label: "Disagree" },
-    { value: 3, label: "Neutral" },
-    { value: 4, label: "Agree" },
-    { value: 5, label: "Strongly Agree" },
+    ...DEFAULT_LIKERT_SCALE,
   ]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const sidebarRef = useRef(null);
@@ -108,52 +172,11 @@ const SurveyQuestions = () => {
           throw new Error(json.msg || "Failed to fetch survey questions");
 
         const backendQuestions = json.questions || json.survey?.questions || [];
-        if (backendQuestions.length === 0) return;
-
-        // Group questions by sectionId, preserving backend section metadata
-        const sectionMap = new Map();
-        backendQuestions.forEach((q) => {
-          const key = q.sectionId || "_none";
-          if (!sectionMap.has(key)) {
-            sectionMap.set(key, {
-              backendSectionId: q.sectionId || null,
-              title: q.section?.title || "Section 1",
-              description: q.section?.description || "",
-              questions: [],
-            });
-          }
-          sectionMap.get(key).questions.push(q);
-        });
-
-        const rebuiltSections = Array.from(sectionMap.entries()).map(
-          ([, sec], index) => {
-            const localId = `section_${index + 1}`;
-            const mappedQuestions = sec.questions.map((q) => ({
-              id: `question_${q._id}`,
-              questionId: q._id || "",
-              questionText: q.questionText || "",
-              questionType: q.questionType || "multiple_choice",
-              required: Boolean(q.required),
-              options: (q.options || []).map((opt) =>
-                typeof opt === "string"
-                  ? { text: opt, allowsCustomInput: false }
-                  : { text: opt.text || "", allowsCustomInput: opt.allowsCustomInput || false }
-              ),
-              likert: null,
-              sectionId: sec.backendSectionId,
-            }));
-            return {
-              id: localId,
-              sectionId: sec.backendSectionId,
-              title: sec.title,
-              description: sec.description || "",
-              order: index + 1,
-              questions: mappedQuestions,
-            };
-          }
-        );
+        const rebuiltSections = buildSectionsFromBackendQuestions(backendQuestions);
+        if (!rebuiltSections) return;
 
         setSections(rebuiltSections);
+        setDeletedQuestionIds([]);
         setSelectedQuestion({
           sectionId: rebuiltSections[0].id,
           questionId: rebuiltSections[0].questions[0].id,
@@ -209,7 +232,7 @@ const SurveyQuestions = () => {
                       ? { options: [], likert: null }
                       : {}),
                     ...(field === "questionType" && value === "likert"
-                      ? { options: [], likert: null }
+                      ? { options: [], likert: { scale: [...DEFAULT_LIKERT_SCALE] } }
                       : {}),
                     ...(field === "questionType" &&
                     (value === "multiple_choice" ||
@@ -303,29 +326,38 @@ const SurveyQuestions = () => {
 
   // Delete question
   const deleteQuestion = (sectionId, questionId) => {
+    const section = sections.find((s) => s.id === sectionId);
+    const question = section?.questions.find((q) => q.id === questionId);
+
+    if (!question) return;
+
+    if (section.questions.length === 1) {
+      alert("You must have at least one question in a section");
+      return;
+    }
+
+    if (question.questionId) {
+      setDeletedQuestionIds((prev) =>
+        prev.includes(question.questionId)
+          ? prev
+          : [...prev, question.questionId]
+      );
+    }
+
+    const newQuestions = section.questions.filter((q) => q.id !== questionId);
+
     setSections(
-      sections.map((section) => {
-        if (section.id === sectionId) {
-          if (section.questions.length === 1) {
-            alert("You must have at least one question in a section");
-            return section;
-          }
-          const newQuestions = section.questions.filter(
-            (q) => q.id !== questionId
-          );
-
-          if (selectedQuestion?.questionId === questionId) {
-            setSelectedQuestion({
-              sectionId,
-              questionId: newQuestions[0]?.id,
-            });
-          }
-
-          return { ...section, questions: newQuestions };
-        }
-        return section;
-      })
+      sections.map((s) =>
+        s.id === sectionId ? { ...s, questions: newQuestions } : s
+      )
     );
+
+    if (selectedQuestion?.questionId === questionId) {
+      setSelectedQuestion({
+        sectionId,
+        questionId: newQuestions[0]?.id,
+      });
+    }
   };
 
   // Duplicate question
@@ -484,13 +516,7 @@ const SurveyQuestions = () => {
     if (question && question.likert && question.likert.scale) {
       setCurrentLikertScale([...question.likert.scale]);
     } else {
-      setCurrentLikertScale([
-        { value: 1, label: "Strongly Disagree" },
-        { value: 2, label: "Disagree" },
-        { value: 3, label: "Neutral" },
-        { value: 4, label: "Agree" },
-        { value: 5, label: "Strongly Agree" },
-      ]);
+      setCurrentLikertScale([...DEFAULT_LIKERT_SCALE]);
     }
     setShowLikertModal(true);
   };
@@ -571,7 +597,27 @@ const SurveyQuestions = () => {
     }
 
     try {
-      // Step 1: Create any sections that don't yet have a backend ID
+      // Step 1: Delete questions removed from the UI that exist on the backend
+      for (const questionId of deletedQuestionIds) {
+        const deleteRes = await fetch(
+          `${config.API_URL}/surveys/${activeSurveyId}/questions/${questionId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+
+        if (!deleteRes.ok && deleteRes.status !== 404) {
+          const deleteJson = await deleteRes.json();
+          throw new Error(
+            deleteJson.msg || deleteJson.message || "Failed to delete question"
+          );
+        }
+      }
+
+      // Step 2: Create any sections that don't yet have a backend ID
       const resolvedSections = [];
       for (let i = 0; i < sections.length; i++) {
         const section = sections[i];
@@ -602,15 +648,14 @@ const SurveyQuestions = () => {
         resolvedSections.push({ ...section, sectionId: sectionJson.section._id });
       }
 
-      // Step 2: Build flat questions array for bulk-questions endpoint
+      // Step 3: Build flat questions array for bulk-questions endpoint
       const allQuestions = resolvedSections.flatMap((section) =>
         section.questions
           .filter((q) => q.questionText.trim() !== "")
           .map((q) => {
             const questionData = {
               questionText: q.questionText.trim(),
-              // likert has no API equivalent — map to five_point
-              questionType: q.questionType === "likert" ? "five_point" : q.questionType,
+              questionType: mapUiQuestionTypeToBackend(q.questionType),
               required: Boolean(q.required),
             };
             // Include questionId for existing questions so the API updates instead of creates
@@ -628,7 +673,7 @@ const SurveyQuestions = () => {
           })
       );
 
-      // Step 3: Bulk save via the correct endpoint
+      // Step 4: Bulk save via the correct endpoint
       const response = await fetch(
         `${config.API_URL}/surveys/${activeSurveyId}/bulk-questions`,
         {
@@ -646,8 +691,7 @@ const SurveyQuestions = () => {
         throw new Error(json.msg || json.message || "Failed to save questions");
       }
 
-      // Step 4: Re-fetch questions to sync backend-assigned IDs into local state,
-      // preventing duplicate creation on the next save
+      // Step 5: Re-fetch questions to sync backend state into local state
       const refetchRes = await fetch(
         `${config.API_URL}/surveys/${activeSurveyId}/questions`,
         {
@@ -660,36 +704,20 @@ const SurveyQuestions = () => {
 
       if (refetchRes.ok) {
         const refetchJson = await refetchRes.json();
-        const backendQs = refetchJson.questions || [];
+        const backendQs =
+          refetchJson.questions || refetchJson.survey?.questions || [];
+        const rebuiltSections = buildSectionsFromBackendQuestions(backendQs);
 
-        // Group backend questions by sectionId for efficient lookup
-        const questionsBySectionId = {};
-        backendQs.forEach((bq) => {
-          const key = bq.sectionId || "_none";
-          if (!questionsBySectionId[key]) questionsBySectionId[key] = [];
-          questionsBySectionId[key].push(bq);
-        });
-
-        setSections(
-          resolvedSections.map((section) => {
-            const sectionKey = section.sectionId || "_none";
-            const sectionBackendQs = questionsBySectionId[sectionKey] || [];
-            return {
-              ...section,
-              questions: section.questions
-                .filter((q) => q.questionText.trim() !== "")
-                .map((q) => {
-                  // Already has an ID — keep as-is
-                  if (q.questionId) return q;
-                  // New question — match by text within the same section
-                  const match = sectionBackendQs.find(
-                    (bq) => bq.questionText === q.questionText.trim()
-                  );
-                  return match ? { ...q, questionId: match._id } : q;
-                }),
-            };
-          })
-        );
+        if (rebuiltSections) {
+          setSections(rebuiltSections);
+          setSelectedQuestion({
+            sectionId: rebuiltSections[0].id,
+            questionId: rebuiltSections[0].questions[0].id,
+          });
+        } else {
+          setSections(resolvedSections);
+        }
+        setDeletedQuestionIds([]);
       } else {
         // Refetch failed — at least persist the resolved section IDs
         setSections(resolvedSections);
