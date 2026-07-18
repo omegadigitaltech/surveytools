@@ -1,0 +1,82 @@
+.profdashbd {
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+.profdashbd *,
+.profdashbd *::before,
+.profdashbd *::after {
+  box-sizing: border-box;
+}
+
+/* ---- Header: let the two buttons wrap instead of overflowing ---- */
+.profdashbd .profdashbd-header {
+  flex-wrap: wrap;
+}
+
+/* ---- Stat cards: 2-up on small screens instead of full stack ---- */
+@media (max-width: 640px) {
+  .profdashbd .profdashbd-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .profdashbd .profdashbd-stat-card {
+    min-width: 0;
+    padding: 1rem;
+  }
+  .profdashbd .profdashbd-stat-card p {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .profdashbd .profdashbd-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Survey card: progress bar goes full width under the text ---- */
+@media (max-width: 640px) {
+  .profdashbd .profdashbd-progress-wrap {
+    width: 100%;
+    padding-left: 0 !important;
+  }
+  .profdashbd .profdashbd-progress {
+    width: 100% !important;
+  }
+  .profdashbd .profdashbd-survey-card {
+    padding: 1rem;
+  }
+}
+
+/* ---- Empty state: scale down on very small screens ---- */
+@media (max-width: 502px) {
+  .profdashbd-header{
+    align-items: flex-start !important;
+    display: none !important;
+  }
+  .profdashbd .profdashbd-empty {
+    padding: 2.5rem 1rem;
+  }
+  .profdashbd .profdashbd-empty-icon {
+    height: 4rem;
+    width: 4rem;
+  }
+  .profdashbd .profdashbd-empty-cta {
+    width: 100%;
+    justify-content: center;
+  }
+ 
+}
+
+/* ---- General small-screen text/spacing tightening ---- */
+@media (max-width: 380px) {
+  .profdashbd h1 {
+    font-size: 1.375rem;
+  }
+  .profdashbd {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}

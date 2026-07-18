@@ -85,7 +85,7 @@ const Navbar = () => {
             {!isAuthenticated && (
               <>
                 <li className="header-w2-item hide">
-                  <NavLink className="header-w2-link button navsignup-btn text-white px-5 py-2 rounded-md" to="/signup">
+                  <NavLink className="header-w2-link button navsignup-btn text-white px-5 py-2 rounded-md" to="/signup-type">
                     Sign up
                   </NavLink>
                 </li>

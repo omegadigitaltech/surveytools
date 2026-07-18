@@ -156,10 +156,10 @@
     align-items: center;
   }
 
-  .hero-box p,
+  /* .hero-box p,
   h1 {
     text-align: center;
-  }
+  } */
 
   .home-title {
     max-width: 256px;

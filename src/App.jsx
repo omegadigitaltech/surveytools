@@ -21,13 +21,16 @@ import Logout from "./components/logout/logout";
 import setupAuthInterceptor from "./utils/setupAuthInterceptor";
 
 import Home from "./pages/home/home";
+import SignUpType from "./pages/signuptype/signuptype.jsx"
 import SignIn from "./pages/signin/signin";
 import SignUp from "./pages/signup/signup";
+import ProfessionalSignUp from "./pages/professionalsignup/professionalsignup.jsx"
 import ResetPw from "./pages/resetpassword/resetpw.jsx";
 import ForgotPw from "./pages/forgotpassword/forgot.jsx";
 import Verify from "./pages/verify/verify";
 import verifyAction from "./pages/verify/action";
 import Dashboard from "./pages/dashboard/dashboard";
+import ProfessionalDshDb from "./pages/professionalDshDb/professionalDshDb.jsx"
 import signInAction from "./pages/signin/action";
 import signUpAction from "./pages/signup/action";
 import postAction from "./pages/surveyquestion/action";
@@ -87,6 +90,7 @@ const router = createBrowserRouter(
        
         <Route element={<DashboardLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="professional-dashboard" element={<ProfessionalDshDb />} />
           <Route path="start-survey" element={<StartSurvey />} />
           <Route path="postsurvey" element={<PostSurvey />}  action={surveyAction} />
           <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
@@ -110,8 +114,10 @@ const router = createBrowserRouter(
         </Route>
       </Route>
       <Route element={<AuthLayout />}>
+      <Route path="signup-type" element={<SignUpType />} />
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />
+        <Route path="professional-signup" element={<ProfessionalSignUp />}  />
         <Route path="verify" element={<Verify />} action={verifyAction} />
         <Route path="forgotpassword" element={<ForgotPw />} />
         <Route path="resetpassword/:token" element={<ResetPw />} />

@@ -109,7 +109,7 @@ const SignIn = () => {
 
         <div className="auth-w5- no-acct">
           New here?&nbsp;
-          <Link className="auth-w5-" to="/signup">Create an account</Link>
+          <Link className="auth-w5-" to="/signup-type">Create an account</Link>
         </div>
       </div>
 

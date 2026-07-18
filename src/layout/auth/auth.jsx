@@ -11,7 +11,7 @@ const Auth = () => {
           <img
             src="/Blue-logo-1.svg"
             alt="Blue Logo"
-            className="md:w-[10rem] h-[2.5rem] md:h-auto"
+            className="md:w-[8rem] h-[2rem] md:h-auto"
           />
         </NavLink>
 

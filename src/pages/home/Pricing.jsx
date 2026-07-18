@@ -41,7 +41,7 @@ const Pricing = () => {
             <li className="flex price-tick"><img src={check} alt=""/>100% cleaned data</li>
             <li className="flex price-tick"><img src={check} alt=""/>Zero additional data entry costs</li>
         </ul>
-        <NavLink to="/signup">
+        <NavLink to="/signup-type">
         <button>Get Started</button>
         </NavLink>
     </div>
@@ -59,7 +59,7 @@ const Pricing = () => {
             <li className="flex price-tick"><img src="./wht-tick.svg" alt=""/>100% cleaned data</li>
             <li className="flex price-tick"><img src="./wht-tick.svg" alt=""/>Zero additional data entry costs</li>
         </ul>
-        <NavLink to="/signup">
+        <NavLink to="/signup-type">
         <button>Get Started</button>
         </NavLink>
     </div>

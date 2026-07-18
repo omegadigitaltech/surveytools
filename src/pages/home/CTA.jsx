@@ -21,7 +21,7 @@ const CTA = () => {
         </p>
         <Link
           className="reveal-item button-filled px-5 py-3 lg:px-10 lg:py-4 mt-[1rem] md:mt-[5%] rounded-md"
-          to="/signup"
+          to="/signup-type"
         >
           Get Started
         </Link>

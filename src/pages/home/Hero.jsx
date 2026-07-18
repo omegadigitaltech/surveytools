@@ -52,7 +52,7 @@ const Hero = () => {
           <div className="hero-btns flex gap-4 lg:gap-8 mt-4 relative z-50">
             <NavLink
               className="button-filled px-5 py-3 lg:px-7 lg:py-2 rounded-md"
-              to="/signup"
+              to="/signup-type"
             >
               Get Started
             </NavLink>
