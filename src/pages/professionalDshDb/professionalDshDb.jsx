@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import "./professionaldsh.css"
+import { NavLink } from "react-router-dom";
 import {
   FileText,
   ClipboardList,
@@ -172,12 +173,9 @@ export default function ProfessionalDashboard({ surveys: surveysProp }) {
     <div className="profdashbd min-h-screen w-full bg-slate-50 px-4 py-6 sm:px-8 sm:py-10">
       {/* Scoped responsive CSS — namespaced under .profdashbd so nothing
           here can conflict with class names elsewhere on the page. */}
-      <style>{`
-        
-      `}</style>
 
-      {/* Dev-only preview toggle — remove when wiring real data */}
-      <div className="mx-auto mb-4 max-w-6xl">
+      {/* DEV-ONLY preview toggle — remove when wiring real data */}
+      {/* <div className="mx-auto mb-4 max-w-6xl">
         <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-500 shadow-sm">
           <input
             type="checkbox"
@@ -187,7 +185,7 @@ export default function ProfessionalDashboard({ surveys: surveysProp }) {
           />
           Preview empty state
         </label>
-      </div>
+      </div> */}
 
       <div className="mx-auto max-w-6xl">
         {/* Header */}
@@ -196,14 +194,17 @@ export default function ProfessionalDashboard({ surveys: surveysProp }) {
             Dashboard
           </h1>
           <div className="flex items-center gap-3">
-            <button className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-blue-700">
+            {/* <button className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-blue-700">
               <FileText className="h-4 w-4" strokeWidth={2} />
               Create a form
-            </button>
+            </button> */}
+            <NavLink to="/postsurvey" >
             <button className="inline-flex items-center gap-2 rounded-lg bg-(--btns) px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-(--base) active:scale-[0.98]">
             <span className="material-icons text-sm">edit</span>
               Create questionnaire
             </button>
+            </NavLink>
+            
           </div>
         </div>
 
