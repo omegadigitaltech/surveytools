@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import useAuthStore from "../../store/useAuthStore";
 import useAppStore from "../../store/useAppStore";
 import config from "../../config/config";
-
+import "./rewards.css";
 // ── auth helper ────────────────────────────────────────────────────────────────
 const authHeader = (token) => ({ Authorization: `Bearer ${token}` });
 
@@ -15,33 +15,34 @@ const Rewards = () => {
   const { pointBalance } = useAppStore();
 
   return (
-    <div className="p-4 md:p-8 bg-[#F8F9FA] min-h-screen">
+    <div className="p-2 md:p-8 bg-[#F8F9FA] min-h-screen">
       <div className="max-w-6xl mx-auto">
-        {/* Top navigation tabs */}
-        <div className="flex gap-8 mb-6 border-b border-gray-200">
+        <div className="flex gap-0 sm:gap-8 mb-6 border-b border-gray-200 overflow-x-auto whitespace-nowrap">
           {[
-            { id: "missions",     icon: "track_changes", label: "Missions"     },
-            { id: "levels",       icon: "trending_up",   label: "Levels"       },
-            { id: "marketplace",  icon: "storefront",    label: "Marketplace"  },
+            { id: "missions", icon: "track_changes", label: "Missions" },
+            { id: "levels", icon: "trending_up", label: "Levels" },
+            { id: "marketplace", icon: "storefront", label: "Marketplace" },
           ].map(({ id, icon, label }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`pb-3 px-2 flex items-center gap-2 text-sm transition-colors ${
+              className={`pb-3 px-2 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm transition-colors flex-shrink-0 ${
                 activeTab === id
                   ? "border-b-2 border-black font-semibold -mb-px"
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              <span className="material-icons text-sm">{icon}</span>
+              <span className="material-icons text-lg reward-tab">{icon}</span>
               {label}
             </button>
           ))}
         </div>
 
-        {activeTab === "missions"    && <MissionsTab    token={authToken} />}
-        {activeTab === "levels"      && <LevelsTab      token={authToken} />}
-        {activeTab === "marketplace" && <MarketplaceTab token={authToken} pointBalance={pointBalance} />}
+        {activeTab === "missions" && <MissionsTab token={authToken} />}
+        {activeTab === "levels" && <LevelsTab token={authToken} />}
+        {activeTab === "marketplace" && (
+          <MarketplaceTab token={authToken} pointBalance={pointBalance} />
+        )}
       </div>
     </div>
   );
@@ -49,27 +50,31 @@ const Rewards = () => {
 
 // ── Missions Tab ───────────────────────────────────────────────────────────────
 const MissionsTab = ({ token }) => {
-  const [missionsType, setMissionsType]   = useState("daily");
-  const [allMissions,  setAllMissions]    = useState([]);
-  const [isLoading,    setIsLoading]      = useState(true);
-  const [claiming,     setClaiming]       = useState(null); // missionId being claimed
+  const [missionsType, setMissionsType] = useState("daily");
+  const [allMissions, setAllMissions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [claiming, setClaiming] = useState(null); // missionId being claimed
 
   // Fetch once; filter client-side by type
   useEffect(() => {
     if (!token) return;
     setIsLoading(true);
     axios
-      .get(`${config.API_URL}/gamification/missions`, { headers: authHeader(token) })
+      .get(`${config.API_URL}/gamification/missions`, {
+        headers: authHeader(token),
+      })
       .then((res) => setAllMissions(res.data.data || []))
       .catch(() => toast.error("Failed to load missions"))
       .finally(() => setIsLoading(false));
   }, [token]);
 
-  const missions        = allMissions.filter((m) => m.type === missionsType);
-  const completedCount  = missions.filter((m) => m.status === "completed" || m.currentValue >= m.targetValue).length;
-  const claimedCount    = missions.filter((m) => m.status === "claimed").length;
-  const dailyMissions   = allMissions.filter((m) => m.type === "daily");
-  const weeklyMissions  = allMissions.filter((m) => m.type === "weekly");
+  const missions = allMissions.filter((m) => m.type === missionsType);
+  const completedCount = missions.filter(
+    (m) => m.status === "completed" || m.currentValue >= m.targetValue,
+  ).length;
+  const claimedCount = missions.filter((m) => m.status === "claimed").length;
+  const dailyMissions = allMissions.filter((m) => m.type === "daily");
+  const weeklyMissions = allMissions.filter((m) => m.type === "weekly");
 
   const handleClaim = async (missionId) => {
     setClaiming(missionId);
@@ -77,12 +82,14 @@ const MissionsTab = ({ token }) => {
       const res = await axios.post(
         `${config.API_URL}/gamification/missions/${missionId}/claim`,
         {},
-        { headers: authHeader(token) }
+        { headers: authHeader(token) },
       );
       toast.success(res.data.message || "Reward claimed!");
       // Mark locally as claimed
       setAllMissions((prev) =>
-        prev.map((m) => (m._id === missionId ? { ...m, status: "claimed" } : m))
+        prev.map((m) =>
+          m._id === missionId ? { ...m, status: "claimed" } : m,
+        ),
       );
     } catch (err) {
       toast.error(err?.response?.data?.message || "Failed to claim reward");
@@ -93,32 +100,44 @@ const MissionsTab = ({ token }) => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1">Missions and Challenges</h1>
-      <p className="text-gray-500 text-sm mb-6">Complete missions to earn bonus points and rewards</p>
+      <h1 className="text-lg sm:text-2xl font-bold mb-1">
+        Missions and Challenges
+      </h1>
+      <p className="text-gray-500 text-sm mb-6">
+        Complete missions to earn bonus points and rewards
+      </p>
 
       {/* Sub-tabs */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-wrap gap-3 mb-6">
         <button
           onClick={() => setMissionsType("daily")}
           className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
-            missionsType === "daily" ? "bg-[#00A5B5] text-white" : "bg-gray-200 text-gray-700"
+            missionsType === "daily"
+              ? "bg-[#00A5B5] text-white"
+              : "bg-gray-200 text-gray-700"
           }`}
         >
           <span className="material-icons text-sm">schedule</span>
           Daily Missions
-          <span className={`px-2 rounded-full text-xs ${missionsType === "daily" ? "bg-white/20" : "bg-gray-300"}`}>
+          <span
+            className={`px-2 rounded-full text-xs ${missionsType === "daily" ? "bg-white/20" : "bg-gray-300"}`}
+          >
             {dailyMissions.length}
           </span>
         </button>
         <button
           onClick={() => setMissionsType("weekly")}
           className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
-            missionsType === "weekly" ? "bg-[#00A5B5] text-white" : "bg-gray-200 text-gray-700"
+            missionsType === "weekly"
+              ? "bg-[#00A5B5] text-white"
+              : "bg-gray-200 text-gray-700"
           }`}
         >
           <span className="material-icons text-sm">auto_awesome</span>
           Weekly Challenge
-          <span className={`px-2 rounded-full text-xs ${missionsType === "weekly" ? "bg-white/20" : "bg-gray-300"}`}>
+          <span
+            className={`px-2 rounded-full text-xs ${missionsType === "weekly" ? "bg-white/20" : "bg-gray-300"}`}
+          >
             {weeklyMissions.length}
           </span>
         </button>
@@ -127,14 +146,20 @@ const MissionsTab = ({ token }) => {
       {/* Cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {isLoading ? (
-          <div className="col-span-2 py-8 text-center text-gray-500">
-            <span className="material-icons animate-spin text-3xl mb-2 block">refresh</span>
-            Loading missions...
+          <div className="col-span-2 py-8 flex flex-col items-center justify-center gap-2 text-gray-500">
+            <span className="material-icons animate-spin text-3xl">
+              refresh
+            </span>
+            <span>Loading missions...</span>
           </div>
         ) : missions.length === 0 ? (
           <div className="col-span-2 py-12 text-center text-gray-500 bg-white rounded-xl border border-gray-100 shadow-sm">
-            <span className="material-icons text-4xl mb-2 opacity-50 block">track_changes</span>
-            <p className="font-semibold text-lg">No {missionsType} missions right now.</p>
+            <span className="material-icons text-4xl mb-2 opacity-50 block">
+              track_changes
+            </span>
+            <p className="font-semibold text-base sm:text-lg">
+              No {missionsType} missions right now.
+            </p>
             <p className="text-sm mt-1">Check back later for new challenges!</p>
           </div>
         ) : (
@@ -151,19 +176,24 @@ const MissionsTab = ({ token }) => {
 
       {/* Completion banner */}
       {!isLoading && missions.length > 0 && (
-        <div className="mt-6 bg-gradient-to-r from-[#009E96] to-[#007A73] text-white p-6 rounded-xl flex items-center justify-between gap-4">
+        <div className="mt-6 bg-gradient-to-r from-[#009E96] to-[#007A73] text-white p-6 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 className="font-bold text-lg">
-              Complete all {missionsType === "daily" ? "Daily Missions" : "Weekly Challenges"}
+              Complete all{" "}
+              {missionsType === "daily"
+                ? "Daily Missions"
+                : "Weekly Challenges"}
             </h3>
             <p className="text-sm opacity-90 mt-1">
               Earn a bonus of{" "}
-              <span className="text-yellow-300 font-bold">500 points</span> when you complete
-              all {missionsType} missions!
+              <span className="text-yellow-300 font-bold">500 points</span> when
+              you complete all {missionsType} missions!
             </p>
           </div>
           <div className="bg-white/20 min-w-[64px] h-16 rounded-lg flex flex-col items-center justify-center font-bold flex-shrink-0 px-3">
-            <span className="text-2xl leading-none">{completedCount - claimedCount}</span>
+            <span className="text-2xl leading-none">
+              {completedCount - claimedCount}
+            </span>
             <span className="text-[10px] leading-tight text-center">
               of {missions.length} complete
             </span>
@@ -176,18 +206,31 @@ const MissionsTab = ({ token }) => {
 
 // ── Mission card ───────────────────────────────────────────────────────────────
 const MissionCard = ({ mission, claiming, onClaim }) => {
-  const { title, description, pointsReward, currentValue = 0, targetValue, status } = mission;
-  const percent     = Math.min((currentValue / targetValue) * 100, 100);
-  const isComplete  = status === "completed" || currentValue >= targetValue;
-  const isClaimed   = status === "claimed";
+  const {
+    title,
+    description,
+    pointsReward,
+    currentValue = 0,
+    targetValue,
+    status,
+  } = mission;
+  const percent = Math.min((currentValue / targetValue) * 100, 100);
+  const isComplete = status === "completed" || currentValue >= targetValue;
+  const isClaimed = status === "claimed";
 
   return (
-    <div className={`bg-white p-6 rounded-xl shadow-sm border flex flex-col justify-between ${isComplete && !isClaimed ? "border-[#00A5B5]" : "border-gray-100"} ${isClaimed ? "opacity-70" : ""}`}>
+    <div
+      className={`bg-white p-6 rounded-xl shadow-sm border flex flex-col justify-between ${isComplete && !isClaimed ? "border-[#00A5B5]" : "border-gray-100"} ${isClaimed ? "opacity-70" : ""}`}
+    >
       <div>
         <div className="flex justify-between items-start mb-2 gap-2">
-          <h3 className="font-bold text-lg w-2/3 leading-tight">{title}</h3>
+          {/* <h3 className="font-bold text-lg w-2/3 leading-tight">{title}</h3> */}
+          <h3 className="font-bold text-lg flex-1 min-w-0 leading-tight">
+            {title}
+          </h3>
           <div className="bg-blue-50 text-blue-500 px-3 py-1 text-sm font-bold rounded-full flex items-center gap-1 flex-shrink-0">
-            <span className="material-icons text-sm">stars</span>+ {pointsReward}
+            <span className="material-icons text-sm">stars</span>+{" "}
+            {pointsReward}
           </div>
         </div>
         <p className="text-sm text-gray-500 mb-6">{description}</p>
@@ -195,7 +238,9 @@ const MissionCard = ({ mission, claiming, onClaim }) => {
       <div>
         <div className="flex justify-between text-sm font-semibold mb-2">
           <span className="text-gray-500">Progress</span>
-          <span className={isComplete ? "text-green-600" : ""}>{currentValue}/{targetValue}</span>
+          <span className={isComplete ? "text-green-600" : ""}>
+            {currentValue}/{targetValue}
+          </span>
         </div>
         <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-4">
           <div
@@ -206,7 +251,9 @@ const MissionCard = ({ mission, claiming, onClaim }) => {
 
         {isClaimed ? (
           <div className="flex items-center gap-1 text-xs text-gray-500 font-semibold justify-center">
-            <span className="material-icons text-sm text-gray-400">check_circle</span>
+            <span className="material-icons text-sm text-gray-400">
+              check_circle
+            </span>
             Reward Claimed
           </div>
         ) : isComplete ? (
@@ -225,95 +272,161 @@ const MissionCard = ({ mission, claiming, onClaim }) => {
 
 // ── Levels Tab ─────────────────────────────────────────────────────────────────
 const LevelsTab = ({ token }) => {
-  const [levels,       setLevels]       = useState([]);
-  const [dashboard,    setDashboard]    = useState(null);
-  const [vipStatus,    setVipStatus]    = useState(null);
-  const [isLoading,    setIsLoading]    = useState(true);
+  const [levels, setLevels] = useState([]);
+  const [dashboard, setDashboard] = useState(null);
+  const [vipStatus, setVipStatus] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!token) return;
     setIsLoading(true);
 
     Promise.all([
-      axios.get(`${config.API_URL}/gamification/dashboard`,  { headers: authHeader(token) }).catch(() => null),
-      axios.get(`${config.API_URL}/gamification/levels`,     { headers: authHeader(token) }).catch(() => null),
-      axios.get(`${config.API_URL}/gamification/vip-status`, { headers: authHeader(token) }).catch(() => null),
+      axios
+        .get(`${config.API_URL}/gamification/dashboard`, {
+          headers: authHeader(token),
+        })
+        .catch(() => null),
+      axios
+        .get(`${config.API_URL}/gamification/levels`, {
+          headers: authHeader(token),
+        })
+        .catch(() => null),
+      axios
+        .get(`${config.API_URL}/gamification/vip-status`, {
+          headers: authHeader(token),
+        })
+        .catch(() => null),
     ])
       .then(([dashRes, levelsRes, vipRes]) => {
-        setDashboard(dashRes?.data?.data   || null);
-        setLevels(levelsRes?.data?.data    || []);
-        setVipStatus(vipRes?.data?.data    || null);
+        setDashboard(dashRes?.data?.data || null);
+        setLevels(levelsRes?.data?.data || []);
+        setVipStatus(vipRes?.data?.data || null);
       })
       .catch(() => toast.error("Failed to load level data"))
       .finally(() => setIsLoading(false));
   }, [token]);
 
   // Derived values from dashboard data
-  const currentLevel  = dashboard?.currentLevel  ?? 2;
-  const levelName     = dashboard?.levelName      ?? "Explorer";
-  const currentXP     = dashboard?.currentXP     ?? 0;
-  const nextLevelXP   = dashboard?.nextLevelXP   ?? 2000;
-  const nextLevelName = dashboard?.nextLevelName  ?? "Achiever";
-  const benefits      = dashboard?.benefits       ?? ["Access to premium surveys", "1.0 x points multiplier", "Weekly bonus mission"];
-  const xpPercent     = nextLevelXP > 0 ? Math.min(Math.round((currentXP / nextLevelXP) * 100), 100) : 0;
+  const currentLevel = dashboard?.currentLevel ?? 2;
+  const levelName = dashboard?.levelName ?? "Explorer";
+  const currentXP = dashboard?.currentXP ?? 0;
+  const nextLevelXP = dashboard?.nextLevelXP ?? 2000;
+  const nextLevelName = dashboard?.nextLevelName ?? "Achiever";
+  const benefits = dashboard?.benefits ?? [
+    "Access to premium surveys",
+    "1.0 x points multiplier",
+    "Weekly bonus mission",
+  ];
+  const xpPercent =
+    nextLevelXP > 0
+      ? Math.min(Math.round((currentXP / nextLevelXP) * 100), 100)
+      : 0;
 
   const currentVipTier = vipStatus?.tier ?? null;
 
   const VIP_TIERS = [
-    { id: "bronze",   name: "Bronze",   points: "0 - 1000",        color: "bg-yellow-600", icon: "military_tech" },
-    { id: "silver",   name: "Silver",   points: "1001 - 5000",     color: "bg-gray-400",   icon: "star"          },
-    { id: "gold",     name: "Gold",     points: "5001 - 10000",    color: "bg-yellow-500", icon: "workspace_premium" },
-    { id: "platinum", name: "Platinum", points: "10001 - 15000",   color: "bg-purple-500", icon: "diamond"       },
+    {
+      id: "bronze",
+      name: "Bronze",
+      points: "0 - 1000",
+      color: "bg-yellow-600",
+      icon: "military_tech",
+    },
+    {
+      id: "silver",
+      name: "Silver",
+      points: "1001 - 5000",
+      color: "bg-gray-400",
+      icon: "star",
+    },
+    {
+      id: "gold",
+      name: "Gold",
+      points: "5001 - 10000",
+      color: "bg-yellow-500",
+      icon: "workspace_premium",
+    },
+    {
+      id: "platinum",
+      name: "Platinum",
+      points: "10001 - 15000",
+      color: "bg-purple-500",
+      icon: "diamond",
+    },
   ];
 
   if (isLoading) {
     return (
-      <div className="py-12 text-center text-gray-500">
-        <span className="material-icons animate-spin text-3xl mb-2 block">refresh</span>
-        Loading level data...
+      <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-500">
+        <span className="material-icons animate-spin text-3xl">refresh</span>
+        <span>Loading level data...</span>
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1">Levels and Progression</h1>
-      <p className="text-gray-500 text-sm mb-6">Track your progress and unlock exclusive benefits</p>
+      <h1 className="text-lg sm:text-2xl font-bold mb-1">
+        Levels and Progression
+      </h1>
+      <p className="text-gray-500 text-sm mb-6">
+        Track your progress and unlock exclusive benefits
+      </p>
 
       {/* Current level + benefits row */}
       <div className="flex flex-col md:flex-row gap-6 mb-8">
         {/* Current level card */}
-        <div className="flex-1 bg-gradient-to-br from-[#00D16B] to-[#007D8C] text-white p-6 rounded-2xl relative overflow-hidden">
+        <div className="flex-1 size-full bg-gradient-to-br from-[#00D16B] to-[#007D8C] text-white p-6 rounded-2xl relative overflow-hidden">
           <div className="text-sm opacity-80 mb-1">Current Level</div>
-          <h2 className="text-3xl font-bold mb-1 relative z-10">Level {currentLevel} — {levelName}</h2>
-          <p className="text-sm opacity-80 mb-6 relative z-10">Keep earning XP to reach the next level</p>
+          <h2 className="text-3xlll text-xl sm:text-sm font-bold mb-1 relative z-10">
+            Level {currentLevel} — {levelName}
+          </h2>
+          <p className="text-sm opacity-80 mb-6 relative z-10">
+            Keep earning XP to reach the next level
+          </p>
           <div className="relative z-10">
             <div className="flex justify-between text-sm font-semibold mb-2">
               <span>Progress to level {currentLevel + 1}</span>
-              <span>{currentXP.toLocaleString()} / {nextLevelXP.toLocaleString()} XP</span>
+              <span>
+                {currentXP.toLocaleString()} / {nextLevelXP.toLocaleString()} XP
+              </span>
             </div>
             <div className="h-3 bg-black/20 rounded-full overflow-hidden mb-2">
-              <div className="h-full bg-white rounded-full transition-all" style={{ width: `${xpPercent}%` }} />
+              <div
+                className="h-full bg-white rounded-full transition-all"
+                style={{ width: `${xpPercent}%` }}
+              />
             </div>
             <p className="text-xs opacity-80">
-              {(nextLevelXP - currentXP).toLocaleString()} XP needed to unlock {nextLevelName}
+              {(nextLevelXP - currentXP).toLocaleString()} XP needed to unlock{" "}
+              {nextLevelName}
             </p>
           </div>
           <div className="absolute right-[-20px] top-[20px] opacity-20 pointer-events-none">
-            <span className="material-icons" style={{ fontSize: "150px" }}>trending_up</span>
+            <span className="material-icons" style={{ fontSize: "150px" }}>
+              trending_up
+            </span>
           </div>
         </div>
 
         {/* Current benefits */}
         <div className="w-full md:w-1/3 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-            <span className="material-icons text-[#00A5B5]">workspace_premium</span>
+            <span className="material-icons text-[#00A5B5]">
+              workspace_premium
+            </span>
             Current Benefits
           </h3>
           <ul className="space-y-3">
             {benefits.map((b, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                <span className="material-icons text-green-500 text-lg">check_circle</span>
+              <li
+                key={i}
+                className="flex items-start gap-2 text-sm text-gray-700"
+              >
+                <span className="material-icons text-green-500 text-lg">
+                  check_circle
+                </span>
                 {b}
               </li>
             ))}
@@ -326,31 +439,42 @@ const LevelsTab = ({ token }) => {
       <div className="space-y-3 mb-8">
         {levels.length === 0 ? (
           <div className="py-8 text-center text-gray-500 bg-white rounded-xl border border-gray-100 shadow-sm">
-            <span className="material-icons text-4xl mb-2 opacity-50 block">trending_up</span>
+            <span className="material-icons text-4xl mb-2 opacity-50 block">
+              trending_up
+            </span>
             <p className="font-semibold">No level data available.</p>
           </div>
         ) : (
           levels.map((lvl, idx) => {
-            const isCurrent  = lvl.level === currentLevel;
+            const isCurrent = lvl.level === currentLevel;
             const isUnlocked = lvl.level <= currentLevel;
             return (
               <div
                 key={lvl._id || idx}
                 className={`p-4 rounded-xl border flex items-center gap-4 bg-white transition-all ${
-                  isCurrent ? "border-[#00A5B5] border-2 shadow-sm" : "border-gray-200"
+                  isCurrent
+                    ? "border-[#00A5B5] border-2 shadow-sm"
+                    : "border-gray-200"
                 }`}
               >
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-white flex-shrink-0 ${
-                  isCurrent  ? "bg-[#00A5B5]" :
-                  isUnlocked ? "bg-gray-400"  : "bg-gray-200"
-                }`}>
+                <div
+                  className={`w-14 h-14 rounded-xl flex items-center justify-center text-white flex-shrink-0 ${
+                    isCurrent
+                      ? "bg-[#00A5B5]"
+                      : isUnlocked
+                        ? "bg-gray-400"
+                        : "bg-gray-200"
+                  }`}
+                >
                   <span className="material-icons">
                     {isCurrent ? "trending_up" : isUnlocked ? "star" : "lock"}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h4 className="font-bold">Level {lvl.level} — {lvl.name}</h4>
+                    <h4 className="font-bold">
+                      Level {lvl.level} — {lvl.name}
+                    </h4>
                     {isCurrent && (
                       <span className="bg-[#00A5B5] text-white text-[10px] px-2 py-0.5 rounded font-bold">
                         Current Level
@@ -362,11 +486,15 @@ const LevelsTab = ({ token }) => {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 mb-2">Unlocked at {(lvl.minXP || 0).toLocaleString()} xp</p>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Unlocked at {(lvl.minXP || 0).toLocaleString()} xp
+                  </p>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
                     {(lvl.benefits || []).map((b, i) => (
                       <span key={i} className="flex items-center gap-1">
-                        <span className="material-icons text-[14px] text-gray-400">check_circle_outline</span>
+                        <span className="material-icons text-[14px] text-gray-400">
+                          check_circle_outline
+                        </span>
                         {b}
                       </span>
                     ))}
@@ -380,17 +508,21 @@ const LevelsTab = ({ token }) => {
 
       {/* VIP Tier System */}
       <h3 className="text-xl font-bold mb-4">VIP Tier System</h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid sm:grid-cos-2 grid-cols-1 md:grid-cols-4 gap-4">
         {VIP_TIERS.map((tier) => {
           const isActive = currentVipTier === tier.id;
           return (
             <div
               key={tier.id}
               className={`bg-white rounded-xl p-4 flex flex-col items-center text-center border transition-all ${
-                isActive ? "border-yellow-400 border-2 shadow-md" : "border-gray-200"
+                isActive
+                  ? "border-yellow-400 border-2 shadow-md"
+                  : "border-gray-200"
               }`}
             >
-              <div className={`w-12 h-12 rounded-full ${tier.color} flex items-center justify-center text-white mb-3`}>
+              <div
+                className={`w-12 h-12 rounded-full ${tier.color} flex items-center justify-center text-white mb-3`}
+              >
                 <span className="material-icons text-xl">{tier.icon}</span>
               </div>
               <h4 className="font-bold">{tier.name}</h4>
@@ -399,11 +531,19 @@ const LevelsTab = ({ token }) => {
                   YOUR TIER
                 </span>
               )}
-              <p className="text-[10px] text-gray-500 mb-4">{tier.points} points earned</p>
+              <p className="text-[10px] text-gray-500 mb-4">
+                {tier.points} points earned
+              </p>
               <ul className="text-left text-[11px] text-gray-600 space-y-2 w-full">
-                {["Faster conversion rate", "2% bonus on rewards", "Standard support"].map((f) => (
-                  <li key={f} className="flex gap-1">
-                    <span className="material-icons text-[14px] text-gray-400">check_circle_outline</span>
+                {[
+                  "Faster conversion rate",
+                  "2% bonus on rewards",
+                  "Standard support",
+                ].map((f) => (
+                  <li key={f} className="flex vip-tier-list  gap-1">
+                    <span className="material-icons text-[14px] vip-tier-tick text-gray-400">
+                      check_circle_outline
+                    </span>
                     {f}
                   </li>
                 ))}
@@ -420,18 +560,18 @@ const LevelsTab = ({ token }) => {
 const MarketplaceTab = ({ token, pointBalance }) => {
   const { setPointBalance } = useAppStore();
 
-  const [listings,      setListings]      = useState([]);
-  const [wallet,        setWallet]        = useState([]);
-  const [transactions,  setTransactions]  = useState([]);
-  const [isLoading,     setIsLoading]     = useState(true);
+  const [listings, setListings] = useState([]);
+  const [wallet, setWallet] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [convertAmount, setConvertAmount] = useState(1000);
-  const [converting,    setConverting]    = useState(false);
-  const [redeemingId,   setRedeemingId]   = useState(null);
-  const [copiedCode,    setCopiedCode]    = useState(null);
-  const [activeFilter,  setActiveFilter]  = useState("all");
+  const [converting, setConverting] = useState(false);
+  const [redeemingId, setRedeemingId] = useState(null);
+  const [copiedCode, setCopiedCode] = useState(null);
+  const [activeFilter, setActiveFilter] = useState("all");
 
-  const maxBalance    = pointBalance ?? 0;
-  const nairaValue    = Math.floor(convertAmount / 10); // 100pts = ₦10
+  const maxBalance = pointBalance ?? 0;
+  const nairaValue = Math.floor(convertAmount / 10); // 100pts = ₦10
 
   // Fetch all marketplace data
   const fetchMarketplace = useCallback(async () => {
@@ -439,13 +579,27 @@ const MarketplaceTab = ({ token, pointBalance }) => {
     setIsLoading(true);
     try {
       const [listingsRes, walletRes, txRes] = await Promise.all([
-        axios.get(`${config.API_URL}/marketplace/listings`,    { headers: authHeader(token) }).catch(() => null),
-        axios.get(`${config.API_URL}/marketplace/wallet`,      { headers: authHeader(token) }).catch(() => null),
-        axios.get(`${config.API_URL}/marketplace/transactions`, { headers: authHeader(token) }).catch(() => null),
+        axios
+          .get(`${config.API_URL}/marketplace/listings`, {
+            headers: authHeader(token),
+          })
+          .catch(() => null),
+        axios
+          .get(`${config.API_URL}/marketplace/wallet`, {
+            headers: authHeader(token),
+          })
+          .catch(() => null),
+        axios
+          .get(`${config.API_URL}/marketplace/transactions`, {
+            headers: authHeader(token),
+          })
+          .catch(() => null),
       ]);
-      setListings(listingsRes?.data?.data     || []);
-      setWallet(walletRes?.data?.data         || []);
-      setTransactions(txRes?.data?.data       || []);
+      setListings(
+        Array.isArray(listingsRes?.data?.data) ? listingsRes.data.data : [],
+      );
+      setWallet(walletRes?.data?.data || []);
+      setTransactions(txRes?.data?.data || []);
     } catch {
       toast.error("Failed to load marketplace");
     } finally {
@@ -453,11 +607,17 @@ const MarketplaceTab = ({ token, pointBalance }) => {
     }
   }, [token]);
 
-  useEffect(() => { fetchMarketplace(); }, [fetchMarketplace]);
+  useEffect(() => {
+    fetchMarketplace();
+  }, [fetchMarketplace]);
 
   // Convert points → voucher
   const handleConvert = async (pointsToConvert) => {
-    if (!pointsToConvert || pointsToConvert <= 0 || pointsToConvert > maxBalance) {
+    if (
+      !pointsToConvert ||
+      pointsToConvert <= 0 ||
+      pointsToConvert > maxBalance
+    ) {
       toast.error("Invalid amount or insufficient points");
       return;
     }
@@ -466,11 +626,14 @@ const MarketplaceTab = ({ token, pointBalance }) => {
       const res = await axios.post(
         `${config.API_URL}/marketplace/convert`,
         { pointsToConvert },
-        { headers: authHeader(token) }
+        { headers: authHeader(token) },
       );
       toast.success(res.data.message || "Voucher generated successfully!");
       // Refresh wallet + update balance
-      const walletRes = await axios.get(`${config.API_URL}/marketplace/wallet`, { headers: authHeader(token) });
+      const walletRes = await axios.get(
+        `${config.API_URL}/marketplace/wallet`,
+        { headers: authHeader(token) },
+      );
       setWallet(walletRes?.data?.data || []);
       if (res.data.data?.remainingPoints !== undefined) {
         setPointBalance(res.data.data.remainingPoints);
@@ -489,12 +652,16 @@ const MarketplaceTab = ({ token, pointBalance }) => {
       const res = await axios.post(
         `${config.API_URL}/marketplace/convert`,
         { pointsToConvert: listing.pointsCost },
-        { headers: authHeader(token) }
+        { headers: authHeader(token) },
       );
       toast.success(res.data.message || `${listing.title} redeemed!`);
-      const walletRes = await axios.get(`${config.API_URL}/marketplace/wallet`, { headers: authHeader(token) });
+      const walletRes = await axios.get(
+        `${config.API_URL}/marketplace/wallet`,
+        { headers: authHeader(token) },
+      );
       setWallet(walletRes?.data?.data || []);
-      if (res.data.data?.remainingPoints !== undefined) setPointBalance(res.data.data.remainingPoints);
+      if (res.data.data?.remainingPoints !== undefined)
+        setPointBalance(res.data.data.remainingPoints);
     } catch (err) {
       toast.error(err?.response?.data?.message || "Redemption failed");
     } finally {
@@ -510,52 +677,63 @@ const MarketplaceTab = ({ token, pointBalance }) => {
     });
   };
 
+  const safeListings = Array.isArray(listings) ? listings : [];
   const filteredListings =
     activeFilter === "all"
-      ? listings
-      : listings.filter((l) =>
-          (l.type || l.category || "").toLowerCase().includes(activeFilter.toLowerCase())
+      ? safeListings
+      : safeListings.filter((l) =>
+          (l.type || l.category || "")
+            .toLowerCase()
+            .includes(activeFilter.toLowerCase()),
         );
 
   return (
     <div>
       {/* Hero banner */}
-      {/* <div
-        className="text-white p-8 rounded-2xl mb-6 flex justify-between items-center relative overflow-hidden"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(11,148,83,0.95), rgba(1,94,49,0.95))",
-        }}
-      > */}
-         <div 
+      {/* <div 
         className="text-white p-8 rounded-2xl mb-6 flex justify-between items-center relative overflow-hidden bg-cover bg-center"
         style={{ 
             backgroundImage: "linear-gradient(to right, rgba(11, 148, 83, 0.9), rgba(1, 94, 49, 0.9)), url('/rewards-bg.jpg')",
         }}
+      > */}
+      <div
+        className="text-white p-6 md:p-8 rounded-2xl mb-6 flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, rgba(0, 131, 3, 0.9) 50%, rgba(0, 150, 184, 0.9)), url('/rewards-bg.jpg')",
+        }}
       >
-        <div className="relative z-10 w-2/3">
+        <div className="relative z-10 w-full md:w-2/3">
           <span className="bg-white/20 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wide inline-block mb-3">
             Rewards Season is Here
           </span>
-          <h1 className="text-3xl font-bold mb-3">
+          <h1 className="text-2xl md:text-3xl font-bold mb-3">
             Convert Your Points Into{" "}
             <span className="text-[#00D16B]">Real</span> Rewards
           </h1>
-          <p className="text-sm opacity-90 mb-6 w-[80%]">
-            Your opinion matters, and so do your rewards. Easily exchange your hard-earned survey
-            points for cash vouchers, premium subscriptions, and exclusive discounts from top
-            partners!
+          <p className="text-sm opacity-90 mb-6 w-full md:w-[80%]">
+            Your opinion matters, and so do your rewards. Easily exchange your
+            hard-earned survey points for cash vouchers, premium subscriptions,
+            and exclusive discounts from top partners!
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <button
-              onClick={() => document.getElementById("quick-convert")?.scrollIntoView({ behavior: "smooth" })}
-              className="bg-[#00A5B5] hover:bg-[#008F9C] border border-white/30 text-white px-6 py-2 rounded font-semibold text-sm transition-colors"
+              onClick={() =>
+                document
+                  .getElementById("quick-convert")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="bg-[#00A5B5] hover:bg-[#008F9C] border border-white/30 text-white px-6 py-2 rounded font-semibold text-xs sm:text-sm transition-colors"
             >
               Start Converting →
             </button>
             <button
-              onClick={() => document.getElementById("marketplace-grid")?.scrollIntoView({ behavior: "smooth" })}
-              className="bg-transparent border border-white/50 text-white px-6 py-2 rounded font-semibold text-sm hover:bg-white/10 transition-colors"
+              onClick={() =>
+                document
+                  .getElementById("marketplace-grid")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="bg-transparent border border-white/50 text-white px-6 py-2 rounded font-semibold text-xs sm:text-sm hover:bg-white/10 transition-colors"
             >
               Browse Catalog
             </button>
@@ -563,7 +741,9 @@ const MarketplaceTab = ({ token, pointBalance }) => {
         </div>
         <div
           className="absolute right-0 top-0 w-1/3 h-full opacity-30 pointer-events-none"
-          style={{ background: "radial-gradient(circle, #00D16B 0%, transparent 70%)" }}
+          style={{
+            background: "radial-gradient(circle, #00D16B 0%, transparent 70%)",
+          }}
         />
       </div>
 
@@ -577,30 +757,43 @@ const MarketplaceTab = ({ token, pointBalance }) => {
             <div>
               <div className="flex items-center gap-1 text-gray-600 font-semibold text-sm">
                 Your Balance
-                <span className="material-icons text-sm text-gray-400">info</span>
+                <span className="material-icons text-sm text-gray-400">
+                  info
+                </span>
               </div>
               <div className="flex items-end gap-2 mt-1">
-                <span className="text-3xl font-bold">{maxBalance.toLocaleString()}</span>
+                <span className="text-3xl font-bold">
+                  {maxBalance.toLocaleString()}
+                </span>
                 <span className="text-gray-500 font-semibold mb-1">pts</span>
               </div>
               <div className="mt-2 bg-green-50 text-green-700 text-xs px-2 py-1 rounded font-semibold inline-flex items-center gap-1">
-                <span className="material-icons text-[14px]">trending_up</span>
-                ≈ ₦{Math.floor(maxBalance / 10).toLocaleString()} Value
+                <span className="material-icons text-[14px]">trending_up</span>≈
+                ₦{Math.floor(maxBalance / 10).toLocaleString()} Value
               </div>
             </div>
           </div>
         </div>
         <button
-          onClick={() => document.getElementById("quick-convert")?.scrollIntoView({ behavior: "smooth" })}
+          onClick={() =>
+            document
+              .getElementById("quick-convert")
+              ?.scrollIntoView({ behavior: "smooth" })
+          }
           className="w-full bg-[#00A5B5] hover:bg-[#008F9C] text-white py-3 rounded-lg font-bold transition-colors"
         >
           Convert Points Now
         </button>
-        <p className="text-center text-xs text-gray-500 mt-2">Conversion rate: 100pts = ₦10</p>
+        <p className="text-center text-xs text-gray-500 mt-2">
+          Conversion rate: 100pts = ₦10
+        </p>
       </div>
 
       {/* Quick Convert */}
-      <div id="quick-convert" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+      <div
+        id="quick-convert"
+        className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"
+      >
         <div className="flex items-center gap-2 mb-6">
           <div className="w-8 h-8 rounded-full bg-green-50 text-green-500 flex items-center justify-center">
             <span className="material-icons text-sm">currency_exchange</span>
@@ -631,7 +824,9 @@ const MarketplaceTab = ({ token, pointBalance }) => {
                 max={maxBalance}
                 value={convertAmount}
                 onChange={(e) =>
-                  setConvertAmount(Math.max(0, Math.min(Number(e.target.value), maxBalance)))
+                  setConvertAmount(
+                    Math.max(0, Math.min(Number(e.target.value), maxBalance)),
+                  )
                 }
                 className="font-bold text-lg w-full outline-none"
               />
@@ -648,19 +843,27 @@ const MarketplaceTab = ({ token, pointBalance }) => {
               />
               <div className="flex justify-between text-xs text-gray-400 mt-2">
                 <span>0</span>
-                <span>{Math.floor((maxBalance || 12500) / 2).toLocaleString()}</span>
+                <span>
+                  {Math.floor((maxBalance || 12500) / 2).toLocaleString()}
+                </span>
                 <span>{(maxBalance || 12500).toLocaleString()}</span>
               </div>
             </div>
           </div>
 
           <div className="hidden md:flex justify-center items-center">
-            <span className="material-icons text-gray-300 rotate-90 md:rotate-0">sync_alt</span>
+            <span className="material-icons text-gray-300 rotate-90 md:rotate-0">
+              sync_alt
+            </span>
           </div>
 
           <div className="flex-1 bg-green-50 rounded-xl p-6 flex flex-col items-center justify-center w-full">
-            <span className="text-xs font-bold text-green-600 mb-1 uppercase">You will receive</span>
-            <span className="text-3xl font-bold text-green-700 mb-2">₦ {nairaValue.toLocaleString()}</span>
+            <span className="text-xs font-bold text-green-600 mb-1 uppercase">
+              You will receive
+            </span>
+            <span className="text-3xl font-bold text-green-700 mb-2">
+              ₦ {nairaValue.toLocaleString()}
+            </span>
             <span className="text-xs text-green-600 flex items-center gap-1 bg-white px-2 py-1 rounded-full">
               <span className="material-icons text-[14px]">check_circle</span>
               Instantly Available
@@ -669,13 +872,17 @@ const MarketplaceTab = ({ token, pointBalance }) => {
         </div>
 
         <button
-          disabled={converting || convertAmount <= 0 || convertAmount > maxBalance}
+          disabled={
+            converting || convertAmount <= 0 || convertAmount > maxBalance
+          }
           onClick={() => handleConvert(convertAmount)}
           className="w-full bg-[#00A5B5] hover:bg-[#008F9C] disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-lg font-bold mt-6 flex justify-center items-center gap-1 transition-colors"
         >
           {converting ? (
             <>
-              <span className="material-icons animate-spin text-sm">refresh</span>
+              <span className="material-icons animate-spin text-sm">
+                refresh
+              </span>
               Processing...
             </>
           ) : (
@@ -705,7 +912,11 @@ const MarketplaceTab = ({ token, pointBalance }) => {
                     : "border border-gray-300 text-gray-600 hover:border-[#00A5B5]"
                 }`}
               >
-                {f === "all" ? "All" : f === "gift_card" ? "Gift Cards" : f.charAt(0).toUpperCase() + f.slice(1)}
+                {f === "all"
+                  ? "All"
+                  : f === "gift_card"
+                    ? "Gift Cards"
+                    : f.charAt(0).toUpperCase() + f.slice(1)}
               </button>
             ))}
           </div>
@@ -718,9 +929,15 @@ const MarketplaceTab = ({ token, pointBalance }) => {
             </div>
           ) : filteredListings.length === 0 ? (
             <div className="col-span-2 py-12 text-center text-gray-500 bg-white rounded-xl border border-gray-100 shadow-sm">
-              <span className="material-icons text-4xl mb-2 opacity-50 block">storefront</span>
-              <p className="font-semibold text-lg">No listings available right now.</p>
-              <p className="text-sm mt-1">Check back later for new rewards to redeem!</p>
+              <span className="material-icons text-4xl mb-2 opacity-50 block">
+                storefront
+              </span>
+              <p className="font-semibold text-base ">
+                No listings available right now.
+              </p>
+              <p className="text-sm mt-1">
+                Check back later for new rewards to redeem!
+              </p>
             </div>
           ) : (
             filteredListings.map((item) => (
@@ -742,9 +959,30 @@ const MarketplaceTab = ({ token, pointBalance }) => {
           Premium Upgrades
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <UpgradeItem title="Pro Member"   cost="5000" duration="1 Month"  color="text-green-500"  border="border-green-400"          icon="workspace_premium" />
-          <UpgradeItem title="Survey Boost" cost="1000" duration="7 Days"   color="text-blue-500"   border="border-blue-400 border-dashed" icon="bolt"             />
-          <UpgradeItem title="Ad-Free Pass" cost="2000" duration="Lifetime" color="text-purple-500" border="border-purple-400"          icon="shield"            />
+          <UpgradeItem
+            title="Pro Member"
+            cost="5000"
+            duration="1 Month"
+            color="text-green-500"
+            border="border-green-400"
+            icon="workspace_premium"
+          />
+          <UpgradeItem
+            title="Survey Boost"
+            cost="1000"
+            duration="7 Days"
+            color="text-blue-500"
+            border="border-blue-400 border-dashed"
+            icon="bolt"
+          />
+          <UpgradeItem
+            title="Ad-Free Pass"
+            cost="2000"
+            duration="Lifetime"
+            color="text-purple-500"
+            border="border-purple-400"
+            icon="shield"
+          />
         </div>
       </div>
 
@@ -754,26 +992,38 @@ const MarketplaceTab = ({ token, pointBalance }) => {
           <span className="material-icons text-purple-500">local_activity</span>
           Voucher Wallet
           <span className="ml-auto bg-purple-50 text-purple-600 text-[10px] px-2 py-0.5 rounded font-bold">
-            {wallet.filter((v) => v.status === "active" || !v.status).length} Active
+            {wallet.filter((v) => v.status === "active" || !v.status).length}{" "}
+            Active
           </span>
         </h3>
 
         {wallet.length === 0 ? (
           <div className="py-8 text-center text-gray-500 border border-dashed border-gray-200 rounded-xl">
             <p className="font-semibold">Your wallet is empty</p>
-            <p className="text-xs mt-1">Convert your points into vouchers to see them here.</p>
+            <p className="text-xs mt-1">
+              Convert your points into vouchers to see them here.
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
             {wallet.map((voucher, idx) => (
-              <div key={voucher._id || idx} className="border border-dashed border-gray-200 rounded-xl p-4 relative">
+              <div
+                key={voucher._id || idx}
+                className="border border-dashed border-gray-200 rounded-xl p-4 relative"
+              >
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <div className="text-xs text-gray-500 font-semibold mb-1">REWARD</div>
-                    <div className="font-bold text-lg">{voucher.title || "Cash Voucher"}</div>
+                    <div className="text-xs text-gray-500 font-semibold mb-1">
+                      REWARD
+                    </div>
+                    <div className="font-bold text-lg">
+                      {voucher.title || "Cash Voucher"}
+                    </div>
                   </div>
                   <div className="bg-green-50 text-green-600 px-2 py-1 rounded text-[10px] font-bold border border-green-200 flex items-center gap-1">
-                    <span className="material-icons text-[12px]">check_circle</span>
+                    <span className="material-icons text-[12px]">
+                      check_circle
+                    </span>
                     {voucher.status === "used" ? "Used" : "Active"}
                   </div>
                 </div>
@@ -793,7 +1043,8 @@ const MarketplaceTab = ({ token, pointBalance }) => {
                   </div>
                   {voucher.createdAt && (
                     <p className="text-xs text-gray-400 mt-2">
-                      Generated {new Date(voucher.createdAt).toLocaleDateString("en-GB")}
+                      Generated{" "}
+                      {new Date(voucher.createdAt).toLocaleDateString("en-GB")}
                     </p>
                   )}
                 </div>
@@ -812,22 +1063,36 @@ const MarketplaceTab = ({ token, pointBalance }) => {
           </h3>
           <div className="space-y-3">
             {transactions.slice(0, 5).map((tx, i) => (
-              <div key={tx._id || i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+              <div
+                key={tx._id || i}
+                className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0"
+              >
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${tx.type === "earn" ? "bg-green-50" : "bg-red-50"}`}>
-                    <span className={`material-icons text-sm ${tx.type === "earn" ? "text-green-500" : "text-red-500"}`}>
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${tx.type === "earn" ? "bg-green-50" : "bg-red-50"}`}
+                  >
+                    <span
+                      className={`material-icons text-sm ${tx.type === "earn" ? "text-green-500" : "text-red-500"}`}
+                    >
                       {tx.type === "earn" ? "arrow_downward" : "arrow_upward"}
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">{tx.description || tx.title}</p>
+                    <p className="text-sm font-semibold text-gray-800">
+                      {tx.description || tx.title}
+                    </p>
                     <p className="text-xs text-gray-400">
-                      {tx.createdAt ? new Date(tx.createdAt).toLocaleDateString("en-GB") : ""}
+                      {tx.createdAt
+                        ? new Date(tx.createdAt).toLocaleDateString("en-GB")
+                        : ""}
                     </p>
                   </div>
                 </div>
-                <span className={`font-bold text-sm ${tx.type === "earn" ? "text-green-600" : "text-red-500"}`}>
-                  {tx.type === "earn" ? "+" : "-"}{Math.abs(tx.points || tx.amount || 0).toLocaleString()} pts
+                <span
+                  className={`font-bold text-sm ${tx.type === "earn" ? "text-green-600" : "text-red-500"}`}
+                >
+                  {tx.type === "earn" ? "+" : "-"}
+                  {Math.abs(tx.points || tx.amount || 0).toLocaleString()} pts
                 </span>
               </div>
             ))}
@@ -850,9 +1115,15 @@ const MarketplaceItem = ({ item, redeeming, onRedeem }) => {
           </div>
         )}
         {imageUrl ? (
-          <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
+          <img
+            src={imageUrl}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
         ) : (
-          <span className="material-icons text-white text-4xl opacity-30">image</span>
+          <span className="material-icons text-white text-4xl opacity-30">
+            image
+          </span>
         )}
       </div>
       <div className="p-4 flex-1 flex flex-col justify-between">
@@ -865,7 +1136,9 @@ const MarketplaceItem = ({ item, redeeming, onRedeem }) => {
         <div className="flex justify-between items-end">
           <div>
             <div className="text-[10px] text-gray-500">Cost</div>
-            <div className="font-bold text-sm">{(pointsCost || 0).toLocaleString()} pts</div>
+            <div className="font-bold text-sm">
+              {(pointsCost || 0).toLocaleString()} pts
+            </div>
           </div>
           <button
             onClick={onRedeem}
@@ -884,11 +1157,15 @@ const MarketplaceItem = ({ item, redeeming, onRedeem }) => {
 const UpgradeItem = ({ title, cost, duration, color, border, icon }) => (
   <div className={`bg-white p-4 rounded-xl border ${border} relative`}>
     <div className="flex justify-between items-start mb-4">
-      <div className={`w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center ${color}`}>
+      <div
+        className={`w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center ${color}`}
+      >
         <span className="material-icons">{icon}</span>
       </div>
       <div className="text-right">
-        <div className="text-[10px] text-gray-400 font-semibold uppercase">Cost</div>
+        <div className="text-[10px] text-gray-400 font-semibold uppercase">
+          Cost
+        </div>
         <div className="font-bold text-sm">
           {cost} <span className="text-xs text-gray-500">pts</span>
         </div>
