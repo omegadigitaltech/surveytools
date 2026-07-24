@@ -1033,7 +1033,9 @@ font-size: .9rem;
 
 
 @media (max-width: 521px) {
-
+.dsh_level, .dsh-point-bal, .dsh_streak{
+  font-size: 1rem !important;
+}
   .confirm-modal .title {
     font-size: 1.1rem !important;
   }
