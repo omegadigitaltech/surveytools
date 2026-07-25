@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function DashboardMain({ pointBalance, stats }) {
   return (
-    <div className="space-y-6 pt-6">
+    <div className="space-y-6 pt-2 sm:pt-6">
       <div className="flex flex-col md:flex-row md:items-center items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>

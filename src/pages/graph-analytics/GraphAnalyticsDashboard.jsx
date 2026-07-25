@@ -62,7 +62,7 @@ const GraphAnalyticsDashboard = () => {
   // --- VIEW 1: SURVEY LIST SELECTION ---
   if (!surveyId) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 lg:p-8">
+      <div className="min-h-screen bg-gray-50z dark:bg-gray-900 p-3 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
           
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -74,10 +74,10 @@ const GraphAnalyticsDashboard = () => {
                 <ArrowLeft className="w-4 h-4 mr-1" />
                 Back to Dashboard
               </Link>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
                 Select a Survey
               </h1>
-              <p className="text-gray-500 dark:text-gray-400 mt-1">
+              <p className="max-[390px]:text-xs text-gray-500 dark:text-gray-400 mt-1">
                 Choose a survey to view its detailed graph analytics.
               </p>
             </div>
@@ -86,21 +86,21 @@ const GraphAnalyticsDashboard = () => {
           {surveysList.length === 0 ? (
             <div className="bg-white p-8 rounded-xl shadow-sm text-center max-w-md mx-auto w-full mt-10 border border-gray-100">
               <div className="text-4xl mb-4">📊</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No surveys yet</h3>
-              <p className="text-gray-500 mb-6">Create and publish your first survey to start seeing analytics here.</p>
+              <h3 className="text-base sm:text-xl font-bold text-gray-900 mb-2">No surveys yet</h3>
+              <p className="text-gray-500 mb-6 max-[390px]:text-sm">Create and publish your first survey to start seeing analytics here.</p>
               <Link to="/postsurvey" className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
                 Create a Survey
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {surveysList.map((survey) => (
                 <div 
                   key={survey._id} 
                   className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-blue-200 transition-all cursor-pointer flex flex-col"
                   onClick={() => navigate(`/analytics/${survey._id}`)}
                 >
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-gray-900 dark:text-white text-lg line-clamp-2 leading-tight">
                       {survey.title}
                     </h3>
@@ -113,7 +113,7 @@ const GraphAnalyticsDashboard = () => {
                     {survey.description || 'No description provided.'}
                   </p>
                   
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 border-t border-gray-50 dark:border-gray-700 pt-4 mt-auto">
+                  <div className="flex w-full items-center justify-between text-xs text-gray-500 dark:text-gray-400 border-t border-gray-50 dark:border-gray-700 pt-4 mt-auto">
                     <div className="flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5" />
                       <span>{survey.participantCounts?.filled || 0} Responses</span>

@@ -53,7 +53,7 @@ import MyForms from "./pages/myforms/MyForm.jsx";
 import Settings from "./pages/settings/settings";
 import Insights from "./pages/insights/insights";
 import FormInsights from "./pages/forminsights/forminsights";
-import Analytics from "./pages/analytics/Analytics.jsx";
+// import Analytics from "./pages/analytics/Analytics.jsx";
 import GraphAnalyticsDashboard from "./pages/graph-analytics/GraphAnalyticsDashboard.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
 import Rewards from "./pages/rewards/rewards";
