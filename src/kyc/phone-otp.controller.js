@@ -7,22 +7,13 @@ const { requestOtpBody, verifyOtpBody } = require('./phone-otp.schema');
 const log = createLogger('phone-otp-controller');
 
 /**
- * Creates the phone-OTP controller.
- * Thin layer: validates input via Zod, delegates to the service, returns JSON.
- * Never reaches into the service's internals — errors from the service propagate
- * automatically via express-async-errors.
- *
  * @param {{ phoneOtpService: ReturnType<import('./phone-otp.service').createPhoneOtpService> }} deps
+ * @returns {{
+ *   requestOtp: (req: import('express').Request, res: import('express').Response) => Promise<void>,
+ *   verifyOtp: (req: import('express').Request, res: import('express').Response) => Promise<void>
+ * }}
  */
 function createPhoneOtpController({ phoneOtpService }) {
-  /**
-   * POST /v1/kyc/otp/request
-   * Issues a 6-digit OTP to the provided phone number.
-   *
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   * @returns {Promise<void>}
-   */
   async function requestOtp(req, res) {
     const result = requestOtpBody.safeParse(req.body);
     if (!result.success) {
@@ -38,14 +29,6 @@ function createPhoneOtpController({ phoneOtpService }) {
     });
   }
 
-  /**
-   * POST /v1/kyc/otp/verify
-   * Verifies the 6-digit OTP and marks it consumed.
-   *
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   * @returns {Promise<void>}
-   */
   async function verifyOtp(req, res) {
     const result = verifyOtpBody.safeParse(req.body);
     if (!result.success) {
