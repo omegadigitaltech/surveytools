@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: SurveyTools KYC API
+  version: 1.0.0
+paths:
+  /v1/kyc/respondent/layer1:
+    post:
+      summary: Submit respondent layer 1 profile
+      description: Submits the initial respondent profile. The user must have a verified phone number, and be 18 or older.
+      operationId: submitRespondentLayer1
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Layer1Body'
+            examples:
+              valid:
+                summary: Valid layer 1 payload
+                value:
+                  dateOfBirth: "1990-01-01T00:00:00.000Z"
+                  gender: "female"
+                  stateOfResidence: "Lagos"
+                  lgaOfResidence: "Ikeja"
+                  isStudent: false
+      responses:
+        '201':
+          description: Layer 1 profile created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  data:
+                    type: object
+        '400':
+          description: Validation error (underage or phone not verified)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Profile already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: integer
+        msg:
+          type: string
+
+    Layer1Body:
+      type: object
+      required:
+        - dateOfBirth
+        - gender
+        - stateOfResidence
+        - lgaOfResidence
+        - isStudent
+      properties:
+        dateOfBirth:
+          type: string
+          format: date-time
+        gender:
+          type: string
+          enum: [male, female, non-binary, prefer-not-to-say]
+        stateOfResidence:
+          type: string
+        lgaOfResidence:
+          type: string
+        isStudent:
+          type: boolean
