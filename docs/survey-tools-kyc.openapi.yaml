@@ -1,0 +1,168 @@
+openapi: 3.0.3
+info:
+  title: SurveyTools KYC & Researcher Profile API
+  version: 0.1.0
+  description: >
+    KYC and Researcher Profile endpoints for SurveyTools.
+    Initialized by BE-01; extended by BE-02 through BE-09.
+
+servers:
+  - url: "{{base_url}}"
+    description: Configured base URL (set per environment in Postman)
+
+paths:
+  /v1/kyc/otp/request:
+    post:
+      summary: Issue a 6-digit OTP to a phone number
+      description: >
+        Generates a 6-digit OTP and sends it via SMS to the provided phone number.
+        Any previously active OTP for that number is invalidated before a new one
+        is issued. Public endpoint — no authentication required.
+      operationId: requestPhoneOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestOtpBody'
+            example:
+              phone: "+2348012345678"
+      responses:
+        '200':
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                status: success
+                msg: "OTP sent to your phone number"
+        '400':
+          description: Validation error (missing or malformed phone number)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: failure
+                code: 400
+                msg: "phone must be a valid E.164 number (e.g. +2348012345678)"
+
+  /v1/kyc/otp/verify:
+    post:
+      summary: Verify a phone OTP
+      description: >
+        Checks the submitted 6-digit code against the most recent active OTP
+        for the given phone number. Marks the OTP consumed on success so it
+        cannot be replayed. Public endpoint — no authentication required.
+      operationId: verifyPhoneOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOtpBody'
+            example:
+              phone: "+2348012345678"
+              code: "123456"
+      responses:
+        '200':
+          description: Phone number verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                status: success
+                msg: "Phone number verified successfully"
+        '400':
+          description: >
+            Validation error, no active OTP, OTP already used,
+            OTP expired, or invalid code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                no_active_otp:
+                  summary: No active OTP for this number
+                  value:
+                    status: failure
+                    code: 400
+                    msg: "No active OTP for this number"
+                already_used:
+                  summary: OTP already consumed
+                  value:
+                    status: failure
+                    code: 400
+                    msg: "OTP already used"
+                expired:
+                  summary: OTP has expired
+                  value:
+                    status: failure
+                    code: 400
+                    msg: "OTP has expired"
+                invalid_code:
+                  summary: Wrong code submitted
+                  value:
+                    status: failure
+                    code: 400
+                    msg: "Invalid OTP"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: JWT issued by the existing SurveyTools auth flow
+
+  schemas:
+    RequestOtpBody:
+      type: object
+      required:
+        - phone
+      properties:
+        phone:
+          type: string
+          description: E.164-format phone number
+          pattern: '^\+\d{7,15}$'
+          example: "+2348012345678"
+
+    VerifyOtpBody:
+      type: object
+      required:
+        - phone
+        - code
+      properties:
+        phone:
+          type: string
+          description: E.164-format phone number
+          pattern: '^\+\d{7,15}$'
+          example: "+2348012345678"
+        code:
+          type: string
+          description: 6-digit OTP received via SMS
+          pattern: '^\d{6}$'
+          example: "123456"
+
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        msg:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [failure]
+        code:
+          type: integer
+        msg:
+          type: string
