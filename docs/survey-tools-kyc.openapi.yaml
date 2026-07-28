@@ -19,6 +19,16 @@ paths:
         Any previously active OTP for that number is invalidated before a new one
         is issued. Public endpoint — no authentication required.
       operationId: requestPhoneOtp
+  title: SurveyTools KYC API
+  version: 1.0.0
+paths:
+  /v1/kyc/register:
+    post:
+      summary: Unified registration for researchers and respondents
+      description: >
+        Creates a new User account, branching downstream profiles via the
+        userType field. Age is strictly validated to be 18+.
+      operationId: registerKycUser
       security: []
       requestBody:
         required: true
@@ -81,6 +91,32 @@ paths:
           description: >
             Validation error, no active OTP, OTP already used,
             OTP expired, or invalid code
+              $ref: '#/components/schemas/SignupBody'
+            example:
+              firstName: "John"
+              lastName: "Doe"
+              email: "john@example.com"
+              password: "password123"
+              userType: "researcher"
+              dateOfBirth: "2000-01-01T00:00:00.000Z"
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+        '400':
+          description: Validation error or duplicate email
           content:
             application/json:
               schema:
@@ -166,3 +202,54 @@ components:
           type: integer
         msg:
           type: string
+                age_gate:
+                  summary: Under 18
+                  value:
+                    status: failure
+                    code: 400
+                    msg: "Must be 18 or older to register"
+                duplicate_email:
+                  summary: Email already in use
+                  value:
+                    status: failure
+                    code: 400
+                    msg: "Email already registered"
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: integer
+        msg:
+          type: string
+
+    SignupBody:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+        - userType
+        - dateOfBirth
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        userType:
+          type: string
+          enum: [researcher, respondent]
+        dateOfBirth:
+          type: string
+          format: date-time

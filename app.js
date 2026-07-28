@@ -28,6 +28,7 @@ const notFoundMiddleware = require('./middleware/not-found');
 const { loadTelecomCatalog } = require("./services/telecom/catalogCache");
 const { syncTelecomCatalog } = require("./services/flutterwave/syncCatalog");
 const phoneOtpRoutes = require('./src/kyc/phone-otp.routes');
+const signupRoutes = require('./src/kyc/signup.routes');
 
 const app = express();
 require('./middleware/passport');
@@ -142,6 +143,7 @@ const marketplaceRouter = require('./routes/marketplace');
 const visualizationRouter = require('./routes/visualization');
 const analyticsRouter = require('./routes/analytics');
 
+app.use('/v1/kyc', signupRoutes);
 app.use('/', adminRouter);
 app.use('/', gamificationRouter);
 app.use('/', marketplaceRouter);
