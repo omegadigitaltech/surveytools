@@ -4,6 +4,10 @@ const { AppError } = require('../../lib/app-error');
 const { assertMinAge } = require('../../lib/age-gate');
 const User = require('../../model/user');
 
+/**
+ * @param {{ respondentProfileRepo: object }} dependencies
+ * @returns {{ submit: (userId: string, data: object) => Promise<object> }}
+ */
 function createRespondentLayer1Service({ respondentProfileRepo }) {
   return {
     async submit(userId, data) {
