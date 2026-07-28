@@ -27,6 +27,7 @@ const uploadErrorHandler = require('./middleware/errorHandler')
 const notFoundMiddleware = require('./middleware/not-found');
 const { loadTelecomCatalog } = require("./services/telecom/catalogCache");
 const { syncTelecomCatalog } = require("./services/flutterwave/syncCatalog");
+const phoneOtpRoutes = require('./src/kyc/phone-otp.routes');
 
 const app = express();
 require('./middleware/passport');
@@ -147,6 +148,9 @@ app.use('/', marketplaceRouter);
 app.use('/', visualizationRouter);
 app.use('/', analyticsRouter);
 
+
+// KYC routes — additive, never modifies existing routes
+app.use('/v1/kyc', phoneOtpRoutes);
 
 // Use the new error handler for file uploads
 // app.use(uploadErrorHandler);
