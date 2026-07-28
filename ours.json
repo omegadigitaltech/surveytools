@@ -43,13 +43,16 @@
     "redis": "^5.0.1",
     "sentiment": "^5.0.2",
     "uuid": "^10.0.0",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "crypto": "^1.0.1"
   },
   "devDependencies": {
     "jest": "^30.4.2"
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/tests/**/*.test.js"]
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
   }
 }

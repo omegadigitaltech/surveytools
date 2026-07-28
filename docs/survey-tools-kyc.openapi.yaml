@@ -68,6 +68,16 @@ paths:
         cannot be replayed. Public endpoint — no authentication required.
       operationId: verifyPhoneOtp
       security: []
+  title: SurveyTools KYC API
+  version: 1.0.0
+paths:
+  /v1/kyc/researcher/profile:
+    post:
+      summary: Submit researcher profile
+      description: Submits a student, professional, or corporate researcher profile. Type is immutable after first submission.
+      operationId: submitResearcherProfile
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -102,6 +112,26 @@ paths:
       responses:
         '201':
           description: User created successfully
+              $ref: '#/components/schemas/ResearcherProfileBody'
+            examples:
+              student:
+                summary: Student payload
+                value:
+                  researcherType: "student"
+                  institution: "XYZ University"
+                  faculty: "Science"
+                  department: "Computer Science"
+                  matricNumber: "12345"
+              professional:
+                summary: Professional payload
+                value:
+                  researcherType: "professional"
+                  jobTitle: "Developer"
+                  organization: "Tech Corp"
+                  industry: "IT"
+      responses:
+        '201':
+          description: Profile created successfully
           content:
             application/json:
               schema:
@@ -117,6 +147,8 @@ paths:
                         type: string
         '400':
           description: Validation error or duplicate email
+        '409':
+          description: Profile already exists
           content:
             application/json:
               schema:
@@ -216,6 +248,13 @@ components:
                     msg: "Email already registered"
 
 components:
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     ErrorResponse:
       type: object
@@ -253,3 +292,13 @@ components:
         dateOfBirth:
           type: string
           format: date-time
+    ResearcherProfileBody:
+      type: object
+      required:
+        - researcherType
+      discriminator:
+        propertyName: researcherType
+      properties:
+        researcherType:
+          type: string
+          enum: [student, professional, corporate]
