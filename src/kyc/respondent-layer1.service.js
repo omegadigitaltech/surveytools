@@ -29,7 +29,6 @@ function createRespondentLayer1Service({ respondentProfileRepo }) {
         ...data
       };
 
-      // Fallback for users who verified before the phone field was added
       if (!profileData.phoneNumber && data.phoneNumber) {
         profileData.phoneNumber = data.phoneNumber;
       }
