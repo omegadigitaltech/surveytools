@@ -13,12 +13,13 @@ const { createEmailOtpController } = require('./email-otp.controller');
 const router = express.Router();
 
 // Wire up the dependency graph
+// Support both standard SMTP_ vars and the team's EMAIL_ vars (like Gmail)
 const emailClient = createEmailClient({
-  host: process.env.SMTP_HOST || 'smtp.mailtrap.io',
-  port: parseInt(process.env.SMTP_PORT, 10) || 2525,
-  user: process.env.SMTP_USER || 'test-user',
-  pass: process.env.SMTP_PASS || 'test-pass',
-  from: process.env.SMTP_FROM || 'no-reply@omega.edu.ng',
+  host: process.env.SMTP_HOST || (process.env.EMAIL ? 'smtp.gmail.com' : 'smtp.mailtrap.io'),
+  port: parseInt(process.env.SMTP_PORT, 10) || (process.env.EMAIL ? 465 : 2525),
+  user: process.env.SMTP_USER || process.env.EMAIL_USER || process.env.EMAIL || 'test-user',
+  pass: process.env.SMTP_PASS || process.env.EMAIL_PASSWORD || 'test-pass',
+  from: process.env.SMTP_FROM || process.env.EMAIL || 'no-reply@omega.edu.ng',
 });
 
 const otpRepo = createEmailOtpRepo({ EmailOtp });
