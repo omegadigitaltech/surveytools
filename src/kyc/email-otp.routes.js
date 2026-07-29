@@ -2,6 +2,7 @@
 
 const express = require('express');
 const rateLimit = require('express-rate-limit');
+const { authMiddleware } = require('../../middleware/auth');
 
 const kycConfig = require('../../config/kyc-config');
 const { createEmailClient } = require('../../lib/email-client');
@@ -44,14 +45,14 @@ const verifyRateLimiter = rateLimit({
 
 /**
  * POST /v1/kyc/email-otp/request
- * Public — no auth required. Issues a 6-digit OTP to the .edu.ng email.
+ * Issues a 6-digit OTP to the .edu.ng email.
  */
-router.post('/email-otp/request', otpRateLimiter, requestOtp);
+router.post('/email-otp/request', authMiddleware, otpRateLimiter, requestOtp);
 
 /**
  * POST /v1/kyc/email-otp/verify
- * Public — no auth required. Verifies the OTP and marks it consumed.
+ * Verifies the OTP and updates the User's emailVerified status.
  */
-router.post('/email-otp/verify', verifyRateLimiter, verifyOtp);
+router.post('/email-otp/verify', authMiddleware, verifyRateLimiter, verifyOtp);
 
 module.exports = router;

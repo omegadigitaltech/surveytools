@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+const { authMiddleware } = require('../../middleware/auth');
 
 const kycConfig = require('../../config/kyc-config');
 const { createSmsClient } = require('../../lib/sms-client');
@@ -22,14 +23,14 @@ const { requestOtp, verifyOtp } = createPhoneOtpController({ phoneOtpService });
 
 /**
  * POST /v1/kyc/otp/request
- * Public — no auth required. Issues a 6-digit OTP to the phone number.
+ * Issues a 6-digit OTP to the phone number.
  */
-router.post('/otp/request', requestOtp);
+router.post('/otp/request', authMiddleware, requestOtp);
 
 /**
  * POST /v1/kyc/otp/verify
- * Public — no auth required. Verifies the OTP and marks it consumed.
+ * Verifies the OTP and updates the User's phoneVerified status.
  */
-router.post('/otp/verify', verifyOtp);
+router.post('/otp/verify', authMiddleware, verifyOtp);
 
 module.exports = router;

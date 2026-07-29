@@ -3,6 +3,7 @@
 const { AppError } = require('../../lib/app-error');
 const { createLogger } = require('../../lib/logger');
 const { requestOtpBody, verifyOtpBody } = require('./phone-otp.schema');
+const User = require('../../model/user');
 
 const log = createLogger('phone-otp-controller');
 
@@ -54,6 +55,12 @@ function createPhoneOtpController({ phoneOtpService }) {
 
     const { phone, code } = result.data;
     await phoneOtpService.verifyOtp(phone, code);
+
+    // Update the User document now that phone is verified
+    await User.findOneAndUpdate(
+      { id: req.userId }, 
+      { phoneVerified: true, phone: phone }
+    );
 
     res.status(200).json({
       status: 'success',
