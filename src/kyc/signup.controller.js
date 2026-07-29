@@ -14,7 +14,7 @@ function createSignupController({ signupService }) {
   async function register(req, res) {
     const result = signupBody.safeParse(req.body);
     if (!result.success) {
-      throw new AppError(400, result.error.errors[0].message);
+      throw new AppError(400, result.error.issues[0].message);
     }
 
     const { userId } = await signupService.register(result.data);

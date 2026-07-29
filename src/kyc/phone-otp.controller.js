@@ -26,7 +26,7 @@ function createPhoneOtpController({ phoneOtpService }) {
   async function requestOtp(req, res) {
     const result = requestOtpBody.safeParse(req.body);
     if (!result.success) {
-      throw new AppError(400, result.error.errors[0].message);
+      throw new AppError(400, result.error.issues[0].message);
     }
 
     const { phone } = result.data;
@@ -49,7 +49,7 @@ function createPhoneOtpController({ phoneOtpService }) {
   async function verifyOtp(req, res) {
     const result = verifyOtpBody.safeParse(req.body);
     if (!result.success) {
-      throw new AppError(400, result.error.errors[0].message);
+      throw new AppError(400, result.error.issues[0].message);
     }
 
     const { phone, code } = result.data;

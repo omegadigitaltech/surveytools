@@ -14,7 +14,7 @@ function createRespondentSensitiveLayersController({ service }) {
   async function submitLayer3(req, res, next) {
     try {
       const result = layer3Body.safeParse(req.body);
-      if (!result.success) throw new AppError(400, result.error.errors[0].message);
+      if (!result.success) throw new AppError(400, result.error.issues[0].message);
       logger.info({ action: 'submit_layer3' });
       await service.submitLayer3(req.userId, result.data);
       res.status(200).json({ status: 'success' });
@@ -24,7 +24,7 @@ function createRespondentSensitiveLayersController({ service }) {
   async function submitLayer4(req, res, next) {
     try {
       const result = layer4Body.safeParse(req.body);
-      if (!result.success) throw new AppError(400, result.error.errors[0].message);
+      if (!result.success) throw new AppError(400, result.error.issues[0].message);
       logger.info({ action: 'submit_layer4' });
       await service.submitLayer4(req.userId, result.data);
       res.status(200).json({ status: 'success' });
@@ -34,7 +34,7 @@ function createRespondentSensitiveLayersController({ service }) {
   async function submitLayer5(req, res, next) {
     try {
       const result = layer5Body.safeParse(req.body);
-      if (!result.success) throw new AppError(400, result.error.errors[0].message);
+      if (!result.success) throw new AppError(400, result.error.issues[0].message);
       logger.info({ action: 'submit_layer5' });
       await service.submitLayer5(req.userId, result.data);
       res.status(200).json({ status: 'success' });

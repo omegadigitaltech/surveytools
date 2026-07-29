@@ -12,7 +12,7 @@ function createRespondentLayer1Controller({ service }) {
     try {
       const result = layer1Body.safeParse(req.body);
       if (!result.success) {
-        throw new AppError(400, result.error.errors[0].message);
+        throw new AppError(400, result.error.issues[0].message);
       }
 
       const userId = req.userId;

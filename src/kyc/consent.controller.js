@@ -12,7 +12,7 @@ function createConsentController({ service }) {
   async function captureConsent(req, res, next) {
     try {
       const result = consentBody.safeParse(req.body);
-      if (!result.success) throw new AppError(400, result.error.errors[0].message);
+      if (!result.success) throw new AppError(400, result.error.issues[0].message);
       
       await service.captureInitialConsent(req.userId, result.data.scopes);
       logger.info({ action: 'capture_consent', userId: req.userId });
@@ -27,7 +27,7 @@ function createConsentController({ service }) {
         throw new AppError(400, 'Invalid scope');
       }
       const result = updateConsentBody.safeParse(req.body);
-      if (!result.success) throw new AppError(400, result.error.errors[0].message);
+      if (!result.success) throw new AppError(400, result.error.issues[0].message);
 
       await service.updateConsentScope(req.userId, scope, result.data.granted);
       logger.info({ action: 'update_consent', userId: req.userId, scope, granted: result.data.granted });

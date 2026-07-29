@@ -14,7 +14,7 @@ function createResearcherProfileController({ service }) {
   async function submitProfile(req, res) {
     const result = researcherProfileBody.safeParse(req.body);
     if (!result.success) {
-      throw new AppError(400, result.error.errors[0].message);
+      throw new AppError(400, result.error.issues[0].message);
     }
 
     const userId = req.userId;
