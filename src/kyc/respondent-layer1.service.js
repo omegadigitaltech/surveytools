@@ -11,7 +11,7 @@ const User = require('../../model/user');
 function createRespondentLayer1Service({ respondentProfileRepo }) {
   return {
     async submit(userId, data) {
-      const user = await User.findById(userId).select('phoneVerified');
+      const user = await User.findOne({ id: userId }).select('phoneVerified');
       if (!user) {
          throw new AppError(404, 'User not found');
       }
