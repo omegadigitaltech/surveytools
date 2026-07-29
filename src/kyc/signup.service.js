@@ -3,6 +3,7 @@
 const bcrypt = require('bcryptjs');
 const { AppError } = require('../../lib/app-error');
 const User = require('../../model/user');
+const { generateID_users } = require('../../middleware/helper');
 
 /**
  * @returns {{ register: (data: any) => Promise<{ userId: string }> }}
@@ -13,8 +14,10 @@ function createSignupService() {
     if (age < 18) throw new AppError(400, 'Must be 18 or older to register');
     
     const hashedPassword = await bcrypt.hash(data.password, 12);
+    const userIdStr = generateID_users(16);
     try {
       const user = await User.create({
+        id:          userIdStr,
         fullname:    `${data.firstName} ${data.lastName}`,
         email:       data.email,
         password:    hashedPassword,
@@ -26,7 +29,7 @@ function createSignupService() {
         faculty:     'unspecified',
         instituition: 'unspecified'
       });
-      return { userId: user._id };
+      return { userId: user.id };
     } catch (err) {
       if (err.code === 11000) throw new AppError(400, 'Email already registered');
       throw err;
