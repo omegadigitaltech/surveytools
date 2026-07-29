@@ -1,26 +1,15 @@
 openapi: 3.0.3
 info:
   title: SurveyTools KYC & Researcher Profile API
-  version: 0.1.0
+  version: 1.0.0
   description: >
     KYC and Researcher Profile endpoints for SurveyTools.
-    Initialized by BE-01; extended by BE-02 through BE-09.
+    Includes unified registration, progressive profiling (Layers 1-5), and OTP verification.
 
 servers:
   - url: "{{base_url}}"
     description: Configured base URL (set per environment in Postman)
 
-paths:
-  /v1/kyc/otp/request:
-    post:
-      summary: Issue a 6-digit OTP to a phone number
-      description: >
-        Generates a 6-digit OTP and sends it via SMS to the provided phone number.
-        Any previously active OTP for that number is invalidated before a new one
-        is issued. Public endpoint — no authentication required.
-      operationId: requestPhoneOtp
-  title: SurveyTools KYC API
-  version: 1.0.0
 paths:
   /v1/kyc/register:
     post:
@@ -30,72 +19,36 @@ paths:
         userType field. Age is strictly validated to be 18+.
       operationId: registerKycUser
       security: []
-  title: SurveyTools KYC API
-  version: 1.0.0
-paths:
-  /v1/kyc/respondent/layer2:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupBody'
+      responses:
+        '201':
+          description: User created successfully
+
+  /v1/kyc/otp/request:
     post:
-      summary: Submit respondent layer 2 profile
-      description: Submits the progressive Layer 2 profile. Requires Layer 1 to be complete and the user to be eligible (surveys threshold met).
-      operationId: submitRespondentLayer2
-      security:
-        - BearerAuth: []
+      summary: Issue a 6-digit OTP to a phone number
+      description: >
+        Generates a 6-digit OTP and sends it via SMS to the provided phone number.
+        Any previously active OTP for that number is invalidated before a new one
+        is issued. Public endpoint — no authentication required.
+      operationId: requestPhoneOtp
+      security: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RequestOtpBody'
-            example:
-              phone: "+2348012345678"
       responses:
         '200':
           description: OTP sent successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessResponse'
-              example:
-                status: success
-                msg: "OTP sent to your phone number"
-        '400':
-          description: Validation error (missing or malformed phone number)
-              $ref: '#/components/schemas/Layer2Body'
-      responses:
-        '200':
-          description: Layer 2 profile completed successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: "success"
-                  data:
-                    type: object
         '400':
           description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Layer 1 incomplete or not yet eligible
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Layer 2 already completed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                status: failure
-                code: 400
-                msg: "phone must be a valid E.164 number (e.g. +2348012345678)"
 
   /v1/kyc/otp/verify:
     post:
@@ -106,13 +59,58 @@ paths:
         cannot be replayed. Public endpoint — no authentication required.
       operationId: verifyPhoneOtp
       security: []
-  title: SurveyTools KYC API
-  version: 1.0.0
-paths:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOtpBody'
+      responses:
+        '200':
+          description: Phone number verified successfully
+        '400':
+          description: Invalid OTP
+
+  /v1/kyc/email-otp/request:
+    post:
+      summary: Issue a 6-digit OTP to a student email
+      description: Generates a 6-digit OTP and sends it via email to a .edu.ng address.
+      operationId: requestEmailOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEmailOtpBody'
+      responses:
+        '200':
+          description: OTP sent successfully
+        '400':
+          description: Validation error
+
+  /v1/kyc/email-otp/verify:
+    post:
+      summary: Verify an email OTP
+      description: Checks the submitted 6-digit code for the email.
+      operationId: verifyEmailOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailOtpBody'
+      responses:
+        '200':
+          description: Email verified successfully
+        '400':
+          description: Invalid OTP
+
   /v1/kyc/researcher/profile:
     post:
       summary: Submit researcher profile
-      description: Submits a student, professional, or corporate researcher profile. Type is immutable after first submission.
+      description: Submits a student, professional, or corporate researcher profile.
       operationId: submitResearcherProfile
       security:
         - BearerAuth: []
@@ -121,55 +119,44 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerifyOtpBody'
-            example:
-              phone: "+2348012345678"
-              code: "123456"
-      responses:
-        '200':
-          description: Phone number verified successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessResponse'
-              example:
-                status: success
-                msg: "Phone number verified successfully"
-        '400':
-          description: >
-            Validation error, no active OTP, OTP already used,
-            OTP expired, or invalid code
-              $ref: '#/components/schemas/SignupBody'
-            example:
-              firstName: "John"
-              lastName: "Doe"
-              email: "john@example.com"
-              password: "password123"
-              userType: "researcher"
-              dateOfBirth: "2000-01-01T00:00:00.000Z"
-      responses:
-        '201':
-          description: User created successfully
               $ref: '#/components/schemas/ResearcherProfileBody'
-            examples:
-              student:
-                summary: Student payload
-                value:
-                  researcherType: "student"
-                  institution: "XYZ University"
-                  faculty: "Science"
-                  department: "Computer Science"
-                  matricNumber: "12345"
-              professional:
-                summary: Professional payload
-                value:
-                  researcherType: "professional"
-                  jobTitle: "Developer"
-                  organization: "Tech Corp"
-                  industry: "IT"
       responses:
         '201':
           description: Profile created successfully
+
+  /v1/kyc/respondent/layer1:
+    post:
+      summary: Submit respondent layer 1 profile
+      description: Basic demographics and academic info.
+      operationId: submitRespondentLayer1
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Layer1Body'
+      responses:
+        '200':
+          description: Layer 1 profile completed successfully
+
+  /v1/kyc/respondent/layer2:
+    post:
+      summary: Submit respondent layer 2 profile
+      description: Submits the progressive Layer 2 profile.
+      operationId: submitRespondentLayer2
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Layer2Body'
+      responses:
+        '200':
+          description: Layer 2 profile completed successfully
 
   /v1/kyc/respondent/layer-status:
     get:
@@ -181,139 +168,6 @@ paths:
       responses:
         '200':
           description: Status retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: "success"
-                  data:
-                    type: object
-                    properties:
-                      userId:
-                        type: string
-        '400':
-          description: Validation error or duplicate email
-        '409':
-          description: Profile already exists
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                no_active_otp:
-                  summary: No active OTP for this number
-                  value:
-                    status: failure
-                    code: 400
-                    msg: "No active OTP for this number"
-                already_used:
-                  summary: OTP already consumed
-                  value:
-                    status: failure
-                    code: 400
-                    msg: "OTP already used"
-                expired:
-                  summary: OTP has expired
-                  value:
-                    status: failure
-                    code: 400
-                    msg: "OTP has expired"
-                invalid_code:
-                  summary: Wrong code submitted
-                  value:
-                    status: failure
-                    code: 400
-                    msg: "Invalid OTP"
-
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      description: JWT issued by the existing SurveyTools auth flow
-
-  schemas:
-    RequestOtpBody:
-      type: object
-      required:
-        - phone
-      properties:
-        phone:
-          type: string
-          description: E.164-format phone number
-          pattern: '^\+\d{7,15}$'
-          example: "+2348012345678"
-
-    VerifyOtpBody:
-      type: object
-      required:
-        - phone
-        - code
-      properties:
-        phone:
-          type: string
-          description: E.164-format phone number
-          pattern: '^\+\d{7,15}$'
-          example: "+2348012345678"
-        code:
-          type: string
-          description: 6-digit OTP received via SMS
-          pattern: '^\d{6}$'
-          example: "123456"
-
-    SuccessResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum: [success]
-        msg:
-          type: string
-
-    ErrorResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum: [failure]
-        code:
-          type: integer
-        msg:
-          type: string
-                age_gate:
-                  summary: Under 18
-                  value:
-                    status: failure
-                    code: 400
-                    msg: "Must be 18 or older to register"
-                duplicate_email:
-                  summary: Email already in use
-                  value:
-                    status: failure
-                    code: 400
-                    msg: "Email already registered"
-
-components:
-                      layer1Completed:
-                        type: boolean
-                      layer2Eligible:
-                        type: boolean
-                      layer2Completed:
-                        type: boolean
-
-  /v1/kyc/respondent/survey-completed:
-    post:
-      summary: Internal hook for survey completion
-      description: Increments surveys completed and checks layer eligibility.
-      operationId: hookSurveyCompleted
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: Hook executed successfully
 
 components:
   securitySchemes:
@@ -321,17 +175,9 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-  schemas:
-    ErrorResponse:
-      type: object
-      properties:
-        status:
-          type: string
-        code:
-          type: integer
-        msg:
-          type: string
+      description: JWT issued by the existing SurveyTools auth flow
 
+  schemas:
     SignupBody:
       type: object
       required:
@@ -342,70 +188,62 @@ components:
         - userType
         - dateOfBirth
       properties:
-        firstName:
+        firstName: { type: string }
+        lastName: { type: string }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+        userType: { type: string, enum: [researcher, respondent] }
+        dateOfBirth: { type: string, format: date-time }
+
+    RequestOtpBody:
+      type: object
+      required: [phone]
+      properties:
+        phone:
           type: string
-        lastName:
-          type: string
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          minLength: 8
-        userType:
-          type: string
-          enum: [researcher, respondent]
-        dateOfBirth:
-          type: string
-          format: date-time
+          pattern: '^\+\d{7,15}$'
+
+    VerifyOtpBody:
+      type: object
+      required: [phone, code]
+      properties:
+        phone: { type: string, pattern: '^\+\d{7,15}$' }
+        code: { type: string, pattern: '^\d{6}$' }
+
+    RequestEmailOtpBody:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string, format: email }
+
+    VerifyEmailOtpBody:
+      type: object
+      required: [email, code]
+      properties:
+        email: { type: string, format: email }
+        code: { type: string, pattern: '^\d{6}$' }
+
     ResearcherProfileBody:
       type: object
-      required:
-        - researcherType
-      discriminator:
-        propertyName: researcherType
+      required: [researcherType]
       properties:
-        researcherType:
-          type: string
-          enum: [student, professional, corporate]
+        researcherType: { type: string, enum: [student, professional, corporate] }
+        # Extra fields conditionally validated
+
+    Layer1Body:
+      type: object
+      required: [dateOfBirth, gender, stateOfResidence, lgaOfResidence, isStudent]
+      properties:
+        dateOfBirth: { type: string, format: date-time }
+        gender: { type: string }
+        stateOfResidence: { type: string }
+        lgaOfResidence: { type: string }
+        isStudent: { type: boolean }
+
     Layer2Body:
       type: object
-      required:
-        - educationLevel
-        - employmentStatus
-        - incomeRange
-        - maritalStatus
       properties:
-        educationLevel:
-          type: string
-          enum: [no_formal, primary, secondary, diploma, undergraduate, postgraduate]
-        employmentStatus:
-          type: string
-          enum: [employed, self_employed, unemployed, student, retired]
-        incomeRange:
-          type: string
-          enum: [below_50k, 50k_150k, 150k_300k, 300k_500k, above_500k]
-        maritalStatus:
-          type: string
-          enum: [single, married, divorced, widowed, prefer_not_to_say]
-servers:
-  - url: "{{base_url}}"
-paths:
-  /v1/kyc/consent:
-    post:
-      summary: Capture initial consent scopes
-      operationId: captureConsent
-      security: [{BearerAuth: []}]
-      responses: { '200': { description: 'Success' } }
-  /v1/kyc/consent/{scope}:
-    patch:
-      summary: Update consent for a specific scope
-      operationId: updateConsent
-      security: [{BearerAuth: []}]
-      responses: { '200': { description: 'Success' } }
-  /v1/kyc/me:
-    delete:
-      summary: Right-to-erasure (wipe KYC PII)
-      operationId: eraseKycData
-      security: [{BearerAuth: []}]
-      responses: { '200': { description: 'Success' } }
+        educationLevel: { type: string }
+        employmentStatus: { type: string }
+        incomeRange: { type: string }
+        maritalStatus: { type: string }

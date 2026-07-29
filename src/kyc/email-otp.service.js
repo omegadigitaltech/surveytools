@@ -1,8 +1,9 @@
 'use strict';
 
+const crypto = require('crypto');
 const { AppError } = require('../../lib/app-error');
 const { createLogger } = require('../../lib/logger');
-const crypto = require('crypto');
+
 
 const log = createLogger('email-otp');
 
