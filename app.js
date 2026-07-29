@@ -25,6 +25,7 @@ const gamificationRouter = require('./routes/gamification');
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const uploadErrorHandler = require('./middleware/errorHandler')
 const notFoundMiddleware = require('./middleware/not-found');
+const respondentLayer1Routes = require('./src/kyc/respondent-layer1.routes');
 const respondentLayer2Routes = require('./src/kyc/respondent-layer2.routes');
 const respondentSensitiveLayersRoutes = require('./src/kyc/respondent-sensitive-layers.routes');
 const consentRoutes = require('./src/kyc/consent.routes');
@@ -146,6 +147,7 @@ app.use('/', authRouter)
 app.use('/', redemptionRouter)
 const marketplaceRouter = require('./routes/marketplace');
 const visualizationRouter = require('./routes/visualization');
+app.use('/v1/kyc', respondentLayer1Routes);
 app.use('/v1/kyc', respondentLayer2Routes);
 app.use('/v1/kyc', respondentSensitiveLayersRoutes);
 app.use('/v1/kyc', consentRoutes);
