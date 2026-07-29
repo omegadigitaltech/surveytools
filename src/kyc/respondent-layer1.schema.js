@@ -12,6 +12,7 @@ const layer1Body = z.object({
   stateOfResidence: z.string().min(1),
   lgaOfResidence:   z.string().min(1),
   isStudent:        z.boolean(),
+  phoneNumber:      z.string().optional(),
   // conditional student fields handled dynamically or validated at service layer
   academicLevel:    z.string().optional(),
   levelOfStudy:     z.string().optional(),

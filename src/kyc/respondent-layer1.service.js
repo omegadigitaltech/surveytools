@@ -11,7 +11,7 @@ const User = require('../../model/user');
 function createRespondentLayer1Service({ respondentProfileRepo }) {
   return {
     async submit(userId, data) {
-      const user = await User.findOne({ id: userId }).select('phoneVerified');
+      const user = await User.findOne({ id: userId }).select('phoneVerified phone');
       if (!user) {
          throw new AppError(404, 'User not found');
       }
@@ -23,7 +23,18 @@ function createRespondentLayer1Service({ respondentProfileRepo }) {
       const existing = await respondentProfileRepo.findByUserId(userId);
       if (existing) throw new AppError(409, 'Layer 1 profile already submitted');
 
-      return respondentProfileRepo.create({ userId, ...data });
+      const profileData = {
+        userId,
+        phoneNumber: user.phone,
+        ...data
+      };
+
+      // Fallback for users who verified before the phone field was added
+      if (!profileData.phoneNumber && data.phoneNumber) {
+        profileData.phoneNumber = data.phoneNumber;
+      }
+
+      return respondentProfileRepo.create(profileData);
     },
   };
 }

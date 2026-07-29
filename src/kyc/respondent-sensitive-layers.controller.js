@@ -4,7 +4,8 @@ const { AppError } = require('../../lib/app-error');
 const { layer3Body } = require('./respondent-layer3.schema');
 const { layer4Body } = require('./respondent-layer4.schema');
 const { layer5Body } = require('./respondent-layer5.schema');
-const logger = require('../../lib/logger');
+const { createLogger } = require('../../lib/logger');
+const logger = createLogger('respondent-sensitive-layers');
 
 /**
  * @param {{ service: object }} dependencies

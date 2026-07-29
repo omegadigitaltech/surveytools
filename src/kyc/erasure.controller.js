@@ -1,5 +1,6 @@
 'use strict';
-const logger = require('../../lib/logger');
+const { createLogger } = require('../../lib/logger');
+const logger = createLogger('erasure');
 
 /**
  * @param {{ erasureService: object }} dependencies

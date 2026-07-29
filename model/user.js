@@ -94,7 +94,8 @@ const UserSchema = new Schema(
     kycStatus:     { type: String, enum: ['none', 'pending', 'verified', 'erased'], default: 'none' },
     userType:      { type: String, enum: ['researcher', 'respondent'], default: null },
     dateOfBirth:   { type: Date, default: null },
-    phoneVerified: { type: Boolean, default: false }
+    phoneVerified: { type: Boolean, default: false },
+    phone:         { type: String }
   },
   { timestamps: true }
 );

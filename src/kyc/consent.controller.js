@@ -1,7 +1,8 @@
 'use strict';
 const { AppError } = require('../../lib/app-error');
 const { consentBody, updateConsentBody } = require('./consent.schema');
-const logger = require('../../lib/logger');
+const { createLogger } = require('../../lib/logger');
+const logger = createLogger('consent');
 const { CONSENT_SCOPES } = require('./consent.model');
 
 /**

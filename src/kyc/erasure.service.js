@@ -13,7 +13,7 @@ function createErasureService() {
       await RespondentProfile.deleteOne({ userId });
 
       // 2. Anonymize User — do NOT hard-delete (gamification + transaction records reference it)
-      await User.findByIdAndUpdate(userId, {
+      await User.findOneAndUpdate({ id: userId }, {
         firstName: '[deleted]',
         lastName:  '[deleted]',
         email:     `deleted-${userId}@surveytools.invalid`,

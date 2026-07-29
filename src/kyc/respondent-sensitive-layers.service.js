@@ -16,13 +16,13 @@ function createRespondentSensitiveLayersService({ respondentProfileRepo }) {
       throw new AppError(403, 'Layer 2 must be completed first');
     }
 
-    if (currentLayer === 3 && profile.layer3Completed || profile.layer3) {
+    if (currentLayer === 3 && (profile.layer3Completed || profile.layer3)) {
       throw new AppError(409, 'Layer 3 already completed');
     }
-    if (currentLayer === 4 && profile.layer4Completed || profile.layer4) {
+    if (currentLayer === 4 && (profile.layer4Completed || profile.layer4)) {
       throw new AppError(409, 'Layer 4 already completed');
     }
-    if (currentLayer === 5 && profile.layer5Completed || profile.layer5) {
+    if (currentLayer === 5 && (profile.layer5Completed || profile.layer5)) {
       throw new AppError(409, 'Layer 5 already completed');
     }
   }
