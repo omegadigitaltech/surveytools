@@ -388,3 +388,24 @@ components:
         maritalStatus:
           type: string
           enum: [single, married, divorced, widowed, prefer_not_to_say]
+servers:
+  - url: "{{base_url}}"
+paths:
+  /v1/kyc/consent:
+    post:
+      summary: Capture initial consent scopes
+      operationId: captureConsent
+      security: [{BearerAuth: []}]
+      responses: { '200': { description: 'Success' } }
+  /v1/kyc/consent/{scope}:
+    patch:
+      summary: Update consent for a specific scope
+      operationId: updateConsent
+      security: [{BearerAuth: []}]
+      responses: { '200': { description: 'Success' } }
+  /v1/kyc/me:
+    delete:
+      summary: Right-to-erasure (wipe KYC PII)
+      operationId: eraseKycData
+      security: [{BearerAuth: []}]
+      responses: { '200': { description: 'Success' } }
