@@ -31,6 +31,7 @@ const consentRoutes = require('./src/kyc/consent.routes');
 const { loadTelecomCatalog } = require("./services/telecom/catalogCache");
 const { syncTelecomCatalog } = require("./services/flutterwave/syncCatalog");
 const phoneOtpRoutes = require('./src/kyc/phone-otp.routes');
+const emailOtpRoutes = require('./src/kyc/email-otp.routes');
 const signupRoutes = require('./src/kyc/signup.routes');
 const researcherProfileRoutes = require('./src/kyc/researcher-profile.routes');
 
@@ -163,6 +164,8 @@ app.use('/', analyticsRouter);
 // KYC routes — additive, never modifies existing routes
 app.use('/v1/kyc', phoneOtpRoutes);
 
+// Email OTP
+app.use('/v1/kyc', emailOtpRoutes);
 // Use the new error handler for file uploads
 // app.use(uploadErrorHandler);
 // Use the original error handler for other errors
