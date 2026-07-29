@@ -31,7 +31,7 @@ describe('createSignupService', () => {
   };
 
   it('valid payload creates User, returns 201 with userId', async () => {
-    User.create.mockResolvedValue({ _id: 'user_123' });
+    User.create.mockResolvedValue({ id: 'user_123', _id: 'user_123' });
     const payload = getValidPayload();
 
     const result = await service.register(payload);

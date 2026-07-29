@@ -24,9 +24,15 @@ describe('Respondent KYC Layer 1', () => {
       const payload = {
         dateOfBirth: new Date('1990-01-01').toISOString(),
         gender: 'female',
+        stateOfOrigin: 'Oyo',
         stateOfResidence: 'Lagos',
         lgaOfResidence: 'Ikeja',
         isStudent: true,
+        academicLevel: 'BSc',
+        levelOfStudy: '400',
+        institution: 'XYZ',
+        faculty: 'Sci',
+        department: 'CS',
       };
       const result = layer1Body.safeParse(payload);
       expect(result.success).toBe(true);
@@ -43,11 +49,11 @@ describe('Respondent KYC Layer 1', () => {
         create: jest.fn(),
       };
       service = createRespondentLayer1Service({ respondentProfileRepo: repoMock });
-      User.findById.mockReset();
+      User.findOne.mockReset();
     });
 
     it('Valid payload creates RespondentProfile', async () => {
-      User.findById.mockReturnValue({
+      User.findOne.mockReturnValue({
         select: jest.fn().mockResolvedValue({ phoneVerified: true }),
       });
       repoMock.findByUserId.mockResolvedValue(null);
@@ -64,7 +70,7 @@ describe('Respondent KYC Layer 1', () => {
     });
 
     it('Unverified phone returns AppError(400)', async () => {
-      User.findById.mockReturnValue({
+      User.findOne.mockReturnValue({
         select: jest.fn().mockResolvedValue({ phoneVerified: false }),
       });
 
@@ -74,8 +80,8 @@ describe('Respondent KYC Layer 1', () => {
       });
     });
 
-    it('Age < 18 returns AppError(400)', async () => {
-      User.findById.mockReturnValue({
+    it('Age < 16 returns AppError(400)', async () => {
+      User.findOne.mockReturnValue({
         select: jest.fn().mockResolvedValue({ phoneVerified: true }),
       });
 
@@ -84,12 +90,12 @@ describe('Respondent KYC Layer 1', () => {
 
       await expect(service.submit('u1', payload)).rejects.toMatchObject({
         status: 400,
-        message: 'Must be 18 or older',
+        message: 'Must be at least 16 years old to participate',
       });
     });
 
     it('Duplicate submission returns AppError(409)', async () => {
-      User.findById.mockReturnValue({
+      User.findOne.mockReturnValue({
         select: jest.fn().mockResolvedValue({ phoneVerified: true }),
       });
       repoMock.findByUserId.mockResolvedValue({ id: 'existing' });

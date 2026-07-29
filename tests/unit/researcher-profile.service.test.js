@@ -14,10 +14,13 @@ describe('Researcher Profile KYC', () => {
     it('Student payload validated correctly', () => {
       const payload = {
         researcherType: 'student',
+        academicStatus: 'Undergrad',
         institution: 'XYZ University',
+        studentEmail: 'test@student.com',
         faculty: 'Science',
         department: 'CS',
-        matricNumber: '12345',
+        level: '400',
+        matriculationNumber: '12345',
       };
       const result = researcherProfileBody.safeParse(payload);
       expect(result.success).toBe(true);
@@ -26,9 +29,18 @@ describe('Researcher Profile KYC', () => {
     it('Corporate payload validated correctly', () => {
       const payload = {
         researcherType: 'corporate',
-        companyName: 'Omega Digital',
-        rcNumber: 'RC123456',
+        orgName: 'Omega Digital',
+        orgType: 'Agency',
         industry: 'Tech',
+        orgEmail: 'test@org.com',
+        orgPhone: '123456',
+        contactName: 'John',
+        contactRole: 'Manager',
+        stateOfOperation: 'Lagos',
+        billingAddress: '123 Main St',
+        researchPurpose: 'Market',
+        expectedMonthlySurveys: '10',
+        rcNumber: 'RC123456',
       };
       const result = researcherProfileBody.safeParse(payload);
       expect(result.success).toBe(true);
@@ -51,10 +63,13 @@ describe('Researcher Profile KYC', () => {
       repoMock.findByUserId.mockResolvedValue(null);
       const payload = {
         researcherType: 'student',
+        academicStatus: 'Undergrad',
         institution: 'XYZ',
+        studentEmail: 'test@student.com',
         faculty: 'Sci',
         department: 'CS',
-        matricNumber: '123',
+        level: '400',
+        matriculationNumber: '123',
       };
       repoMock.create.mockResolvedValue({ id: 'doc123', ...payload });
 

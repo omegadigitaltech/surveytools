@@ -14,7 +14,7 @@ describe('Erasure Service', () => {
   
   beforeEach(() => {
     service = createErasureService();
-    User.findByIdAndUpdate.mockClear();
+    User.findOneAndUpdate.mockClear();
     ResearcherProfile.deleteOne.mockClear();
     RespondentProfile.deleteOne.mockClear();
   });
@@ -27,7 +27,7 @@ describe('Erasure Service', () => {
 
   it('Erasure anonymizes User — does NOT hard-delete the document', async () => {
     await service.erase('u1');
-    expect(User.findByIdAndUpdate).toHaveBeenCalledWith('u1', {
+    expect(User.findOneAndUpdate).toHaveBeenCalledWith({ id: 'u1' }, {
       firstName: '[deleted]',
       lastName:  '[deleted]',
       email:     'deleted-u1@surveytools.invalid',
