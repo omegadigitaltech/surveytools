@@ -30,6 +30,16 @@ paths:
         userType field. Age is strictly validated to be 18+.
       operationId: registerKycUser
       security: []
+  title: SurveyTools KYC API
+  version: 1.0.0
+paths:
+  /v1/kyc/respondent/layer2:
+    post:
+      summary: Submit respondent layer 2 profile
+      description: Submits the progressive Layer 2 profile. Requires Layer 1 to be complete and the user to be eligible (surveys threshold met).
+      operationId: submitRespondentLayer2
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -50,6 +60,34 @@ paths:
                 msg: "OTP sent to your phone number"
         '400':
           description: Validation error (missing or malformed phone number)
+              $ref: '#/components/schemas/Layer2Body'
+      responses:
+        '200':
+          description: Layer 2 profile completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  data:
+                    type: object
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Layer 1 incomplete or not yet eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Layer 2 already completed
           content:
             application/json:
               schema:
@@ -132,6 +170,17 @@ paths:
       responses:
         '201':
           description: Profile created successfully
+
+  /v1/kyc/respondent/layer-status:
+    get:
+      summary: Get layer completion status
+      description: Returns the completion state and trigger status for KYC layers.
+      operationId: getLayerStatus
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Status retrieved successfully
           content:
             application/json:
               schema:
@@ -248,6 +297,23 @@ components:
                     msg: "Email already registered"
 
 components:
+                      layer1Completed:
+                        type: boolean
+                      layer2Eligible:
+                        type: boolean
+                      layer2Completed:
+                        type: boolean
+
+  /v1/kyc/respondent/survey-completed:
+    post:
+      summary: Internal hook for survey completion
+      description: Increments surveys completed and checks layer eligibility.
+      operationId: hookSurveyCompleted
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Hook executed successfully
 
 components:
   securitySchemes:
@@ -302,3 +368,23 @@ components:
         researcherType:
           type: string
           enum: [student, professional, corporate]
+    Layer2Body:
+      type: object
+      required:
+        - educationLevel
+        - employmentStatus
+        - incomeRange
+        - maritalStatus
+      properties:
+        educationLevel:
+          type: string
+          enum: [no_formal, primary, secondary, diploma, undergraduate, postgraduate]
+        employmentStatus:
+          type: string
+          enum: [employed, self_employed, unemployed, student, retired]
+        incomeRange:
+          type: string
+          enum: [below_50k, 50k_150k, 150k_300k, 300k_500k, above_500k]
+        maritalStatus:
+          type: string
+          enum: [single, married, divorced, widowed, prefer_not_to_say]
