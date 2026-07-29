@@ -25,7 +25,7 @@ function createPhoneOtpService({ smsClient, otpRepo, kycConfig }) {
   async function requestOtp(phone) {
     await otpRepo.invalidatePrevious(phone);
 
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const code = require('crypto').randomInt(100000, 1000000).toString();
     const expiresAt = new Date(Date.now() + kycConfig.otpExpiryMs);
 
     await otpRepo.create({ phone, code, expiresAt });
