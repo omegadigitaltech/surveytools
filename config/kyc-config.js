@@ -19,12 +19,7 @@ module.exports = Object.freeze({
 
   /** OTP validity in milliseconds — used by the service to set expiresAt */
   otpExpiryMs: OTP_EXPIRY_MINUTES * 60 * 1000,
-const OTP_EXPIRY_MINUTES = Number(process.env.OTP_EXPIRY_MINUTES || 10);
 
-module.exports = Object.freeze({
-  smsProviderApiKey: process.env.SMS_PROVIDER_API_KEY || '',
-  smsProviderBaseUrl: process.env.SMS_PROVIDER_BASE_URL || '',
-  otpExpiryMinutes: OTP_EXPIRY_MINUTES,
-  otpExpiryMs: OTP_EXPIRY_MINUTES * 60 * 1000,
+  /** Survey-completion count that triggers progressive profiling Layer 2 */
   kycLayer2SurveyThreshold: Number(process.env.KYC_LAYER2_SURVEY_THRESHOLD || 5),
 });
