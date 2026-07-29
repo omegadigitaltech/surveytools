@@ -13,7 +13,7 @@ const CONSENT_SCOPES = Object.freeze([
 ]);
 
 const consentRecordSchema = new mongoose.Schema({
-  userId:    { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  userId:    { type: String, ref: 'User', required: true, index: true },
   scope:     { type: String, enum: CONSENT_SCOPES, required: true },
   granted:   { type: Boolean, required: true },
   grantedAt: { type: Date },

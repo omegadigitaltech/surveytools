@@ -9,7 +9,7 @@ const encryptedFieldSchema = new mongoose.Schema({
 }, { _id: false });
 
 const respondentProfileSchema = new mongoose.Schema({
-  userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true, index: true },
+  userId:           { type: String, ref: 'User', required: true, unique: true, index: true },
   phoneNumber:      { type: String, required: true },
   dateOfBirth:      { type: Date, required: true },
   gender:           { type: String, enum: ['male', 'female', 'non-binary', 'prefer-not-to-say'], required: true },

@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 
 const researcherProfileSchema = new mongoose.Schema({
-  userId:         { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true, index: true },
+  userId:         { type: String, ref: 'User', required: true, unique: true, index: true },
   researcherType: { type: String, enum: ['student', 'professional', 'corporate'], required: true },
   // student fields
   academicStatus: String, institution: String, studentEmail: String, faculty: String, department: String, level: String, matriculationNumber: String, researchTopic: String,
