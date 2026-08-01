@@ -61,6 +61,7 @@ import MissionsPage from "./pages/missions/missions";
 import Help from "./pages/help/help";
 import Admin from "./pages/admin/Admin";
 import PersonalInformation from "./pages/register/PersonalInfo.jsx";
+import AcaAndProf from "./pages/register/AcaAndProf.jsx";
 
 const RootLayout = () => {
   const { pathname } = useLocation();
@@ -117,6 +118,7 @@ const router = createBrowserRouter(
       <Route element={<AuthLayout />}>
       <Route path="register" element={<Register />} />
       <Route path="register/personalinfo" element={<PersonalInformation />} />
+      <Route path="register/academicprofile" element={<AcaAndProf />} />
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />
         

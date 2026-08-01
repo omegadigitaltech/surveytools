@@ -4,16 +4,16 @@ import ProgressTracker from "./components/ProgressTracker";
 import Card from "./components/Card";
 
 
-export default function PersonalInformation() {
+export default function AcaAndProf() {
   const [gender, setGender] = useState("");
-  const step = 1;
+  const step = 2;
   const totalSteps = 6;
 
   return (
     <div className= "flex flex-col items-stretch justify-center ">
     <div className="personal-info inline-flex min-h-screen flex-col items-stretch justify-center">
       <ProgressTracker step={step} totalSteps={totalSteps} />
-      <Card title={"Personal Information"} description={"Tell us a little about yourself"}>
+      <Card title={"Academic & Professional Profile"} description={"Help us understand your background."}>
         <form className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
             <Field label="First Name" required>
@@ -124,3 +124,4 @@ function RadioOption({ name, value, label, checked, onChange }) {
     </label>
   );
 }
+

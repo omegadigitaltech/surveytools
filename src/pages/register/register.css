@@ -6,6 +6,15 @@
          focus:border-transparent transition-shadow;
 }
 
+.personal-info label {
+}
+.personal-info label>span {
+  @apply border-none px-2 py-0 bg-none bg-transparent;
+}
+
+.chevron-continue {
+  @apply border-none;
+}
 
 @media(max-width: 450px){
     
