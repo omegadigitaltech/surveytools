@@ -7,7 +7,7 @@ import config from "../../config/config";
 const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
-  const { token } = useAuthStore();
+  const { authToken } = useAuthStore();
   const [activeTab, setActiveTab] = useState("missions");
 
   // Basic password protection
@@ -85,9 +85,9 @@ const Admin = () => {
         </div>
 
         <div className="bg-white p-6 rounded shadow">
-          {activeTab === "missions" && <CreateMissionForm token={token} />}
-          {activeTab === "levels" && <CreateLevelForm token={token} />}
-          {activeTab === "marketplace" && <CreateListingForm token={token} />}
+          {activeTab === "missions" && <CreateMissionForm token={authToken} />}
+          {activeTab === "levels" && <CreateLevelForm token={authToken} />}
+          {activeTab === "marketplace" && <CreateListingForm token={authToken} />}
         </div>
       </div>
     </div>
