@@ -1,0 +1,21 @@
+@reference "tailwindcss";
+
+.register .input {
+  @apply w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900
+         placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500
+         focus:border-transparent transition-shadow;
+}
+
+.personal-info label {
+}
+.personal-info label>span {
+  @apply border-none px-2 py-0 bg-none bg-transparent;
+}
+
+.chevron-continue {
+  @apply border-none;
+}
+
+@media(max-width: 450px){
+    
+}

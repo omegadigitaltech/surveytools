@@ -21,7 +21,7 @@ import Logout from "./components/logout/logout";
 import setupAuthInterceptor from "./utils/setupAuthInterceptor";
 
 import Home from "./pages/home/home";
-import SignUpType from "./pages/signuptype/signuptype.jsx"
+import Register from "./pages/register/register.jsx"
 import SignIn from "./pages/signin/signin";
 import SignUp from "./pages/signup/signup";
 import ProfessionalSignUp from "./pages/professionalsignup/professionalsignup.jsx"
@@ -60,6 +60,9 @@ import Rewards from "./pages/rewards/rewards";
 import MissionsPage from "./pages/missions/missions";
 import Help from "./pages/help/help";
 import Admin from "./pages/admin/Admin";
+import PersonalInformation from "./pages/register/PersonalInfo.jsx";
+import AcaAndProf from "./pages/register/AcaAndProf.jsx";
+import HealthLifestyle from "./pages/register/HealthLifestyle.jsx";
 
 const RootLayout = () => {
   const { pathname } = useLocation();
@@ -114,9 +117,13 @@ const router = createBrowserRouter(
         </Route>
       </Route>
       <Route element={<AuthLayout />}>
-      <Route path="signup-type" element={<SignUpType />} />
+      <Route path="register" element={<Register />} />
+      <Route path="register/personalinfo" element={<PersonalInformation />} />
+      <Route path="register/academicprofile" element={<AcaAndProf />} />
+      <Route path="register/healthlifestyle" element={<HealthLifestyle />} />
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />
+        
         <Route path="professional-signup" element={<ProfessionalSignUp />}  />
         <Route path="verify" element={<Verify />} action={verifyAction} />
         <Route path="forgotpassword" element={<ForgotPw />} />
