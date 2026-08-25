@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import useAuthStore from "../../store/useAuthStore";
 import config from "../../config/config";
+// Corrected AuthToken
 
 const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
