@@ -88,7 +88,14 @@ const UserSchema = new Schema(
           message: 'Invalid push notification type'
         }
       }
-    } // set permission from users
+    }, // set permission from users
+    
+    // Additive KYC fields (BE-02)
+    kycStatus:     { type: String, enum: ['none', 'pending', 'verified', 'erased'], default: 'none' },
+    userType:      { type: String, enum: ['researcher', 'respondent'], default: null },
+    dateOfBirth:   { type: Date, default: null },
+    phoneVerified: { type: Boolean, default: false },
+    phone:         { type: String }
   },
   { timestamps: true }
 );

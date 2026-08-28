@@ -55,13 +55,13 @@ async function sendNotification(email, owner, text, title) {
     html: htmlContent,
   };
 
-  const transport = await transporter.sendMail(mailOptions, (error) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Email sent");
-    }
-  });
+  let transport;
+  try {
+    transport = await transporter.sendMail(mailOptions);
+    console.log("Email sent");
+  } catch (error) {
+    console.error("Nodemailer EAUTH or connection error silently caught:", error.message);
+  }
 
   return { transport: transport };
 }

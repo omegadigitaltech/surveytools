@@ -25,8 +25,16 @@ const gamificationRouter = require('./routes/gamification');
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const uploadErrorHandler = require('./middleware/errorHandler')
 const notFoundMiddleware = require('./middleware/not-found');
+const respondentLayer1Routes = require('./src/kyc/respondent-layer1.routes');
+const respondentLayer2Routes = require('./src/kyc/respondent-layer2.routes');
+const respondentSensitiveLayersRoutes = require('./src/kyc/respondent-sensitive-layers.routes');
+const consentRoutes = require('./src/kyc/consent.routes');
 const { loadTelecomCatalog } = require("./services/telecom/catalogCache");
 const { syncTelecomCatalog } = require("./services/flutterwave/syncCatalog");
+const phoneOtpRoutes = require('./src/kyc/phone-otp.routes');
+const emailOtpRoutes = require('./src/kyc/email-otp.routes');
+const signupRoutes = require('./src/kyc/signup.routes');
+const researcherProfileRoutes = require('./src/kyc/researcher-profile.routes');
 
 const app = express();
 require('./middleware/passport');
@@ -139,7 +147,14 @@ app.use('/', authRouter)
 app.use('/', redemptionRouter)
 const marketplaceRouter = require('./routes/marketplace');
 const visualizationRouter = require('./routes/visualization');
+app.use('/v1/kyc', respondentLayer1Routes);
+app.use('/v1/kyc', respondentLayer2Routes);
+app.use('/v1/kyc', respondentSensitiveLayersRoutes);
+app.use('/v1/kyc', consentRoutes);
 const analyticsRouter = require('./routes/analytics');
+
+app.use('/v1/kyc', signupRoutes);
+app.use('/v1/kyc', researcherProfileRoutes);
 
 app.use('/', adminRouter);
 app.use('/', gamificationRouter);
@@ -148,6 +163,11 @@ app.use('/', visualizationRouter);
 app.use('/', analyticsRouter);
 
 
+// KYC routes — additive, never modifies existing routes
+app.use('/v1/kyc', phoneOtpRoutes);
+
+// Email OTP
+app.use('/v1/kyc', emailOtpRoutes);
 // Use the new error handler for file uploads
 // app.use(uploadErrorHandler);
 // Use the original error handler for other errors

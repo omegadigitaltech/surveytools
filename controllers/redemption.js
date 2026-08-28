@@ -252,6 +252,12 @@ async function redeemTelecom({
 
 // Controller wrappers (keep separate routes if you want)
 const redeemAirtime = async (req, res) => {
+  const { AppError } = require('../lib/app-error');
+  const user = await User.findOne({ id: req.userId }).select('phoneVerified');
+  if (!user || !user.phoneVerified) {
+    throw new AppError(403, 'Phone verification required before redemption');
+  }
+
   await req.startTransaction();
   try {
     const result = await redeemTelecom({
@@ -277,6 +283,12 @@ const redeemAirtime = async (req, res) => {
 };
 
 const redeemData = async (req, res) => {
+  const { AppError } = require('../lib/app-error');
+  const user = await User.findOne({ id: req.userId }).select('phoneVerified');
+  if (!user || !user.phoneVerified) {
+    throw new AppError(403, 'Phone verification required before redemption');
+  }
+
   await req.startTransaction();
   try {
     const result = await redeemTelecom({

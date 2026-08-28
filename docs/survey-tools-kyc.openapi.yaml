@@ -1,0 +1,249 @@
+openapi: 3.0.3
+info:
+  title: SurveyTools KYC & Researcher Profile API
+  version: 1.0.0
+  description: >
+    KYC and Researcher Profile endpoints for SurveyTools.
+    Includes unified registration, progressive profiling (Layers 1-5), and OTP verification.
+
+servers:
+  - url: "{{base_url}}"
+    description: Configured base URL (set per environment in Postman)
+
+paths:
+  /v1/kyc/register:
+    post:
+      summary: Unified registration for researchers and respondents
+      description: >
+        Creates a new User account, branching downstream profiles via the
+        userType field. Age is strictly validated to be 18+.
+      operationId: registerKycUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupBody'
+      responses:
+        '201':
+          description: User created successfully
+
+  /v1/kyc/otp/request:
+    post:
+      summary: Issue a 6-digit OTP to a phone number
+      description: >
+        Generates a 6-digit OTP and sends it via SMS to the provided phone number.
+        Any previously active OTP for that number is invalidated before a new one
+        is issued. Public endpoint — no authentication required.
+      operationId: requestPhoneOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestOtpBody'
+      responses:
+        '200':
+          description: OTP sent successfully
+        '400':
+          description: Validation error
+
+  /v1/kyc/otp/verify:
+    post:
+      summary: Verify a phone OTP
+      description: >
+        Checks the submitted 6-digit code against the most recent active OTP
+        for the given phone number. Marks the OTP consumed on success so it
+        cannot be replayed. Public endpoint — no authentication required.
+      operationId: verifyPhoneOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOtpBody'
+      responses:
+        '200':
+          description: Phone number verified successfully
+        '400':
+          description: Invalid OTP
+
+  /v1/kyc/email-otp/request:
+    post:
+      summary: Issue a 6-digit OTP to a student email
+      description: Generates a 6-digit OTP and sends it via email to a .edu.ng address.
+      operationId: requestEmailOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEmailOtpBody'
+      responses:
+        '200':
+          description: OTP sent successfully
+        '400':
+          description: Validation error
+
+  /v1/kyc/email-otp/verify:
+    post:
+      summary: Verify an email OTP
+      description: Checks the submitted 6-digit code for the email.
+      operationId: verifyEmailOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailOtpBody'
+      responses:
+        '200':
+          description: Email verified successfully
+        '400':
+          description: Invalid OTP
+
+  /v1/kyc/researcher/profile:
+    post:
+      summary: Submit researcher profile
+      description: Submits a student, professional, or corporate researcher profile.
+      operationId: submitResearcherProfile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResearcherProfileBody'
+      responses:
+        '201':
+          description: Profile created successfully
+
+  /v1/kyc/respondent/layer1:
+    post:
+      summary: Submit respondent layer 1 profile
+      description: Basic demographics and academic info.
+      operationId: submitRespondentLayer1
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Layer1Body'
+      responses:
+        '200':
+          description: Layer 1 profile completed successfully
+
+  /v1/kyc/respondent/layer2:
+    post:
+      summary: Submit respondent layer 2 profile
+      description: Submits the progressive Layer 2 profile.
+      operationId: submitRespondentLayer2
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Layer2Body'
+      responses:
+        '200':
+          description: Layer 2 profile completed successfully
+
+  /v1/kyc/respondent/layer-status:
+    get:
+      summary: Get layer completion status
+      description: Returns the completion state and trigger status for KYC layers.
+      operationId: getLayerStatus
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Status retrieved successfully
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT issued by the existing SurveyTools auth flow
+
+  schemas:
+    SignupBody:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+        - userType
+        - dateOfBirth
+      properties:
+        firstName: { type: string }
+        lastName: { type: string }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+        userType: { type: string, enum: [researcher, respondent] }
+        dateOfBirth: { type: string, format: date-time }
+
+    RequestOtpBody:
+      type: object
+      required: [phone]
+      properties:
+        phone:
+          type: string
+          pattern: '^\+\d{7,15}$'
+
+    VerifyOtpBody:
+      type: object
+      required: [phone, code]
+      properties:
+        phone: { type: string, pattern: '^\+\d{7,15}$' }
+        code: { type: string, pattern: '^\d{6}$' }
+
+    RequestEmailOtpBody:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string, format: email }
+
+    VerifyEmailOtpBody:
+      type: object
+      required: [email, code]
+      properties:
+        email: { type: string, format: email }
+        code: { type: string, pattern: '^\d{6}$' }
+
+    ResearcherProfileBody:
+      type: object
+      required: [researcherType]
+      properties:
+        researcherType: { type: string, enum: [student, professional, corporate] }
+        # Extra fields conditionally validated
+
+    Layer1Body:
+      type: object
+      required: [dateOfBirth, gender, stateOfResidence, lgaOfResidence, isStudent]
+      properties:
+        dateOfBirth: { type: string, format: date-time }
+        gender: { type: string }
+        stateOfResidence: { type: string }
+        lgaOfResidence: { type: string }
+        isStudent: { type: boolean }
+
+    Layer2Body:
+      type: object
+      properties:
+        educationLevel: { type: string }
+        employmentStatus: { type: string }
+        incomeRange: { type: string }
+        maritalStatus: { type: string }
