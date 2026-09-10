@@ -87,7 +87,7 @@ const Verify = () => {
 
   return (
     <section className="verify">
-      <div className="verify_inner flex wrap">
+      <div className="verify_inner form-coll flex wrap">
         <h2>Verify Email</h2>
         <div className="verify_info_inner">
           <div className="verify_info flex">

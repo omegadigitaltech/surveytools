@@ -91,7 +91,7 @@ const HealthLifestyle = () => {
       <div className="personal-info inline-flex min-h-screen flex-col items-stretch justify-center">
         <ProgressTracker step={step} totalSteps={totalSteps} />
         <Card
-          title={"Health &amp; Lifestyle"}
+          title={"Health & Lifestyle"}
           description={"Select all that apply."}
           optional={true}
         >
@@ -148,14 +148,14 @@ function PillOption({ label, selected, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs transition-colors ${
         selected
           ? "border-sky-600 bg-sky-50 text-sky-700"
           : "border-slate-200 text-slate-600 hover:border-slate-300"
       }`}
     >
       {selected ? (
-        <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2} />
+        <CheckCircle2 className="w-3.5 h-3.5 " strokeWidth={2} />
       ) : (
         <Circle className="w-3.5 h-3.5 text-slate-300" strokeWidth={2} />
       )}

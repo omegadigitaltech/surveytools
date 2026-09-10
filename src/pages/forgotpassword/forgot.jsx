@@ -31,8 +31,8 @@ const ForgotPw = () => {
     }
   };
   return (
-    <section className="forgot-section flex">
-      <div className="forgot">
+    <section className="forgot-section  flex">
+      <div className="forgot form-col">
         <h2>Password Reset</h2>
         <Form onSubmit={handleSubmit} className="auth-w5-form">
           <div className="auth-w5-field">

@@ -22,6 +22,7 @@ import setupAuthInterceptor from "./utils/setupAuthInterceptor";
 
 import Home from "./pages/home/home";
 import Register from "./pages/register/register.jsx"
+import SignUpType from "./pages/signup/signupType.jsx";
 import SignIn from "./pages/signin/signin";
 import SignUp from "./pages/signup/signup";
 import ProfessionalSignUp from "./pages/professionalsignup/professionalsignup.jsx"
@@ -63,6 +64,9 @@ import Admin from "./pages/admin/Admin";
 import PersonalInformation from "./pages/register/PersonalInfo.jsx";
 import AcaAndProf from "./pages/register/AcaAndProf.jsx";
 import HealthLifestyle from "./pages/register/HealthLifestyle.jsx";
+import SocioEconomic from "./pages/register/SocioEconomic.jsx";
+import Beliefs from "./pages/register/Beliefs.jsx";
+import ReviewSubmit from "./pages/register/review.jsx";
 
 const RootLayout = () => {
   const { pathname } = useLocation();
@@ -117,13 +121,16 @@ const router = createBrowserRouter(
         </Route>
       </Route>
       <Route element={<AuthLayout />}>
-      <Route path="register" element={<Register />} />
+      {/* <Route path="register" element={<Register />} /> */}
       <Route path="register/personalinfo" element={<PersonalInformation />} />
       <Route path="register/academicprofile" element={<AcaAndProf />} />
       <Route path="register/healthlifestyle" element={<HealthLifestyle />} />
+      <Route path="register/socioeconomic" element={<SocioEconomic />} />
+      <Route path="register/beliefs" element={<Beliefs />} />
+      <Route path="register/review" element={<ReviewSubmit />} />
+      <Route path="signup-type" element={<SignUpType />} />
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />
-        
         <Route path="professional-signup" element={<ProfessionalSignUp />}  />
         <Route path="verify" element={<Verify />} action={verifyAction} />
         <Route path="forgotpassword" element={<ForgotPw />} />

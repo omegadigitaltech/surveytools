@@ -1,7 +1,8 @@
 .verify_inner h2{
 font-size: 1rem;
+font-weight: 500;
 text-align: center;
-margin-bottom: 1.5rem;
+margin: 1rem 0;
 }
 .verify_info_inner {
 flex-direction: column;
@@ -10,10 +11,16 @@ margin-bottom: 2rem;
 }
 .verify_inner{
 flex-direction: column;
+background: #ffffff;
+border-radius: 16px;
+box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+padding: 1rem 2rem;
+max-width: 750px;
+/* width: 100%; */
 }
 .verify_info{
     /* gap: 5rem; */
-    padding: 3rem;
+    padding: 1.5rem;
     justify-content: space-between;
     background: var(--base) ;
     color: var(--wht);
@@ -71,6 +78,11 @@ input[type=number]::-webkit-inner-spin-button {
     font-weight: 600;
 }
 /* Media Query */
+@media(max-width:712px){
+    .verify_inner{
+width: 95% !important;
+}
+}
 @media(max-width:512px){
     .verify_info img{
         display: none;
@@ -88,7 +100,7 @@ input[type=number]::-webkit-inner-spin-button {
         width: 80%;
     }
     .verify_inner{
-        width: 95% !important; 
+        width: 98% !important; 
     }
     .verify_codes input{
         background: var(--litgray);
@@ -104,6 +116,7 @@ input[type=number]::-webkit-inner-spin-button {
     }
 }
 @media(max-width:384px){
-
+    .verify_inner {
+        padding: .5rem;
+    }
 }
-/* 512px */

@@ -49,7 +49,7 @@ const ResetPw = () => {
 
   return (
     <section className="reset-section flex">
-      <div className="forgot">
+      <div className="forgot form-col">
         <h2>Reset Password</h2>
         <Form onSubmit={handleSubmit} className="auth-form">
           <div className="reset-auth-field">

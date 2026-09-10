@@ -136,7 +136,13 @@ button.inactive {
 .fw-6h {
   font-weight: 600;
 }
-
+.f-size{
+  font-size: .9rem;
+  font-weight: 500;
+}
+.sf-size{
+  font-size: .75rem;
+}
 /* SPIN EFFECT */
 .spin-btn {
   background: var(--base);
@@ -192,6 +198,9 @@ button.inactive {
 @media (max-width: 550px) {
   .wrap {
     width: 95%;
+  }
+  .f-size{
+    font-size: .85rem;
   }
 }
 

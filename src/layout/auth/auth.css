@@ -1,6 +1,7 @@
 .auth {
-    padding: 3em 0;
+    padding:2em 0 3em 0;
     background: linear-gradient(135deg, #e8f0fe 0%, #f0e8ff 50%, #c3ccdb 100%);
+    /* height: 100%; */
 }
 .auth-w1-lead {
     color: var(--cl-lead);
@@ -79,7 +80,7 @@
         min-height: 100vh;
     }
     .auth-wrap{
-        width: 90% !important;
+        width: 98% !important;
     }
     .auth-w3-icon {
         width: 20px;

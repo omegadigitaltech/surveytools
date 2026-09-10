@@ -26,7 +26,7 @@ const Features = () => {
     },
   ];
   return (
-    <section className="features pt-[3rem] pb-[5rem] md:pb-[10rem] px-[5%]">
+    <section className="features pt-[3rem] pb-[5rem] md:pb-[10rem] px-[5%]" id="features">
       <h2 ref={headingRef} className="reveal text-4xl md:text-5xl text-center font-[600] py-10">
         Our Features
       </h2>

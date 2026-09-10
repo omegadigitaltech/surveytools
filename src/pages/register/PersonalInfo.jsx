@@ -10,21 +10,21 @@ export default function PersonalInformation() {
   const totalSteps = 6;
 
   return (
-    <div className= "flex flex-col items-stretch justify-center ">
-    <div className="personal-info inline-flex min-h-screen flex-col items-stretch justify-center">
+    <div className= "flex flex-col items-stretch justify-center mt-3">
+    <div className="personal-info w-[100%] inline-flex min-h-screen flex-col items-stretch justify-center">
       <ProgressTracker step={step} totalSteps={totalSteps} />
       <Card title={"Personal Information"} description={"Tell us a little about yourself"}>
-        <form className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-            <Field label="First Name" required>
-              <input type="text" placeholder="First name" className="input" />
+        <form className="space-y-6 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 ">
+            <Field label="First Name" className="text-xs sm:text-sm" required>
+              <input type="text" placeholder="First name" className="input " />
             </Field>
             <Field label="Last Name" required>
-              <input type="text" placeholder="Last name" className="input" />
+              <input type="text" placeholder="Last name" className="input " />
             </Field>
 
             <Field label="Gender" required>
-              <div className="flex items-center gap-6 pt-2">
+              <div className="flex items-center  flex-wrap gap-6 pt-2">
                 <RadioOption
                   name="gender"
                   value="male"

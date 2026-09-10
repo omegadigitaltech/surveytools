@@ -10,7 +10,7 @@
     border-radius: 16px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     padding: 1.8rem 2.5rem;
-    max-width: 680px;
+    max-width: 750px;
     width: 100%;
 }
 
@@ -299,6 +299,9 @@
 }
 
 @media (max-width: 585px) {
+    .auth-wrap {
+        width: 98% !important;
+    }
     .auth-w5-heading {
         font-size: 1.3rem;
     }
@@ -340,10 +343,6 @@
 }
 
 @media (max-width: 400px) {
-    .auth-wrap {
-        width: 95% !important;
-    }
-
     .auth-w5 {
         padding: 0.5rem;
         margin-top: 1.2rem;

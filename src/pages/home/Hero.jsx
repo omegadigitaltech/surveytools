@@ -56,9 +56,11 @@ const Hero = () => {
             >
               Get Started
             </NavLink>
-            <NavLink className="px-5 py-3 lg:px-7 lg:py-2 rounded-md border-[1px] border-[var(--btns)]">
+            <a 
+            href="#features"
+            className="px-5 py-3 lg:px-7 lg:py-2 rounded-md border-[1px] border-[var(--btns)]">
               How it Works
-            </NavLink>
+            </a>
           </div>
         </div>
       </div>
