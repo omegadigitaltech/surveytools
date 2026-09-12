@@ -66,7 +66,7 @@ import AcaAndProf from "./pages/register/AcaAndProf.jsx";
 import HealthLifestyle from "./pages/register/HealthLifestyle.jsx";
 import SocioEconomic from "./pages/register/SocioEconomic.jsx";
 import Beliefs from "./pages/register/Beliefs.jsx";
-import ReviewSubmit from "./pages/register/review.jsx";
+import ReviewSubmit from "./pages/register/Review.jsx";
 
 const RootLayout = () => {
   const { pathname } = useLocation();

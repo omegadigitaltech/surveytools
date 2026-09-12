@@ -5,6 +5,7 @@ import RadioOption from "./RadioOption";
 import backaro from "../../assets/img/backaro.svg";
 import "./register.css";
 
+// Not using for now
 
 const accountTypes = [
   {
