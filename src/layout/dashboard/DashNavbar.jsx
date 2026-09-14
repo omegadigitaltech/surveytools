@@ -74,18 +74,18 @@ const Sidebar = () => {
             </span>
             <span>Analytics</span>
           </NavLink>
-          <NavLink to="/my-forms" className="sidebar-link">
+          {/* <NavLink to="/my-forms" className="sidebar-link">
             <span>
               <img src="/Folder-With-Files.svg" alt="Folder-With-FIles" />
             </span>
             <span>My Forms</span>
-          </NavLink>
-          <NavLink to="/create-form" className="sidebar-link">
+          </NavLink> */}
+          {/* <NavLink to="/create-form" className="sidebar-link">
             <span>
               <img src="/form.svg" alt="Chat-Square" />
             </span>
             <span>Create a form</span>
-          </NavLink>
+          </NavLink> */}
           {/* <NavLink to="/settings" className="sidebar-link">
             <span>
               <img src="/Settings-Minimalistic.svg" alt="Settings" />
