@@ -95,7 +95,8 @@ const UserSchema = new Schema(
     userType:      { type: String, enum: ['researcher', 'respondent'], default: null },
     dateOfBirth:   { type: Date, default: null },
     phoneVerified: { type: Boolean, default: false },
-    phone:         { type: String }
+    phone:         { type: String },
+    emailVerified: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

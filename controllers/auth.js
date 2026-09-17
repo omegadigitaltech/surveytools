@@ -538,8 +538,9 @@ const forgetPassword = async (req, res) => {
     const code = crypto.randomInt(100000, 1000000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    // Store on User document (reuse existing resetPasswordToken fields)
-    user.resetPasswordToken = code;
+    // Hash before storing so a DB read cannot be weaponised to reset accounts
+    const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
+    user.resetPasswordToken = hashedCode;
     user.resetPasswordExpires = expiresAt;
     await user.save();
 
@@ -609,12 +610,20 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    // Look up user and validate the OTP code
-    const user = await User.findOne({
-      email,
-      resetPasswordToken: code,
-      resetPasswordExpires: { $gt: Date.now() },
-    });
+    // Hash submitted code to match what we stored
+    const crypto = require("crypto");
+    const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
+
+    // Atomically consume the token — prevents concurrent reuse of the same OTP
+    const user = await User.findOneAndUpdate(
+      {
+        email,
+        resetPasswordToken: hashedCode,
+        resetPasswordExpires: { $gt: Date.now() },
+      },
+      { $unset: { resetPasswordToken: '', resetPasswordExpires: '' } },
+      { new: false }
+    );
 
     if (!user) {
       return res.status(400).json({
@@ -624,10 +633,8 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    // Update password and clear the reset code
+    // Token already atomically consumed above — just update the password
     user.password = await bcrypt.hash(newPassword, 10);
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
     await user.save();
 
     const emailData = {

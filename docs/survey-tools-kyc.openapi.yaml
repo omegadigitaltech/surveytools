@@ -204,7 +204,7 @@ paths:
   /v1/kyc/respondent/layer3:
     post:
       summary: Submit respondent sensitive layer 3
-      description: Financial profile data. Fields are encrypted at rest using AES-256-GCM.
+      description: Health and lifestyle data (chronic conditions, smoking, exercise, blood group, genotype). Fields are encrypted at rest using AES-256-GCM.
       operationId: submitRespondentLayer3
       security:
         - BearerAuth: []
@@ -221,7 +221,7 @@ paths:
   /v1/kyc/respondent/layer4:
     post:
       summary: Submit respondent sensitive layer 4
-      description: Health and lifestyle data. Fields are encrypted at rest using AES-256-GCM.
+      description: Socioeconomic profile data (income, housing, transport, devices, dependants). Fields are encrypted at rest using AES-256-GCM.
       operationId: submitRespondentLayer4
       security:
         - BearerAuth: []
@@ -238,7 +238,7 @@ paths:
   /v1/kyc/respondent/layer5:
     post:
       summary: Submit respondent sensitive layer 5
-      description: Political and religious views. Fields are encrypted at rest using AES-256-GCM.
+      description: Cultural and identity data (religion, ethnicity, languages spoken, marital status). Fields are encrypted at rest using AES-256-GCM.
       operationId: submitRespondentLayer5
       security:
         - BearerAuth: []

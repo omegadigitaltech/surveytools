@@ -6,7 +6,7 @@ info:
     Marketplace/Vouchers, and Visualizations APIs.
   version: 1.0.0
 servers:
-  - url: undefined://{{base_url}}
+  - url: http://localhost:5003
 tags:
   - name: 1. Authentication
   - name: 2. Admin Controls (Gamification & Marketplace)

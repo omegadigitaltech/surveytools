@@ -49,9 +49,9 @@ Your API will be accessible at `http://localhost:PORT`
 
 The complete, interactive OpenAPI specification is available locally when running the server in dev mode. It combines both the legacy Full Backend APIs and the new KYC Features into a single, unified documentation page. You can access it via three different endpoints:
 
-1. **[Swagger UI (Interactive)](http://localhost:5003/api-docs)**: Interactive interface to read the docs and test the endpoints directly from your browser. (`/api-docs`)
-2. **[ReDoc (Reading UI)](http://localhost:5003/redoc)**: A clean, modern, reading-focused documentation UI. (`/redoc`)
-3. **[Raw JSON Spec](http://localhost:5003/api-docs.json)**: The raw OpenAPI JSON file, perfect for importing into Postman or Insomnia. (`/api-docs.json`)
+1. **[Swagger UI (Interactive)](http://localhost:5000/api-docs)**: Interactive interface to read the docs and test the endpoints directly from your browser. (`/api-docs`)
+2. **[ReDoc (Reading UI)](http://localhost:5000/redoc)**: A clean, modern, reading-focused documentation UI. (`/redoc`)
+3. **[Raw JSON Spec](http://localhost:5000/api-docs.json)**: The raw OpenAPI JSON file, perfect for importing into Postman or Insomnia. (`/api-docs.json`)
 
 *Note: The OpenAPI YAML files acting as the source of truth are located in the `docs/` folder.*
 

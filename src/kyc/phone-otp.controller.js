@@ -56,10 +56,22 @@ function createPhoneOtpController({ phoneOtpService }) {
     const { phone, code } = result.data;
     await phoneOtpService.verifyOtp(phone, code, req.userId);
 
-    // Update the User document now that phone is verified
-    await User.findOneAndUpdate(
-      { id: req.userId }, 
-      { phoneVerified: true, phone: phone }
+    // Atomically update the User — only succeeds if no other verified account owns this number
+    const updated = await User.findOneAndUpdate(
+      { id: req.userId, $or: [{ phone: { $exists: false } }, { phone: null }, { phone: phone }] },
+      { phoneVerified: true, phone: phone },
+      { new: true }
+    );
+
+    if (!updated) {
+      throw new AppError(409, 'This phone number is already verified on another account');
+    }
+
+    // Backfill the phoneNumber on the RespondentProfile seed created at registration
+    const RespondentProfile = require('./respondent-profile.model');
+    await RespondentProfile.findOneAndUpdate(
+      { userId: req.userId, phoneNumber: '' },
+      { phoneNumber: phone }
     );
 
     res.status(200).json({
