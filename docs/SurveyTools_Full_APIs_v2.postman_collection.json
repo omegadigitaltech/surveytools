@@ -102,8 +102,8 @@
               "script": {
                 "exec": [
                   "const response = pm.response.json();",
-                  "if (response && response.data && response.data.token) {",
-                  "    pm.collectionVariables.set(\"token\", response.data.token);",
+                  "if (response && response.data && response.token) {",
+                  "    pm.collectionVariables.set(\"token\", response.token);",
                   "    console.log(\"Token captured successfully!\");",
                   "}"
                 ],
@@ -848,6 +848,16 @@
                 "otp",
                 "request"
               ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
             }
           }
         },
@@ -914,6 +924,16 @@
                 "email-otp",
                 "request"
               ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
             }
           }
         },
@@ -941,6 +961,16 @@
                 "kyc",
                 "email-otp",
                 "verify"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
               ]
             }
           }
@@ -972,7 +1002,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"researcherType\": \"professional\"\n}"
+              "raw": "{\n  \"researcherType\": \"professional\",\n  \"title\": \"Dr.\",\n  \"profession\": \"Data Scientist\",\n  \"areaOfSpecialisation\": \"Machine Learning\",\n  \"employer\": \"Omega Digital Tech\",\n  \"workEmail\": \"jane.smith@omegadigitaltech.com\",\n  \"stateOfPractice\": \"Lagos\",\n  \"researchPurpose\": \"Academic and market research on consumer behaviour\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/v1/kyc/researcher/profile",
