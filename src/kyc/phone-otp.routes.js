@@ -6,6 +6,7 @@ const { authMiddleware } = require('../../middleware/auth');
 const kycConfig = require('../../config/kyc-config');
 const { createSmsClient } = require('../../lib/sms-client');
 const PhoneOtp = require('../../model/phone-otp');
+const User = require('../../model/user');
 const { createPhoneOtpRepo } = require('./phone-otp.repo');
 const { createPhoneOtpService } = require('./phone-otp.service');
 const { createPhoneOtpController } = require('./phone-otp.controller');
@@ -18,7 +19,7 @@ const smsClient = createSmsClient({
   baseUrl: kycConfig.smsProviderBaseUrl,
 });
 const otpRepo = createPhoneOtpRepo({ PhoneOtp });
-const phoneOtpService = createPhoneOtpService({ smsClient, otpRepo, kycConfig });
+const phoneOtpService = createPhoneOtpService({ smsClient, otpRepo, kycConfig, userModel: User });
 const { requestOtp, verifyOtp } = createPhoneOtpController({ phoneOtpService });
 
 /**

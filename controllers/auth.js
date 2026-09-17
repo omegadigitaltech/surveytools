@@ -200,6 +200,9 @@ const postLogin = async (req, res) => {
     data: {
       redirectUrl: redirectUrl,
       user: user,
+      // If false, the frontend must redirect the user to phone OTP verification
+      // before allowing access to any protected feature (e.g. redemption).
+      requiresPhoneVerification: !user.phoneVerified,
     },
     admin: user.admin,
     token,
@@ -507,6 +510,7 @@ const getUserPoints = async (req, res) => {
 };
 
 // Forget Password Controller
+// Forget Password — sends a 6-digit OTP to the user's email
 const forgetPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -519,71 +523,52 @@ const forgetPassword = async (req, res) => {
       });
     }
 
-    // Find user by email
     const user = await User.findOne({ email });
+    // Always return 200 to prevent email enumeration
     if (!user) {
-      return res.status(404).json({
-        status: "failure",
-        code: 404,
-        msg: "User with this email does not exist",
+      return res.status(200).json({
+        status: "success",
+        code: 200,
+        msg: "If an account exists for this email, a reset code has been sent",
       });
     }
 
-    // Generate reset token
+    // Generate 6-digit OTP — consistent with phone/email OTP flow
     const crypto = require("crypto");
-    const resetToken = crypto.randomBytes(32).toString("hex");
+    const code = crypto.randomInt(100000, 1000000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    // Hash the token and save to database
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(resetToken)
-      .digest("hex");
-
-    // Set token and expiry (10 minutes)
-    user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    // Store on User document (reuse existing resetPasswordToken fields)
+    user.resetPasswordToken = code;
+    user.resetPasswordExpires = expiresAt;
     await user.save();
 
-    // Create reset URL
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-
-    // Email content
     const emailData = {
       to: user.email,
-      subject: "Password Reset Request - SurveyPro",
+      subject: "SurveyTools Password Reset Code",
       html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #333;">Password Reset Request</h2>
+                    <h2 style="color: #333;">Password Reset</h2>
                     <p>Hello ${user.fullname},</p>
-                    <p>We received a request to reset your password for your SurveyPro account.</p>
-                    <p>Click the button below to reset your password:</p>
+                    <p>Your password reset code is:</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="${resetUrl}" 
-                           style="background-color: #007bff; color: white; padding: 12px 30px; 
-                                  text-decoration: none; border-radius: 5px; display: inline-block;">
-                            Reset Password
-                        </a>
+                        <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #007bff;">${code}</span>
                     </div>
-                    <p>Or copy and paste this link in your browser:</p>
-                    <p style="word-break: break-all; color: #007bff;">${resetUrl}</p>
-                    <p><strong>This link will expire in 10 minutes.</strong></p>
-                    <p>If you didn't request this password reset, please ignore this email.</p>
+                    <p><strong>This code expires in 10 minutes.</strong></p>
+                    <p>If you did not request a password reset, please ignore this email.</p>
                     <hr style="margin: 30px 0;">
-                    <p style="color: #666; font-size: 12px;">
-                        This is an automated email from SurveyPro. Please do not reply to this email.
-                    </p>
+                    <p style="color: #666; font-size: 12px;">This is an automated email from SurveyTools. Do not reply.</p>
                 </div>
             `,
     };
 
-    // Send email using existing queue service
     const { addEmailToQueue } = require("../utils/queueService");
     await addEmailToQueue("password-reset", emailData);
 
     res.status(200).json({
       status: "success",
       code: 200,
-      msg: "Password reset link has been sent to your email",
+      msg: "If an account exists for this email, a reset code has been sent",
     });
   } catch (error) {
     console.error("Error in forget password:", error);
@@ -595,20 +580,19 @@ const forgetPassword = async (req, res) => {
   }
 };
 
-// Reset Password Controller
+// Reset Password — verifies the 6-digit OTP and sets a new password
 const resetPassword = async (req, res) => {
   try {
-    const { token, newPassword, confirmPassword } = req.body;
+    const { email, code, newPassword, confirmPassword } = req.body;
 
-    if (!token || !newPassword || !confirmPassword) {
+    if (!email || !code || !newPassword || !confirmPassword) {
       return res.status(400).json({
         status: "failure",
         code: 400,
-        msg: "Token, new password, and confirm password are required",
+        msg: "email, code, newPassword, and confirmPassword are all required",
       });
     }
 
-    // Validate password match
     if (newPassword !== confirmPassword) {
       return res.status(400).json({
         status: "failure",
@@ -617,22 +601,18 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    // Validate password strength
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       return res.status(400).json({
         status: "failure",
         code: 400,
-        msg: "Password must be at least 6 characters long",
+        msg: "Password must be at least 8 characters long",
       });
     }
 
-    // Hash the token
-    const crypto = require("crypto");
-    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
-    // Find user with valid reset token
+    // Look up user and validate the OTP code
     const user = await User.findOne({
-      resetPasswordToken: hashedToken,
+      email,
+      resetPasswordToken: code,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
@@ -640,41 +620,27 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({
         status: "failure",
         code: 400,
-        msg: "Token is invalid or has expired",
+        msg: "Reset code is invalid or has expired",
       });
     }
 
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Update user password and clear reset token
-    user.password = hashedPassword;
+    // Update password and clear the reset code
+    user.password = await bcrypt.hash(newPassword, 10);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
 
-    // Send confirmation email
     const emailData = {
       to: user.email,
-      subject: "Password Reset Successful - SurveyPro",
+      subject: "SurveyTools Password Reset Successful",
       html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #28a745;">Password Reset Successful</h2>
                     <p>Hello ${user.fullname},</p>
-                    <p>Your password has been successfully reset for your SurveyPro account.</p>
-                    <p>You can now log in with your new password.</p>
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="${process.env.FRONTEND_URL}/login" 
-                           style="background-color: #28a745; color: white; padding: 12px 30px; 
-                                  text-decoration: none; border-radius: 5px; display: inline-block;">
-                            Login Now
-                        </a>
-                    </div>
-                    <p>If you didn't make this change, please contact our support team immediately.</p>
+                    <p>Your password has been successfully reset. You can now log in with your new password.</p>
+                    <p>If you didn't make this change, contact our support team immediately.</p>
                     <hr style="margin: 30px 0;">
-                    <p style="color: #666; font-size: 12px;">
-                        This is an automated email from SurveyPro. Please do not reply to this email.
-                    </p>
+                    <p style="color: #666; font-size: 12px;">This is an automated email from SurveyTools. Do not reply.</p>
                 </div>
             `,
     };
@@ -685,7 +651,7 @@ const resetPassword = async (req, res) => {
     res.status(200).json({
       status: "success",
       code: 200,
-      msg: "Password has been reset successfully. You can now login with your new password.",
+      msg: "Password has been reset successfully. You can now log in with your new password.",
     });
   } catch (error) {
     console.error("Error in reset password:", error);

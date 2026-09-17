@@ -1,0 +1,422 @@
+openapi: 3.0.0
+info:
+  title: SurveyTools Comprehensive API Collection
+  description: >-
+    Collection featuring Auth, Admin Gamification, Gamification,
+    Marketplace/Vouchers, and Visualizations APIs.
+  version: 1.0.0
+servers:
+  - url: undefined://{{base_url}}
+tags:
+  - name: 1. Authentication
+  - name: 2. Admin Controls (Gamification & Marketplace)
+  - name: 3. Gamification
+  - name: 4. Marketplace & Vouchers
+  - name: 5. Graph Visualizations
+  - name: 6. Analytics
+paths:
+  /auth/login:
+    post:
+      tags:
+        - 1. Authentication
+      summary: Login (Auto-Saves Token)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: user@example.com
+                password: yourpassword
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/gamification/missions:
+    post:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Create Mission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: Survey Master
+                description: Complete 5 surveys today.
+                type: daily
+                category: surveys
+                targetValue: 5
+                xpReward: 200
+                pointsReward: 50
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/marketplace/listings:
+    post:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Create Marketplace Listing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: 10% Amazon Gift Card
+                description: Get 10% off your next Amazon purchase.
+                type: gift_card
+                pointsCost: 500
+                value: 10% Off
+                partnerName: Amazon
+                stock: 100
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/gamification/levels:
+    post:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Create Level Config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                level: 2
+                name: Explorer
+                minXP: 1000
+                maxXP: 2500
+                benefits:
+                  - Extra spin wheel attempt
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /gamification/dashboard:
+    get:
+      tags:
+        - 3. Gamification
+      summary: Dashboard Stats
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /gamification/spin:
+    post:
+      tags:
+        - 3. Gamification
+      summary: Spin Wheel
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /gamification/missions:
+    get:
+      tags:
+        - 3. Gamification
+      summary: Get Missions
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /gamification/missions/{missionProgressId}/claim:
+    post:
+      tags:
+        - 3. Gamification
+      summary: Claim Mission Reward
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: missionProgressId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /gamification/leaderboard:
+    get:
+      tags:
+        - 3. Gamification
+      summary: Get Leaderboard
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: period
+          in: query
+          schema:
+            type: string
+          example: all_time
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /gamification/vip-status:
+    get:
+      tags:
+        - 3. Gamification
+      summary: Get VIP Status
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /marketplace/listings:
+    get:
+      tags:
+        - 4. Marketplace & Vouchers
+      summary: Get Listings
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /marketplace/convert:
+    post:
+      tags:
+        - 4. Marketplace & Vouchers
+      summary: Convert Points / Buy Voucher
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                pointsToConvert: 500
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /marketplace/wallet:
+    get:
+      tags:
+        - 4. Marketplace & Vouchers
+      summary: Get Voucher Wallet
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /marketplace/transactions:
+    get:
+      tags:
+        - 4. Marketplace & Vouchers
+      summary: Get Transaction Summary
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /surveys/{surveyId}/visualizations:
+    get:
+      tags:
+        - 5. Graph Visualizations
+      summary: Get Basic Graph Data
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: graphType
+          in: query
+          schema:
+            type: string
+          example: bar
+        - name: questionId
+          in: query
+          schema:
+            type: string
+          example: '{{questionId}}'
+        - name: surveyId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /surveys/{surveyId}/analytics/overview:
+    get:
+      tags:
+        - 6. Analytics
+      summary: Get Survey Analytics Overview
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: surveyId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /analytics/engagement:
+    get:
+      tags:
+        - 6. Analytics
+      summary: Get User Engagement Analytics
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /surveys/{surveyId}/analytics/trends:
+    get:
+      tags:
+        - 6. Analytics
+      summary: Get Response Trends Analytics
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: timeframe
+          in: query
+          schema:
+            type: string
+          example: weekly
+        - name: surveyId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

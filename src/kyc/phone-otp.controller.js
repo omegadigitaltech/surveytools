@@ -54,7 +54,7 @@ function createPhoneOtpController({ phoneOtpService }) {
     }
 
     const { phone, code } = result.data;
-    await phoneOtpService.verifyOtp(phone, code);
+    await phoneOtpService.verifyOtp(phone, code, req.userId);
 
     // Update the User document now that phone is verified
     await User.findOneAndUpdate(

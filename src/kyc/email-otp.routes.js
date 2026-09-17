@@ -24,7 +24,8 @@ const emailClient = createEmailClient({
 });
 
 const otpRepo = createEmailOtpRepo({ EmailOtp });
-const emailOtpService = createEmailOtpService({ emailClient, otpRepo, kycConfig });
+// allowedDomain: '.edu.ng' — this route is for academic institution email verification only
+const emailOtpService = createEmailOtpService({ emailClient, otpRepo, kycConfig, allowedDomain: '.edu.ng' });
 const { requestOtp, verifyOtp } = createEmailOtpController({ emailOtpService });
 
 const otpRateLimiter = rateLimit({
@@ -45,7 +46,7 @@ const verifyRateLimiter = rateLimit({
 
 /**
  * POST /v1/kyc/email-otp/request
- * Issues a 6-digit OTP to the .edu.ng email.
+ * Issues a 6-digit OTP to an academic .edu.ng email for institution affiliation verification.
  */
 router.post('/email-otp/request', authMiddleware, otpRateLimiter, requestOtp);
 

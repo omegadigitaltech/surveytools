@@ -13,6 +13,9 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const redis = require('redis');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const redoc = require('redoc-express');
 
 const User = require('./model/user')
 
@@ -35,6 +38,8 @@ const phoneOtpRoutes = require('./src/kyc/phone-otp.routes');
 const emailOtpRoutes = require('./src/kyc/email-otp.routes');
 const signupRoutes = require('./src/kyc/signup.routes');
 const researcherProfileRoutes = require('./src/kyc/researcher-profile.routes');
+const erasureRoutes = require('./src/kyc/erasure.routes');
+const researcherTierRoutes = require('./src/kyc/researcher-tier.routes');
 
 const app = express();
 require('./middleware/passport');
@@ -58,6 +63,57 @@ const corsOptions = {
 app.use(cors());
 
 app.use(express.static("public"));
+
+// Load the raw specs
+const kycSwaggerDoc = YAML.load(path.join(__dirname, 'docs', 'survey-tools-kyc.openapi.yaml'));
+const fullSwaggerDoc = YAML.load(path.join(__dirname, 'docs', 'surveytools-full.openapi.yaml'));
+
+// Assign a proper tag heading to all KYC endpoints instead of "default"
+if (kycSwaggerDoc && kycSwaggerDoc.paths) {
+  Object.keys(kycSwaggerDoc.paths).forEach(pathKey => {
+    const pathObj = kycSwaggerDoc.paths[pathKey];
+    Object.keys(pathObj).forEach(method => {
+      if (typeof pathObj[method] === 'object') {
+        pathObj[method].tags = ['0. KYC Unified Integration'];
+      }
+    });
+  });
+}
+
+// Dynamically merge them into one giant API spec
+const mergedSwaggerDoc = {
+  ...fullSwaggerDoc,
+  info: {
+    ...fullSwaggerDoc.info,
+    title: 'SurveyTools Comprehensive API'
+  },
+  paths: {
+    ...fullSwaggerDoc.paths,
+    ...kycSwaggerDoc.paths
+  },
+  components: {
+    ...fullSwaggerDoc.components,
+    schemas: {
+      ...(fullSwaggerDoc.components?.schemas || {}),
+      ...(kycSwaggerDoc.components?.schemas || {})
+    },
+    securitySchemes: {
+      ...(fullSwaggerDoc.components?.securitySchemes || {}),
+      ...(kycSwaggerDoc.components?.securitySchemes || {})
+    }
+  }
+};
+
+// Mount Swagger UI as a single page
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(mergedSwaggerDoc, { 
+  customSiteTitle: "SurveyTools Comprehensive API Docs" 
+}));
+
+// Raw JSON endpoint
+app.get('/api-docs.json', (req, res) => res.json(mergedSwaggerDoc));
+
+// ReDoc UI documentation
+app.get('/redoc', redoc({ title: 'SurveyTools Unified API Docs', specUrl: '/api-docs.json' }));
 app.use(bodyParser.json());
 // app.set("view engine", "ejs");
 app.use(express.json());
@@ -88,55 +144,37 @@ if (!fs.existsSync(tempFilesDir)) {
 }
 
 
-// Check Redis connection
-const checkRedisConnection = async () => {
+// Check Redis availability with a quick TCP probe (no ioredis client needed)
+const checkRedisConnection = () => {
+  const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+  let host = '127.0.0.1';
+  let port = 6379;
   try {
-    const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-    console.log(`Attempting to connect to Redis at ${REDIS_URL}`);
-    
-    const client = redis.createClient({
-      url: REDIS_URL,
-      socket: {
-        reconnectStrategy: (retries) => {
-          // Stop retrying after 3 attempts during startup check
-          if (retries >= 3) {
-            console.warn('Redis connection failed after 3 attempts');
-            return false; // stop retrying
-          }
-          return Math.min(retries * 1000, 3000); // wait up to 3 seconds
-        }
-      }
+    const parsed = new URL(REDIS_URL);
+    host = parsed.hostname || host;
+    port = parseInt(parsed.port, 10) || port;
+  } catch (_) {}
+
+  return new Promise((resolve) => {
+    const net = require('net');
+    const socket = net.createConnection({ host, port });
+    const timer = setTimeout(() => { socket.destroy(); resolve(false); }, 2000);
+
+    socket.on('connect', () => {
+      clearTimeout(timer);
+      socket.destroy();
+      console.log('✅ Redis connected successfully');
+      resolve(true);
     });
-    
-    client.on('error', (err) => {
-      console.error('Redis connection error:', err);
-      console.warn('Email notification queue will not work without Redis!');
-      console.warn('The application will still function, but new survey notifications will not be sent');
+
+    socket.on('error', () => {
+      clearTimeout(timer);
+      console.warn(`⚠️ Redis unavailable at ${REDIS_URL}. Email notifications queue is disabled; the app will still function normally.`);
+      resolve(false);
     });
-    
-    // Set a timeout for the connection attempt
-    const timeout = setTimeout(() => {
-      console.warn('Redis connection timed out');
-      try {
-        client.disconnect();
-      } catch (e) {
-        // Ignore disconnect errors
-      }
-    }, 5000);
-    
-    await client.connect();
-    clearTimeout(timeout);
-    
-    console.log('✅ Redis connected successfully');
-    await client.disconnect();
-    return true;
-  } catch (error) {
-    console.error('Redis connection error:', error);
-    console.warn('Email notification queue will not work without Redis!');
-    console.warn('The application will still function, but new survey notifications will not be sent');
-    return false;
-  }
+  });
 };
+
 
 
 
@@ -155,6 +193,8 @@ const analyticsRouter = require('./routes/analytics');
 
 app.use('/v1/kyc', signupRoutes);
 app.use('/v1/kyc', researcherProfileRoutes);
+app.use('/v1/kyc', erasureRoutes);
+app.use('/v1/kyc', researcherTierRoutes);
 
 app.use('/', adminRouter);
 app.use('/', gamificationRouter);

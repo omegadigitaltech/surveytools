@@ -22,8 +22,8 @@ router.get('/isLoggedIn', isLoggedIn)
 router.post('/verify',authMiddleware, verify)
 router.get('/failure', failurePage)
 
-router.post('/login', postLogin)
-router.post('/register', postRegister)
+router.post(['/login', '/auth/login'], postLogin)
+router.post(['/register', '/auth/register'], postRegister)
 
 // Password reset routes
 router.post('/forget-password', forgetPassword)
