@@ -31,6 +31,7 @@ function createSignupService() {
         password:    hashedPassword,
         userType:    data.userType,
         dateOfBirth: dob,
+        verified:    true, // bypass legacy auth email checks
         // Providing dummy values for legacy required fields to satisfy schema without changing it
         gender:      data.gender || 'unspecified',
         department:  data.department || 'unspecified',
