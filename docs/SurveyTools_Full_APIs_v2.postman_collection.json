@@ -186,67 +186,6 @@
           }
         },
         {
-          "name": "Register",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"type\": \"Normal\",\n  \"fullname\": \"John Doe\",\n  \"email\": \"john.legacy@example.com\",\n  \"gender\": \"Male\",\n  \"instituition\": \"University of Example\",\n  \"department\": \"Computer Science\",\n  \"faculty\": \"Science\",\n  \"password\": \"password123\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/register",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "auth",
-                "register"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Verify (OTP)",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"code\": 1234\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/verify",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "verify"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
           "name": "Is Logged In",
           "request": {
             "method": "GET",
