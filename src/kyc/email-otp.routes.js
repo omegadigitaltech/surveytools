@@ -24,8 +24,8 @@ const emailClient = createEmailClient({
 });
 
 const otpRepo = createEmailOtpRepo({ EmailOtp });
-// allowedDomain: '.edu.ng' — this route is for academic institution email verification only
-const emailOtpService = createEmailOtpService({ emailClient, otpRepo, kycConfig, allowedDomain: '.edu.ng' });
+// allowedDomain is configurable via KYC_STUDENT_EMAIL_DOMAIN env var (default: .edu.ng)
+const emailOtpService = createEmailOtpService({ emailClient, otpRepo, kycConfig, allowedDomain: process.env.KYC_STUDENT_EMAIL_DOMAIN || '.edu.ng' });
 const { requestOtp, verifyOtp } = createEmailOtpController({ emailOtpService });
 
 const otpRateLimiter = rateLimit({
