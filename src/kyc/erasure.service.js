@@ -14,10 +14,19 @@ function createErasureService() {
 
       // 2. Anonymize User — do NOT hard-delete (gamification + transaction records reference it)
       await User.findOneAndUpdate({ id: userId }, {
-        firstName: '[deleted]',
-        lastName:  '[deleted]',
-        email:     `deleted-${userId}@surveytools.invalid`,
-        phone:     null,
+        fullname: '[deleted]',
+        email: `deleted-${userId}@surveytools.invalid`,
+        phone: null,
+        bio: null,
+        pic_url: null,
+        verified: false,
+        code: null,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+        userType: null,
+        dateOfBirth: null,
+        phoneVerified: false,
+        emailVerified: false,
         kycStatus: 'erased',
       });
 

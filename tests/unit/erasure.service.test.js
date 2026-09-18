@@ -28,10 +28,19 @@ describe('Erasure Service', () => {
   it('Erasure anonymizes User — does NOT hard-delete the document', async () => {
     await service.erase('u1');
     expect(User.findOneAndUpdate).toHaveBeenCalledWith({ id: 'u1' }, {
-      firstName: '[deleted]',
-      lastName:  '[deleted]',
-      email:     'deleted-u1@surveytools.invalid',
-      phone:     null,
+      fullname: '[deleted]',
+      email: 'deleted-u1@surveytools.invalid',
+      phone: null,
+      bio: null,
+      pic_url: null,
+      verified: false,
+      code: null,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+      userType: null,
+      dateOfBirth: null,
+      phoneVerified: false,
+      emailVerified: false,
       kycStatus: 'erased',
     });
   });

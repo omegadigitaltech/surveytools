@@ -350,15 +350,15 @@ components:
 
   schemas:
     SignupBody:
-      type: object
       description: The payload varies based on userType.
-      required:
-        - firstName
-        - lastName
-        - email
-        - password
-        - userType
-        - dateOfBirth
+      oneOf:
+        - $ref: '#/components/schemas/SignupResearcherBody'
+        - $ref: '#/components/schemas/SignupRespondentNonStudentBody'
+        - $ref: '#/components/schemas/SignupRespondentStudentBody'
+
+    SignupCommonBody:
+      type: object
+      required: [firstName, lastName, email, password, userType, dateOfBirth]
       properties:
         firstName: { type: string }
         lastName: { type: string }
@@ -366,37 +366,49 @@ components:
         password: { type: string, minLength: 8 }
         userType: { type: string, enum: [researcher, respondent] }
         dateOfBirth: { type: string, format: date-time }
-        gender: 
-          type: string
-          enum: [male, female, non-binary, prefer-not-to-say]
-          description: Required if userType is respondent
-        stateOfOrigin:
-          type: string
-          description: Required if userType is respondent
-        stateOfResidence:
-          type: string
-          description: Required if userType is respondent
-        lgaOfResidence:
-          type: string
-          description: Required if userType is respondent
-        isStudent:
-          type: boolean
-          description: Required if userType is respondent
-        academicLevel:
-          type: string
-          description: Required if isStudent is true
-        levelOfStudy:
-          type: string
-          description: Required if isStudent is true
-        institution:
-          type: string
-          description: Required if isStudent is true
-        faculty:
-          type: string
-          description: Required if isStudent is true
-        department:
-          type: string
-          description: Required if isStudent is true
+
+    SignupResearcherBody:
+      allOf:
+        - $ref: '#/components/schemas/SignupCommonBody'
+        - type: object
+          properties:
+            userType: { type: string, enum: [researcher] }
+
+    SignupRespondentNonStudentBody:
+      allOf:
+        - $ref: '#/components/schemas/SignupCommonBody'
+        - type: object
+          required: [gender, stateOfOrigin, stateOfResidence, lgaOfResidence, isStudent]
+          properties:
+            userType: { type: string, enum: [respondent] }
+            gender:
+              type: string
+              enum: [male, female, non-binary, prefer-not-to-say]
+            stateOfOrigin: { type: string }
+            stateOfResidence: { type: string }
+            lgaOfResidence: { type: string }
+            isStudent: { type: boolean, enum: [false] }
+
+    SignupRespondentStudentBody:
+      allOf:
+        - $ref: '#/components/schemas/SignupCommonBody'
+        - type: object
+          required:
+            [gender, stateOfOrigin, stateOfResidence, lgaOfResidence, isStudent, academicLevel, levelOfStudy, institution, faculty, department]
+          properties:
+            userType: { type: string, enum: [respondent] }
+            gender:
+              type: string
+              enum: [male, female, non-binary, prefer-not-to-say]
+            stateOfOrigin: { type: string }
+            stateOfResidence: { type: string }
+            lgaOfResidence: { type: string }
+            isStudent: { type: boolean, enum: [true] }
+            academicLevel: { type: string }
+            levelOfStudy: { type: string }
+            institution: { type: string }
+            faculty: { type: string }
+            department: { type: string }
 
     ResetPasswordBody:
       type: object

@@ -101,4 +101,15 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
+UserSchema.index(
+  { phone: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      phoneVerified: true,
+      phone: { $type: 'string' },
+    },
+  }
+);
+
 module.exports = mongoose.model("User", UserSchema);

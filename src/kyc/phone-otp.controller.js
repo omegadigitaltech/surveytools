@@ -57,11 +57,19 @@ function createPhoneOtpController({ phoneOtpService }) {
     await phoneOtpService.verifyOtp(phone, code, req.userId);
 
     // Atomically update the User — only succeeds if no other verified account owns this number
-    const updated = await User.findOneAndUpdate(
-      { id: req.userId, $or: [{ phone: { $exists: false } }, { phone: null }, { phone: phone }] },
-      { phoneVerified: true, phone: phone },
-      { new: true }
-    );
+    let updated;
+    try {
+      updated = await User.findOneAndUpdate(
+        { id: req.userId, $or: [{ phone: { $exists: false } }, { phone: null }, { phone: phone }] },
+        { phoneVerified: true, phone: phone },
+        { new: true }
+      );
+    } catch (err) {
+      if (err?.code === 11000) {
+        throw new AppError(409, 'This phone number is already verified on another account');
+      }
+      throw err;
+    }
 
     if (!updated) {
       throw new AppError(409, 'This phone number is already verified on another account');
