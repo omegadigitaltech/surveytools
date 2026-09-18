@@ -43,12 +43,12 @@ const verifyRateLimiter = rateLimit({
  * POST /v1/kyc/otp/request
  * Issues a 6-digit OTP to the phone number.
  */
-router.post('/otp/request', authMiddleware, otpRateLimiter, requestOtp);
+router.post('/otp/request', otpRateLimiter, authMiddleware, requestOtp);
 
 /**
  * POST /v1/kyc/otp/verify
  * Verifies the OTP and updates the User's phoneVerified status.
  */
-router.post('/otp/verify', authMiddleware, verifyRateLimiter, verifyOtp);
+router.post('/otp/verify', verifyRateLimiter, authMiddleware, verifyOtp);
 
 module.exports = router;
