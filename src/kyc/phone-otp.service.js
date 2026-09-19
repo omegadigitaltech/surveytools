@@ -19,9 +19,10 @@ const log = createLogger('phone-otp');
  *     invalidatePrevious: Function,
  *   },
  *   kycConfig: { otpExpiryMs: number },
+ *   userModel: object,  // Mongoose User model — used for phone uniqueness check
  * }} deps
  */
-function createPhoneOtpService({ smsClient, otpRepo, kycConfig }) {
+function createPhoneOtpService({ smsClient, otpRepo, kycConfig, userModel }) {
   /**
    * Issues a 6-digit OTP to the given phone number.
    * Any previous active OTPs are invalidated first.
@@ -46,13 +47,24 @@ function createPhoneOtpService({ smsClient, otpRepo, kycConfig }) {
   /**
    * Verifies a 6-digit OTP submitted by the user.
    * Marks the OTP consumed on success so it cannot be replayed.
+   * Rejects if the phone number is already verified on a different account.
    *
    * @param {string} phone - E.164-format phone number
    * @param {string} code - 6-digit OTP provided by the user
+   * @param {string} requestingUserId - the `id` field of the user making this call
    * @returns {Promise<true>}
    * @throws {AppError} 400 if no active OTP, already consumed, expired, or wrong code
+   * @throws {AppError} 409 if phone is already verified on a different account
    */
-  async function verifyOtp(phone, code) {
+  async function verifyOtp(phone, code, requestingUserId) {
+    // Gap 4 fix: reject if this number is already verified on a DIFFERENT account
+    if (userModel) {
+      const existing = await userModel.findOne({ phone, phoneVerified: true }).select('id').lean();
+      if (existing && existing.id !== requestingUserId) {
+        throw new AppError(409, 'This phone number is already verified on another account');
+      }
+    }
+
     const otp = await otpRepo.findActive(phone);
 
     if (!otp) {

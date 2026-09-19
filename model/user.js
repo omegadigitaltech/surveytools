@@ -95,9 +95,21 @@ const UserSchema = new Schema(
     userType:      { type: String, enum: ['researcher', 'respondent'], default: null },
     dateOfBirth:   { type: Date, default: null },
     phoneVerified: { type: Boolean, default: false },
-    phone:         { type: String }
+    phone:         { type: String },
+    emailVerified: { type: Boolean, default: false }
   },
   { timestamps: true }
+);
+
+UserSchema.index(
+  { phone: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      phoneVerified: true,
+      phone: { $type: 'string' },
+    },
+  }
 );
 
 module.exports = mongoose.model("User", UserSchema);

@@ -2,6 +2,7 @@
 
 const express = require('express');
 const { authMiddleware } = require('../../middleware/auth');
+const kycConfig = require('../../config/kyc-config');
 const RespondentProfile = require('./respondent-profile.model');
 const { createRespondentProfileRepo } = require('./respondent-profile.repo');
 const { createRespondentSensitiveLayersService } = require('./respondent-sensitive-layers.service');
@@ -10,7 +11,7 @@ const { createRespondentSensitiveLayersController } = require('./respondent-sens
 const router = express.Router();
 
 const respondentProfileRepo = createRespondentProfileRepo({ RespondentProfile });
-const service = createRespondentSensitiveLayersService({ respondentProfileRepo });
+const service = createRespondentSensitiveLayersService({ respondentProfileRepo, kycConfig });
 const { submitLayer3, submitLayer4, submitLayer5 } = createRespondentSensitiveLayersController({ service });
 
 router.post('/respondent/layer3', authMiddleware, submitLayer3);

@@ -21,5 +21,8 @@ module.exports = Object.freeze({
   otpExpiryMs: OTP_EXPIRY_MINUTES * 60 * 1000,
 
   /** Survey-completion count that triggers progressive profiling Layer 2 */
-  kycLayer2SurveyThreshold: Number(process.env.KYC_LAYER2_SURVEY_THRESHOLD || 5),
+  // Layer 2 unlocks after the 1st completed survey (product doc §6)
+  kycLayer2SurveyThreshold: Number(process.env.KYC_LAYER2_SURVEY_THRESHOLD || 1),
+  // Layers 3 & 4 unlock after the 5th completed survey (product doc §6)
+  kycSensitiveLayersSurveyThreshold: Number(process.env.KYC_SENSITIVE_LAYERS_SURVEY_THRESHOLD || 5),
 });
