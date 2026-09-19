@@ -193,13 +193,17 @@ const postLogin = async (req, res) => {
   });
   res.cookie("token", token, { httpOnly: true });
 
+  const userData = user.toObject();
+  delete userData.password;
+  delete userData.code;
+
   res.status(200).json({
     status: "success",
     code: 200,
     msg: "User successfully logged in",
     data: {
       redirectUrl: redirectUrl,
-      user: user,
+      user: userData,
       // If false, the frontend must redirect the user to phone OTP verification
       // before allowing access to any protected feature (e.g. redemption).
       requiresPhoneVerification: !user.phoneVerified,
@@ -223,7 +227,7 @@ const googleLogin = async (req, res) => {
   }
 
   const { verified } = await getVerification(req.user.id);
-  const user = await User.findOne({ id: req.user.id });
+  const user = await User.findOne({ id: req.user.id }).select('-password -code');
 
   let redirectUrl;
   if (verified == true) {
@@ -261,7 +265,7 @@ const facebookLogin = async (req, res) => {
   }
   // send verification code to their email.
   const { verified } = await getVerification(req.user.id);
-  const user = await User.findOne({ id: req.user.id });
+  const user = await User.findOne({ id: req.user.id }).select('-password -code');
   let redirectUrl;
   if (verified == true) {
     redirectUrl = req.session.referer || url;
