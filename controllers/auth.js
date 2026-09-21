@@ -197,6 +197,29 @@ const postLogin = async (req, res) => {
   delete userData.password;
   delete userData.code;
 
+  // Non-blocking streak update — must never throw or affect login response
+  (async () => {
+    try {
+      const { UserGamification } = require('../model/gamification');
+      const profile = await UserGamification.findOne({ userId: user._id });
+      if (!profile) return;
+      
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const last = profile.lastLoginDate ? new Date(profile.lastLoginDate) : null;
+      if (last) last.setHours(0, 0, 0, 0);
+      
+      const isToday = last && last.getTime() === today.getTime();
+      const isYesterday = last && (today - last) === 86400000;
+      
+      if (!isToday) {
+        profile.currentStreak = isYesterday ? profile.currentStreak + 1 : 1;
+        profile.longestStreak = Math.max(profile.longestStreak, profile.currentStreak);
+        profile.lastLoginDate = today;
+        await profile.save();
+      }
+    } catch (_) { /* silently ignored */ }
+  })();
+
   res.status(200).json({
     status: "success",
     code: 200,
@@ -241,6 +264,29 @@ const googleLogin = async (req, res) => {
   });
   res.cookie("token", token, { httpOnly: true });
 
+  // Non-blocking streak update — must never throw or affect login response
+  (async () => {
+    try {
+      const { UserGamification } = require('../model/gamification');
+      const profile = await UserGamification.findOne({ userId: user._id });
+      if (!profile) return;
+      
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const last = profile.lastLoginDate ? new Date(profile.lastLoginDate) : null;
+      if (last) last.setHours(0, 0, 0, 0);
+      
+      const isToday = last && last.getTime() === today.getTime();
+      const isYesterday = last && (today - last) === 86400000;
+      
+      if (!isToday) {
+        profile.currentStreak = isYesterday ? profile.currentStreak + 1 : 1;
+        profile.longestStreak = Math.max(profile.longestStreak, profile.currentStreak);
+        profile.lastLoginDate = today;
+        await profile.save();
+      }
+    } catch (_) { /* silently ignored */ }
+  })();
+
   res.status(200).json({
     status: "success",
     code: 200,
@@ -277,6 +323,29 @@ const facebookLogin = async (req, res) => {
     expiresIn: process.env.JWT_LIFETIME,
   });
   res.cookie("token", token, { httpOnly: true });
+  // Non-blocking streak update — must never throw or affect login response
+  (async () => {
+    try {
+      const { UserGamification } = require('../model/gamification');
+      const profile = await UserGamification.findOne({ userId: user._id });
+      if (!profile) return;
+      
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const last = profile.lastLoginDate ? new Date(profile.lastLoginDate) : null;
+      if (last) last.setHours(0, 0, 0, 0);
+      
+      const isToday = last && last.getTime() === today.getTime();
+      const isYesterday = last && (today - last) === 86400000;
+      
+      if (!isToday) {
+        profile.currentStreak = isYesterday ? profile.currentStreak + 1 : 1;
+        profile.longestStreak = Math.max(profile.longestStreak, profile.currentStreak);
+        profile.lastLoginDate = today;
+        await profile.save();
+      }
+    } catch (_) { /* silently ignored */ }
+  })();
+
   res.status(200).json({
     status: "success",
     code: 200,

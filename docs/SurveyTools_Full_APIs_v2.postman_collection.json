@@ -1,1508 +1,1748 @@
 {
-  "info": {
-    "name": "SurveyTools Full APIs (with KYC v2)",
-    "description": "Complete API collection including Gamification, Marketplace, Analytics, and the full progressive KYC/NDPR suite.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:5003",
-      "type": "string"
+    "info": {
+        "name": "SurveyTools Full APIs (with KYC v2)",
+        "description": "Complete API collection including Gamification, Marketplace, Analytics, and the full progressive KYC/NDPR suite.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
-    {
-      "key": "token",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "missionProgressId",
-      "value": "ID_HERE",
-      "type": "string"
-    },
-    {
-      "key": "surveyId",
-      "value": "SURVEY_ID_HERE",
-      "type": "string"
-    },
-    {
-      "key": "questionId",
-      "value": "PRIMARY_QUESTION_ID",
-      "type": "string"
-    },
-    {
-      "key": "crossQuestionId",
-      "value": "SECONDARY_QUESTION_ID",
-      "type": "string"
-    }
-  ],
-  "item": [
-    {
-      "name": "1. Authentication",
-      "item": [
+    "variable": [
         {
-          "name": "1.1 Register Respondent (Layer 1)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"userType\": \"respondent\",\n  \"dateOfBirth\": \"1990-01-01T00:00:00.000Z\",\n  \"gender\": \"male\",\n  \"stateOfOrigin\": \"Lagos\",\n  \"stateOfResidence\": \"Lagos\",\n  \"lgaOfResidence\": \"Ikeja\",\n  \"isStudent\": false\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/register",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "register"
-              ]
-            }
-          }
+            "key": "base_url",
+            "value": "http://localhost:5003",
+            "type": "string"
         },
         {
-          "name": "1.2 Register Researcher",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"userType\": \"researcher\",\n  \"dateOfBirth\": \"1985-05-15T00:00:00.000Z\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/register",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "register"
-              ]
-            }
-          }
+            "key": "token",
+            "value": "",
+            "type": "string"
         },
         {
-          "name": "1.3 Login (Captures Token)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "const response = pm.response.json();",
-                  "if (response && response.data && response.token) {",
-                  "    pm.collectionVariables.set(\"token\", response.token);",
-                  "    console.log(\"Token captured successfully!\");",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/login",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "auth",
-                "login"
-              ]
-            }
-          }
+            "key": "missionProgressId",
+            "value": "ID_HERE",
+            "type": "string"
         },
         {
-          "name": "1.4 Forget Password (Request OTP)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/forget-password",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "forget-password"
-              ]
-            }
-          }
+            "key": "surveyId",
+            "value": "SURVEY_ID_HERE",
+            "type": "string"
         },
         {
-          "name": "1.5 Reset Password (Submit OTP)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"code\": \"123456\",\n  \"newPassword\": \"NewPass123!\",\n  \"confirmPassword\": \"NewPass123!\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/reset-password",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "reset-password"
-              ]
-            }
-          }
+            "key": "questionId",
+            "value": "PRIMARY_QUESTION_ID",
+            "type": "string"
         },
         {
-          "name": "Is Logged In",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/isLoggedIn",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "isLoggedIn"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update User",
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"bio\": \"I am a new bio for the legacy user update\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/update-user",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "update-user"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get User Profile",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/user/profile",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "user",
-                "profile"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get User Points",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/user/points",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "user",
-                "points"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Logout",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/auth/logout",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "auth",
-                "logout"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
+            "key": "crossQuestionId",
+            "value": "SECONDARY_QUESTION_ID",
+            "type": "string"
         }
-      ]
-    },
-    {
-      "name": "2. Admin Controls (Gamification & Marketplace)",
-      "item": [
+    ],
+    "item": [
         {
-          "name": "Create Mission",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Survey Master\",\n  \"description\": \"Complete 5 surveys today.\",\n  \"type\": \"daily\",\n  \"category\": \"surveys\",\n  \"targetValue\": 5,\n  \"xpReward\": 200,\n  \"pointsReward\": 50\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/admin/gamification/missions",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "admin",
-                "gamification",
-                "missions"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
+            "name": "1. Authentication",
+            "item": [
                 {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Create Marketplace Listing",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"10% Amazon Gift Card\",\n  \"description\": \"Get 10% off your next Amazon purchase.\",\n  \"type\": \"gift_card\",\n  \"pointsCost\": 500,\n  \"value\": \"10% Off\",\n  \"partnerName\": \"Amazon\",\n  \"stock\": 100\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/admin/marketplace/listings",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "admin",
-                "marketplace",
-                "listings"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Create Level Config",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"level\": 2,\n  \"name\": \"Explorer\",\n  \"minXP\": 1000,\n  \"maxXP\": 2500,\n  \"benefits\": [\"Extra spin wheel attempt\"]\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/admin/gamification/levels",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "admin",
-                "gamification",
-                "levels"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "3. Gamification",
-      "item": [
-        {
-          "name": "Dashboard Stats",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/gamification/dashboard",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "gamification",
-                "dashboard"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Spin Wheel",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/gamification/spin",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "gamification",
-                "spin"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Missions",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/gamification/missions",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "gamification",
-                "missions"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Claim Mission Reward",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/gamification/missions/{{missionProgressId}}/claim",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "gamification",
-                "missions",
-                "{{missionProgressId}}",
-                "claim"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Leaderboard",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/gamification/leaderboard?period=all_time",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "gamification",
-                "leaderboard"
-              ],
-              "query": [
-                {
-                  "key": "period",
-                  "value": "all_time"
-                }
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get VIP Status",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/gamification/vip-status",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "gamification",
-                "vip-status"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "4. Marketplace & Vouchers",
-      "item": [
-        {
-          "name": "Get Listings",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/marketplace/listings",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "marketplace",
-                "listings"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Convert Points / Buy Voucher",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"pointsToConvert\": 500\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/marketplace/convert",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "marketplace",
-                "convert"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Voucher Wallet",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/marketplace/wallet",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "marketplace",
-                "wallet"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Transaction Summary",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/marketplace/transactions",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "marketplace",
-                "transactions"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "5. Graph Visualizations",
-      "item": [
-        {
-          "name": "Get Basic Graph Data",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/surveys/{{surveyId}}/visualizations?graphType=bar&questionId={{questionId}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "surveys",
-                "{{surveyId}}",
-                "visualizations"
-              ],
-              "query": [
-                {
-                  "key": "graphType",
-                  "value": "bar"
+                    "name": "1.1 Register Respondent (Layer 1)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"userType\": \"respondent\",\n  \"dateOfBirth\": \"1990-01-01T00:00:00.000Z\",\n  \"gender\": \"male\",\n  \"stateOfOrigin\": \"Lagos\",\n  \"stateOfResidence\": \"Lagos\",\n  \"lgaOfResidence\": \"Ikeja\",\n  \"isStudent\": false\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "register"
+                            ]
+                        }
+                    }
                 },
                 {
-                  "key": "questionId",
-                  "value": "{{questionId}}"
-                }
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
+                    "name": "1.2 Register Researcher",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"userType\": \"researcher\",\n  \"dateOfBirth\": \"1985-05-15T00:00:00.000Z\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "register"
+                            ]
+                        }
+                    }
+                },
                 {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
+                    "name": "1.3 Login (Captures Token)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "const response = pm.response.json();",
+                                    "if (response && response.data && response.token) {",
+                                    "    pm.collectionVariables.set(\"token\", response.token);",
+                                    "    console.log(\"Token captured successfully!\");",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "1.4 Forget Password (Request OTP)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/forget-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "forget-password"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "1.5 Reset Password (Submit OTP)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"code\": \"123456\",\n  \"newPassword\": \"NewPass123!\",\n  \"confirmPassword\": \"NewPass123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/reset-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "reset-password"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Is Logged In",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/isLoggedIn",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "isLoggedIn"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update User",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"bio\": \"I am a new bio for the legacy user update\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/update-user",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "update-user"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get User Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/user/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "user",
+                                "profile"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get User Points",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/user/points",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "user",
+                                "points"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
                 }
-              ]
-            }
-          }
+            ]
+        },
+        {
+            "name": "2. Admin Controls (Gamification & Marketplace)",
+            "item": [
+                {
+                    "name": "Create Mission",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Survey Master\",\n  \"description\": \"Complete 5 surveys today.\",\n  \"type\": \"daily\",\n  \"category\": \"surveys\",\n  \"targetValue\": 5,\n  \"xpReward\": 200,\n  \"pointsReward\": 50\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/gamification/missions",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "gamification",
+                                "missions"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Marketplace Listing",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"10% Amazon Gift Card\",\n  \"description\": \"Get 10% off your next Amazon purchase.\",\n  \"type\": \"gift_card\",\n  \"pointsCost\": 500,\n  \"value\": \"10% Off\",\n  \"partnerName\": \"Amazon\",\n  \"stock\": 100\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/marketplace/listings",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "marketplace",
+                                "listings"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Level Config",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"level\": 2,\n  \"name\": \"Explorer\",\n  \"minXP\": 1000,\n  \"maxXP\": 2500,\n  \"benefits\": [\"Extra spin wheel attempt\"]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/gamification/levels",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "gamification",
+                                "levels"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Admin - Create Achievement (Phase 3)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/gamification/achievements",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "gamification",
+                                "achievements"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"First Blood\",\n    \"description\": \"Complete first survey\",\n    \"type\": \"surveys\",\n    \"requirementValue\": 1,\n    \"rewardPoints\": 100,\n    \"iconUrl\": \"http://example.com/icon.png\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Admin - Get All Levels (Phase 3)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/gamification/levels",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "gamification",
+                                "levels"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Admin - Get VIP Tiers (Phase 3)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/gamification/vip",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "gamification",
+                                "vip"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Admin - Create Bonus Event (Phase 3)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/gamification/bonus-events",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "gamification",
+                                "bonus-events"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Weekend Double XP\",\n    \"type\": \"double_xp\",\n    \"multiplier\": 2.0,\n    \"startDate\": \"2026-10-01T00:00:00Z\",\n    \"endDate\": \"2026-10-02T23:59:59Z\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Admin - Get Bonus Events (Phase 3)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/gamification/bonus-events",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "gamification",
+                                "bonus-events"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "3. Gamification",
+            "item": [
+                {
+                    "name": "Dashboard Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/gamification/dashboard",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "gamification",
+                                "dashboard"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Spin Wheel",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/gamification/spin",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "gamification",
+                                "spin"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Missions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/gamification/missions",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "gamification",
+                                "missions"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Claim Mission Reward",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/gamification/missions/{{missionProgressId}}/claim",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "gamification",
+                                "missions",
+                                "{{missionProgressId}}",
+                                "claim"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Leaderboard",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/gamification/leaderboard?period=all_time",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "gamification",
+                                "leaderboard"
+                            ],
+                            "query": [
+                                {
+                                    "key": "period",
+                                    "value": "all_time"
+                                }
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get VIP Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/gamification/vip-status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "gamification",
+                                "vip-status"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Levels (Phase 2)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/gamification/levels",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "gamification",
+                                "levels"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Achievements (Phase 2)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/gamification/achievements",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "gamification",
+                                "achievements"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Spin History (Phase 2)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/gamification/spin/history",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "gamification",
+                                "spin",
+                                "history"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Referrals (Phase 2)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/gamification/referrals",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "gamification",
+                                "referrals"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "4. Marketplace & Vouchers",
+            "item": [
+                {
+                    "name": "Get Listings",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/marketplace/listings",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "marketplace",
+                                "listings"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Convert Points / Buy Voucher",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"pointsToConvert\": 500\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/marketplace/convert",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "marketplace",
+                                "convert"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Voucher Wallet",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/marketplace/wallet",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "marketplace",
+                                "wallet"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Transaction Summary",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/marketplace/transactions",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "marketplace",
+                                "transactions"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "5. Graph Visualizations",
+            "item": [
+                {
+                    "name": "Get Basic Graph Data",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/surveys/{{surveyId}}/visualizations?graphType=bar&questionId={{questionId}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "surveys",
+                                "{{surveyId}}",
+                                "visualizations"
+                            ],
+                            "query": [
+                                {
+                                    "key": "graphType",
+                                    "value": "bar"
+                                },
+                                {
+                                    "key": "questionId",
+                                    "value": "{{questionId}}"
+                                }
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "6. Analytics",
+            "item": [
+                {
+                    "name": "Get Survey Analytics Overview",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/surveys/{{surveyId}}/analytics/overview",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "surveys",
+                                "{{surveyId}}",
+                                "analytics",
+                                "overview"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get User Engagement Analytics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/analytics/engagement",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "analytics",
+                                "engagement"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Response Trends Analytics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/surveys/{{surveyId}}/analytics/trends?timeframe=weekly",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "surveys",
+                                "{{surveyId}}",
+                                "analytics",
+                                "trends"
+                            ],
+                            "query": [
+                                {
+                                    "key": "timeframe",
+                                    "value": "weekly"
+                                }
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "7. OTP Verification",
+            "item": [
+                {
+                    "name": "2.1 Request Phone OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"phone\": \"+2348012345678\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/otp/request",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "otp",
+                                "request"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2.2 Verify Phone OTP",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"phone\": \"+2348012345678\",\n  \"code\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/otp/verify",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "otp",
+                                "verify"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2.3 Request Email OTP (Academic/Org)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"student@example.edu.ng\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/email-otp/request",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "email-otp",
+                                "request"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2.4 Verify Email OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"student@example.edu.ng\",\n  \"code\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/email-otp/verify",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "email-otp",
+                                "verify"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "8. Profiles & Progressive Layers",
+            "item": [
+                {
+                    "name": "3.1 Submit Researcher Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"researcherType\": \"professional\",\n  \"title\": \"Dr.\",\n  \"profession\": \"Data Scientist\",\n  \"areaOfSpecialisation\": \"Machine Learning\",\n  \"employer\": \"Omega Digital Tech\",\n  \"workEmail\": \"jane.smith@omegadigitaltech.com\",\n  \"stateOfPractice\": \"Lagos\",\n  \"researchPurpose\": \"Academic and market research on consumer behaviour\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/researcher/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "researcher",
+                                "profile"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.2 Get Researcher Tier",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/researcher/tier",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "researcher",
+                                "tier"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.3 Get Respondent Layer Status",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/respondent/layer-status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "respondent",
+                                "layer-status"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.4 Submit Respondent Layer 2",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"educationLevel\": \"Bachelors\",\n  \"employmentStatus\": \"Employed\",\n  \"incomeRange\": \"100k-500k\",\n  \"maritalStatus\": \"Single\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/respondent/layer2",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "respondent",
+                                "layer2"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.5 Submit Respondent Layer 3 (Health - Encrypted)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"chronicHealthConditions\": [],\n  \"disabilityStatus\": \"None\",\n  \"smokingStatus\": \"Never\",\n  \"alcoholConsumption\": \"Occasional\",\n  \"exerciseFrequency\": \"Weekly\",\n  \"dietaryPattern\": \"Omnivore\",\n  \"bloodGroup\": \"O+\",\n  \"genotype\": \"AA\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/respondent/layer3",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "respondent",
+                                "layer3"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.6 Submit Respondent Layer 4 (Socioeconomic - Encrypted)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"monthlyHouseholdIncome\": \"500k-1M\",\n  \"housingType\": \"Rented\",\n  \"primaryTransport\": \"Public\",\n  \"internetAccessQuality\": \"Good\",\n  \"primaryDevice\": \"Smartphone\",\n  \"numberOfDependants\": 0\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/respondent/layer4",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "respondent",
+                                "layer4"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.7 Submit Respondent Layer 5 (Cultural - Encrypted)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"religion\": \"Christianity\",\n  \"ethnicity\": \"Yoruba\",\n  \"languagesSpoken\": [\"English\", \"Yoruba\"],\n  \"maritalStatus\": \"Single\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/respondent/layer5",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "respondent",
+                                "layer5"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.8 Simulate Survey Completed Hook",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/respondent/survey-completed",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "respondent",
+                                "survey-completed"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "9. NDPR & Compliance",
+            "item": [
+                {
+                    "name": "4.1 Submit NDPR Consent",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"scopes\": [\"basic_profile\", \"health_data\", \"socioeconomic_data\", \"religious_cultural_data\", \"survey_participation\", \"marketing\"]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/consent",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "consent"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4.2 Revoke specific scope consent",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"granted\": false\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/consent/marketing",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "consent",
+                                "marketing"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4.3 Erase KYC Data (Right to Erasure)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/v1/kyc/me",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "kyc",
+                                "me"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "10. User Profile & Legacy Auth",
+            "description": "Legacy authentication endpoints and user profile management (Update User, Get Points, Logout)",
+            "item": []
         }
-      ]
-    },
-    {
-      "name": "6. Analytics",
-      "item": [
-        {
-          "name": "Get Survey Analytics Overview",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/surveys/{{surveyId}}/analytics/overview",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "surveys",
-                "{{surveyId}}",
-                "analytics",
-                "overview"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get User Engagement Analytics",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/analytics/engagement",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "analytics",
-                "engagement"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Response Trends Analytics",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/surveys/{{surveyId}}/analytics/trends?timeframe=weekly",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "surveys",
-                "{{surveyId}}",
-                "analytics",
-                "trends"
-              ],
-              "query": [
-                {
-                  "key": "timeframe",
-                  "value": "weekly"
-                }
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "7. OTP Verification",
-      "item": [
-        {
-          "name": "2.1 Request Phone OTP",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"phone\": \"+2348012345678\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/otp/request",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "otp",
-                "request"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "2.2 Verify Phone OTP",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"phone\": \"+2348012345678\",\n  \"code\": \"123456\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/otp/verify",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "otp",
-                "verify"
-              ]
-            }
-          }
-        },
-        {
-          "name": "2.3 Request Email OTP (Academic/Org)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"student@example.edu.ng\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/email-otp/request",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "email-otp",
-                "request"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "2.4 Verify Email OTP",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"student@example.edu.ng\",\n  \"code\": \"123456\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/email-otp/verify",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "email-otp",
-                "verify"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "8. Profiles & Progressive Layers",
-      "item": [
-        {
-          "name": "3.1 Submit Researcher Profile",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"researcherType\": \"professional\",\n  \"title\": \"Dr.\",\n  \"profession\": \"Data Scientist\",\n  \"areaOfSpecialisation\": \"Machine Learning\",\n  \"employer\": \"Omega Digital Tech\",\n  \"workEmail\": \"jane.smith@omegadigitaltech.com\",\n  \"stateOfPractice\": \"Lagos\",\n  \"researchPurpose\": \"Academic and market research on consumer behaviour\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/researcher/profile",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "researcher",
-                "profile"
-              ]
-            }
-          }
-        },
-        {
-          "name": "3.2 Get Researcher Tier",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/researcher/tier",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "researcher",
-                "tier"
-              ]
-            }
-          }
-        },
-        {
-          "name": "3.3 Get Respondent Layer Status",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/respondent/layer-status",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "respondent",
-                "layer-status"
-              ]
-            }
-          }
-        },
-        {
-          "name": "3.4 Submit Respondent Layer 2",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"educationLevel\": \"Bachelors\",\n  \"employmentStatus\": \"Employed\",\n  \"incomeRange\": \"100k-500k\",\n  \"maritalStatus\": \"Single\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/respondent/layer2",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "respondent",
-                "layer2"
-              ]
-            }
-          }
-        },
-        {
-          "name": "3.5 Submit Respondent Layer 3 (Health - Encrypted)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"chronicHealthConditions\": [],\n  \"disabilityStatus\": \"None\",\n  \"smokingStatus\": \"Never\",\n  \"alcoholConsumption\": \"Occasional\",\n  \"exerciseFrequency\": \"Weekly\",\n  \"dietaryPattern\": \"Omnivore\",\n  \"bloodGroup\": \"O+\",\n  \"genotype\": \"AA\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/respondent/layer3",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "respondent",
-                "layer3"
-              ]
-            }
-          }
-        },
-        {
-          "name": "3.6 Submit Respondent Layer 4 (Socioeconomic - Encrypted)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"monthlyHouseholdIncome\": \"500k-1M\",\n  \"housingType\": \"Rented\",\n  \"primaryTransport\": \"Public\",\n  \"internetAccessQuality\": \"Good\",\n  \"primaryDevice\": \"Smartphone\",\n  \"numberOfDependants\": 0\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/respondent/layer4",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "respondent",
-                "layer4"
-              ]
-            }
-          }
-        },
-        {
-          "name": "3.7 Submit Respondent Layer 5 (Cultural - Encrypted)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"religion\": \"Christianity\",\n  \"ethnicity\": \"Yoruba\",\n  \"languagesSpoken\": [\"English\", \"Yoruba\"],\n  \"maritalStatus\": \"Single\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/respondent/layer5",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "respondent",
-                "layer5"
-              ]
-            }
-          }
-        },
-        {
-          "name": "3.8 Simulate Survey Completed Hook",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/respondent/survey-completed",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "respondent",
-                "survey-completed"
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "9. NDPR & Compliance",
-      "item": [
-        {
-          "name": "4.1 Submit NDPR Consent",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"scopes\": [\"basic_profile\", \"health_data\", \"socioeconomic_data\", \"religious_cultural_data\", \"survey_participation\", \"marketing\"]\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/consent",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "consent"
-              ]
-            }
-          }
-        },
-        {
-          "name": "4.2 Revoke specific scope consent",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"granted\": false\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/consent/marketing",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "consent",
-                "marketing"
-              ]
-            }
-          }
-        },
-        {
-          "name": "4.3 Erase KYC Data (Right to Erasure)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/v1/kyc/me",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "kyc",
-                "me"
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "10. User Profile & Legacy Auth",
-      "description": "Legacy authentication endpoints and user profile management (Update User, Get Points, Logout)",
-      "item": []
-    }
-  ]
+    ]
 }
