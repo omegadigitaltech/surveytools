@@ -25,6 +25,8 @@ const mainRouter = require('./routes/main')
 const redemptionRouter = require('./routes/redemption')
 const adminRouter = require('./routes/admin');
 const gamificationRouter = require('./routes/gamification');
+const gamificationNewRouter = require('./src/gamification/gamification.routes');
+const adminGamificationNewRouter = require('./src/admin-gamification/admin-gamification.routes');
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const uploadErrorHandler = require('./middleware/errorHandler')
 const notFoundMiddleware = require('./middleware/not-found');
@@ -198,6 +200,9 @@ app.use('/v1/kyc', researcherTierRoutes);
 
 app.use('/', adminRouter);
 app.use('/', gamificationRouter);
+// New gamification additions — additive only, never modifies existing routes
+app.use('/', gamificationNewRouter);
+app.use('/', adminGamificationNewRouter);
 app.use('/', marketplaceRouter);
 app.use('/', visualizationRouter);
 app.use('/', analyticsRouter);

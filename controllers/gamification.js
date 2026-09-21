@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const {
   UserGamification,
   SpinHistory,
@@ -10,7 +11,7 @@ const {
   VIPTierConfig,
 } = require('../model/gamification');
 const User = require('../model/user');
-const mongoose = require('mongoose');
+const { AppError } = require('../lib/app-error');
 
 // ─── HELPER: GET OR CREATE GAMIFICATION PROFILE ─────────────────────────────
 const getGamificationProfile = async (userId, session = null) => {
@@ -22,7 +23,83 @@ const getGamificationProfile = async (userId, session = null) => {
   return profile;
 };
 
-// ─── GET DASHBOARD / PROFILE ──────────────────────────────────────────────────
+// ─── HELPER: XP LEVEL-UP CHECK ────────────────────────────────────────────────
+const checkAndApplyLevelUp = async (profile, session = null) => {
+  let levelUp = false;
+  let nextLevelConfig = await LevelConfig.findOne({ level: profile.level + 1 }).session(session);
+
+  while (nextLevelConfig && profile.xp >= nextLevelConfig.minXP) {
+    profile.level = nextLevelConfig.level;
+    levelUp = true;
+    nextLevelConfig = await LevelConfig.findOne({ level: profile.level + 1 }).session(session);
+  }
+  return levelUp;
+};
+
+// ─── HELPER: ACHIEVEMENT UNLOCK CHECK ──────────────────────────────────────────
+const checkAndUnlockAchievements = async (profile, user, session = null) => {
+  const achievements = await Achievement.find({ isActive: true }).session(session);
+  const unlockedIds = profile.achievements.map(a => a.achievementId.toString());
+  
+  let newUnlocks = false;
+  let totalXPReward = 0;
+  let totalPointsReward = 0;
+
+  for (const achievement of achievements) {
+    if (unlockedIds.includes(achievement._id.toString())) continue;
+
+    let unlocked = false;
+    switch (achievement.category) {
+      case 'surveys':
+        if (profile.totalSurveysCompleted >= achievement.triggerValue) unlocked = true;
+        break;
+      case 'streak':
+        if (profile.currentStreak >= achievement.triggerValue) unlocked = true;
+        break;
+      case 'referral':
+        if (profile.referralCount >= achievement.triggerValue) unlocked = true;
+        break;
+      case 'points':
+        if (profile.totalPointsEarned >= achievement.triggerValue) unlocked = true;
+        break;
+      case 'level':
+        if (profile.level >= achievement.triggerValue) unlocked = true;
+        break;
+      case 'spin':
+        if (profile.totalSpins >= achievement.triggerValue) unlocked = true;
+        break;
+    }
+
+    if (unlocked) {
+      profile.achievements.push({ achievementId: achievement._id, unlockedAt: new Date() });
+      totalXPReward += achievement.xpReward;
+      totalPointsReward += achievement.pointsReward;
+      newUnlocks = true;
+    }
+  }
+
+  if (newUnlocks) {
+    if (totalXPReward > 0) {
+      profile.xp += totalXPReward;
+      profile.totalXPEarned += totalXPReward;
+      // Re-check level up in case achievement XP pushed us over
+      await checkAndApplyLevelUp(profile, session);
+    }
+    if (totalPointsReward > 0) {
+      user.pointBalance += totalPointsReward;
+      profile.totalPointsEarned += totalPointsReward;
+    }
+  }
+  return newUnlocks;
+};
+
+// ─── GET DASHBOARD ────────────────────────────────────────────────────────────
+/**
+ * Retrieves the user's gamification dashboard stats.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 const getGamificationDashboard = async (req, res, next) => {
   try {
     const userId = req.userId;
@@ -75,14 +152,20 @@ const getGamificationDashboard = async (req, res, next) => {
   }
 };
 
-// ─── DAILY SPIN ──────────────────────────────────────────────────────────────
+// ─── SPIN WHEEL ───────────────────────────────────────────────────────────────
+/**
+ * Uses a daily spin to grant random gamification rewards.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 const spinWheel = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
     const user = await User.findOne({ id: req.userId }).session(session);
-    if (!user) throw new Error('User not found');
+    if (!user) throw new AppError(404, 'User not found');
 
     const profile = await getGamificationProfile(user._id, session);
 
@@ -143,6 +226,10 @@ const spinWheel = async (req, res, next) => {
       boostApplied: ['2x_multiplier', 'speed_up', 'jackpot'].includes(result)
     });
 
+    // Evaluate Progressions
+    await checkAndApplyLevelUp(profile, session);
+    await checkAndUnlockAchievements(profile, user, session);
+
     await user.save({ session });
     await profile.save({ session });
     await history.save({ session });
@@ -168,6 +255,12 @@ const spinWheel = async (req, res, next) => {
 };
 
 // ─── GET MISSIONS ─────────────────────────────────────────────────────────────
+/**
+ * Retrieves active daily and weekly missions for the user.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 const getMissions = async (req, res, next) => {
   try {
     const user = await User.findOne({ id: req.userId });
@@ -202,7 +295,13 @@ const getMissions = async (req, res, next) => {
   }
 };
 
-// ─── CLAIM MISSION REWARD ────────────────────────────────────────────────────
+// ─── CLAIM MISSION REWARD ─────────────────────────────────────────────────────
+/**
+ * Claims the reward for a completed mission.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 const claimMissionReward = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -210,7 +309,7 @@ const claimMissionReward = async (req, res, next) => {
   try {
     const { missionProgressId } = req.params;
     const user = await User.findOne({ id: req.userId }).session(session);
-    if (!user) throw new Error('User not found');
+    if (!user) throw new AppError(404, 'User not found');
 
     const progress = await UserMissionProgress.findOne({
       _id: missionProgressId,
@@ -249,6 +348,17 @@ const claimMissionReward = async (req, res, next) => {
       profile.totalXPEarned += mission.xpReward;
     }
 
+    progress.completed = true;
+    progress.rewardClaimed = true;
+    progress.completedAt = new Date();
+    await progress.save({ session });
+
+    await checkAndApplyLevelUp(profile, session);
+    await checkAndUnlockAchievements(profile, user, session);
+
+    await user.save({ session });
+    await profile.save({ session });
+
     progress.rewardClaimed = true;
 
     await progress.save({ session });
@@ -274,6 +384,12 @@ const claimMissionReward = async (req, res, next) => {
 };
 
 // ─── GET LEADERBOARD ──────────────────────────────────────────────────────────
+/**
+ * Retrieves the gamification leaderboard.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 const getLeaderboard = async (req, res, next) => {
   try {
     const { period = 'all_time' } = req.query; // daily, weekly, all_time
@@ -288,13 +404,15 @@ const getLeaderboard = async (req, res, next) => {
         .limit(50)
         .populate('userId', 'fullname pic_url');
         
-      entries = entries.map((e, index) => ({
-        rank: index + 1,
-        fullname: e.userId.fullname,
-        pic_url: e.userId.pic_url,
-        xp: e.xp,
-        level: e.level
-      }));
+      entries = entries
+        .filter(e => e.userId != null)
+        .map((e, index) => ({
+          rank: index + 1,
+          fullname: e.userId.fullname,
+          pic_url: e.userId.pic_url,
+          xp: e.xp,
+          level: e.level
+        }));
     } else {
       // Logic for daily/weekly would query LeaderboardEntry using periodKey
       // Mocking for now as it requires background aggregation jobs
@@ -311,6 +429,12 @@ const getLeaderboard = async (req, res, next) => {
 };
 
 // ─── GET VIP STATUS ───────────────────────────────────────────────────────────
+/**
+ * Retrieves the user's VIP status and benefits.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 const getVipStatus = async (req, res, next) => {
   try {
     const user = await User.findOne({ id: req.userId });
@@ -319,7 +443,7 @@ const getVipStatus = async (req, res, next) => {
     const profile = await getGamificationProfile(user._id);
     const tiers = await VIPTierConfig.find().sort({ minPoints: 1 });
     
-    const currentTierConfig = tiers.find(t => t.tier === profile.vipTier) || tiers[0];
+    const currentTierConfig = tiers.find(t => t.tier === profile.vipTier) || tiers[0] || { tier: profile.vipTier || 'bronze', conversionRate: 1, bonusOnRewards: 0, supportLevel: 'standard' };
     const nextTierConfig = tiers.find(t => t.minPoints > user.pointBalance);
 
     res.status(200).json({
