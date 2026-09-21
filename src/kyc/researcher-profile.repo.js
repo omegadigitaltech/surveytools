@@ -4,7 +4,8 @@
  * @param {{ ResearcherProfile: import('mongoose').Model }} deps
  * @returns {{
  *   findByUserId: (userId: string) => Promise<object|null>,
- *   create: (data: object) => Promise<object>
+ *   create: (data: object) => Promise<object>,
+ *   updateTier: (userId: string, tier: string) => Promise<object|null>
  * }}
  */
 function createResearcherProfileRepo({ ResearcherProfile }) {
@@ -17,7 +18,16 @@ function createResearcherProfileRepo({ ResearcherProfile }) {
     return profile.toObject();
   }
 
-  return { findByUserId, create };
+  async function updateTier(userId, tier) {
+    const profile = await ResearcherProfile.findOneAndUpdate(
+      { userId },
+      { tier },
+      { new: true }
+    );
+    return profile ? profile.toObject() : null;
+  }
+
+  return { findByUserId, create, updateTier };
 }
 
 module.exports = { createResearcherProfileRepo };

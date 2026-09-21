@@ -22,12 +22,22 @@ router.get('/isLoggedIn', isLoggedIn)
 router.post('/verify',authMiddleware, verify)
 router.get('/failure', failurePage)
 
-router.post('/login', postLogin)
-router.post('/register', postRegister)
+router.post(['/login', '/auth/login'], postLogin)
+router.post(['/register', '/auth/register'], postRegister)
+
+const rateLimit = require('express-rate-limit');
+
+const resetPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { status: 'failure', code: 429, msg: 'Too many reset attempts, please try again after 15 minutes' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Password reset routes
 router.post('/forget-password', forgetPassword)
-router.post('/reset-password', resetPassword)
+router.post('/reset-password', resetPasswordLimiter, resetPassword)
 
 router.get('/auth/logout', logout)
 

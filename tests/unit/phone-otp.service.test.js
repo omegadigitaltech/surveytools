@@ -23,6 +23,15 @@ function makeSmsClient(overrides = {}) {
   };
 }
 
+function makeUserModel(overrides = {}) {
+  return {
+    findOne: jest.fn().mockReturnValue({
+      select: jest.fn().mockReturnValue({ lean: jest.fn().mockResolvedValue(null) }),
+    }),
+    ...overrides,
+  };
+}
+
 const kycConfig = { otpExpiryMs: 10 * 60 * 1000 }; // 10 minutes
 
 // ---------------------------------------------------------------------------
@@ -176,6 +185,76 @@ describe('createPhoneOtpService — verifyOtp', () => {
     const service = createPhoneOtpService({ smsClient, otpRepo, kycConfig });
 
     await expect(service.verifyOtp('+2348012345678', '123456')).rejects.toThrow();
+    expect(otpRepo.markConsumed).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// verifyOtp — phone uniqueness check (Gap 4)
+// ---------------------------------------------------------------------------
+
+describe('createPhoneOtpService — verifyOtp phone uniqueness', () => {
+  function makeActiveOtp(overrides = {}) {
+    return {
+      _id: 'otp-id-1',
+      phone: '+2348012345678',
+      code: '123456',
+      consumed: false,
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      ...overrides,
+    };
+  }
+
+  it('skips uniqueness check when no userModel is provided', async () => {
+    const activeOtp = makeActiveOtp();
+    const otpRepo = makeOtpRepo({ findActive: jest.fn().mockResolvedValue(activeOtp) });
+    const smsClient = makeSmsClient();
+    // No userModel — old behaviour
+    const service = createPhoneOtpService({ smsClient, otpRepo, kycConfig });
+
+    const result = await service.verifyOtp('+2348012345678', '123456', 'user-abc');
+    expect(result).toBe(true);
+  });
+
+  it('allows verification when phone is already verified on the SAME account', async () => {
+    const activeOtp = makeActiveOtp();
+    const otpRepo = makeOtpRepo({ findActive: jest.fn().mockResolvedValue(activeOtp) });
+    const smsClient = makeSmsClient();
+    // userModel returns the SAME user
+    const userModel = {
+      findOne: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue({ id: 'user-abc' }),
+        }),
+      }),
+    };
+    const service = createPhoneOtpService({ smsClient, otpRepo, kycConfig, userModel });
+
+    const result = await service.verifyOtp('+2348012345678', '123456', 'user-abc');
+    expect(result).toBe(true);
+  });
+
+  it('throws 409 when phone is already verified on a DIFFERENT account', async () => {
+    const activeOtp = makeActiveOtp();
+    const otpRepo = makeOtpRepo({ findActive: jest.fn().mockResolvedValue(activeOtp) });
+    const smsClient = makeSmsClient();
+    // userModel returns a DIFFERENT user
+    const userModel = {
+      findOne: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue({ id: 'user-xyz' }),
+        }),
+      }),
+    };
+    const service = createPhoneOtpService({ smsClient, otpRepo, kycConfig, userModel });
+
+    await expect(
+      service.verifyOtp('+2348012345678', '123456', 'user-abc')
+    ).rejects.toMatchObject({
+      status: 409,
+      message: 'This phone number is already verified on another account',
+    });
+    // Should NOT consume the OTP either
     expect(otpRepo.markConsumed).not.toHaveBeenCalled();
   });
 });

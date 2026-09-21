@@ -5,48 +5,129 @@ const User = require('../model/user');
 // Set up Redis connection with fallback to local Redis
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 
-// Redis connection options with retry strategy
-const redisOptions = {
-  redis: {
-    port: process.env.REDIS_PORT || 6379,
-    host: process.env.REDIS_HOST || '127.0.0.1',
-    password: process.env.REDIS_PASSWORD,
-    retryStrategy: (times) => {
-      // Exponential backoff with a cap at 30 seconds
-      const delay = Math.min(Math.pow(2, times) * 1000, 30000);
-      console.log(`Redis connection retry in ${delay}ms`);
-      return delay;
-    }
-  }
-};
 
-// Create email notification queue with retry options
-let emailQueue;
-try {
-  emailQueue = new Queue('email-notifications', REDIS_URL, {
-    defaultJobOptions: {
-      attempts: 5,
-      backoff: {
-        type: 'exponential',
-        delay: 5000
-      },
-      removeOnComplete: true
-    },
-    settings: {
-      lockDuration: 30000, // 30 seconds
-      stalledInterval: 30000, // 30 seconds
-    }
-  });
 
-  console.log('Email queue initialized successfully');
-  
-  // Log errors from the queue
-  emailQueue.on('error', (error) => {
-    console.error('Queue error:', error);
+let emailQueue = null;
+let redisConnected = false;
+let redisWarningLogged = false;
+
+// Pre-check Redis availability before handing off to Bull.
+// Bull's ioredis client throws unhandled promise rejections when Redis is
+// offline and retryStrategy returns null, so we probe first and only create
+// the queue when Redis is actually reachable.
+const net = require('net');
+
+function probeRedis(url) {
+  return new Promise((resolve) => {
+    let host = '127.0.0.1';
+    let port = 6379;
+    try {
+      const parsed = new URL(url);
+      host = parsed.hostname || host;
+      port = parseInt(parsed.port, 10) || port;
+    } catch (_) {}
+
+    const socket = net.createConnection({ host, port });
+    const timer = setTimeout(() => {
+      socket.destroy();
+      resolve(false);
+    }, 1000);
+
+    socket.on('connect', () => {
+      clearTimeout(timer);
+      socket.destroy();
+      resolve(true);
+    });
+
+    socket.on('error', () => {
+      clearTimeout(timer);
+      resolve(false);
+    });
   });
-} catch (error) {
-  console.error('Failed to initialize email queue:', error);
 }
+
+// Initialize queue asynchronously — if Redis is offline we skip Bull entirely
+(async () => {
+  const redisAvailable = await probeRedis(REDIS_URL);
+
+  if (!redisAvailable) {
+    console.warn(`⚠️ Redis is unavailable at ${REDIS_URL}. Background email queue is disabled; critical emails will be sent directly.`);
+    return;
+  }
+
+  try {
+    emailQueue = new Queue('email-notifications', REDIS_URL, {
+      redis: {
+        maxRetriesPerRequest: null,
+        enableReadyCheck: false,
+      },
+      defaultJobOptions: {
+        attempts: 5,
+        backoff: { type: 'exponential', delay: 5000 },
+        removeOnComplete: true,
+      },
+      settings: {
+        lockDuration: 30000,
+        stalledInterval: 30000,
+      },
+    });
+
+    emailQueue.on('ready', () => {
+      redisConnected = true;
+      console.log('✅ Email queue connected to Redis successfully');
+    });
+
+    emailQueue.on('error', (error) => {
+      redisConnected = false;
+      if (!redisWarningLogged) {
+        console.warn(`⚠️ Email queue error: ${error.message}`);
+        redisWarningLogged = true;
+      }
+    });
+
+    // Process email sending jobs
+    emailQueue.process(async (job) => {
+      const { emailType, data } = job.data;
+
+      try {
+        switch (emailType) {
+          case 'survey-published':
+            await sendSurveyPublishedNotification(data);
+            break;
+          case 'password-reset':
+          case 'password-reset-confirmation':
+          case 'direct-email':
+            await sendDirectEmail(data);
+            break;
+          default:
+            if (typeof job.data === 'object' && job.data.to && job.data.subject) {
+              await sendDirectEmail(job.data);
+            } else {
+              throw new Error(`Unknown email type: ${emailType}`);
+            }
+        }
+        return { success: true };
+      } catch (error) {
+        console.error(`Email job failed: ${error.message}`);
+        throw error;
+      }
+    });
+
+    emailQueue.on('completed', (job) => {
+      console.log(`Email job ${job.id} completed`);
+    });
+
+    emailQueue.on('failed', (job, err) => {
+      console.error(`Email job ${job.id} failed with error: ${err.message}`);
+    });
+
+    console.log('✅ Email queue initialized successfully');
+  } catch (error) {
+    console.warn('⚠️ Failed to initialize email queue:', error.message);
+    emailQueue = null;
+  }
+})();
+
 
 // Configure email transporter
 const getEmailTransporter = () => {
@@ -59,41 +140,6 @@ const getEmailTransporter = () => {
   });
 };
 
-// Process email sending jobs
-if (emailQueue) {
-  emailQueue.process(async (job) => {
-    const { emailType, data } = job.data;
-    
-    try {
-      switch (emailType) {
-        case 'survey-published':
-          await sendSurveyPublishedNotification(data);
-          break;
-        case 'password-reset':
-          await sendDirectEmail(data);
-          break;
-        case 'password-reset-confirmation':
-          await sendDirectEmail(data);
-          break;
-        case 'direct-email':
-          await sendDirectEmail(data);
-          break;
-        // Add other email types as needed
-        default:
-          // If no emailType is specified, assume it's direct email data
-          if (typeof job.data === 'object' && job.data.to && job.data.subject) {
-            await sendDirectEmail(job.data);
-          } else {
-            throw new Error(`Unknown email type: ${emailType}`);
-          }
-      }
-      return { success: true };
-    } catch (error) {
-      console.error(`Email job failed: ${error.message}`);
-      throw error;
-    }
-  });
-}
 
 // Send notification about a new published survey to all users
 async function sendSurveyPublishedNotification(data) {
@@ -188,12 +234,7 @@ async function sendDirectEmail(emailData) {
 }
 
 // Add job to queue
-const addEmailToQueue = (emailTypeOrData, data, options = {}) => {
-  if (!emailQueue) {
-    console.error('Email queue not initialized, cannot add job');
-    return Promise.resolve({ status: 'error', message: 'Queue not available' });
-  }
-  
+const addEmailToQueue = async (emailTypeOrData, data, options = {}) => {
   let jobData;
   
   // Check if first parameter is an email data object (new pattern)
@@ -213,6 +254,23 @@ const addEmailToQueue = (emailTypeOrData, data, options = {}) => {
     console.error('Invalid parameters for addEmailToQueue');
     return Promise.resolve({ status: 'error', message: 'Invalid parameters' });
   }
+
+  // If Redis is offline or queue is not available, fallback directly for direct transactional emails
+  if (!emailQueue || !redisConnected) {
+    if (jobData.emailType === 'direct-email' || jobData.emailType === 'password-reset' || jobData.emailType === 'password-reset-confirmation') {
+      try {
+        console.log(`Redis queue is offline; sending direct email to ${jobData.data.to || jobData.data.email}`);
+        await sendDirectEmail(jobData.data);
+        return { status: 'success', message: 'Email sent directly' };
+      } catch (err) {
+        console.error('Direct email fallback failed:', err);
+        return { status: 'error', message: err.message };
+      }
+    } else {
+      console.warn(`Redis queue is offline; skipped background batch notification for ${jobData.emailType}`);
+      return { status: 'skipped', message: 'Queue unavailable' };
+    }
+  }
   
   return emailQueue.add(
     jobData,
@@ -228,18 +286,6 @@ const addEmailToQueue = (emailTypeOrData, data, options = {}) => {
   );
 };
 
-// Handle completed jobs
-if (emailQueue) {
-  emailQueue.on('completed', (job) => {
-    console.log(`Email job ${job.id} completed`);
-  });
-
-  // Handle failed jobs
-  emailQueue.on('failed', (job, err) => {
-    console.error(`Email job ${job.id} failed with error: ${err.message}`);
-  });
-}
-
 module.exports = {
   addEmailToQueue
-}; 
+};

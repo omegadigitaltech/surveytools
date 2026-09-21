@@ -4,16 +4,21 @@ const { AppError } = require('../../lib/app-error');
 const { encrypt } = require('../../lib/field-encryptor');
 
 /**
- * @param {{ respondentProfileRepo: object }} dependencies
+ * @param {{ respondentProfileRepo: object, kycConfig: object }} dependencies
  * @returns {object}
  */
-function createRespondentSensitiveLayersService({ respondentProfileRepo }) {
+function createRespondentSensitiveLayersService({ respondentProfileRepo, kycConfig }) {
   async function checkPrerequisites(userId, currentLayer) {
     const profile = await respondentProfileRepo.findByUserId(userId);
     if (!profile) throw new AppError(404, 'Profile not found');
     
     if (!profile.layer2Completed) {
       throw new AppError(403, 'Layer 2 must be completed first');
+    }
+
+    const sensitiveThreshold = kycConfig?.kycSensitiveLayersSurveyThreshold || 5;
+    if ((profile.surveysCompleted || 0) < sensitiveThreshold) {
+      throw new AppError(403, `Layers 3-5 require at least ${sensitiveThreshold} completed surveys`);
     }
 
     if (currentLayer === 3 && (profile.layer3Completed || profile.layer3)) {

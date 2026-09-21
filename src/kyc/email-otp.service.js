@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const { AppError } = require('../../lib/app-error');
 const { createLogger } = require('../../lib/logger');
 
-
 const log = createLogger('email-otp');
 
 /**
@@ -20,19 +19,21 @@ const log = createLogger('email-otp');
  *     invalidatePrevious: Function,
  *   },
  *   kycConfig: { otpExpiryMs: number },
+ *   allowedDomain?: string | null,  // e.g. '.edu.ng' to restrict, null/undefined to allow any domain
  * }} deps
  */
-function createEmailOtpService({ emailClient, otpRepo, kycConfig }) {
+function createEmailOtpService({ emailClient, otpRepo, kycConfig, allowedDomain = null }) {
   /**
    * Issues a 6-digit OTP to the given email.
    * Any previous active OTPs are invalidated first.
+   * If allowedDomain is set, only emails ending with that domain are accepted.
    *
    * @param {string} email
    * @returns {Promise<void>}
    */
   async function requestOtp(email) {
-    if (!email.endsWith('.edu.ng')) {
-      throw new AppError(400, 'Student verification requires a valid .edu.ng email address');
+    if (allowedDomain && !email.endsWith(allowedDomain)) {
+      throw new AppError(400, `This verification step requires a valid ${allowedDomain} email address`);
     }
 
     await otpRepo.invalidatePrevious(email);
@@ -41,13 +42,13 @@ function createEmailOtpService({ emailClient, otpRepo, kycConfig }) {
     const expiresAt = new Date(Date.now() + kycConfig.otpExpiryMs);
 
     await otpRepo.create({ email, code, expiresAt });
-    await emailClient.send({ 
-      to: email, 
-      subject: 'SurveyTools Student Verification OTP',
-      body: `Your SurveyTools student verification code is ${code}. It expires in ${Math.round(kycConfig.otpExpiryMs / 60000)} minutes.` 
+    await emailClient.send({
+      to: email,
+      subject: 'SurveyTools Email Verification',
+      body: `Your SurveyTools verification code is ${code}. It expires in ${Math.round(kycConfig.otpExpiryMs / 60000)} minutes.`,
     });
 
-    log.info({ email }, 'Email OTP issued');
+    log.info({ email, allowedDomain }, 'Email OTP issued');
   }
 
   /**

@@ -124,6 +124,27 @@ paths:
         '201':
           description: Profile created successfully
 
+  /v1/kyc/researcher/tier:
+    get:
+      summary: Get researcher pricing tier
+      description: Returns the user's current pricing tier based on their researcher profile.
+      operationId: getResearcherTier
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Tier retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string }
+                  data:
+                    type: object
+                    properties:
+                      tier: { type: string }
+
   /v1/kyc/respondent/layer1:
     post:
       summary: Submit respondent layer 1 profile
@@ -169,6 +190,156 @@ paths:
         '200':
           description: Status retrieved successfully
 
+  /v1/kyc/respondent/survey-completed:
+    post:
+      summary: Simulate survey completed (trigger layer unlock)
+      description: Internal hook called after a survey is submitted. Increments the respondent's survey count and unlocks Layer 2 if the configured threshold is met.
+      operationId: hookSurveyCompleted
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Survey completion recorded successfully
+
+  /v1/kyc/respondent/layer3:
+    post:
+      summary: Submit respondent sensitive layer 3
+      description: Health and lifestyle data (chronic conditions, smoking, exercise, blood group, genotype). Fields are encrypted at rest using AES-256-GCM.
+      operationId: submitRespondentLayer3
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Layer3Body'
+      responses:
+        '200':
+          description: Layer 3 profile submitted successfully
+
+  /v1/kyc/respondent/layer4:
+    post:
+      summary: Submit respondent sensitive layer 4
+      description: Socioeconomic profile data (income, housing, transport, devices, dependants). Fields are encrypted at rest using AES-256-GCM.
+      operationId: submitRespondentLayer4
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Layer4Body'
+      responses:
+        '200':
+          description: Layer 4 profile submitted successfully
+
+  /v1/kyc/respondent/layer5:
+    post:
+      summary: Submit respondent sensitive layer 5
+      description: Cultural and identity data (religion, ethnicity, languages spoken, marital status). Fields are encrypted at rest using AES-256-GCM.
+      operationId: submitRespondentLayer5
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Layer5Body'
+      responses:
+        '200':
+          description: Layer 5 profile submitted successfully
+
+  /v1/kyc/consent:
+    post:
+      summary: Capture initial NDPR consent
+      description: Records the respondent's initial consent to data collection and processing under NDPR.
+      operationId: captureConsent
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentBody'
+      responses:
+        '201':
+          description: Consent recorded successfully
+
+  /v1/kyc/consent/{scope}:
+    patch:
+      summary: Update consent for a specific scope
+      description: Allows a respondent to update their consent status for a specific processing scope (e.g. marketing, research).
+      operationId: updateConsent
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: scope
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentUpdateBody'
+      responses:
+        '200':
+          description: Consent updated successfully
+
+  /v1/kyc/me:
+    delete:
+      summary: Erase respondent KYC data (NDPR right to erasure)
+      description: Permanently erases all KYC profile data for the authenticated respondent, in compliance with NDPR right-to-erasure obligations.
+      operationId: eraseKycData
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: KYC data erased successfully
+
+  /forget-password:
+    post:
+      summary: Request password reset OTP
+      description: Sends a 6-digit OTP to the user's email for password reset.
+      operationId: requestPasswordReset
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '200':
+          description: If an account exists for this email, a reset code has been sent
+
+  /reset-password:
+    post:
+      summary: Reset password using OTP
+      description: Verifies the 6-digit OTP and sets a new password.
+      operationId: resetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordBody'
+      responses:
+        '200':
+          description: Password has been reset successfully
+        '400':
+          description: Validation error or invalid OTP
+
 components:
   securitySchemes:
     BearerAuth:
@@ -179,14 +350,15 @@ components:
 
   schemas:
     SignupBody:
+      description: The payload varies based on userType.
+      oneOf:
+        - $ref: '#/components/schemas/SignupResearcherBody'
+        - $ref: '#/components/schemas/SignupRespondentNonStudentBody'
+        - $ref: '#/components/schemas/SignupRespondentStudentBody'
+
+    SignupCommonBody:
       type: object
-      required:
-        - firstName
-        - lastName
-        - email
-        - password
-        - userType
-        - dateOfBirth
+      required: [firstName, lastName, email, password, userType, dateOfBirth]
       properties:
         firstName: { type: string }
         lastName: { type: string }
@@ -194,6 +366,58 @@ components:
         password: { type: string, minLength: 8 }
         userType: { type: string, enum: [researcher, respondent] }
         dateOfBirth: { type: string, format: date-time }
+
+    SignupResearcherBody:
+      allOf:
+        - $ref: '#/components/schemas/SignupCommonBody'
+        - type: object
+          properties:
+            userType: { type: string, enum: [researcher] }
+
+    SignupRespondentNonStudentBody:
+      allOf:
+        - $ref: '#/components/schemas/SignupCommonBody'
+        - type: object
+          required: [gender, stateOfOrigin, stateOfResidence, lgaOfResidence, isStudent]
+          properties:
+            userType: { type: string, enum: [respondent] }
+            gender:
+              type: string
+              enum: [male, female, non-binary, prefer-not-to-say]
+            stateOfOrigin: { type: string }
+            stateOfResidence: { type: string }
+            lgaOfResidence: { type: string }
+            isStudent: { type: boolean, enum: [false] }
+
+    SignupRespondentStudentBody:
+      allOf:
+        - $ref: '#/components/schemas/SignupCommonBody'
+        - type: object
+          required:
+            [gender, stateOfOrigin, stateOfResidence, lgaOfResidence, isStudent, academicLevel, levelOfStudy, institution, faculty, department]
+          properties:
+            userType: { type: string, enum: [respondent] }
+            gender:
+              type: string
+              enum: [male, female, non-binary, prefer-not-to-say]
+            stateOfOrigin: { type: string }
+            stateOfResidence: { type: string }
+            lgaOfResidence: { type: string }
+            isStudent: { type: boolean, enum: [true] }
+            academicLevel: { type: string }
+            levelOfStudy: { type: string }
+            institution: { type: string }
+            faculty: { type: string }
+            department: { type: string }
+
+    ResetPasswordBody:
+      type: object
+      required: [email, code, newPassword, confirmPassword]
+      properties:
+        email: { type: string, format: email }
+        code: { type: string, pattern: '^\d{6}$' }
+        newPassword: { type: string, minLength: 8 }
+        confirmPassword: { type: string }
 
     RequestOtpBody:
       type: object
@@ -247,3 +471,72 @@ components:
         employmentStatus: { type: string }
         incomeRange: { type: string }
         maritalStatus: { type: string }
+
+    Layer3Body:
+      type: object
+      description: Health and lifestyle data. All fields are encrypted at rest (AES-256-GCM).
+      properties:
+        chronicHealthConditions:
+          type: array
+          items: { type: string }
+        disabilityStatus: { type: string }
+        smokingStatus: { type: string }
+        alcoholConsumption: { type: string }
+        exerciseFrequency: { type: string }
+        dietaryPattern: { type: string }
+        bloodGroup: { type: string }
+        genotype: { type: string }
+        menstrualHealthStatus:
+          type: string
+          nullable: true
+          description: Female respondents only; enforced at service layer.
+        pregnancyStatus:
+          type: string
+          nullable: true
+          description: Female respondents only; enforced at service layer.
+
+    Layer4Body:
+      type: object
+      description: Socioeconomic data. All fields are encrypted at rest (AES-256-GCM).
+      properties:
+        monthlyHouseholdIncome: { type: string }
+        housingType: { type: string }
+        primaryTransport: { type: string }
+        internetAccessQuality: { type: string }
+        primaryDevice: { type: string }
+        numberOfDependants: { type: integer, minimum: 0 }
+
+    Layer5Body:
+      type: object
+      description: Cultural and identity data. All fields are encrypted at rest (AES-256-GCM).
+      properties:
+        religion: { type: string }
+        ethnicity: { type: string }
+        languagesSpoken:
+          type: array
+          items: { type: string }
+        maritalStatus: { type: string }
+
+    ConsentBody:
+      type: object
+      required: [scopes]
+      properties:
+        scopes:
+          type: array
+          items:
+            type: string
+            enum:
+              - basic_profile
+              - health_data
+              - socioeconomic_data
+              - religious_cultural_data
+              - survey_participation
+              - marketing
+
+    ConsentUpdateBody:
+      type: object
+      required: [granted]
+      properties:
+        granted:
+          type: boolean
+          description: true to grant consent, false to revoke it.
