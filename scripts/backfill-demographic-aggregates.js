@@ -4,7 +4,18 @@ const connectDB = require('../db/connectDB');
 const RespondentProfile = require('../src/kyc/respondent-profile.model');
 const { decrypt } = require('../lib/field-encryptor');
 const { Survey } = require('../model/survey');
-const { creditLayerToSurvey } = require('../src/corporate-dashboard/demographic-credit.service');
+const { createDemographicCreditService } = require('../src/corporate-dashboard/demographic-credit.service');
+const SurveyLayerCredit = require('../model/survey-layer-credit');
+const DemographicAggregate = require('../model/demographic-aggregate');
+const { createLogger } = require('../lib/logger');
+
+const logger = createLogger('backfill');
+
+const { creditLayerToSurvey } = createDemographicCreditService({
+  SurveyLayerCredit,
+  DemographicAggregate,
+  createLogger
+});
 
 async function backfillPastSurveys(userId, layer, plaintextPayload) {
   const pastSurveys = await Survey.find({ submittedUsers: userId }).select('_id');
@@ -14,7 +25,7 @@ async function backfillPastSurveys(userId, layer, plaintextPayload) {
       await creditLayerToSurvey(s._id, userId, layer, plaintextPayload);
       count++;
     } catch (err) {
-      console.warn(`[WARN] Failed to credit survey ${s._id} for user ${userId} layer ${layer}:`, err.message);
+      logger.warn({ err, surveyId: s._id, userId, layer }, 'Failed to credit survey for user layer');
     }
   }
   return count;
@@ -22,7 +33,7 @@ async function backfillPastSurveys(userId, layer, plaintextPayload) {
 
 async function run() {
   await connectDB();
-  console.log('Connected to DB. Starting backfill...');
+  logger.info('Connected to DB. Starting backfill...');
 
   const profiles = await RespondentProfile.find({
     $or: [
@@ -32,35 +43,35 @@ async function run() {
     ]
   });
 
-  console.log(`Found ${profiles.length} profiles with Layer 3-5 data.`);
+  logger.info({ profilesFound: profiles.length }, 'Found profiles with Layer 3-5 data.');
 
   let successCount = 0;
   let failCount = 0;
 
   for (const profile of profiles) {
     const userId = profile.userId;
-    console.log(`Processing userId: ${userId}`);
+    logger.info({ userId }, 'Processing user');
 
     for (const layer of ['layer3', 'layer4', 'layer5']) {
       if (profile[layer]) {
         try {
           const plaintext = JSON.parse(decrypt(profile[layer]));
           const credited = await backfillPastSurveys(userId, layer, plaintext);
-          console.log(` - ${layer}: credited to ${credited} surveys`);
+          logger.info({ layer, creditedSurveys: credited }, 'Layer credited');
           successCount++;
         } catch (err) {
-          console.error(`[ERROR] Failed processing ${layer} for user ${userId}:`, err.message);
+          logger.error({ err, userId, layer }, 'Failed processing layer for user');
           failCount++;
         }
       }
     }
   }
 
-  console.log(`Backfill complete. Success: ${successCount}, Failures: ${failCount}`);
+  logger.info({ successCount, failCount }, 'Backfill complete.');
   process.exit(0);
 }
 
 run().catch(err => {
-  console.error('Fatal error during backfill:', err);
+  logger.error({ err }, 'Fatal error during backfill');
   process.exit(1);
 });

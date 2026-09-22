@@ -2,14 +2,11 @@
 
 const { AppError } = require('../../lib/app-error');
 const { encrypt } = require('../../lib/field-encryptor');
-const { creditLayerToSurvey } = require('../corporate-dashboard/demographic-credit.service');
-const { Survey } = require('../../model/survey');
-
 /**
- * @param {{ respondentProfileRepo: object, kycConfig: object }} dependencies
+ * @param {{ respondentProfileRepo: object, kycConfig: object, creditLayerToSurvey: function, Survey: object }} dependencies
  * @returns {object}
  */
-function createRespondentSensitiveLayersService({ respondentProfileRepo, kycConfig }) {
+function createRespondentSensitiveLayersService({ respondentProfileRepo, kycConfig, creditLayerToSurvey, Survey }) {
   async function backfillPastSurveys(userId, layer, plaintextPayload) {
     const pastSurveys = await Survey.find({ submittedUsers: userId }).select('_id');
     await Promise.all(pastSurveys.map(s =>

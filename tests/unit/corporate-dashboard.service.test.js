@@ -1,24 +1,46 @@
-const { getAnalytics, getOverview } = require('../../src/corporate-dashboard/corporate-dashboard.service');
-const repo = require('../../src/corporate-dashboard/corporate-dashboard.repo');
+const { createCorporateDashboardService } = require('../../src/corporate-dashboard/corporate-dashboard.service');
 const { AppError } = require('../../lib/app-error');
-
-jest.mock('../../src/corporate-dashboard/corporate-dashboard.repo');
+const schemas = require('../../src/corporate-dashboard/corporate-dashboard.schema');
 
 describe('Corporate Dashboard Service', () => {
+  let service;
+  let mockRepo;
+  let mockLogger;
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockRepo = {
+      getOrgWideStats: jest.fn(),
+      getSurveysForExport: jest.fn(),
+      getAggregatedDemographics: jest.fn(),
+      getOrgBillingDetails: jest.fn()
+    };
+    mockLogger = {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn()
+    };
+    const createLogger = jest.fn().mockReturnValue(mockLogger);
+
+    service = createCorporateDashboardService({ 
+      repo: mockRepo, 
+      AppError, 
+      schemas, 
+      PDFDocument: jest.fn(), 
+      Invoice: {}, 
+      createLogger 
+    });
   });
 
   it('should validate allowed filters', async () => {
-    repo.getSurveysForExport.mockResolvedValueOnce({ _id: 'survey1' });
-    repo.getAggregatedDemographics.mockResolvedValueOnce({});
+    mockRepo.getSurveysForExport.mockResolvedValueOnce({ _id: 'survey1' });
+    mockRepo.getAggregatedDemographics.mockResolvedValueOnce({});
     
-    await expect(getAnalytics('user1', { surveyId: 'survey1', filters: ['gender'] })).resolves.toBeDefined();
-    expect(repo.getAggregatedDemographics).toHaveBeenCalledWith('survey1', ['gender']);
+    await expect(service.getAnalytics('user1', { surveyId: 'survey1', filters: ['gender'] })).resolves.toBeDefined();
+    expect(mockRepo.getAggregatedDemographics).toHaveBeenCalledWith('survey1', ['gender']);
   });
 
   it('should reject invalid filters', async () => {
-    await expect(getAnalytics('user1', { surveyId: 'survey1', filters: ['invalid_filter'] }))
+    await expect(service.getAnalytics('user1', { surveyId: 'survey1', filters: ['invalid_filter'] }))
       .rejects.toThrow(AppError);
   });
 });

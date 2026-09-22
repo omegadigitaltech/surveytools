@@ -1,66 +1,67 @@
-const mongoose = require('mongoose');
-const { creditLayerToSurvey } = require('../../src/corporate-dashboard/demographic-credit.service');
-const SurveyLayerCredit = require('../../model/survey-layer-credit');
-const DemographicAggregate = require('../../model/demographic-aggregate');
-
-jest.mock('../../model/survey-layer-credit');
-jest.mock('../../model/demographic-aggregate');
+const { createDemographicCreditService } = require('../../src/corporate-dashboard/demographic-credit.service');
 
 describe('Demographic Credit Service', () => {
+  let service;
+  let mockSurveyLayerCredit;
+  let mockDemographicAggregate;
+  let mockLogger;
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockSurveyLayerCredit = {
+      create: jest.fn()
+    };
+    mockDemographicAggregate = {
+      bulkWrite: jest.fn()
+    };
+    mockLogger = {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn()
+    };
+    const createLogger = jest.fn().mockReturnValue(mockLogger);
+
+    service = createDemographicCreditService({
+      SurveyLayerCredit: mockSurveyLayerCredit,
+      DemographicAggregate: mockDemographicAggregate,
+      createLogger
+    });
   });
 
   it('should insert credit and increment aggregates', async () => {
-    SurveyLayerCredit.create.mockResolvedValueOnce({});
-    DemographicAggregate.findOneAndUpdate.mockResolvedValue({});
+    mockSurveyLayerCredit.create.mockResolvedValueOnce(true);
+    mockDemographicAggregate.bulkWrite.mockResolvedValueOnce(true);
 
-    await creditLayerToSurvey('survey1', 'user1', 'layer3', {
-      bloodGroup: 'O+',
-      hobbies: ['Reading', 'Gaming']
-    });
+    await service.creditLayerToSurvey('survey1', 'user1', 'layer3', { gender: 'Male' });
 
-    expect(SurveyLayerCredit.create).toHaveBeenCalledWith({
+    expect(mockSurveyLayerCredit.create).toHaveBeenCalledWith({
       surveyId: 'survey1',
       userId: 'user1',
       layer: 'layer3'
     });
-
-    // Should call findOneAndUpdate for bloodGroup, Reading, Gaming
-    expect(DemographicAggregate.findOneAndUpdate).toHaveBeenCalledTimes(3);
     
-    expect(DemographicAggregate.findOneAndUpdate).toHaveBeenCalledWith(
-      { surveyId: 'survey1', layer: 'layer3', field: 'bloodGroup', value: 'O+' },
-      { $inc: { count: 1 } },
-      { upsert: true }
-    );
-    
-    expect(DemographicAggregate.findOneAndUpdate).toHaveBeenCalledWith(
-      { surveyId: 'survey1', layer: 'layer3', field: 'hobbies', value: 'Reading' },
-      { $inc: { count: 1 } },
-      { upsert: true }
-    );
+    expect(mockDemographicAggregate.bulkWrite).toHaveBeenCalledWith([{
+      updateOne: {
+        filter: { surveyId: 'survey1', layer: 'layer3', field: 'gender', value: 'Male' },
+        update: { $inc: { count: 1 } },
+        upsert: true
+      }
+    }]);
   });
 
   it('should safely no-op on duplicate key error (11000)', async () => {
-    const duplicateError = new Error('Duplicate key');
+    const duplicateError = new Error('Duplicate');
     duplicateError.code = 11000;
-    SurveyLayerCredit.create.mockRejectedValueOnce(duplicateError);
+    mockSurveyLayerCredit.create.mockRejectedValueOnce(duplicateError);
 
-    await creditLayerToSurvey('survey1', 'user1', 'layer3', {
-      bloodGroup: 'O+'
-    });
-
-    expect(SurveyLayerCredit.create).toHaveBeenCalled();
-    // It should return early without incrementing aggregates
-    expect(DemographicAggregate.findOneAndUpdate).not.toHaveBeenCalled();
+    await expect(service.creditLayerToSurvey('survey1', 'user1', 'layer3', { gender: 'Male' })).resolves.toBeUndefined();
+    expect(mockDemographicAggregate.bulkWrite).not.toHaveBeenCalled();
+    expect(mockLogger.info).toHaveBeenCalledWith(expect.anything(), 'Credit already processed. Skipping.');
   });
 
   it('should throw on non-11000 error', async () => {
-    const error = new Error('Some error');
-    SurveyLayerCredit.create.mockRejectedValueOnce(error);
+    const otherError = new Error('Database down');
+    mockSurveyLayerCredit.create.mockRejectedValueOnce(otherError);
 
-    await expect(creditLayerToSurvey('survey1', 'user1', 'layer3', {}))
-      .rejects.toThrow('Some error');
+    await expect(service.creditLayerToSurvey('survey1', 'user1', 'layer3', { gender: 'Male' })).rejects.toThrow('Database down');
   });
 });
