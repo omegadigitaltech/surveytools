@@ -8,15 +8,6 @@
  * Intended for local dev-server E2E verification only.
  */
 
-/**
- * DEV-ONLY seed script — creates a test User, Institutional ResearcherProfile,
- * Survey (with questions/answers), and DemographicAggregate records, then fires
- * live requests against all 6 corporate-dashboard export formats.
- *
- * WARNING: connects to whatever MONGODB_URI is set in .env and writes real
- * documents to that database. Do NOT run against staging/production.
- * Intended for local dev-server E2E verification only.
- */
 
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
