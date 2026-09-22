@@ -13,7 +13,7 @@ const errorHandlerMiddleware = async (err, req, res, next) => {
 
     if(err.name === 'ValidationError'){
       customError.msg = Object.values(err.errors).map((item) => item.message).join(',')
-      customError.statusCode = 400
+      customError.statusCode = err.statusCode || 400
     }
   
     if(err.code && err.code === 11000){
