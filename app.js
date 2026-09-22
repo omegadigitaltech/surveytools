@@ -207,6 +207,9 @@ app.use('/', marketplaceRouter);
 app.use('/', visualizationRouter);
 app.use('/', analyticsRouter);
 
+const corporateDashboardRoutes = require('./src/corporate-dashboard/corporate-dashboard.routes');
+app.use('/v1/dashboard', corporateDashboardRoutes);
+
 
 // KYC routes — additive, never modifies existing routes
 app.use('/v1/kyc', phoneOtpRoutes);

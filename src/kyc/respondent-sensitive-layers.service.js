@@ -2,12 +2,21 @@
 
 const { AppError } = require('../../lib/app-error');
 const { encrypt } = require('../../lib/field-encryptor');
+const { creditLayerToSurvey } = require('../corporate-dashboard/demographic-credit.service');
+const { Survey } = require('../../model/survey');
 
 /**
  * @param {{ respondentProfileRepo: object, kycConfig: object }} dependencies
  * @returns {object}
  */
 function createRespondentSensitiveLayersService({ respondentProfileRepo, kycConfig }) {
+  async function backfillPastSurveys(userId, layer, plaintextPayload) {
+    const pastSurveys = await Survey.find({ submittedUsers: userId }).select('_id');
+    await Promise.all(pastSurveys.map(s =>
+      creditLayerToSurvey(s._id, userId, layer, plaintextPayload)
+    ));
+  }
+
   async function checkPrerequisites(userId, currentLayer) {
     const profile = await respondentProfileRepo.findByUserId(userId);
     if (!profile) throw new AppError(404, 'Profile not found');
@@ -36,18 +45,21 @@ function createRespondentSensitiveLayersService({ respondentProfileRepo, kycConf
     await checkPrerequisites(userId, 3);
     const encrypted = encrypt(JSON.stringify(payload));
     await respondentProfileRepo.updateLayer3(userId, encrypted);
+    await backfillPastSurveys(userId, 'layer3', payload);
   }
 
   async function submitLayer4(userId, payload) {
     await checkPrerequisites(userId, 4);
     const encrypted = encrypt(JSON.stringify(payload));
     await respondentProfileRepo.updateLayer4(userId, encrypted);
+    await backfillPastSurveys(userId, 'layer4', payload);
   }
 
   async function submitLayer5(userId, payload) {
     await checkPrerequisites(userId, 5);
     const encrypted = encrypt(JSON.stringify(payload));
     await respondentProfileRepo.updateLayer5(userId, encrypted);
+    await backfillPastSurveys(userId, 'layer5', payload);
   }
 
   return { submitLayer3, submitLayer4, submitLayer5 };

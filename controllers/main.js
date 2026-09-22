@@ -10,8 +10,22 @@ const { uploadQuestionnaire } = require('./questionnaireUpload');
 const { createCsvString, formatSurveyDataForCsv } = require('../utils/exportService');
 const { addEmailToQueue } = require('../utils/queueService');
 const Section = require('../model/section.js');
+const { decrypt } = require('../lib/field-encryptor');
+const { creditLayerToSurvey } = require('../src/corporate-dashboard/demographic-credit.service');
+const RespondentProfile = require('../src/kyc/respondent-profile.model');
 
 const main_url = process.env.FRONTEND_URL
+
+async function creditExistingLayersToSurvey(surveyId, userId) {
+  const profile = await RespondentProfile.findOne({ userId });
+  if (!profile) return;
+  for (const layer of ['layer3', 'layer4', 'layer5']) {
+    if (profile[layer]) {
+      const plaintext = JSON.parse(decrypt(profile[layer]));
+      await creditLayerToSurvey(surveyId, userId, layer, plaintext);
+    }
+  }
+}
 
 const start = async (req, res) => {
   const filePath = path.join(__dirname, '../index.html');
@@ -685,6 +699,12 @@ const submitAnswers = async (req, res, next) => {
 
     survey.participants += 1;
     survey.submittedUsers.push(user._id);
+
+    // Forward trigger for corporate dashboard demographic aggregations
+    // We do NOT await this in the critical path to avoid blocking the user request
+    creditExistingLayersToSurvey(survey._id, user.id).catch(err => {
+      console.error('Failed to credit existing layers to survey:', err);
+    });
 
     // Update faculty count
     if (user.faculty) {
