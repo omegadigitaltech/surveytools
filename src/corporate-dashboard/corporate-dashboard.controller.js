@@ -76,6 +76,23 @@ function createCorporateDashboardController({ service, User, AppError }) {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="survey_export_${req.query.surveyId}.pdf"`);
         return res.send(Buffer.from(result.data, 'base64'));
+      } else if (result.format === 'xlsx') {
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="survey_export_${req.query.surveyId}.xlsx"`);
+        return res.send(result.data);
+      } else if (result.format === 'json') {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', `attachment; filename="survey_export_${req.query.surveyId}.json"`);
+        return res.send(result.data);
+      } else if (result.format === 'pptx') {
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+        res.setHeader('Content-Disposition', `attachment; filename="survey_export_${req.query.surveyId}.pptx"`);
+        return res.send(result.data);
+      } else if (result.format === 'spss') {
+        // Fallback catch (though service should throw AppError 501 before this point)
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.setHeader('Content-Disposition', `attachment; filename="survey_export_${req.query.surveyId}.sav"`);
+        return res.send(result.data);
       }
       
       res.json({ status: 'success', data: result });

@@ -172,6 +172,94 @@ function createCorporateDashboardService({ repo, AppError, schemas, PDFDocument,
         
         doc.end();
       });
+    } else if (format === 'xlsx') {
+      const ExcelJS = require('exceljs');
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'SurveyTools';
+      
+      // Sheet 1: Raw Responses
+      const rawSheet = workbook.addWorksheet('Raw Responses');
+      const respondentMap = new Map();
+      const questionHeaders = new Set();
+      
+      if (survey.questions && survey.questions.length > 0) {
+        survey.questions.forEach((q, qIndex) => {
+          const qTitle = q.questionText || `Question ${qIndex + 1}`;
+          questionHeaders.add(qTitle);
+          if (q.answers && q.answers.length > 0) {
+            q.answers.forEach(a => {
+              const respondentId = String(a.userId || a._id);
+              if (!respondentMap.has(respondentId)) {
+                respondentMap.set(respondentId, {
+                  'Respondent Name': a.fullname || 'Anonymous',
+                  'Respondent ID': respondentId
+                });
+              }
+              let responseStr = Array.isArray(a.response) ? a.response.join('; ') : String(a.response);
+              respondentMap.get(respondentId)[qTitle] = responseStr;
+            });
+          }
+        });
+      }
+
+      const columns = [
+        { header: 'Respondent Name', key: 'Respondent Name', width: 25 },
+        { header: 'Respondent ID', key: 'Respondent ID', width: 30 }
+      ];
+      questionHeaders.forEach(h => columns.push({ header: h, key: h, width: 30 }));
+      rawSheet.columns = columns;
+      
+      const records = Array.from(respondentMap.values());
+      records.forEach(r => rawSheet.addRow(r));
+
+      // Sheet 2: Demographic Summary
+      const summarySheet = workbook.addWorksheet('Demographic Summary');
+      summarySheet.columns = [
+        { header: 'Demographic Field', key: 'field', width: 25 },
+        { header: 'Value', key: 'value', width: 25 },
+        { header: 'Count', key: 'count', width: 15 }
+      ];
+      
+      const demographics = await repo.getAggregatedDemographics(surveyId);
+      for (const [field, dataArr] of Object.entries(demographics)) {
+        dataArr.forEach(item => {
+          summarySheet.addRow({ field, value: item.value, count: item.count });
+        });
+      }
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      return { format, data: buffer };
+    } else if (format === 'json') {
+      return { format, data: JSON.stringify(survey, null, 2) };
+    } else if (format === 'pptx') {
+      const PptxGenJS = require('pptxgenjs');
+      const pres = new PptxGenJS();
+      pres.title = `Survey Export: ${survey.title || 'Untitled'}`;
+      
+      const slide = pres.addSlide();
+      slide.addText(`Survey Export: ${survey.title || 'Untitled'}`, { x: 1, y: 1, w: 8, fontSize: 24, bold: true });
+      slide.addText(`Total Participants: ${survey.no_of_participants || 0}`, { x: 1, y: 2, w: 8, fontSize: 18 });
+      
+      const demographics = await repo.getAggregatedDemographics(surveyId);
+      if (demographics && Object.keys(demographics).length > 0) {
+        const demoSlide = pres.addSlide();
+        demoSlide.addText('Key Demographic Breakdown', { x: 0.5, y: 0.5, w: 9, fontSize: 18, bold: true });
+        
+        const firstField = Object.keys(demographics)[0];
+        const dataArr = demographics[firstField];
+        
+        const chartData = [{
+          name: firstField,
+          labels: dataArr.map(d => String(d.value)),
+          values: dataArr.map(d => d.count)
+        }];
+        demoSlide.addChart(pres.ChartType.bar, chartData, { x: 0.5, y: 1.2, w: 8, h: 4, showTitle: true, title: firstField });
+      }
+
+      const buffer = await pres.write({ outputType: 'nodebuffer' });
+      return { format, data: buffer };
+    } else if (format === 'spss') {
+      throw new AppError(501, 'SPSS export is not yet implemented');
     }
 
     return { survey, format };

@@ -17,7 +17,7 @@ const analyticsQuerySchema = z.object({
 
 const exportQuerySchema = z.object({
   surveyId: z.string().min(1, "surveyId is required"),
-  format: z.enum(['csv', 'pdf']).default('csv'),
+  format: z.enum(['csv', 'pdf', 'xlsx', 'json', 'pptx', 'spss']).default('csv'),
 });
 
 module.exports = {
