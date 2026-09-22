@@ -256,7 +256,7 @@ function createCorporateDashboardService({ repo, AppError, schemas, PDFDocument,
         demoSlide.addChart(pres.ChartType.bar, chartData, { x: 0.5, y: 1.2, w: 8, h: 4, showTitle: true, title: firstField });
       }
 
-      const buffer = await pres.write({ outputType: 'nodebuffer' });
+      const buffer = await pres.write('nodebuffer');
       return { format, data: buffer };
     } else if (format === 'spss') {
       throw new AppError(501, 'SPSS export is not yet implemented');
