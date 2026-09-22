@@ -218,7 +218,6 @@ app.use('/v1/kyc', emailOtpRoutes);
 // Use the original error handler for other errors
 app.use(errorHandlerMiddleware);
 app.use(notFoundMiddleware);
-console.log(process.env.MONGODB_URI)
 
 
 
