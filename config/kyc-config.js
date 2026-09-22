@@ -7,15 +7,15 @@
 
 const OTP_EXPIRY_MINUTES = Number(process.env.OTP_EXPIRY_MINUTES || 10);
 
-const rawKey = process.env.KYC_FIELD_ENCRYPTION_KEY;
+const rawKey = process.env.KYC_ENCRYPTION_KEY;
 const isTestEnv = process.env.NODE_ENV === 'test';
 
 if (!rawKey && !isTestEnv) {
-  throw new Error('KYC_FIELD_ENCRYPTION_KEY is required');
+  throw new Error('KYC_ENCRYPTION_KEY is required');
 }
 
 if (rawKey && !/^[a-fA-F0-9]{64}$/.test(rawKey)) {
-  throw new Error('KYC_FIELD_ENCRYPTION_KEY must be a 64-character hex string');
+  throw new Error('KYC_ENCRYPTION_KEY must be a 64-character hex string');
 }
 
 module.exports = Object.freeze({
