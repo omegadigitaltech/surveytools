@@ -4,7 +4,7 @@
  * @param {{ service: object, User: object }} dependencies
  * @returns {object}
  */
-function createCorporateDashboardController({ service, User }) {
+function createCorporateDashboardController({ service, User, AppError }) {
   
   /**
    * Retrieves overview statistics for the corporate dashboard
@@ -15,7 +15,7 @@ function createCorporateDashboardController({ service, User }) {
   async function getOverview(req, res, next) {
     try {
       const user = await User.findOne({ id: req.userId });
-      if (!user) return res.status(404).json({ msg: 'User not found' });
+      if (!user) throw new AppError(404, 'User not found');
       const data = await service.getOverview(user._id);
       res.json({ status: 'success', data });
     } catch (err) { next(err); }
@@ -30,7 +30,7 @@ function createCorporateDashboardController({ service, User }) {
   async function getAnalytics(req, res, next) {
     try {
       const user = await User.findOne({ id: req.userId });
-      if (!user) return res.status(404).json({ msg: 'User not found' });
+      if (!user) throw new AppError(404, 'User not found');
 
       const filtersParam = req.query.filters;
       let filters;
@@ -51,7 +51,7 @@ function createCorporateDashboardController({ service, User }) {
    */
   async function getInvoice(req, res, next) {
     try {
-      const data = await service.generateInvoice(req.userId, req.params.id);
+      const data = await service.generateInvoice(req.userId, req.params.surveyId);
       res.json({ status: 'success', data });
     } catch (err) { next(err); }
   }
@@ -65,10 +65,20 @@ function createCorporateDashboardController({ service, User }) {
   async function getExport(req, res, next) {
     try {
       const user = await User.findOne({ id: req.userId });
-      if (!user) return res.status(404).json({ msg: 'User not found' });
+      if (!user) throw new AppError(404, 'User not found');
 
-      const data = await service.exportData(user._id, req.query);
-      res.json({ status: 'success', data });
+      const result = await service.exportData(user._id, req.query);
+      if (result.format === 'csv') {
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="survey_export_${req.query.surveyId}.csv"`);
+        return res.send(result.data);
+      } else if (result.format === 'pdf') {
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="survey_export_${req.query.surveyId}.pdf"`);
+        return res.send(Buffer.from(result.data, 'base64'));
+      }
+      
+      res.json({ status: 'success', data: result });
     } catch (err) { next(err); }
   }
 

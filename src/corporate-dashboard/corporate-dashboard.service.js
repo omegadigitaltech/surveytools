@@ -109,6 +109,71 @@ function createCorporateDashboardService({ repo, AppError, schemas, PDFDocument,
     const survey = await repo.getSurveysForExport(surveyId, orgUserId);
     if (!survey) throw new AppError(404, 'Survey not found or access denied');
 
+    if (format === 'csv') {
+      const { Parser } = require('json2csv');
+      const respondentMap = new Map();
+      
+      if (survey.questions && survey.questions.length > 0) {
+        survey.questions.forEach((q, qIndex) => {
+          const qTitle = q.questionText || `Question ${qIndex + 1}`;
+          if (q.answers && q.answers.length > 0) {
+            q.answers.forEach(a => {
+              const respondentId = String(a.userId || a._id);
+              if (!respondentMap.has(respondentId)) {
+                respondentMap.set(respondentId, {
+                  RespondentName: a.fullname || 'Anonymous',
+                  RespondentID: respondentId
+                });
+              }
+              let responseStr = Array.isArray(a.response) ? a.response.join('; ') : String(a.response);
+              respondentMap.get(respondentId)[qTitle] = responseStr;
+            });
+          }
+        });
+      }
+
+      const records = Array.from(respondentMap.values());
+      let csvData = 'No data available';
+      if (records.length > 0) {
+        const parser = new Parser();
+        csvData = parser.parse(records);
+      }
+      return { format, data: csvData };
+    } else if (format === 'pdf') {
+      return new Promise((resolve, reject) => {
+        const doc = new PDFDocument();
+        const buffers = [];
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', () => {
+          const pdfData = Buffer.concat(buffers);
+          resolve({ format, data: pdfData.toString('base64') });
+        });
+        doc.on('error', reject);
+
+        doc.fontSize(20).text(`Survey Export: ${survey.title || 'Untitled'}`, { align: 'center' });
+        doc.moveDown();
+        doc.fontSize(12).text(`Total Participants: ${survey.no_of_participants || 0}`);
+        doc.moveDown();
+
+        if (survey.questions && survey.questions.length > 0) {
+          survey.questions.forEach((q, i) => {
+            doc.fontSize(14).text(`${i + 1}. ${q.questionText}`);
+            if (q.answers && q.answers.length > 0) {
+              q.answers.forEach(a => {
+                let responseStr = Array.isArray(a.response) ? a.response.join(', ') : String(a.response);
+                doc.fontSize(10).text(`- ${a.fullname || 'Anonymous'}: ${responseStr}`);
+              });
+            } else {
+              doc.fontSize(10).text('- No responses yet');
+            }
+            doc.moveDown();
+          });
+        }
+        
+        doc.end();
+      });
+    }
+
     return { survey, format };
   }
 

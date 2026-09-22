@@ -29,7 +29,7 @@ const { createCorporateDashboardController } = require('./corporate-dashboard.co
 // Initialization
 const repo = createCorporateDashboardRepo({ Survey, DemographicAggregate, ResearcherProfile });
 const service = createCorporateDashboardService({ repo, AppError, schemas, PDFDocument, Invoice, createLogger });
-const controller = createCorporateDashboardController({ service, User });
+const controller = createCorporateDashboardController({ service, User, AppError });
 const respondentProfileRepo = createRespondentProfileRepo({ RespondentProfile });
 const researcherProfileRepo = createResearcherProfileRepo({ ResearcherProfile });
 const tierService = createResearcherTierService({ researcherProfileRepo });
@@ -42,7 +42,7 @@ router.use(requireResearcherTier(['Institutional']));
 
 router.get('/corporate/overview', controller.getOverview);
 router.get('/corporate/analytics', controller.getAnalytics);
-router.get('/corporate/invoice/:id', controller.getInvoice);
+router.get('/corporate/invoice/:surveyId', controller.getInvoice);
 router.get('/corporate/export', controller.getExport);
 
 module.exports = router;
