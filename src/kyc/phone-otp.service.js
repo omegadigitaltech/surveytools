@@ -41,7 +41,7 @@ function createPhoneOtpService({ smsClient, otpRepo, kycConfig, userModel }) {
     await smsClient.send({ to: phone, body: `Your SurveyTools verification code is ${code}` });
 
     // OTP code is intentionally absent from this log line.
-    log.info({ phone }, 'OTP issued');
+    log.info({ phone: phone.replace(/.(?=.{4})/g, '*') }, 'OTP issued');
   }
 
   /**
@@ -84,7 +84,7 @@ function createPhoneOtpService({ smsClient, otpRepo, kycConfig, userModel }) {
     }
 
     await otpRepo.markConsumed(otp._id);
-    log.info({ phone }, 'OTP verified');
+    log.info({ phone: phone.replace(/.(?=.{4})/g, '*') }, 'OTP verified');
     return true;
   }
 

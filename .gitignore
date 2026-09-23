@@ -14,3 +14,10 @@ thoughts.txt
 /scripts.scratch/
 
 .scratch/
+
+# Test artifacts
+*.log
+token.txt
+export.*
+export_test.*
+CRASH_DUMP*.txt

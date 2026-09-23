@@ -10,8 +10,31 @@ const { uploadQuestionnaire } = require('./questionnaireUpload');
 const { createCsvString, formatSurveyDataForCsv } = require('../utils/exportService');
 const { addEmailToQueue } = require('../utils/queueService');
 const Section = require('../model/section.js');
+const { decrypt } = require('../lib/field-encryptor');
+const { createDemographicCreditService } = require('../src/corporate-dashboard/demographic-credit.service');
+const SurveyLayerCredit = require('../model/survey-layer-credit');
+const DemographicAggregate = require('../model/demographic-aggregate');
+const { createLogger } = require('../lib/logger');
+const RespondentProfile = require('../src/kyc/respondent-profile.model');
 
 const main_url = process.env.FRONTEND_URL
+
+const { creditLayerToSurvey } = createDemographicCreditService({ 
+  SurveyLayerCredit, 
+  DemographicAggregate, 
+  createLogger 
+});
+
+async function creditExistingLayersToSurvey(surveyId, userId) {
+  const profile = await RespondentProfile.findOne({ userId });
+  if (!profile) return;
+  for (const layer of ['layer3', 'layer4', 'layer5']) {
+    if (profile[layer]) {
+      const plaintext = JSON.parse(decrypt(profile[layer]));
+      await creditLayerToSurvey(surveyId, userId, layer, plaintext);
+    }
+  }
+}
 
 const start = async (req, res) => {
   const filePath = path.join(__dirname, '../index.html');
@@ -708,6 +731,12 @@ const submitAnswers = async (req, res, next) => {
 
     await session.commitTransaction();
     session.endSession();
+
+    // Forward trigger for corporate dashboard demographic aggregations
+    // We do NOT await this in the critical path to avoid blocking the user request
+    creditExistingLayersToSurvey(survey._id, user.id).catch(err => {
+      createLogger('main-controller').error({ err }, 'Failed to credit existing layers to survey');
+    });
 
     res.status(200).json({ status: "success", code: 200, msg: 'Survey successfully submitted', survey });
   } catch (error) {
