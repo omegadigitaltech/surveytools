@@ -3,6 +3,10 @@
 const { createResearcherProfileService } = require('../../src/kyc/researcher-profile.service');
 const { researcherProfileBody } = require('../../src/kyc/researcher-profile.schema');
 
+jest.mock('../../model/user', () => ({
+  findOne: jest.fn().mockReturnValue({ select: jest.fn().mockResolvedValue({ phoneVerified: true, emailVerified: true }) })
+}));
+
 describe('Researcher Profile KYC', () => {
   describe('Schema Validation', () => {
     it('Unknown researcherType rejected by Zod', () => {

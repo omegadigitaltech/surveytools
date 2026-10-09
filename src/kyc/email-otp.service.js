@@ -48,7 +48,7 @@ function createEmailOtpService({ emailClient, otpRepo, kycConfig, allowedDomain 
       body: `Your SurveyTools verification code is ${code}. It expires in ${Math.round(kycConfig.otpExpiryMs / 60000)} minutes.`,
     });
 
-    log.info({ email, allowedDomain }, 'Email OTP issued');
+    log.info({ email: email.replace(/(?<=^.{3}).*(?=@)/, '***'), allowedDomain }, 'Email OTP issued');
   }
 
   /**
@@ -79,7 +79,7 @@ function createEmailOtpService({ emailClient, otpRepo, kycConfig, allowedDomain 
     }
 
     await otpRepo.markConsumed(otp._id);
-    log.info({ email }, 'Email OTP verified');
+    log.info({ email: email.replace(/(?<=^.{3}).*(?=@)/, '***') }, 'Email OTP verified');
     return true;
   }
 

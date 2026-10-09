@@ -9,15 +9,24 @@ jest.mock('../../lib/field-encryptor', () => ({
 describe('Respondent Sensitive Layers Service', () => {
   let repoMock;
   let service;
+  let mockSurvey;
+  let mockCreditLayerToSurvey;
 
   beforeEach(() => {
     repoMock = {
       findByUserId: jest.fn(),
       updateLayer3: jest.fn().mockResolvedValue({ success: true }),
     };
+    mockSurvey = {
+      find: jest.fn().mockReturnValue({ select: jest.fn().mockResolvedValue([]) })
+    };
+    mockCreditLayerToSurvey = jest.fn().mockResolvedValue();
+
     service = createRespondentSensitiveLayersService({
       respondentProfileRepo: repoMock,
       kycConfig: { kycSensitiveLayersSurveyThreshold: 5 },
+      Survey: mockSurvey,
+      creditLayerToSurvey: mockCreditLayerToSurvey
     });
   });
 

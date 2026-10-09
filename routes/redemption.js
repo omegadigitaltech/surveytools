@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { authMiddleware } = require('../middleware/auth');
 const { withTransaction, transactionHandler } = require('../middleware/transaction');
+const { requirePhoneVerified } = require('../src/kyc/require-phone-verified.middleware');
 const {
   getDataPlansHandler,
   redeemAirtime,
@@ -13,10 +14,10 @@ const {
 router.get('/redemption/plans', authMiddleware, getDataPlansHandler);
 
 // Redeem points for airtime - apply transaction middleware
-router.post('/redemption/airtime', authMiddleware, withTransaction, redeemAirtime);
+router.post('/redemption/airtime', authMiddleware, requirePhoneVerified, withTransaction, redeemAirtime);
 
 // Redeem points for data - apply transaction middleware
-router.post('/redemption/data', authMiddleware, withTransaction, redeemData);
+router.post('/redemption/data', authMiddleware, requirePhoneVerified, withTransaction, redeemData);
 
 // Get redemption history
 router.get('/redemption/history', authMiddleware, getRedemptionHistory);

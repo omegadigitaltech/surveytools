@@ -788,6 +788,129 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "Corporate Dashboard",
+            "item": [
+                {
+                    "name": "Get Organization Overview",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/v1/dashboard/corporate/overview",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "dashboard",
+                                "corporate",
+                                "overview"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Survey Analytics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/v1/dashboard/corporate/analytics?surveyId={{surveyId}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "dashboard",
+                                "corporate",
+                                "analytics"
+                            ],
+                            "query": [
+                                {
+                                    "key": "surveyId",
+                                    "value": "{{surveyId}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Generate & Retrieve Invoice",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/v1/dashboard/corporate/invoice/{{surveyId}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "dashboard",
+                                "corporate",
+                                "invoice",
+                                "{{surveyId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Export Survey Data",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/v1/dashboard/corporate/export?surveyId={{surveyId}}&format=csv",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "dashboard",
+                                "corporate",
+                                "export"
+                            ],
+                            "query": [
+                                {
+                                    "key": "surveyId",
+                                    "value": "{{surveyId}}"
+                                },
+                                {
+                                    "key": "format",
+                                    "value": "csv",
+                                    "description": "csv, pdf, xlsx, json, pptx"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
         }
     ]
 }

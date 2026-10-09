@@ -1,10 +1,8 @@
 {
   "info": {
-    "_postman_id": "a3e2298a-124a-487e-8336-7bbe4130d4aa",
-    "name": "SurveyTools Full APIs (with KYC v2) Copy",
+    "name": "SurveyTools Full & Corporate Dashboard (All Inclusive)",
     "description": "Complete API collection including Gamification, Marketplace, Analytics, and the full progressive KYC/NDPR suite.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "34178422"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
@@ -1916,6 +1914,175 @@
                   "value": "csv",
                   "description": "csv, pdf, xlsx, json, pptx"
                 }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "12. Core Surveys",
+      "description": "Endpoints to manage the core Survey entities (Create, Read, List)",
+      "item": [
+        {
+          "name": "Create Survey",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response && response.data && response.data._id) {",
+                  "    pm.collectionVariables.set(\"surveyId\", response.data._id);",
+                  "    console.log(\"Survey ID captured successfully!\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Survey: Employee Satisfaction Survey\",\n  \"description\": \"A survey to gauge employee satisfaction across different departments.\",\n  \"no_of_participants\": 100,\n  \"gender\": \"Both\",\n  \"preferred_participants\": \"Professionals\",\n  \"max_faculty_participants\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/surveys",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Questions to Survey",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questions\": [\n    {\n      \"questionId\": \"q_001\",\n      \"questionText\": \"How satisfied are you with your current role?\",\n      \"questionType\": \"five_point\",\n      \"required\": true,\n      \"options\": [\n        \"1 - Very Dissatisfied\",\n        \"2 - Dissatisfied\",\n        \"3 - Neutral\",\n        \"4 - Satisfied\",\n        \"5 - Very Satisfied\"\n      ]\n    },\n    {\n      \"questionId\": \"q_002\",\n      \"questionText\": \"Which department do you work in?\",\n      \"questionType\": \"multiple_choice\",\n      \"required\": true,\n      \"options\": [\n        \"Engineering\",\n        \"Sales\",\n        \"Marketing\",\n        \"HR\",\n        \"Operations\"\n      ]\n    },\n    {\n      \"questionId\": \"q_003\",\n      \"questionText\": \"What improvements would you like to see in the workplace?\",\n      \"questionType\": \"fill_in\",\n      \"required\": false\n    },\n    {\n      \"questionId\": \"q_004\",\n      \"questionText\": \"Which benefits are most important to you?\",\n      \"questionType\": \"multiple_selection\",\n      \"required\": true,\n      \"options\": [\n        \"Health Insurance\",\n        \"Remote Work\",\n        \"Bonus/Equity\",\n        \"Gym Membership\"\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/surveys/{{surveyId}}/bulk-questions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys",
+                "{{surveyId}}",
+                "bulk-questions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Surveys",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/surveys",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Survey by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/surveys/{{surveyId}}/info",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys",
+                "{{surveyId}}",
+                "info"
               ]
             }
           },

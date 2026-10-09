@@ -2,6 +2,10 @@
 
 const { createProgressiveProfileService } = require('../../src/kyc/progressive-profile.service');
 
+jest.mock('../../config/kyc-config', () => ({
+  kycLayer2SurveyThreshold: 5
+}));
+
 describe('Progressive Profiling Service', () => {
   let repoMock;
   let service;
