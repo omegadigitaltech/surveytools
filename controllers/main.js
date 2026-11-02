@@ -16,6 +16,8 @@ const SurveyLayerCredit = require('../model/survey-layer-credit');
 const DemographicAggregate = require('../model/demographic-aggregate');
 const { createLogger } = require('../lib/logger');
 const RespondentProfile = require('../src/kyc/respondent-profile.model');
+const { UserGamification, BonusEvent } = require('../model/gamification');
+const { resolveBoostMultiplier } = require('../src/gamification/boost-resolver');
 
 const main_url = process.env.FRONTEND_URL
 
@@ -720,9 +722,11 @@ const submitAnswers = async (req, res, next) => {
 
     await survey.save({ session });
 
-    // Add points to user's balance only if point_per_user is a valid number
+    // Add points to user's balance, applying any active boost multiplier
     if (survey.point_per_user && !isNaN(survey.point_per_user)) {
-      user.pointBalance += survey.point_per_user;
+      const multiplier = await resolveBoostMultiplier({ UserGamification, BonusEvent, user });
+      const pointsToAward = Math.round(survey.point_per_user * multiplier);
+      user.pointBalance += pointsToAward;
     } else {
       console.log(`Warning: Invalid point_per_user value (${survey.point_per_user}) for survey ${survey._id}`);
     }
