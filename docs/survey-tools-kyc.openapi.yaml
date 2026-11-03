@@ -124,6 +124,27 @@ paths:
         '201':
           description: Profile created successfully
 
+  /v1/kyc/account-type:
+    patch:
+      summary: Update account type for existing users
+      description: Allows existing users to set their account type (researcher or respondent) and submit their complete profile in a single call. Automatically assigns tiers for researchers (student -> Standard, professional -> Premium, corporate -> Institutional).
+      operationId: updateAccountType
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountTypeBody'
+      responses:
+        '200':
+          description: Account type updated successfully
+        '400':
+          description: Validation error
+        '404':
+          description: User not found
+
   /v1/kyc/researcher/tier:
     get:
       summary: Get researcher pricing tier
@@ -453,6 +474,49 @@ components:
       properties:
         researcherType: { type: string, enum: [student, professional, corporate] }
         # Extra fields conditionally validated
+
+    AccountTypeBody:
+      type: object
+      required: [userType]
+      properties:
+        userType:
+          type: string
+          enum: [researcher, respondent]
+          description: Target account type for the existing user.
+        # If userType is researcher:
+        researcherType:
+          type: string
+          enum: [student, professional, corporate]
+        academicStatus: { type: string }
+        institution: { type: string }
+        studentEmail: { type: string, format: email }
+        faculty: { type: string }
+        department: { type: string }
+        level: { type: string }
+        title: { type: string }
+        profession: { type: string }
+        areaOfSpecialisation: { type: string }
+        employer: { type: string }
+        workEmail: { type: string, format: email }
+        stateOfPractice: { type: string }
+        orgName: { type: string }
+        orgType: { type: string }
+        industry: { type: string }
+        orgEmail: { type: string, format: email }
+        orgPhone: { type: string }
+        contactName: { type: string }
+        contactRole: { type: string }
+        stateOfOperation: { type: string }
+        billingAddress: { type: string }
+        researchPurpose: { type: string }
+        expectedMonthlySurveys: { type: string }
+        # If userType is respondent:
+        gender: { type: string, enum: [male, female, non-binary, prefer-not-to-say] }
+        stateOfOrigin: { type: string }
+        stateOfResidence: { type: string }
+        lgaOfResidence: { type: string }
+        isStudent: { type: boolean }
+        dateOfBirth: { type: string, format: date-time }
 
     Layer1Body:
       type: object

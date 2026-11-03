@@ -42,6 +42,7 @@ const signupRoutes = require('./src/kyc/signup.routes');
 const researcherProfileRoutes = require('./src/kyc/researcher-profile.routes');
 const erasureRoutes = require('./src/kyc/erasure.routes');
 const researcherTierRoutes = require('./src/kyc/researcher-tier.routes');
+const accountTypeRoutes = require('./src/kyc/account-type.routes');
 
 const app = express();
 require('./middleware/passport');
@@ -197,6 +198,7 @@ app.use('/v1/kyc', signupRoutes);
 app.use('/v1/kyc', researcherProfileRoutes);
 app.use('/v1/kyc', erasureRoutes);
 app.use('/v1/kyc', researcherTierRoutes);
+app.use('/v1/kyc', accountTypeRoutes);
 
 app.use('/', adminRouter);
 app.use('/', gamificationRouter);
@@ -218,6 +220,7 @@ app.use('/v1/kyc', phoneOtpRoutes);
 app.use('/v1/kyc', emailOtpRoutes);
 // Use the new error handler for file uploads
 // app.use(uploadErrorHandler);
+
 // Use the original error handler for other errors
 app.use(errorHandlerMiddleware);
 app.use(notFoundMiddleware);

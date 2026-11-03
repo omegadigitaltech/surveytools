@@ -2,8 +2,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../model/user");
 const jwtSecret = process.env.JWT_SECRET;
-const { generateID_users, getVerification } = require("../middleware/helper");
-const { url } = require("../middleware/helper");
+const { generateID_users, getVerification, url } = require("../middleware/helper");
+const { evaluateUserAccountType } = require("../src/kyc/account-type.evaluator");
 
 const postRegister = async (req, res) => {
   try {
@@ -220,6 +220,8 @@ const postLogin = async (req, res) => {
     } catch (_) { /* silently ignored */ }
   })();
 
+  const accountTypeEval = await evaluateUserAccountType(user, userData);
+
   res.status(200).json({
     status: "success",
     code: 200,
@@ -230,6 +232,7 @@ const postLogin = async (req, res) => {
       // If false, the frontend must redirect the user to phone OTP verification
       // before allowing access to any protected feature (e.g. redemption).
       requiresPhoneVerification: !user.phoneVerified,
+      requiresAccountTypeUpdate: accountTypeEval.requiresAccountTypeUpdate,
     },
     admin: user.admin,
     token,
@@ -287,13 +290,18 @@ const googleLogin = async (req, res) => {
     } catch (_) { /* silently ignored */ }
   })();
 
+  const userData = user.toObject ? user.toObject() : { ...user };
+  const accountTypeEval = await evaluateUserAccountType(user, userData);
+
   res.status(200).json({
     status: "success",
     code: 200,
     msg: "User successfully logged in",
     data: {
       redirectUrl: redirectUrl,
-      user: user,
+      user: userData,
+      requiresPhoneVerification: !user.phoneVerified,
+      requiresAccountTypeUpdate: accountTypeEval.requiresAccountTypeUpdate,
     },
   });
 };
@@ -530,12 +538,16 @@ const getUserProfile = async (req, res) => {
       });
     }
 
+    const userData = user.toObject ? user.toObject() : { ...user };
+    const accountTypeEval = await evaluateUserAccountType(user, userData);
+
     res.status(200).json({
       status: "success",
       code: 200,
       msg: "User profile retrieved successfully",
       data: {
-        user: user,
+        user: userData,
+        requiresAccountTypeUpdate: accountTypeEval.requiresAccountTypeUpdate,
       },
     });
   } catch (error) {
