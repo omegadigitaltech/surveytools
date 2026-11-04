@@ -24,8 +24,8 @@ const emailClient = createEmailClient({
 });
 
 const otpRepo = createEmailOtpRepo({ EmailOtp });
-// allowedDomain is configurable via KYC_STUDENT_EMAIL_DOMAIN env var (default: .edu.ng)
-const emailOtpService = createEmailOtpService({ emailClient, otpRepo, kycConfig, allowedDomain: process.env.KYC_STUDENT_EMAIL_DOMAIN || '.edu.ng' });
+// No domain restriction — accepts any valid email address
+const emailOtpService = createEmailOtpService({ emailClient, otpRepo, kycConfig, allowedDomain: null });
 const { requestOtp, verifyOtp } = createEmailOtpController({ emailOtpService });
 
 const otpRateLimiter = rateLimit({
@@ -46,13 +46,13 @@ const verifyRateLimiter = rateLimit({
 
 /**
  * POST /v1/kyc/email-otp/request
- * Issues a 6-digit OTP to an academic .edu.ng email for institution affiliation verification.
+ * Issues a 6-digit OTP to any valid email address for general identity verification.
  */
 router.post('/email-otp/request', authMiddleware, otpRateLimiter, requestOtp);
 
 /**
  * POST /v1/kyc/email-otp/verify
- * Verifies the OTP and updates the User's emailVerified status.
+ * Verifies the OTP and marks the user's email as verified (emailVerified = true).
  */
 router.post('/email-otp/verify', authMiddleware, verifyRateLimiter, verifyOtp);
 

@@ -232,6 +232,7 @@ const postLogin = async (req, res) => {
       // If false, the frontend must redirect the user to phone OTP verification
       // before allowing access to any protected feature (e.g. redemption).
       requiresPhoneVerification: !user.phoneVerified,
+      requiresEmailVerification: !user.emailVerified,
       requiresAccountTypeUpdate: accountTypeEval.requiresAccountTypeUpdate,
     },
     admin: user.admin,
@@ -301,6 +302,7 @@ const googleLogin = async (req, res) => {
       redirectUrl: redirectUrl,
       user: userData,
       requiresPhoneVerification: !user.phoneVerified,
+      requiresEmailVerification: !user.emailVerified,
       requiresAccountTypeUpdate: accountTypeEval.requiresAccountTypeUpdate,
     },
   });
@@ -547,6 +549,8 @@ const getUserProfile = async (req, res) => {
       msg: "User profile retrieved successfully",
       data: {
         user: userData,
+        requiresPhoneVerification: !user.phoneVerified,
+        requiresEmailVerification: !user.emailVerified,
         requiresAccountTypeUpdate: accountTypeEval.requiresAccountTypeUpdate,
       },
     });

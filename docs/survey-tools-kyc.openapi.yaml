@@ -73,10 +73,11 @@ paths:
 
   /v1/kyc/email-otp/request:
     post:
-      summary: Issue a 6-digit OTP to a student email
-      description: Generates a 6-digit OTP and sends it via email to a .edu.ng address.
+      summary: Issue a 6-digit OTP to any email
+      description: Generates a 6-digit OTP and sends it via email to any valid email address for general email verification.
       operationId: requestEmailOtp
-      security: []
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -91,10 +92,11 @@ paths:
 
   /v1/kyc/email-otp/verify:
     post:
-      summary: Verify an email OTP
-      description: Checks the submitted 6-digit code for the email.
+      summary: Verify a general email OTP
+      description: Checks the submitted 6-digit code and marks emailVerified as true.
       operationId: verifyEmailOtp
-      security: []
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -104,6 +106,44 @@ paths:
       responses:
         '200':
           description: Email verified successfully
+        '400':
+          description: Invalid OTP
+
+  /v1/kyc/academic-email-otp/request:
+    post:
+      summary: Issue a 6-digit OTP to an academic institutional email
+      description: Generates a 6-digit OTP and sends it via email to a .edu.ng address for student researcher verification.
+      operationId: requestAcademicEmailOtp
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestAcademicEmailOtpBody'
+      responses:
+        '200':
+          description: OTP sent successfully
+        '400':
+          description: Validation error
+
+  /v1/kyc/academic-email-otp/verify:
+    post:
+      summary: Verify an academic email OTP
+      description: Checks the submitted 6-digit code and marks academicEmailVerified as true for student researchers.
+      operationId: verifyAcademicEmailOtp
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyAcademicEmailOtpBody'
+      responses:
+        '200':
+          description: Academic email verified successfully
         '400':
           description: Invalid OTP
 
@@ -462,6 +502,19 @@ components:
         email: { type: string, format: email }
 
     VerifyEmailOtpBody:
+      type: object
+      required: [email, code]
+      properties:
+        email: { type: string, format: email }
+        code: { type: string, pattern: '^\d{6}$' }
+
+    RequestAcademicEmailOtpBody:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string, format: email, pattern: '.*\.edu\.ng$' }
+
+    VerifyAcademicEmailOtpBody:
       type: object
       required: [email, code]
       properties:

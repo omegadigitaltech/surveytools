@@ -4,7 +4,7 @@ const { createResearcherProfileService } = require('../../src/kyc/researcher-pro
 const { researcherProfileBody } = require('../../src/kyc/researcher-profile.schema');
 
 jest.mock('../../model/user', () => ({
-  findOne: jest.fn().mockReturnValue({ select: jest.fn().mockResolvedValue({ phoneVerified: true, emailVerified: true }) })
+  findOne: jest.fn().mockReturnValue({ select: jest.fn().mockResolvedValue({ phoneVerified: true, emailVerified: true, academicEmailVerified: true }) })
 }));
 
 describe('Researcher Profile KYC', () => {
@@ -100,6 +100,29 @@ describe('Researcher Profile KYC', () => {
         message: 'Researcher profile already submitted and cannot be changed',
       });
       expect(repoMock.create).not.toHaveBeenCalled();
+    });
+
+    it('Rejects student researcher if academicEmailVerified is false', async () => {
+      const User = require('../../model/user');
+      User.findOne.mockReturnValueOnce({
+        select: jest.fn().mockResolvedValue({ phoneVerified: true, emailVerified: true, academicEmailVerified: false }),
+      });
+
+      const payload = {
+        researcherType: 'student',
+        academicStatus: 'Undergrad',
+        institution: 'XYZ',
+        studentEmail: 'test@student.edu.ng',
+        faculty: 'Sci',
+        department: 'CS',
+        level: '400',
+        matriculationNumber: '123',
+      };
+
+      await expect(service.submit('user_123', payload)).rejects.toMatchObject({
+        status: 403,
+        message: /academic email/i,
+      });
     });
   });
 });

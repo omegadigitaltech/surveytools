@@ -41,6 +41,8 @@ describe('Erasure Service', () => {
       dateOfBirth: null,
       phoneVerified: false,
       emailVerified: false,
+      academicEmailVerified: false,
+      academicEmail: null,
       kycStatus: 'erased',
     });
   });
