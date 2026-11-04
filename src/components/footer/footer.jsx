@@ -3,10 +3,14 @@ import iconFb from "../../assets/img/icon-fb.svg";
 import iconLk from "../../assets/img/icon-lk.svg";
 import iconX from "../../assets/img/icon-x.svg";
 import iconIg from "../../assets/img/icon-ig.svg";
+import useAuthStore from "../../store/useAuthStore";
+import { isResearcher } from "../../utils/kycFlow";
 import "./footer.css";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const researcher = useAuthStore((state) => isResearcher(state.userType));
 
   return (
     <footer className="footer">
@@ -60,15 +64,19 @@ const Footer = () => {
           <div className="footer-nav-col">
             <h3 className="footer-nav-heading">Products</h3>
             <ul className="footer-nav-list">
-              <li>
-                <Link to="/postsurvey">Create Surveys</Link>
-              </li>
-              <li>
+              {(!isAuthenticated || researcher) && (
+                <li>
+                  <Link to="/postsurvey">Create Surveys</Link>
+                </li>
+              )}
+              {/* <li>
                 <Link to="create-form">Create Form</Link>
-              </li>
-              <li>
-                <Link to="/dashboard">Fill Surveys</Link>
-              </li>
+              </li> */}
+              {!researcher && (
+                <li>
+                  <Link to="/dashboard">Fill Surveys</Link>
+                </li>
+              )}
               <li>
                 <Link to="/signup">Sign Up</Link>
               </li>

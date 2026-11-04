@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, CheckCircle2, Info } from "lucide-react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronRight, Info } from "lucide-react";
 import backaro from "../../../assets/img/backaro.svg";
 
 import "../card.css";
@@ -8,22 +9,27 @@ const Card = (props) => {
   const {
     title,
     description,
-    destination,
     optional = false,
     showContinue = true,
+    onBack,
+    onContinue,
+    onSkip,
+    continueLabel = "Continue",
+    busy = false,
     children,
   } = props;
-  const [gender, setGender] = useState("");
+  const navigate = useNavigate();
+
   return (
     <div className="form-card w-full bg-white rounded-t-2xl sm:px-10 p-4 sm:pt-8 pb-6">
       {/* Card */}
       <div className="bg-white rounded-b-2xl ">
         <button
           type="button"
+          onClick={onBack ?? (() => navigate(-1))}
           className="flex items-center  gap-1 text-slate-900 mb-1 "
           aria-label="Go back"
         >
-          {/* <ChevronLeft className="w-6 h-6" strokeWidth={2} /> */}
           <img
             src={backaro}
             className="w-4 h-4 sm:w-5 sm:h-5 mr-2"
@@ -54,12 +60,24 @@ const Card = (props) => {
 
       {/* Footer action bar */}
       {showContinue && (
-        <div className="flex justify-end mt-4">
+        <div className="flex justify-end items-center gap-4 mt-4">
+          {onSkip && (
+            <button
+              type="button"
+              onClick={onSkip}
+              disabled={busy}
+              className="text-sm font-medium text-slate-500 hover:text-slate-700"
+            >
+              Skip
+            </button>
+          )}
           <button
             type="button"
-            className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-700 transition-colors text-white font-medium px-4 py-1 rounded-lg"
+            onClick={onContinue}
+            disabled={busy}
+            className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-white font-medium px-4 py-1 rounded-lg"
           >
-            Continue
+            {busy ? "Saving..." : continueLabel}
             <ChevronRight
               className="chevron-continue w-4 !h-8 border-none"
               strokeWidth={2.5}

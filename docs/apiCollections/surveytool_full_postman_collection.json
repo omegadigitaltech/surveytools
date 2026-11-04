@@ -1,0 +1,2469 @@
+{
+  "info": {
+    "_postman_id": "348f29bd-7cc5-4145-bfd1-8c30fbf9a51a",
+    "name": "SurveyTools Full & Corporate Dashboard (All Inclusive)",
+    "description": "Complete API collection including Gamification, Marketplace, Analytics, and the full progressive KYC/NDPR suite.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "34178422"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "1.1 Register Respondent (Layer 1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"userType\": \"respondent\",\n  \"dateOfBirth\": \"1990-01-01T00:00:00.000Z\",\n  \"gender\": \"male\",\n  \"stateOfOrigin\": \"Lagos\",\n  \"stateOfResidence\": \"Lagos\",\n  \"lgaOfResidence\": \"Ikeja\",\n  \"isStudent\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.2 Register Researcher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"userType\": \"researcher\",\n  \"dateOfBirth\": \"1985-05-15T00:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.3 Login (Captures Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response && response.data && response.token) {",
+                  "    pm.collectionVariables.set(\"token\", response.token);",
+                  "    console.log(\"Token captured successfully!\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.4 Forget Password (Request OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/forget-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "forget-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.5 Reset Password (Submit OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"code\": \"123456\",\n  \"newPassword\": \"NewPass123!\",\n  \"confirmPassword\": \"NewPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reset-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Is Logged In",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/isLoggedIn",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "isLoggedIn"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"I am a new bio for the legacy user update\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/update-user",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "update-user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Points",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/points",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "points"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Admin Controls (Gamification & Marketplace)",
+      "item": [
+        {
+          "name": "Create Mission",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Survey Master\",\n  \"description\": \"Complete 5 surveys today.\",\n  \"type\": \"daily\",\n  \"category\": \"surveys\",\n  \"targetValue\": 5,\n  \"xpReward\": 200,\n  \"pointsReward\": 50\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/gamification/missions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "gamification",
+                "missions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Marketplace Listing",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"10% Amazon Gift Card\",\n  \"description\": \"Get 10% off your next Amazon purchase.\",\n  \"type\": \"gift_card\",\n  \"pointsCost\": 500,\n  \"value\": \"10% Off\",\n  \"partnerName\": \"Amazon\",\n  \"stock\": 100\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/marketplace/listings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "marketplace",
+                "listings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Level Config",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": 2,\n  \"name\": \"Explorer\",\n  \"minXP\": 1000,\n  \"maxXP\": 2500,\n  \"benefits\": [\"Extra spin wheel attempt\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/gamification/levels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "gamification",
+                "levels"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin - Create Achievement (Phase 3)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"First Blood\",\n    \"description\": \"Complete first survey\",\n    \"type\": \"surveys\",\n    \"requirementValue\": 1,\n    \"rewardPoints\": 100,\n    \"iconUrl\": \"http://example.com/icon.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/gamification/achievements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "gamification",
+                "achievements"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin - Get All Levels (Phase 3)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/gamification/levels",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "gamification",
+                "levels"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin - Get VIP Tiers (Phase 3)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/gamification/vip",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "gamification",
+                "vip"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin - Create Bonus Event (Phase 3)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Weekend Double XP\",\n    \"type\": \"double_xp\",\n    \"multiplier\": 2.0,\n    \"startDate\": \"2026-10-01T00:00:00Z\",\n    \"endDate\": \"2026-10-02T23:59:59Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/gamification/bonus-events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "gamification",
+                "bonus-events"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin - Get Bonus Events (Phase 3)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/gamification/bonus-events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "gamification",
+                "bonus-events"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Gamification",
+      "item": [
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/gamification/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "gamification",
+                "dashboard"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Spin Wheel",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/gamification/spin",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "gamification",
+                "spin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Missions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/gamification/missions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "gamification",
+                "missions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Claim Mission Reward",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/gamification/missions/{{missionProgressId}}/claim",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "gamification",
+                "missions",
+                "{{missionProgressId}}",
+                "claim"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Leaderboard",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/gamification/leaderboard?period=all_time",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "gamification",
+                "leaderboard"
+              ],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "all_time"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get VIP Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/gamification/vip-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "gamification",
+                "vip-status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Levels (Phase 2)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/gamification/levels",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "levels"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Achievements (Phase 2)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/gamification/achievements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "achievements"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Spin History (Phase 2)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/gamification/spin/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "spin",
+                "history"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Referrals (Phase 2)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/gamification/referrals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "referrals"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Marketplace & Vouchers",
+      "item": [
+        {
+          "name": "Get Listings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/marketplace/listings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "marketplace",
+                "listings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Convert Points / Buy Voucher",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pointsToConvert\": 500\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/marketplace/convert",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "marketplace",
+                "convert"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Voucher Wallet",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/marketplace/wallet",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "marketplace",
+                "wallet"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaction Summary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/marketplace/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "marketplace",
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Graph Visualizations",
+      "item": [
+        {
+          "name": "Get Basic Graph Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/surveys/{{surveyId}}/visualizations?graphType=bar&questionId={{questionId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys",
+                "{{surveyId}}",
+                "visualizations"
+              ],
+              "query": [
+                {
+                  "key": "graphType",
+                  "value": "bar"
+                },
+                {
+                  "key": "questionId",
+                  "value": "{{questionId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Analytics",
+      "item": [
+        {
+          "name": "Get Survey Analytics Overview",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/surveys/{{surveyId}}/analytics/overview",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys",
+                "{{surveyId}}",
+                "analytics",
+                "overview"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Engagement Analytics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/analytics/engagement",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "engagement"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Response Trends Analytics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/surveys/{{surveyId}}/analytics/trends?timeframe=weekly",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys",
+                "{{surveyId}}",
+                "analytics",
+                "trends"
+              ],
+              "query": [
+                {
+                  "key": "timeframe",
+                  "value": "weekly"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. OTP Verification",
+      "item": [
+        {
+          "name": "2.1 Request Phone OTP",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+2348012345678\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/otp/request",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "otp",
+                "request"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.2 Verify Phone OTP",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+2348012345678\",\n  \"code\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/otp/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "otp",
+                "verify"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.3 Request Email OTP (Academic/Org)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student@example.edu.ng\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/email-otp/request",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "email-otp",
+                "request"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.4 Verify Email OTP",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student@example.edu.ng\",\n  \"code\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/email-otp/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "email-otp",
+                "verify"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Profiles & Progressive Layers",
+      "item": [
+        {
+          "name": "3.1 Submit Researcher Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"researcherType\": \"professional\",\n  \"title\": \"Dr.\",\n  \"profession\": \"Data Scientist\",\n  \"areaOfSpecialisation\": \"Machine Learning\",\n  \"employer\": \"Omega Digital Tech\",\n  \"workEmail\": \"jane.smith@omegadigitaltech.com\",\n  \"stateOfPractice\": \"Lagos\",\n  \"researchPurpose\": \"Academic and market research on consumer behaviour\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/researcher/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "researcher",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.2 Get Researcher Tier",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/researcher/tier",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "researcher",
+                "tier"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.3 Get Respondent Layer Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/respondent/layer-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "respondent",
+                "layer-status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.4 Submit Respondent Layer 2",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"educationLevel\": \"Bachelors\",\n  \"employmentStatus\": \"Employed\",\n  \"incomeRange\": \"100k-500k\",\n  \"maritalStatus\": \"Single\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/respondent/layer2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "respondent",
+                "layer2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.5 Submit Respondent Layer 3 (Health - Encrypted)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chronicHealthConditions\": [],\n  \"disabilityStatus\": \"None\",\n  \"smokingStatus\": \"Never\",\n  \"alcoholConsumption\": \"Occasional\",\n  \"exerciseFrequency\": \"Weekly\",\n  \"dietaryPattern\": \"Omnivore\",\n  \"bloodGroup\": \"O+\",\n  \"genotype\": \"AA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/respondent/layer3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "respondent",
+                "layer3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.6 Submit Respondent Layer 4 (Socioeconomic - Encrypted)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monthlyHouseholdIncome\": \"500k-1M\",\n  \"housingType\": \"Rented\",\n  \"primaryTransport\": \"Public\",\n  \"internetAccessQuality\": \"Good\",\n  \"primaryDevice\": \"Smartphone\",\n  \"numberOfDependants\": 0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/respondent/layer4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "respondent",
+                "layer4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.7 Submit Respondent Layer 5 (Cultural - Encrypted)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"religion\": \"Christianity\",\n  \"ethnicity\": \"Yoruba\",\n  \"languagesSpoken\": [\"English\", \"Yoruba\"],\n  \"maritalStatus\": \"Single\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/respondent/layer5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "respondent",
+                "layer5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.8 Simulate Survey Completed Hook",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/respondent/survey-completed",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "respondent",
+                "survey-completed"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9. NDPR & Compliance",
+      "item": [
+        {
+          "name": "4.1 Submit NDPR Consent",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scopes\": [\"basic_profile\", \"health_data\", \"socioeconomic_data\", \"religious_cultural_data\", \"survey_participation\", \"marketing\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/consent",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "consent"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.2 Revoke specific scope consent",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"granted\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/consent/marketing",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "consent",
+                "marketing"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.3 Erase KYC Data (Right to Erasure)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/kyc/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "kyc",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10. User Profile & Legacy Auth",
+      "item": [],
+      "description": "Legacy authentication endpoints and user profile management (Update User, Get Points, Logout)"
+    },
+    {
+      "name": "11. Corporate Dashboard",
+      "item": [
+        {
+          "name": "Get Organization Overview",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/dashboard/corporate/overview",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "dashboard",
+                "corporate",
+                "overview"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Survey Analytics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/dashboard/corporate/analytics?surveyId={{surveyId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "dashboard",
+                "corporate",
+                "analytics"
+              ],
+              "query": [
+                {
+                  "key": "surveyId",
+                  "value": "{{surveyId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate & Retrieve Invoice",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/dashboard/corporate/invoice/{{surveyId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "dashboard",
+                "corporate",
+                "invoice",
+                "{{surveyId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Export Survey Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/dashboard/corporate/export?surveyId={{surveyId}}&format=csv",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "dashboard",
+                "corporate",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "surveyId",
+                  "value": "{{surveyId}}"
+                },
+                {
+                  "key": "format",
+                  "value": "csv",
+                  "description": "csv, pdf, xlsx, json, pptx"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "12. Core Surveys",
+      "item": [
+        {
+          "name": "Create Survey",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response && response.data && response.data._id) {",
+                  "    pm.collectionVariables.set(\"surveyId\", response.data._id);",
+                  "    console.log(\"Survey ID captured successfully!\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Survey: Employee Satisfaction Survey\",\n  \"description\": \"A survey to gauge employee satisfaction across different departments.\",\n  \"no_of_participants\": 100,\n  \"gender\": \"Both\",\n  \"preferred_participants\": \"Professionals\",\n  \"max_faculty_participants\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/surveys",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Questions to Survey",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questions\": [\n    {\n      \"questionId\": \"q_001\",\n      \"text\": \"How satisfied are you with your current role?\",\n      \"type\": \"rating\",\n      \"required\": true,\n      \"options\": [\n        \"1 - Very Dissatisfied\",\n        \"2 - Dissatisfied\",\n        \"3 - Neutral\",\n        \"4 - Satisfied\",\n        \"5 - Very Satisfied\"\n      ]\n    },\n    {\n      \"questionId\": \"q_002\",\n      \"text\": \"Which department do you work in?\",\n      \"type\": \"single_choice\",\n      \"required\": true,\n      \"options\": [\n        \"Engineering\",\n        \"Sales\",\n        \"Marketing\",\n        \"HR\",\n        \"Operations\"\n      ]\n    },\n    {\n      \"questionId\": \"q_003\",\n      \"text\": \"What improvements would you like to see in the workplace?\",\n      \"type\": \"text\",\n      \"required\": false\n    },\n    {\n      \"questionId\": \"q_004\",\n      \"text\": \"Which benefits are most important to you?\",\n      \"type\": \"multiple_choice\",\n      \"required\": true,\n      \"options\": [\n        \"Health Insurance\",\n        \"Remote Work\",\n        \"Bonus/Equity\",\n        \"Gym Membership\"\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/surveys/{{surveyId}}/bulk-questions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys",
+                "{{surveyId}}",
+                "bulk-questions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Surveys",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/surveys",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Survey by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/surveys/{{surveyId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "surveys",
+                "{{surveyId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints to manage the core Survey entities (Create, Read, List)"
+    },
+    {
+      "name": "13. Form Integration",
+      "item": [
+        {
+          "name": "Import Form by URL (Typeform / Tally / Google Forms)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/forms/import",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "forms",
+                "import"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://myworkspace.typeform.com/to/EXAMPLE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List Imported Forms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/forms?page=1&limit=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "forms"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "platform",
+                  "value": "typeform",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Form by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/forms/{{formId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "forms",
+                "{{formId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload SurveyHeart CSV Snapshot",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/forms/csv-upload",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "forms",
+                "csv-upload"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "CSV file exported from SurveyHeart"
+                },
+                {
+                  "key": "title",
+                  "value": "My SurveyHeart Export",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "[Google OAuth] Start Authorization",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/forms/oauth/google/start",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "forms",
+                "oauth",
+                "google",
+                "start"
+              ]
+            },
+            "description": "Opens Google consent screen. Follow the redirect in a browser. Requires GOOGLE_FORMS_CLIENT_ID and GOOGLE_FORMS_CLIENT_SECRET to be configured on the server."
+          }
+        },
+        {
+          "name": "[Google OAuth] Handle Callback (exchange code)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/forms/oauth/google/callback?code={{googleOAuthCode}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "forms",
+                "oauth",
+                "google",
+                "callback"
+              ],
+              "query": [
+                {
+                  "key": "code",
+                  "value": "{{googleOAuthCode}}"
+                }
+              ]
+            },
+            "description": "Called by Google after user grants consent. The code param comes from the Google redirect. Store the code in the googleOAuthCode variable."
+          }
+        },
+        {
+          "name": "[Webhook Test] Simulate Typeform Response (local only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "typeform-signature",
+                "value": "sha256={{typeformHmacSignature}}",
+                "description": "Compute HMAC-SHA256 of the body using TYPEFORM_WEBHOOK_SECRET, base64-encode it, prefix sha256="
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/forms/webhooks/typeform",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "forms",
+                "webhooks",
+                "typeform"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"form_response\": {\n    \"form_id\": \"EXAMPLE_FORM_ID\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Simulates an inbound Typeform webhook. You must compute a valid HMAC-SHA256 signature for the request body and set it in the typeform-signature header."
+          }
+        },
+        {
+          "name": "[Webhook Test] Simulate Tally Response (local only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "tally-signature",
+                "value": "{{tallyHmacSignature}}",
+                "description": "Compute base64(HMAC-SHA256(signing secret, raw request body)) using TALLY_WEBHOOK_SECRET"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/forms/webhooks/tally",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "forms",
+                "webhooks",
+                "tally"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"formId\": \"EXAMPLE_FORM_ID\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Simulates an inbound Tally webhook. You must compute a valid base64-encoded HMAC-SHA256 signature over the raw request body and set it in the tally-signature header."
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5003"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "missionProgressId",
+      "value": "ID_HERE"
+    },
+    {
+      "key": "surveyId",
+      "value": "SURVEY_ID_HERE"
+    },
+    {
+      "key": "questionId",
+      "value": "PRIMARY_QUESTION_ID"
+    },
+    {
+      "key": "crossQuestionId",
+      "value": "SECONDARY_QUESTION_ID"
+    },
+    {
+      "key": "formId",
+      "value": "FORM_ID_HERE"
+    },
+    {
+      "key": "googleOAuthCode",
+      "value": "GOOGLE_OAUTH_CODE_HERE"
+    },
+    {
+      "key": "typeformHmacSignature",
+      "value": "BASE64_HMAC_HERE"
+    },
+    {
+      "key": "tallyHmacSignature",
+      "value": "BASE64_HMAC_HERE"
+    }
+  ]
+}

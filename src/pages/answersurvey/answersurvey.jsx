@@ -10,6 +10,8 @@ import { toast } from "react-toastify";
 import useAuthStore from "../../store/useAuthStore";
 import Complete from "../../components/completed/complete";
 import config from "../../config/config";
+import { getLayerStatus, notifySurveyCompleted } from "../../utils/kycApi";
+import { KYC_ROUTES } from "../../utils/kycFlow";
 import backaro from "../../assets/img/backaro.svg";
 import "./answersurvey.css";
 
@@ -17,6 +19,7 @@ const AnswerSurvey = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const authToken = useAuthStore((state) => state.authToken);
+  const userType = useAuthStore((state) => state.userType);
   const location = useLocation();
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,6 +28,7 @@ const AnswerSurvey = () => {
   const [submitting, setSubmitting] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
+  const [layer2Unlocked, setLayer2Unlocked] = useState(false);
 
   const { title, description, createdAt, points } = location.state || {};
 
@@ -262,6 +266,7 @@ const AnswerSurvey = () => {
       }
       setEarnedPoints(points);
       setShowComplete(true);
+      trackKycMilestone();
     } catch (error) {
       console.log(error);
       console.error("Error submitting survey:", error);
@@ -271,7 +276,25 @@ const AnswerSurvey = () => {
     }
   };
 
+  // Each completed survey counts toward unlocking KYC Layer 2. Best effort:
+  // a failure here must never spoil the completed survey.
+  const trackKycMilestone = async () => {
+    if (userType === "researcher") return;
+    try {
+      await notifySurveyCompleted();
+      const status = await getLayerStatus();
+      setLayer2Unlocked(status.layer2Eligible && !status.layer2Completed);
+    } catch {
+      /* ignored: the counter catches up on the next survey */
+    }
+  };
+
   const handleDone = () => {
+    if (layer2Unlocked) {
+      toast.success("You've unlocked your extended profile!");
+      navigate(KYC_ROUTES.layer2);
+      return;
+    }
     navigate("/dashboard");
   };
 

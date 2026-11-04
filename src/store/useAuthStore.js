@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import useKycStore from './useKycStore';
 
 const useAuthStore = create(
   persist(
@@ -9,6 +10,15 @@ const useAuthStore = create(
       userEmail: '',
       userName: '',
       userInst: '',
+      userType: '',
+      // "standard" | "premium" | "institutional"; empty until the tier endpoint
+      // resolves it. Researchers only.
+      researcherTier: '',
+      // Accounts from before account types may be respondents who already
+      // posted surveys. null = not checked yet. Kept in memory only.
+      ownsSurveys: null,
+      // From the login response; true until the phone OTP is verified
+      requiresPhoneVerification: false,
       currentSurveyId: '',
       signupEmail: '',
       isLogoutVisible: false,
@@ -17,9 +27,26 @@ const useAuthStore = create(
       hasPaid: false,
 
       // Action to set authentication data after successful login
-      setAuthData: (token, email, name, inst) => {
-        set({ authToken: token, isAuthenticated: true, userEmail: email, userName: name, userInst: inst, });
+      setAuthData: ({ token, email, name, userType, requiresPhoneVerification }) => {
+        // Legacy pages still read the token from localStorage directly
+        localStorage.setItem('token', token);
+        set({
+          authToken: token,
+          isAuthenticated: true,
+          userEmail: email,
+          userName: name,
+          userType,
+          researcherTier: '',
+          ownsSurveys: null,
+          requiresPhoneVerification,
+        });
       },
+
+      setRequiresPhoneVerification: (value) => set({ requiresPhoneVerification: value }),
+
+      setResearcherTier: (tier) => set({ researcherTier: tier || '' }),
+
+      setOwnsSurveys: (value) => set({ ownsSurveys: value }),
 
       setSignupEmail: (email) => {
         set({ signupEmail: email })
@@ -43,7 +70,20 @@ const useAuthStore = create(
      },
       // Action to clear user data on logout
       logout: () => {
-        set({ authToken: '', isAuthenticated: false, userEmail: '', userName: '', currentSurveyId: '' });
+        localStorage.removeItem('token');
+        useKycStore.getState().resetLayer1();
+        set({
+          authToken: '',
+          isAuthenticated: false,
+          userEmail: '',
+          userName: '',
+          userInst: '',
+          userType: '',
+          researcherTier: '',
+          ownsSurveys: null,
+          requiresPhoneVerification: false,
+          currentSurveyId: '',
+        });
       }
     }),
     {
@@ -55,7 +95,10 @@ const useAuthStore = create(
         isAuthenticated: state.isAuthenticated,
         userEmail: state.userEmail,
         userName: state.userName,
-        userInst: state.userInst
+        userInst: state.userInst,
+        userType: state.userType,
+        researcherTier: state.researcherTier,
+        requiresPhoneVerification: state.requiresPhoneVerification
       })
     }
   )

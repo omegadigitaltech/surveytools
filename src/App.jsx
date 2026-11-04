@@ -16,22 +16,19 @@ import AuthLayout from "./layout/auth/auth";
 import DashboardLayout from "./layout/dashboard/dashboard";
 import StoreProvider from "./store/StoreProvider";
 import ProtectRoute from "./components/protectroute/protectroute";
+import RoleRoute from "./components/protectroute/RoleRoute";
 import useAuthStore from "./store/useAuthStore.js";
 import Logout from "./components/logout/logout";
 import setupAuthInterceptor from "./utils/setupAuthInterceptor";
 
 import Home from "./pages/home/home";
-import Register from "./pages/register/register.jsx"
-import SignUpType from "./pages/signup/signupType.jsx";
 import SignIn from "./pages/signin/signin";
 import SignUp from "./pages/signup/signup";
-import ProfessionalSignUp from "./pages/professionalsignup/professionalsignup.jsx"
 import ResetPw from "./pages/resetpassword/resetpw.jsx";
 import ForgotPw from "./pages/forgotpassword/forgot.jsx";
 import Verify from "./pages/verify/verify";
-import verifyAction from "./pages/verify/action";
 import Dashboard from "./pages/dashboard/dashboard";
-import ProfessionalDshDb from "./pages/professionalDshDb/professionalDshDb.jsx"
+import ResearcherDashboard from "./pages/ResearcherDashboard/ResearcherDashboard.jsx"
 import signInAction from "./pages/signin/action";
 import signUpAction from "./pages/signup/action";
 import postAction from "./pages/surveyquestion/action";
@@ -58,7 +55,7 @@ import FormInsights from "./pages/forminsights/forminsights";
 import GraphAnalyticsDashboard from "./pages/graph-analytics/GraphAnalyticsDashboard.jsx";
 import VerifyPayment from "./pages/verify-payment/verify-payment";
 import Rewards from "./pages/rewards/rewards";
-import MissionsPage from "./pages/missions/missions";
+// import MissionsPage from "./pages/missions/missions";
 import Help from "./pages/help/help";
 import Admin from "./pages/admin/Admin";
 import PersonalInformation from "./pages/register/PersonalInfo.jsx";
@@ -67,6 +64,9 @@ import HealthLifestyle from "./pages/register/HealthLifestyle.jsx";
 import SocioEconomic from "./pages/register/SocioEconomic.jsx";
 import Beliefs from "./pages/register/Beliefs.jsx";
 import ReviewSubmit from "./pages/register/Review.jsx";
+import EducationEmployment from "./pages/register/EducationEmployment.jsx";
+import ResearcherProfile from "./pages/register/ResearcherProfile.jsx";
+import KycGate from "./pages/register/components/KycGate.jsx";
 
 const RootLayout = () => {
   const { pathname } = useLocation();
@@ -88,53 +88,88 @@ const router = createBrowserRouter(
 
       <Route element={<ProtectRoute />}>
       {/* NO DASHBOARD LAYOUT FOR THEM */}
-        <Route path="answersurvey/:id" element={<AnswerSurvey />} />
+        <Route element={<RoleRoute allow="respondent" />}>
+          <Route path="answersurvey/:id" element={<AnswerSurvey />} />
+        </Route>
         <Route element={<HomeLayout />}>
-          <Route path="surveyquestion" element={<SurveyQuestion />} action={postAction} />
-          <Route path="create-form" element={<FormQuestions />} />
+          <Route element={<RoleRoute allow="researcher" allowSurveyOwners />}>
+            <Route path="surveyquestion" element={<SurveyQuestion />} action={postAction} />
+          </Route>
+          {/* Forms are switched off for now */}
+          <Route element={<RoleRoute allow="none" />}>
+            <Route path="create-form" element={<FormQuestions />} />
+          </Route>
         </Route>
        {/*--- */}
-       
+
         <Route element={<DashboardLayout />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="professional-dashboard" element={<ProfessionalDshDb />} />
-          <Route path="start-survey" element={<StartSurvey />} />
-          <Route path="postsurvey" element={<PostSurvey />}  action={surveyAction} />
+          <Route element={<RoleRoute allow="respondent" />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="withdraw" element={<Withdraw />} />
+            <Route path="rewards" element={<Rewards />} />
+            {/* <Route path="missions" element={<MissionsPage />} /> */}
+          </Route>
+
+          <Route element={<RoleRoute allow="researcher" />}>
+            <Route path="researcher-dashboard" element={<ResearcherDashboard />} />
+            <Route path="start-survey" element={<StartSurvey />} />
+            <Route path="postsurvey" element={<PostSurvey />}  action={surveyAction} />
+            <Route path="analytics" element={<GraphAnalyticsDashboard />} />
+            <Route path="analytics/:surveyId" element={<GraphAnalyticsDashboard />} />
+          </Route>
+
+          {/* Managing a survey that already exists */}
+          <Route element={<RoleRoute allow="researcher" allowSurveyOwners />}>
+            <Route path="publish" element={<Publish />} />
+            <Route path="insights/:id" element={<Insights />} />
+            <Route path="payment" element={<Payment />} />
+            <Route path="verify-payment" element={<VerifyPayment />} />
+          </Route>
+
+          {/* Forms are switched off for now */}
+          <Route element={<RoleRoute allow="none" />}>
+            <Route path="/my-forms" element={<MyForms />} />
+            <Route path="formquestion/:id" element={<FormQuestions />} />
+            <Route path="forminsights/:id" element={<FormInsights />} />
+          </Route>
+
           <Route path="expandsurvey/:id" element={<ExpandSurvey />} />
-          <Route path="publish" element={<Publish />} />
-          <Route path="insights/:id" element={<Insights />} />
-          <Route path="analytics" element={<GraphAnalyticsDashboard />} /> 
-          <Route path="analytics/:surveyId" element={<GraphAnalyticsDashboard />} />
-          <Route path="/my-forms" element={<MyForms />} />
-          <Route path="formquestion/:id" element={<FormQuestions />} />
-          <Route path="forminsights/:id" element={<FormInsights />} />
-          <Route path="payment" element={<Payment />} />
-          <Route path="verify-payment" element={<VerifyPayment />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="withdraw" element={<Withdraw />} />
-          <Route path="rewards" element={<Rewards />} />
-          <Route path="missions" element={<MissionsPage />} />
           <Route path="help" element={<Help />} />
 
         </Route>
       </Route>
       <Route element={<AuthLayout />}>
-      {/* <Route path="register" element={<Register />} /> */}
-      <Route path="register/personalinfo" element={<PersonalInformation />} />
-      <Route path="register/academicprofile" element={<AcaAndProf />} />
-      <Route path="register/healthlifestyle" element={<HealthLifestyle />} />
-      <Route path="register/socioeconomic" element={<SocioEconomic />} />
-      <Route path="register/beliefs" element={<Beliefs />} />
-      <Route path="register/review" element={<ReviewSubmit />} />
-      <Route path="signup-type" element={<SignUpType />} />
+        {/* Signed in, phone not yet verified */}
+        <Route element={<ProtectRoute requirePhone={false} />}>
+          <Route path="verify" element={<Verify />} />
+        </Route>
+
+        {/* KYC: each gate checks layer-status and redirects to the right step */}
+        <Route element={<ProtectRoute />}>
+          <Route element={<KycGate stage="layer1" />}>
+            <Route path="register/personalinfo" element={<PersonalInformation />} />
+            <Route path="register/academicprofile" element={<AcaAndProf />} />
+            <Route path="register/review" element={<ReviewSubmit />} />
+          </Route>
+          <Route element={<KycGate stage="layer2" />}>
+            <Route path="register/education" element={<EducationEmployment />} />
+          </Route>
+          <Route element={<KycGate stage="enrichment" />}>
+            <Route path="register/healthlifestyle" element={<HealthLifestyle />} />
+            <Route path="register/socioeconomic" element={<SocioEconomic />} />
+            <Route path="register/beliefs" element={<Beliefs />} />
+          </Route>
+          <Route element={<KycGate stage="researcher" />}>
+            <Route path="register/researcher" element={<ResearcherProfile />} />
+          </Route>
+        </Route>
+
         <Route path="signin" element={<SignIn />} action={signInAction} />
         <Route path="signup" element={<SignUp />} action={signUpAction} />
-        <Route path="professional-signup" element={<ProfessionalSignUp />}  />
-        <Route path="verify" element={<Verify />} action={verifyAction} />
         <Route path="forgotpassword" element={<ForgotPw />} />
-        <Route path="resetpassword/:token" element={<ResetPw />} />
         <Route path="reset-password" element={<ResetPw />} />
       </Route>
     </Route>

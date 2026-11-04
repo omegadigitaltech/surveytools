@@ -39,7 +39,7 @@ margin-bottom: 1rem;
 
 .input_codes{
     justify-content: center;
-    gap: 3rem;
+    gap: 1rem;
 }
 .verify_codes input{
     background: var(--litgray);
@@ -51,6 +51,26 @@ font-size: 1.4rem;
 }
 .verify_codes input:focus{
 border: 1px solid var(--base);
+}
+.verify_codes input.verify-phone{
+    width: 100%;
+    max-width: 22rem;
+    font-size: 1.1rem;
+}
+.verify-error{
+    color: #dc2626;
+    font-size: .875rem;
+    text-align: center;
+    margin-top: 1rem;
+}
+.verify-switch{
+    text-align: center;
+    font-size: .875rem;
+    color: #64748b;
+}
+.verify-switch button{
+    color: var(--base);
+    font-weight: 600;
 }
 /* Remove number input spinners for WebKit browsers (Chrome, Safari, etc.) */
 input[type=number]::-webkit-outer-spin-button,
@@ -110,9 +130,12 @@ width: 95% !important;
     font-size: 1rem;
     /* border: 1px solid black; */
     }
+    .verify_codes input{
+        width: 2.75rem;
+    }
     .input_codes{
         justify-content: center;
-        gap: 1rem;
+        gap: .5rem;
     }
 }
 @media(max-width:384px){

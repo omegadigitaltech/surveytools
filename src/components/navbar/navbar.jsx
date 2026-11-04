@@ -5,11 +5,13 @@ import iconBell from "../../assets/img/icon-bell.svg";
 import iconUser from "../../assets/img/icon-user.svg";
 import iconLogOut from "../../assets/img/icon-logout.svg";
 import useAuthStore from "../../store/useAuthStore";
+import { getHomeRoute, isResearcher } from "../../utils/kycFlow";
 import "./navbar.css";
 
 const Navbar = () => {
   // const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
+  const { userName, userType, showLogoutConfirmation, isAuthenticated } = useAuthStore();
+  const researcher = isResearcher(userType);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleMenu = () => setMenuOpen((prev) => !prev);
@@ -66,15 +68,17 @@ const Navbar = () => {
             {isAuthenticated && (
               <>
                 <li className="header-w2-item show header-w2-hide">
-                  <NavLink className="header-w2-link" to="/dashboard">
+                  <NavLink className="header-w2-link" to={getHomeRoute(userType)}>
                     Dashboard
                   </NavLink>
                 </li>
-                <li className="header-w2-item show header-w2-hide">
-                  <NavLink className="header-w2-link" to="/postsurvey">
-                    Post Survey
-                  </NavLink>
-                </li>
+                {researcher && (
+                  <li className="header-w2-item show header-w2-hide">
+                    <NavLink className="header-w2-link" to="/postsurvey">
+                      Post Survey
+                    </NavLink>
+                  </li>
+                )}
                 {/* <li className="header-w2-item show header-w2-hide">
                   <NavLink className="header-w2-link" to="/create-form">
                     Create Form
@@ -85,7 +89,7 @@ const Navbar = () => {
             {!isAuthenticated && (
               <>
                 <li className="header-w2-item hide">
-                  <NavLink className="header-w2-link button navsignup-btn text-white px-5 py-2 rounded-md" to="/signup-type">
+                  <NavLink className="header-w2-link button navsignup-btn text-white px-5 py-2 rounded-md" to="/signup">
                     Sign up
                   </NavLink>
                 </li>
@@ -120,24 +124,28 @@ const Navbar = () => {
       {menuOpen && (
         
            <nav className="mobile-sidednav sidebar-nav mt-12">
-           <NavLink to="/dashboard" className="sidebar-link">
+           <NavLink to={getHomeRoute(userType)} className="sidebar-link">
              <span>
                <img src="/dashboard.svg" alt="Widget 2" />
              </span>
              <span>Dashboard</span>
            </NavLink>
-           <NavLink to="/postsurvey" className="sidebar-link ">
-             <span>
-               <img src="/survey.svg" alt="Chat-Square" />
-             </span>
-             <span className="text-black-600">Create a survey</span>
-           </NavLink>
-           <NavLink to="/analytics" className="sidebar-link">
-             <span>
-               <img src="/Chat-Square-2.svg" alt="Chat-Square" />
-             </span>
-             <span>Analytics</span>
-           </NavLink>
+           {researcher && (
+             <>
+               <NavLink to="/postsurvey" className="sidebar-link ">
+                 <span>
+                   <img src="/survey.svg" alt="Chat-Square" />
+                 </span>
+                 <span className="text-black-600">Create a survey</span>
+               </NavLink>
+               <NavLink to="/analytics" className="sidebar-link">
+                 <span>
+                   <img src="/Chat-Square-2.svg" alt="Chat-Square" />
+                 </span>
+                 <span>Analytics</span>
+               </NavLink>
+             </>
+           )}
            {/* <NavLink to="/my-forms" className="sidebar-link">
              <span>
                <img src="/Folder-With-Files.svg" alt="Folder-With-FIles" />

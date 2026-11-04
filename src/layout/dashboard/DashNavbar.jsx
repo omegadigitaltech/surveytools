@@ -7,17 +7,20 @@ import useOutsideClick from "../../hooks/useOutsideClick";
 import "./navbar.css";
 import useDashboardStore from "../../store/useDashboardStore";
 import DailySpinModal from "../../components/DailySpinModal/DailySpinModal";
+import { getHomeRoute, isResearcher } from "../../utils/kycFlow";
 
 const Sidebar = () => {
-  const { userName, showLogoutConfirmation, isAuthenticated } = useAuthStore();
+  const { userName, userType, showLogoutConfirmation, isAuthenticated } = useAuthStore();
   const { menuOpen, setMenuOpen } = useDashboardStore();
   const sidebar = useRef(null);
   const navigate = useNavigate();
   const [showSpinModal, setShowSpinModal] = useState(false);
-  if (!isAuthenticated) return null;
+  const researcher = isResearcher(userType);
 
   // Setup clickOutside function for sidebar
   useOutsideClick(sidebar, () => setMenuOpen(false));
+
+  if (!isAuthenticated) return null;
 
   return (
     <>
@@ -56,24 +59,28 @@ const Sidebar = () => {
 
         {/* Navigation */}
         <nav className="sidebar-nav mt-12">
-          <NavLink to="/dashboard" className="sidebar-link">
+          <NavLink to={getHomeRoute(userType)} className="sidebar-link">
             <span>
               <img src="/dashboard.svg" alt="Widget 2" />
             </span>
             <span>Dashboard</span>
           </NavLink>
-          <NavLink to="/postsurvey" className="sidebar-link ">
-            <span>
-              <img src="/survey.svg" alt="Chat-Square" />
-            </span>
-            <span className="text-black-600">Create a survey</span>
-          </NavLink>
-          <NavLink to="/analytics" className="sidebar-link">
-            <span>
-              <img src="/Chat-Square-2.svg" alt="Chat-Square" />
-            </span>
-            <span>Analytics</span>
-          </NavLink>
+          {researcher && (
+            <>
+              <NavLink to="/postsurvey" className="sidebar-link ">
+                <span>
+                  <img src="/survey.svg" alt="Chat-Square" />
+                </span>
+                <span className="text-black-600">Create a survey</span>
+              </NavLink>
+              <NavLink to="/analytics" className="sidebar-link">
+                <span>
+                  <img src="/Chat-Square-2.svg" alt="Chat-Square" />
+                </span>
+                <span>Analytics</span>
+              </NavLink>
+            </>
+          )}
           {/* <NavLink to="/my-forms" className="sidebar-link">
             <span>
               <img src="/Folder-With-Files.svg" alt="Folder-With-FIles" />
@@ -92,12 +99,14 @@ const Sidebar = () => {
             </span>
             <span>Settings</span>
           </NavLink> */}
-          <NavLink to="/rewards" className="sidebar-link">
-            <span>
-              <img src="/rewards.svg" alt="Rewards" />
-            </span>
-            <span>Rewards</span>
-          </NavLink>
+          {!researcher && (
+            <NavLink to="/rewards" className="sidebar-link">
+              <span>
+                <img src="/rewards.svg" alt="Rewards" />
+              </span>
+              <span>Rewards</span>
+            </NavLink>
+          )}
           <NavLink to="/help" className="sidebar-link"
           >
             <span>
@@ -106,10 +115,12 @@ const Sidebar = () => {
             <span>Help & Support</span>
           </NavLink>
 
-          <button className="dailyspin-btn" onClick={() =>  setShowSpinModal(true)}>
-            <img src="/spinmenu.svg" alt="spin" />
-            <span>Daily Spin</span>
-          </button>
+          {!researcher && (
+            <button className="dailyspin-btn" onClick={() =>  setShowSpinModal(true)}>
+              <img src="/spinmenu.svg" alt="spin" />
+              <span>Daily Spin</span>
+            </button>
+          )}
           {/* <NavLink to="/responses" className="sidebar-link">
             <span>
               <img

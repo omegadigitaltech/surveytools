@@ -1,11 +1,15 @@
 import React from "react"
 import "./logout.css"
 import useAuthStore from "../../store/useAuthStore"
+import { logoutSession } from "../../utils/kycApi"
 
 const Logout = () => {
-    const { hideLogoutConfirmation, logout } = useAuthStore();
+    const { hideLogoutConfirmation, logout, authToken } = useAuthStore();
     const handleConfirm = () => {
+        // Clear local state first so a 401 from an already-expired token
+        // doesn't trigger the "session expired" redirect
         logout();
+        logoutSession(authToken);
         hideLogoutConfirmation();
     };
 

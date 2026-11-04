@@ -6,7 +6,6 @@ import useAuthStore from "../../store/useAuthStore";
 const action = async ({ request }) => {
   // Experiment
   const authToken = localStorage.getItem("token");
-  console.log(authToken)
   // Expo
   const formData = await request.formData();
   

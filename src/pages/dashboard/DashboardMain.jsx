@@ -11,18 +11,6 @@ export default function DashboardMain({ pointBalance, stats }) {
             Respond to surveys and earn rewards
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          {/* <Link to="/create-form" className="text-red-500 hover:underline text-sm font-semibold">
-            Create A Form
-          </Link> */}
-          <Link
-            to="/postsurvey"
-            className="bg-[#00A5B5] hover:bg-[#008F9C] text-white px-4 py-2 rounded-lg text-sm font-semibold shadow flex items-center gap-2"
-          >
-            <span className="material-icons text-sm">edit</span> Create
-            Questionnaire
-          </Link>
-        </div>
       </div>
 
       <div className="point-boost bg-gradient-to-r from-[#008303] to-[#0096B8] rounded-2xl p-10 text-white flex flex-col md:flex-row justify-between items-center shadow-lg relative overflow-hidden">

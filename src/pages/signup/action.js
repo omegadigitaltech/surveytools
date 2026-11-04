@@ -1,54 +1,45 @@
-import { redirect } from "react-router";
 import { toast } from "react-toastify";
-import config from "../../config/config";
-// import { uiSliceAction } from "../../components/store/uiSlice";
-// import callAPI from "../../utils/helpers/callAPI";
+import { register } from "../../utils/kycApi";
+import { ageFrom, toIsoDate } from "../../utils/kycFlow";
 
 const action = async ({ formData }) => {
-  // const data = await request.formData();
+  const password = formData.get("password");
+  const dob = formData.get("dateOfBirth");
+
+  // Mirror the backend rules so the user gets inline feedback first
+  if (password.length < 8) {
+    toast.error("Password must be at least 8 characters.");
+    return null;
+  }
+  if (password !== formData.get("confirm")) {
+    toast.error("Passwords do not match.");
+    return null;
+  }
+  if (ageFrom(dob) < 18) {
+    toast.error("You must be 18 or older to register.");
+    return null;
+  }
+
   const user = {
-    first_name: formData.get("firstname"),
-    last_name: formData.get("lastname"),
-    email: formData.get("email"),
-    instituition: formData.get("institution"),
-    password: formData.get("password"),
-    confirm_password: formData.get("confirm"),
-    faculty: formData.get("faculty"),
-    department: formData.get("department"),
-    gender: formData.get("gender"),
-  };
-  const API_URL = `${config.API_URL}/register`;
-  const options = {
-    body: JSON.stringify(user),
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Allow-Control-Allow-Origin": "*",
-    },
+    firstName: formData.get("firstname").trim(),
+    lastName: formData.get("lastname").trim(),
+    email: formData.get("email").trim(),
+    password,
+    userType: formData.get("userType"),
+    dateOfBirth: toIsoDate(dob),
   };
 
   try {
-    const resp = await fetch(API_URL, options);
-    const json = await resp.json();
-
-    console.log(json)
-    if (json.code !== 201) {
-      throw new Error(json.msg);
-    }
-    const token = json.token;
-  if (token) {
-    localStorage.setItem("token", token);
-  }
-    toast.success(json.msg);
-
-    return {
-      status: "success",
-      signupEmail: json.data.user.email,
-    };
-
+    await register(user);
+    // Registration returns no token: the user signs in next
+    toast.success("Account created. Please log in to continue.");
+    return { status: "success", signupEmail: user.email };
   } catch (err) {
-    toast.error(err.message);
-    // throw err;
+    toast.error(
+      /already registered/i.test(err.message)
+        ? "An account with this email already exists. Log in instead?"
+        : err.message,
+    );
   }
 
   return null;

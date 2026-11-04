@@ -1,6 +1,7 @@
-import { Form, Link, useNavigate, useActionData } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import { Form, Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import useAuthStore from "../../store/useAuthStore";
+import { getPostAuthRoute } from "../../utils/kycFlow";
 import action from "./action";
 import "./signin.css";
 import "../utils.css";
@@ -13,6 +14,8 @@ import features from "../../assets/img/illustration-signin.svg";
 const SignIn = () => {
   const navigate = useNavigate();
   const setAuthData = useAuthStore((state) => state.setAuthData);
+  // Prefilled after a fresh signup, which doesn't log the user in
+  const signupEmail = useAuthStore((state) => state.signupEmail);
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,14 +37,15 @@ const SignIn = () => {
 
     // Check if login was successful and set auth data in Zustand store
     if (response?.status === "success") {
-      setAuthData(response.token, response.userEmail, response.userName, response.userInst);
-      setTimeout(() => {
-        if (response.userVerified) {
-          navigate("/dashboard");
-        } else {
-          navigate("/verify");
-        }
-      }, 1500);
+      setAuthData({
+        token: response.token,
+        email: response.userEmail,
+        name: response.userName,
+        userType: response.userType,
+        requiresPhoneVerification: response.requiresPhoneVerification,
+      });
+      // Unverified phones go to OTP; otherwise resume KYC where it stopped
+      navigate(await getPostAuthRoute(response), { replace: true });
     } else {
       setLoading(false);
     }
@@ -68,6 +72,7 @@ const SignIn = () => {
               type="text"
               name="email"
               id="email"
+              defaultValue={signupEmail}
               placeholder="Enter your email address"
               required
             />
@@ -80,7 +85,7 @@ const SignIn = () => {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
-                placeholder="Create a password"
+                placeholder="Enter your password"
                 required
               />
               <img className="signin-icon pw-toggle" src={iconPass} alt="Toggle Password Visibility" onClick={handleToggle} />
@@ -109,7 +114,7 @@ const SignIn = () => {
 
         <div className="auth-w5- no-acct">
           New here?&nbsp;
-          <Link className="auth-w5-" to="/signup-type">Create an account</Link>
+          <Link className="auth-w5-" to="/signup">Create an account</Link>
         </div>
       </div>
 

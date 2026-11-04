@@ -1,51 +1,28 @@
-import { redirect } from "react-router";
-import config from "../../config/config";
 import { toast } from "react-toastify";
+import { login } from "../../utils/kycApi";
 
 const action = async ({ formData }) => {
-  // const data = await request.formData();
-  const user = {
-    email: formData.get("email"),
-    password: formData.get("password"),
-  };
-
-  const API_URL = `${config.API_URL}/login`;
-  const options = {
-    body: JSON.stringify(user),
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
-
   try {
-    const resp = await fetch(API_URL, options);
-    const json = await resp.json();
+    const json = await login(formData.get("email"), formData.get("password"));
+    const { user, requiresPhoneVerification } = json.data;
 
-    if (json.status !== "success") {
-      toast.error(json.msg || "Login failed. Please try again.");
-      return { status: "error", message: json.msg || "Login failed. Please try again." };  
-    }
     toast.success(json.msg);
-    console.log("Login response:", json);
-
-    // Store only the token in localStorage
-    const token = json.token;
-    if (token) {
-      localStorage.setItem("token", token);
-    }
-    
     return {
       status: "success",
-      token,
-      userEmail: json.data.user.email,
-      userName: json.data.user.fullname,
-      userVerified: json.data.user.verified,
-      userInst: json.data.user.instituition,
+      token: json.token,
+      userEmail: user.email,
+      userName: user.fullname,
+      userType: user.userType,
+      requiresPhoneVerification: Boolean(requiresPhoneVerification),
     };
   } catch (err) {
-    toast.error("An error occurred. Please try again.");
-    return { status: "error", message: "An error occurred. Please try again." };
+    // 401 here means bad credentials; never say which field was wrong
+    const message =
+      err.status === 401
+        ? "Invalid email or password."
+        : err.message || "An error occurred. Please try again.";
+    toast.error(message);
+    return { status: "error", message };
   }
 };
 

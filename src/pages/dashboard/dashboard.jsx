@@ -21,6 +21,7 @@ import ConfirmDetails from "./ConfirmDetails";
 import Report from "./Report";
 import useAppStore from "../../store/useAppStore";
 import DashboardMain from "./DashboardMain";
+import { getMySurveys } from "../ResearcherDashboard/ResearcherDashboardApi";
 // import ContestModal from "../../components/ContestModal";
 
 const Dashboard = () => {
@@ -29,9 +30,11 @@ const Dashboard = () => {
   const authToken = useAuthStore((state) => state.authToken);
   const surveys = useAuthStore((state) => state.surveys);
   const setSurveys = useAuthStore((state) => state.setSurveys);
+  const setOwnsSurveys = useAuthStore((state) => state.setOwnsSurveys);
   const [showPoint, setShowPoint] = useState(false);
   const [mySurveys, setMySurveys] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [mySurveysError, setMySurveysError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [isLoadingPoints, setIsLoadingPoints] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [dashboardStats, setDashboardStats] = useState(null);
@@ -49,27 +52,17 @@ const Dashboard = () => {
   const { pointBalance, setPointBalance } = useAppStore();
 
   //  functions
+  // Respondents can no longer create surveys, but accounts that posted some
+  // before account types existed keep them here. No surveys, no tab.
   const fetchMySurveys = async () => {
     setIsLoading(true);
-    const API_URL = `${config.API_URL}/my-surveys`;
-    const options = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-    };
+    setMySurveysError("");
     try {
-      const response = await fetch(API_URL, options);
-      const json = await response.json();
-
-      if (!response.ok) {
-        throw new Error(json.message || "Failed to fetch my surveys");
-      }
-
-      setMySurveys(json.mySurveys);
+      const fetched = await getMySurveys();
+      setMySurveys(fetched);
+      setOwnsSurveys(fetched.length > 0);
     } catch (error) {
-      toast.error(error.message || "Error fetching my surveys");
+      if (error.status !== 401) setMySurveysError(error.message);
       console.error("Error fetching my surveys:", error);
     } finally {
       setIsLoading(false);
@@ -82,6 +75,12 @@ const Dashboard = () => {
       fetchMySurveys();
     }
   };
+
+  useEffect(() => {
+    fetchMySurveys();
+  }, []);
+
+  const showMySurveysTab = mySurveys.length > 0 || Boolean(mySurveysError);
 
   const filteredSurveys = surveys.filter((survey) =>
     survey.title.toLowerCase().includes(searchKey.toLowerCase())
@@ -226,12 +225,14 @@ const Dashboard = () => {
               >
                 Available Surveys
               </h3>
-              <h3
-                className={`${activeTab === "my-surveys" ? "active_head" : ""}`}
-                onClick={() => handleTabClick("my-surveys")}
-              >
-                My Surveys
-              </h3>
+              {showMySurveysTab && (
+                <h3
+                  className={`${activeTab === "my-surveys" ? "active_head" : ""}`}
+                  onClick={() => handleTabClick("my-surveys")}
+                >
+                  My Surveys
+                </h3>
+              )}
             </div>
             <div className="survey_posts">
               {activeTab === "available" ? (
@@ -310,6 +311,13 @@ const Dashboard = () => {
                   <div className="loader"></div>
                   <p>Loading your surveys...</p>
                 </div>
+              ) : mySurveysError ? (
+                <p className="no_result">
+                  {mySurveysError}{" "}
+                  <button type="button" className="underline" onClick={fetchMySurveys}>
+                    Try again
+                  </button>
+                </p>
               ) : mySurveys.length > 0 ? (
                 mySurveys.map((survey, index) => (
                   <Link key={survey._id} to={`/expandsurvey/${survey._id}`}>

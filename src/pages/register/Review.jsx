@@ -1,21 +1,32 @@
-import React, { useState } from "react";
-
-import {
-  ChevronLeft,
-  ChevronRight,
-  CheckCircle2,
-  Check,
-  Circle,
-  Info,
-} from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { ChevronRight, CheckCircle2 } from "lucide-react";
 
 import ProgressTracker from "./components/ProgressTracker";
-
 import Card from "./components/Card";
+import { ConfirmCheckbox } from "./components/fields";
+import useLayerSubmit from "./components/useLayerSubmit";
+import useKycStore from "../../store/useKycStore";
+import { CONSENT_SCOPES } from "../../utils/kycApi";
+import { KYC_ROUTES } from "../../utils/kycFlow";
+import {
+  LAYER1_STEPS,
+  buildLayer1Payload,
+  isStudent,
+  validateAcademic,
+  validatePersonal,
+} from "./layer1";
 
-const ReviewSubmit = ({ personalInfo = {}, onEdit, onSubmit }) => {
-  const step = 6;
-  const totalSteps = 6;
+const GENDER_LABELS = {
+  male: "Male",
+  female: "Female",
+  "prefer-not-to-say": "Prefer not to say",
+};
+
+const ReviewSubmit = () => {
+  const navigate = useNavigate();
+  const { layer1, resetLayer1 } = useKycStore();
+  const { busy, submit } = useLayerSubmit();
 
   const [confirmAccurate, setConfirmAccurate] = useState(false);
   const [agreePrivacyPolicy, setAgreePrivacyPolicy] = useState(false);
@@ -24,19 +35,53 @@ const ReviewSubmit = ({ personalInfo = {}, onEdit, onSubmit }) => {
   const allChecked =
     confirmAccurate && agreePrivacyPolicy && consentVerification;
 
-  const handleSubmit = () => {
-    if (!allChecked) return;
-    onSubmit?.();
+  // Drop the draft once we've left the page after a successful submit.
+  // Clearing it earlier would trip the redirects below mid-navigation.
+  const submitted = useRef(false);
+  useEffect(() => () => submitted.current && resetLayer1(), [resetLayer1]);
+
+  // The draft is in memory only; after a refresh, start again at step 1
+  if (Object.keys(validatePersonal(layer1)).length) {
+    return <Navigate to="/register/personalinfo" replace />;
+  }
+  if (Object.keys(validateAcademic(layer1)).length) {
+    return <Navigate to="/register/academicprofile" replace />;
+  }
+
+  const handleSubmit = async () => {
+    if (!allChecked || busy) return;
+    const done = await submit(1, buildLayer1Payload(layer1), {
+      // NDPR minimum: identity/location data + permission to receive surveys
+      scopes: [CONSENT_SCOPES.basicProfile, CONSENT_SCOPES.surveyParticipation],
+      next: KYC_ROUTES.home,
+      successMsg: "Profile submitted. You can start taking surveys!",
+    });
+    submitted.current = done;
   };
+
+  const summary = [
+    ["Gender", GENDER_LABELS[layer1.gender]],
+    ["Date of Birth", new Date(`${layer1.dateOfBirth}T00:00`).toLocaleDateString()],
+    ["State of Origin", layer1.stateOfOrigin],
+    ["Residence", `${layer1.lgaOfResidence}, ${layer1.stateOfResidence}`],
+    ["Academic Status", layer1.academicStatus],
+    ...(isStudent(layer1)
+      ? [
+          ["Institution", layer1.institution],
+          ["Level of Study", layer1.levelOfStudy],
+        ]
+      : []),
+  ];
 
   return (
     <div className="flex flex-col items-stretch justify-center ">
       <div className="personal-info mt-2 inline-flex min-h-screennn flex-col items-stretch justify-center">
-        <ProgressTracker step={step} totalSteps={totalSteps} />
+        <ProgressTracker step={LAYER1_STEPS} totalSteps={LAYER1_STEPS} showSaved={false} />
 
         <Card
           title={"Review & Submit"}
           description={"Please review your information before final submission"}
+          onBack={() => navigate("/register/academicprofile")}
           showContinue={false}
         >
           <div className="space-y-6">
@@ -56,7 +101,8 @@ const ReviewSubmit = ({ personalInfo = {}, onEdit, onSubmit }) => {
 
                 <button
                   type="button"
-                  onClick={onEdit}
+                  onClick={() => navigate("/register/personalinfo")}
+                  disabled={busy}
                   className="text-sm font-medium text-sky-600 hover:text-sky-700"
                 >
                   Edit
@@ -64,19 +110,12 @@ const ReviewSubmit = ({ personalInfo = {}, onEdit, onSubmit }) => {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-slate-400">Name</p>
-                  <p className="text-sm text-slate-900">
-                    {personalInfo.name || "—"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-slate-400">Phone</p>
-                  <p className="text-sm text-slate-900">
-                    {personalInfo.phone || "—"}
-                  </p>
-                </div>
+                {summary.map(([label, value]) => (
+                  <div key={label}>
+                    <p className="text-sm text-slate-400">{label}</p>
+                    <p className="text-sm text-slate-900">{value || "—"}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -97,22 +136,22 @@ const ReviewSubmit = ({ personalInfo = {}, onEdit, onSubmit }) => {
               <ConfirmCheckbox
                 checked={consentVerification}
                 onClick={() => setConsentVerification((v) => !v)}
-                label="I consent to secure identity verification processing"
+                label="I consent to my profile being processed to match me with surveys"
               />
             </div>
 
             {/* Submit */}
             <button
               type="button"
-              disabled={!allChecked}
+              disabled={!allChecked || busy}
               onClick={handleSubmit}
               className={`w-full flex items-center justify-center gap-1.5 rounded-md py-1 text-sm font-medium text-white transition-colors ${
-                allChecked
+                allChecked && !busy
                   ? "bg-sky-400 hover:bg-sky-500 cursor-pointer"
                   : "bg-sky-300/60 cursor-not-allowed"
               }`}
             >
-              Submit Verification
+              {busy ? "Submitting..." : "Submit Verification"}
               <ChevronRight className="w-4 h-4 !border-none"  strokeWidth={2} />
             </button>
           </div>
@@ -121,32 +160,5 @@ const ReviewSubmit = ({ personalInfo = {}, onEdit, onSubmit }) => {
     </div>
   );
 };
-
-function ConfirmCheckbox({ checked, onClick, label }) {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        className="group flex items-center gap-3 text-left w-full"
-      >
-        <span
-          className={`flex-shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-            checked
-              ? "border-sky-600 bg-sky-600"
-              : "border-slate-300 bg-white group-hover:border-slate-400"
-          }`}
-        >
-          <Check
-            className={`!w-3.5 !h-3.5 text-white transition-opacity ${
-              checked ? "opacity-100" : "opacity-0"
-            }`}
-            strokeWidth={3}
-          />
-        </span>
-  
-        <span className="text-sm text-slate-900">{label}</span>
-      </button>
-    );
-  }
 
 export default ReviewSubmit;

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import config from "../../config/config";
 import useAuthStore from "../../store/useAuthStore";
 import { validateSurveyAccess } from "../../utils/helpers/surveyChecks";
+import { isResearcher } from "../../utils/kycFlow";
 import { toast } from "react-toastify";
 import Loader from "../../components/loader/loader";
 import backaro from "../../assets/img/backaro.svg";
@@ -20,6 +21,7 @@ const expandsurvey = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const authToken = useAuthStore((state) => state.authToken);
+  const userType = useAuthStore((state) => state.userType);
   const [survey, setSurvey] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isOwnSurvey, setIsOwnSurvey] = useState(false);
@@ -32,23 +34,23 @@ const expandsurvey = () => {
       const options = {
         method: "GET",
         headers: {
-          "Content-Type": "applictions/json",
+          "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
         },
       };
 
-      const response = await fetch(API_URl, options);
-      const json = await response.json();
-
       try {
+        const response = await fetch(API_URl, options);
+        const json = await response.json();
+
         if (!response.ok)
-          throw new Error(json.msg || "Failed to fectch survey details");
+          throw new Error(json.msg || "Failed to fetch survey details");
         setSurvey(json.survey);
         // Check if the logged-in user is the creator of the survey
         setIsOwnSurvey(json.survey.isCreator === true);
 
       } catch (error) {
-        toast.error(error.msg || "Error fetching survey details")
+        toast.error(error.message || "Error fetching survey details")
         console.error("Error:", error);
       } finally {
         setLoading(false);
@@ -60,13 +62,17 @@ const expandsurvey = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       const API_URL = `${config.API_URL}/user/profile`;
-      const response = await fetch(API_URL, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-      const data = await response.json();
-      setUserDetails(data.data.user);
+      try {
+        const response = await fetch(API_URL, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        const data = await response.json();
+        setUserDetails(data.data.user);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
     };
 
     fetchUserDetails();
@@ -198,7 +204,7 @@ const expandsurvey = () => {
         <button className="start-btn btn" onClick={handleEditClick}>
           Edit Survey
         </button>
-      ) : (
+      ) : !isResearcher(userType) && (
         <button
           className="start-btn btn"
           onClick={async () => {

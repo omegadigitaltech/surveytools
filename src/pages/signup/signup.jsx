@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Form, Link, useActionData, useNavigate, } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import React, { useState } from "react";
+import { Form, Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/useAuthStore";
 import action from "./action";
 import "./signup.css";
@@ -9,16 +7,24 @@ import "../utils.css";
 import features from "../../assets/img/illustration-signup.svg";
 import iconHide from "../../assets/img/icon-eye-hide.svg";
 import iconShow from "../../assets/img/icon-eye-show.svg";
-import { faculty_dept } from "../../utils/constants/facultyData";
+
+const USER_TYPES = [
+  { value: "respondent", label: "Take surveys", hint: "Earn rewards answering surveys" },
+  { value: "researcher", label: "Run research", hint: "Create and publish surveys" },
+];
+
+// Latest birth date that is 18 today, for the date picker's max
+const maxDob = (() => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 18);
+  return d.toISOString().slice(0, 10);
+})();
 
 const SignUp = () => {
   const navigate = useNavigate();
   const setSignupEmail = useAuthStore((state) => state.setSignupEmail);
-  // const actionData = useActionData();
   const [showPassword, setShowPassword] = useState(false);
-  const [faculty, setFaculty] = useState("");
-  const [department, setDepartment] = useState("");
-  const [gender, setGender] = useState("");
+  const [userType, setUserType] = useState("respondent");
 
   const handleToggle = () => {
     setShowPassword((prevState) => !prevState);
@@ -26,11 +32,6 @@ const SignUp = () => {
   const iconPass = showPassword ? iconShow : iconHide;
   
   const [loading, setLoading] = useState(false);
-
-  const handleFacultyChange = (e) => {
-    setFaculty(e.target.value);
-    setDepartment(""); // Reset department when faculty changes
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,16 +43,12 @@ const SignUp = () => {
     
     if (response?.status === "success") {
       setSignupEmail(response.signupEmail);
-      setTimeout(() => {
-        setLoading(false);
-          navigate("/verify");
-      }, 1500);
+      navigate("/signin");
     } else {
       setLoading(false);
     }
   }
-    catch (err) {
-    console.error("Unexpected error:", err);
+    catch {
     setLoading(false);
   }
     };
@@ -64,6 +61,30 @@ const SignUp = () => {
 
         <Form className="auth-w4-form" method="post" action="/signup" onSubmit={handleSubmit}>
           <div className="auth-w4-grid">
+            {/* Account type - decides the KYC flow after sign in */}
+            <div className="auth-w4-field auth-w4-full">
+              <span className="auth-w4-label">I want to</span>
+              <input type="hidden" name="userType" value={userType} />
+              <div className="grid grid-cols-2 gap-3">
+                {USER_TYPES.map((type) => (
+                  <button
+                    key={type.value}
+                    type="button"
+                    aria-pressed={userType === type.value}
+                    onClick={() => setUserType(type.value)}
+                    className={`text-left px-4 py-2 rounded-lg border text-sm transition-colors ${
+                      userType === type.value
+                        ? "border-sky-600 bg-sky-50 text-sky-700"
+                        : "border-slate-200 text-slate-700 hover:border-slate-300"
+                    }`}
+                  >
+                    <span className="block font-medium">{type.label}</span>
+                    <span className="block text-xs text-slate-500">{type.hint}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Name fields - side by side */}
             <div className="auth-w4-field">
               <label className="auth-w4-label" htmlFor="firstname">
@@ -107,85 +128,21 @@ const SignUp = () => {
               />
             </div>
 
-            {/* Institution - full width */}
+            {/* Date of birth - full width */}
             <div className="auth-w4-field auth-w4-full">
-              <label className="auth-w4-label" htmlFor="institution">
-                Institution
+              <label className="auth-w4-label" htmlFor="dateOfBirth">
+                Date of Birth
               </label>
               <input
                 className="auth-w4-input"
-                type="text"
-                name="institution"
-                id="institution"
-                placeholder="Enter your institution name"
+                type="date"
+                name="dateOfBirth"
+                id="dateOfBirth"
+                max={maxDob}
                 required
               />
             </div>
 
-            <div className="auth-w4-field auth-w4-full">
-              <label className="auth-w4-label" htmlFor="gender">
-                Gender
-              </label>
-              <select
-                className="auth-w4-input"
-                name="gender"
-                id="gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                required
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-            </div>
-
-            <div className="auth-w4-field auth-w4-full">
-              <label className="auth-w4-label" htmlFor="faculty">
-                Faculty
-              </label>
-              <select
-                className="auth-w4-input"
-                name="faculty"
-                id="faculty"
-                value={faculty}
-                onChange={handleFacultyChange}
-                required
-              >
-                <option value="">Select Faculty</option>
-                {faculty_dept.map((item) => (
-                  <option key={item.faculty} value={item.faculty}>
-                    {item.faculty}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Department - conditional rendering */}
-            {faculty && (
-              <div className="auth-w4-field auth-w4-full">
-                <label className="auth-w4-label" htmlFor="department">
-                  Department
-                </label>
-                <select
-                  className="auth-w4-input"
-                  name="department"
-                  id="department"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  required
-                >
-                  <option value="">Select Department</option>
-                  {faculty_dept
-                    .find(f => f.faculty === faculty)
-                    ?.departments.map((dept) => (
-                      <option key={dept} value={dept}>
-                        {dept}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            )}
             <div className="auth-w4-field auth-w4-full">
               <label className="auth-w4-label" htmlFor="password">
                 Password
@@ -196,7 +153,8 @@ const SignUp = () => {
                  type={showPassword ? "text" : "password"}
                  name="password"
                  id="password"
-                 placeholder="Create a password"
+                 placeholder="At least 8 characters"
+                 minLength={8}
                   required
                  />
                 <img

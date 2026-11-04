@@ -9,7 +9,7 @@
   box-sizing: border-box;
 }
 
-/* ---- Header: let the two buttons wrap instead of overflowing ---- */
+/* ---- Header: let the content wrap instead of overflowing ---- */
 .profdashbd .profdashbd-header {
   flex-wrap: wrap;
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { Form, useNavigate } from "react-router-dom";
-import config from "../../config/config";
+import { requestPasswordReset } from "../../utils/kycApi";
 import "./forgot.css";
 
 const ForgotPw = () => {
@@ -13,17 +13,10 @@ const ForgotPw = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`${config.API_URL}/forget-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.msg || json.message || "Error");
-      toast.success("Check email for reset link.");
-      // optional: redirect or clear form
-      // setTimeout(() => navigate("/signin"), 1500);
-      setEmail("");
+      await requestPasswordReset(email.trim());
+      // The backend answers 200 whether or not the account exists
+      toast.success("If that email has an account, a 6-digit code is on its way.");
+      navigate("/reset-password", { state: { email: email.trim() } });
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -55,7 +48,7 @@ const ForgotPw = () => {
             disabled={loading}
             className="forgot-btn auth-w5-btn"
           >
-            {loading ? "Sending..." : "Reset Password"}
+            {loading ? "Sending..." : "Send Reset Code"}
           </button>
         </Form>
       </div>

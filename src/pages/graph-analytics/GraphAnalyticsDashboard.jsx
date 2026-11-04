@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, BarChart2, Calendar, Users, PieChart as PieChartIcon, GitMerge, Calculator, Network } from 'lucide-react';
-import { toast } from 'react-toastify';
 import config from '../../config/config';
 import useAuthStore from '../../store/useAuthStore';
 import "./graphanalytics.css"
@@ -16,6 +15,8 @@ const GraphAnalyticsDashboard = () => {
   const [surveysList, setSurveysList] = useState([]);
   const [loadingInitial, setLoadingInitial] = useState(!surveyId);
   const [activeTab, setActiveTab] = useState('basic'); // basic, cross, stats, advanced
+  const [listError, setListError] = useState('');
+  const [attempt, setAttempt] = useState(0);
 
   // If no surveyId is provided, we fetch the list of surveys to let the user select one.
   useEffect(() => {
@@ -27,6 +28,7 @@ const GraphAnalyticsDashboard = () => {
     const fetchMySurveys = async () => {
       try {
         setLoadingInitial(true);
+        setListError('');
         const res = await fetch(`${config.API_URL}/my-surveys`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
@@ -37,7 +39,7 @@ const GraphAnalyticsDashboard = () => {
         
         setSurveysList(data.mySurveys || []);
       } catch (err) {
-        toast.error('Error loading surveys for analytics');
+        setListError('Error loading surveys for analytics');
       } finally {
         setLoadingInitial(false);
       }
@@ -46,7 +48,7 @@ const GraphAnalyticsDashboard = () => {
     if (authToken) {
       fetchMySurveys();
     }
-  }, [surveyId, authToken]);
+  }, [surveyId, authToken, attempt]);
 
   if (loadingInitial) {
     return (
@@ -83,7 +85,18 @@ const GraphAnalyticsDashboard = () => {
             </div>
           </div>
 
-          {surveysList.length === 0 ? (
+          {listError ? (
+            <div className="bg-white p-8 rounded-xl shadow-sm text-center max-w-md mx-auto w-full mt-10 border border-gray-100">
+              <p className="text-gray-500 mb-6 max-[390px]:text-sm">{listError}</p>
+              <button
+                type="button"
+                onClick={() => setAttempt((n) => n + 1)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+              >
+                Try again
+              </button>
+            </div>
+          ) : surveysList.length === 0 ? (
             <div className="bg-white p-8 rounded-xl shadow-sm text-center max-w-md mx-auto w-full mt-10 border border-gray-100">
               <div className="text-4xl mb-4">📊</div>
               <h3 className="text-base sm:text-xl font-bold text-gray-900 mb-2">No surveys yet</h3>
