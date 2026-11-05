@@ -10,14 +10,14 @@ const User = require('../../model/user');
 function createResearcherProfileService({ repo }) {
   async function submit(userId, data) {
     // Gate 1: phone must be verified for ALL researcher types
-    const user = await User.findOne({ id: userId }).select('phoneVerified emailVerified');
+    const user = await User.findOne({ id: userId }).select('phoneVerified emailVerified academicEmailVerified');
     if (!user) throw new AppError(404, 'User not found');
     if (!user.phoneVerified) {
       throw new AppError(403, 'Phone number must be verified before submitting a researcher profile');
     }
 
-    // Gate 2: student researchers must have verified their .edu.ng email
-    if (data.researcherType === 'student' && !user.emailVerified) {
+    // Gate 2: student researchers must have verified their academic .edu.ng email
+    if (data.researcherType === 'student' && !user.academicEmailVerified) {
       throw new AppError(403, 'Academic email (.edu.ng) must be verified before submitting a student researcher profile');
     }
 

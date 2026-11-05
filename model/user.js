@@ -96,7 +96,9 @@ const UserSchema = new Schema(
     dateOfBirth:   { type: Date, default: null },
     phoneVerified: { type: Boolean, default: false },
     phone:         { type: String },
-    emailVerified: { type: Boolean, default: false }
+    emailVerified:         { type: Boolean, default: false },
+    academicEmailVerified: { type: Boolean, default: false },
+    academicEmail:         { type: String, default: null }
   },
   { timestamps: true }
 );

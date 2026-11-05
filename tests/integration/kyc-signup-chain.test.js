@@ -227,10 +227,10 @@ describe('Researcher profile service — verification gates', () => {
     jest.restoreAllMocks();
   });
 
-  it('blocks student researcher profile submission if email not verified', async () => {
+  it('blocks student researcher profile submission if academic email not verified', async () => {
     const User = require('../../model/user');
     jest.spyOn(User, 'findOne').mockReturnValue({
-      select: jest.fn().mockResolvedValue({ phoneVerified: true, emailVerified: false }),
+      select: jest.fn().mockResolvedValue({ phoneVerified: true, emailVerified: true, academicEmailVerified: false }),
     });
 
     const repo = makeResearcherProfileRepo(null);
@@ -244,7 +244,7 @@ describe('Researcher profile service — verification gates', () => {
       faculty: 'Science',
       department: 'Physics',
       level: '300L',
-    })).rejects.toMatchObject({ status: 403, message: /email/i });
+    })).rejects.toMatchObject({ status: 403, message: /academic email/i });
 
     jest.restoreAllMocks();
   });
@@ -252,7 +252,7 @@ describe('Researcher profile service — verification gates', () => {
   it('allows professional researcher profile when phone verified (no email gate)', async () => {
     const User = require('../../model/user');
     jest.spyOn(User, 'findOne').mockReturnValue({
-      select: jest.fn().mockResolvedValue({ phoneVerified: true, emailVerified: false }),
+      select: jest.fn().mockResolvedValue({ phoneVerified: true, emailVerified: false, academicEmailVerified: false }),
     });
 
     const repo = makeResearcherProfileRepo(null);
@@ -276,7 +276,7 @@ describe('Researcher profile service — verification gates', () => {
   it('rejects duplicate profile submission with 409', async () => {
     const User = require('../../model/user');
     jest.spyOn(User, 'findOne').mockReturnValue({
-      select: jest.fn().mockResolvedValue({ phoneVerified: true, emailVerified: true }),
+      select: jest.fn().mockResolvedValue({ phoneVerified: true, emailVerified: true, academicEmailVerified: true }),
     });
 
     // Repo already has a profile for this user
