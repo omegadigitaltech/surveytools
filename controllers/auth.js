@@ -17,6 +17,8 @@ const postRegister = async (req, res) => {
       department,
       faculty,
       gender,
+      userType,
+      type,
     } = req.body;
 
     // Validate required fields
@@ -97,7 +99,8 @@ const postRegister = async (req, res) => {
 
     const user = await User.create({
       id: unique_id,
-      type: "Normal",
+      type: type || "Normal",
+      userType: userType || undefined,
       fullname,
       email,
       instituition,
