@@ -72,13 +72,13 @@ app.use(express.static("public"));
 const kycSwaggerDoc = YAML.load(path.join(__dirname, 'docs', 'survey-tools-kyc.openapi.yaml'));
 const fullSwaggerDoc = YAML.load(path.join(__dirname, 'docs', 'surveytools-full.openapi.yaml'));
 
-// Assign a proper tag heading to all KYC endpoints instead of "default"
+// Preserve existing tags on KYC endpoints, only set fallback if no tags exist
 if (kycSwaggerDoc && kycSwaggerDoc.paths) {
   Object.keys(kycSwaggerDoc.paths).forEach(pathKey => {
     const pathObj = kycSwaggerDoc.paths[pathKey];
     Object.keys(pathObj).forEach(method => {
-      if (typeof pathObj[method] === 'object') {
-        pathObj[method].tags = ['0. KYC Unified Integration'];
+      if (typeof pathObj[method] === 'object' && (!pathObj[method].tags || !pathObj[method].tags.length)) {
+        pathObj[method].tags = ['8. Profiles & Progressive Layers'];
       }
     });
   });
