@@ -170,6 +170,12 @@ const initGamificationCron = () => {
     runWeeklyMissions();
     snapshotLeaderboard('weekly');
   });
+
+  // Run immediately on server start so missions are always available
+  // regardless of when the server boots during the day
+  logger.info('[CRON] Running initial mission assignment on startup...');
+  runDailyMissions();
+  runWeeklyMissions();
   
   logger.info('[CRON] Gamification scheduler (node-cron) initialized.');
 };
