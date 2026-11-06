@@ -1,184 +1,448 @@
 openapi: 3.0.0
 info:
   title: SurveyTools Comprehensive API Collection
-  description: >-
-    Collection featuring Auth, Admin Gamification, Gamification,
-    Marketplace/Vouchers, Redemption, and Visualizations APIs.
+  description: 'Complete API Collection for SurveyTools covering Authentication, Admin Controls, Gamification, Marketplace, Visualizations, Analytics, OTP Verification, Progressive Profiles, NDPR Compliance, Corporate Dashboard, Core Surveys, and Telecom Redemption.'
   version: 1.0.0
 servers:
-  - url: http://localhost:5003
+  - url: 'http://localhost:5003'
+    description: Local server
 tags:
   - name: 1. Authentication
+    description: 'User registration, login, token refresh, and session management'
   - name: 2. Admin Controls (Gamification & Marketplace)
+    description: 'Admin operations for missions, levels, VIP tiers, marketplace items, users, and surveys'
   - name: 3. Gamification
+    description: 'User rewards, daily spin wheel, active missions, leaderboards, and achievements'
   - name: 4. Marketplace & Vouchers
+    description: 'Marketplace listings, points-to-voucher conversions, and voucher wallet'
   - name: 5. Graph Visualizations
+    description: Survey visual chart data
   - name: 6. Analytics
-  - name: 7. Redemption
-
+    description: 'Survey response analytics, trends, engagement, and AI insights'
+  - name: 7. OTP Verification
+    description: 'Phone OTP, General Email OTP, and Academic Email OTP request and verification'
+  - name: 8. Profiles & Progressive Layers
+    description: 'Researcher profiles, tier evaluation, account type switching, and progressive respondent layers 1-5'
+  - name: 9. NDPR & Compliance
+    description: 'NDPR user consent capture, marketing consent revocation, and right-to-erasure account deletion'
+  - name: 10. User Profile & Legacy Auth
+    description: Legacy profile inspection and legacy verification endpoints
+  - name: 11. Corporate Dashboard
+    description: 'Institutional researcher corporate analytics, survey data export, and invoices'
+  - name: 12. Core Surveys
+    description: 'Survey creation, bulk question management, and survey details'
+  - name: 13. Redemption
+    description: Direct telecom airtime and mobile data plan redemption with verified phone
 paths:
-
-  # ─── 1. AUTHENTICATION ───────────────────────────────────────────────────────
-
-  /auth/register:
+  /v1/kyc/register:
     post:
       tags:
         - 1. Authentication
-      summary: Register New User
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                first_name: John
-                last_name: Doe
-                email: john.doe@university.edu
-                password: StrongPass123!
-                confirm_password: StrongPass123!
-                department: Computer Science
-                faculty: Engineering
-                gender: male
-                instituition: University of Lagos
+      summary: Unified Registration (Respondent & Researcher)
+      description: Unified registration endpoint supporting both respondent and researcher accounts with userType discrimination.
       parameters:
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - firstName
+                - lastName
+                - email
+                - password
+                - userType
+                - dateOfBirth
+              properties:
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Doe
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  example: SecurePass123!
+                userType:
+                  type: string
+                  enum:
+                    - respondent
+                    - researcher
+                  example: respondent
+                dateOfBirth:
+                  type: string
+                  format: date-time
+                  example: '1995-06-15T00:00:00.000Z'
+                gender:
+                  type: string
+                  enum:
+                    - male
+                    - female
+                    - non-binary
+                    - prefer-not-to-say
+                  example: male
+                stateOfOrigin:
+                  type: string
+                  example: Lagos
+                stateOfResidence:
+                  type: string
+                  example: Lagos
+                lgaOfResidence:
+                  type: string
+                  example: Ikeja
+                isStudent:
+                  type: boolean
+                  example: false
+            example:
+              firstName: John
+              lastName: Doe
+              email: john.doe@example.com
+              password: SecurePass123!
+              userType: respondent
+              dateOfBirth: '1995-06-15T00:00:00.000Z'
+              gender: male
+              stateOfResidence: Lagos
+              lgaOfResidence: Ikeja
+              isStudent: false
       responses:
         '201':
-          description: User created successfully
+          description: User registered successfully
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 201
-                  msg: User successfully created and signed in
-                  data:
-                    redirectUrl: http://localhost:3000/verification
-                    user:
-                      id: abc123xyz456
-                      fullname: John Doe
-                      email: john.doe@university.edu
-                      department: Computer Science
-                      faculty: Engineering
-                      gender: male
-                      instituition: University of Lagos
-                      verified: false
-                      admin: false
-                      pointBalance: 0
-                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+              example:
+                status: success
+                code: 201
+                message: User created successfully
+                data:
+                  userId: usr_98a7b6c5d4e3f2a1
         '400':
-          description: Email already exists or validation error
+          description: Error response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: failure
-                  code: 400
-                  msg: Email already exists
-
+              example:
+                status: failure
+                code: 400
+                msg: Email already registered or age must be 18+
+  /auth/register:
+    post:
+      tags:
+        - 1. Authentication
+      summary: Register New User (Legacy University Flow)
+      description: 'Academic flow registration supporting userType, university faculty, department, and institutions.'
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - first_name
+                - last_name
+                - email
+                - password
+                - confirm_password
+                - department
+                - faculty
+                - gender
+                - instituition
+              properties:
+                first_name:
+                  type: string
+                  example: John
+                last_name:
+                  type: string
+                  example: Doe
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@university.edu
+                password:
+                  type: string
+                  example: StrongPass123!
+                confirm_password:
+                  type: string
+                  example: StrongPass123!
+                userType:
+                  type: string
+                  enum:
+                    - respondent
+                    - researcher
+                  example: respondent
+                department:
+                  type: string
+                  example: Computer Science
+                faculty:
+                  type: string
+                  example: Engineering
+                gender:
+                  type: string
+                  enum:
+                    - male
+                    - female
+                  example: male
+                instituition:
+                  type: string
+                  example: University of Lagos
+            example:
+              first_name: John
+              last_name: Doe
+              email: john.doe@university.edu
+              password: StrongPass123!
+              confirm_password: StrongPass123!
+              userType: respondent
+              department: Computer Science
+              faculty: Engineering
+              gender: male
+              instituition: University of Lagos
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                code: 201
+                msg: User successfully created and signed in
+                data:
+                  redirectUrl: 'http://localhost:3000/verification'
+                  user:
+                    id: abc123xyz456
+                    fullname: John Doe
+                    email: john.doe@university.edu
+                    userType: respondent
+                    department: Computer Science
+                    faculty: Engineering
+                    gender: male
+                    instituition: University of Lagos
+                    verified: false
+                    admin: false
+                    pointBalance: 0
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: failure
+                code: 400
+                msg: Email already exists or required fields missing
   /auth/login:
     post:
       tags:
         - 1. Authentication
       summary: Login (Auto-Saves Token)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                email: user@example.com
-                password: yourpassword
       parameters:
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              email: foluwaseyipeter450@gmail.com
+              password: password
       responses:
         '200':
-          description: Login successful
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  msg: Login successful
-                  data:
-                    redirectUrl: http://localhost:3000/dashboard
-                    user:
-                      id: abc123xyz456
-                      fullname: John Doe
-                      email: user@example.com
-                      verified: true
-                      admin: false
-                      pointBalance: 350
-                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+              example:
+                status: success
+                code: 200
+                msg: Login successful
+                data:
+                  redirectUrl: 'http://localhost:3000/dashboard'
+                  user:
+                    id: abc123xyz456
+                    fullname: Peter Parker
+                    email: foluwaseyipeter450@gmail.com
+                    verified: true
+                    admin: true
+                    pointBalance: 1250
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         '401':
-          description: Invalid credentials
+          description: Error response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: failure
-                  code: 401
-                  msg: Invalid credentials
-
-  /verify:
+              example:
+                status: failure
+                code: 401
+                msg: Invalid credentials
+  /forget-password:
     post:
       tags:
         - 1. Authentication
-      summary: Verify Email (OTP)
-      description: Submit the OTP code sent to the user's email to verify their account.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                code: 123456
+      summary: Forgot Password (Request Reset OTP)
       parameters:
-        - name: Authorization
-          in: header
-          schema:
-            type: string
-          example: Bearer {{token}}
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              email: foluwaseyipeter450@gmail.com
       responses:
         '200':
-          description: User verified successfully
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  msg: User verified
+              example:
+                status: success
+                code: 200
+                msg: Password reset email sent successfully
+  /reset-password:
+    post:
+      tags:
+        - 1. Authentication
+      summary: Reset Password (Submit OTP)
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              email: foluwaseyipeter450@gmail.com
+              code: '123456'
+              newPassword: NewSecurePass456!
+              confirmPassword: NewSecurePass456!
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                code: 200
+                msg: Password reset successfully
         '400':
-          description: Invalid or expired OTP
+          description: Error response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: failure
-                  code: 400
-                  msg: Invalid verification code
-
+              example:
+                status: failure
+                code: 400
+                msg: Invalid or expired OTP
+  /isLoggedIn:
+    get:
+      tags:
+        - 1. Authentication
+      summary: Check Login Status
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                code: 200
+                msg: User is Logged in
+                data:
+                  isLoggedIn: true
+  /update-user:
+    patch:
+      tags:
+        - 1. Authentication
+      summary: Update User Profile
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              fullname: Peter Parker Updated
+              gender: male
+              age: 26
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                code: 200
+                msg: User settings successfully updated
+                data:
+                  id: abc123xyz456
+                  fullname: Peter Parker Updated
+                  email: foluwaseyipeter450@gmail.com
+                  gender: male
   /user/profile:
     get:
       tags:
@@ -187,42 +451,27 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: User profile returned
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  data:
-                    id: abc123xyz456
-                    fullname: John Doe
-                    email: user@example.com
-                    department: Computer Science
-                    faculty: Engineering
-                    gender: male
-                    instituition: University of Lagos
-                    verified: true
-                    admin: false
-                    pointBalance: 350
-                    pic_url: null
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  status: failure
-                  code: 404
-                  msg: User not found
-
+              example:
+                status: success
+                code: 200
+                data:
+                  id: abc123xyz456
+                  fullname: Peter Parker
+                  email: foluwaseyipeter450@gmail.com
+                  userType: researcher
+                  admin: true
+                  pointBalance: 1250
   /user/points:
     get:
       tags:
@@ -231,190 +480,105 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: Points balance returned
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  data:
-                    pointBalance: 350
-
-  /update-user:
-    patch:
+              example:
+                status: success
+                code: 200
+                data:
+                  pointBalance: 1250
+  /auth/logout:
+    get:
       tags:
         - 1. Authentication
-      summary: Update User Profile
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                first_name: John
-                last_name: Updated
-                gender: male
+      summary: Logout User
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
-        - name: Content-Type
-          in: header
-          schema:
-            type: string
-          example: application/json
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: User updated successfully
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  msg: User settings successfully updated
-                  data:
-                    id: abc123xyz456
-                    fullname: John Updated
-                    email: user@example.com
-                    gender: male
-                    pointBalance: 350
-
-  /forget-password:
-    post:
-      tags:
-        - 1. Authentication
-      summary: Forgot Password (Send Reset Email)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
               example:
-                email: user@example.com
-      parameters:
-        - name: Content-Type
-          in: header
-          schema:
-            type: string
-          example: application/json
-      responses:
-        '200':
-          description: Reset email sent
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  status: success
-                  code: 200
-                  msg: Password reset email sent successfully
-
-  /reset-password:
-    post:
-      tags:
-        - 1. Authentication
-      summary: Reset Password
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                email: user@example.com
-                code: 123456
-                newPassword: NewStrongPass123!
-                confirmPassword: NewStrongPass123!
-      parameters:
-        - name: Content-Type
-          in: header
-          schema:
-            type: string
-          example: application/json
-      responses:
-        '200':
-          description: Password reset successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  status: success
-                  code: 200
-                  msg: Password reset successfully
-
-  # ─── 2. ADMIN CONTROLS ───────────────────────────────────────────────────────
-
+                status: success
+                code: 200
+                msg: Successfully logged out
   /admin/gamification/missions:
     post:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
       summary: Create Mission
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                title: Survey Master
-                description: Complete 5 surveys today.
-                type: daily
-                category: surveys
-                targetValue: 5
-                xpReward: 200
-                pointsReward: 50
-                isActive: true
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              title: Complete 3 Surveys
+              description: Finish 3 surveys this week
+              type: weekly
+              category: surveys
+              targetValue: 3
+              xpReward: 150
+              pointsReward: 50
+              isActive: true
       responses:
         '201':
-          description: Mission created successfully
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    _id: 64f1a2b3c4d5e6f7a8b9c0d1
-                    title: Survey Master
-                    description: Complete 5 surveys today.
-                    type: daily
-                    category: surveys
-                    targetValue: 5
-                    xpReward: 200
-                    pointsReward: 50
-                    isActive: true
-                    createdAt: '2026-11-06T00:00:00.000Z'
+              example:
+                status: success
+                data:
+                  _id: 64f1a2b3c4d5e6f7a8b9c0d1
+                  title: Complete 3 Surveys
+                  type: weekly
+                  category: surveys
+                  targetValue: 3
+                  xpReward: 150
+                  pointsReward: 50
+                  isActive: true
         '400':
-          description: Validation error (e.g. missing required field)
+          description: Error response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: failure
-                  code: 400
-                  msg: Path `category` is required.
+              example:
+                status: failure
+                code: 400
+                msg: Path `category` is required.
     get:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
@@ -422,98 +586,86 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: List of all missions
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    - _id: 64f1a2b3c4d5e6f7a8b9c0d1
-                      title: Survey Master
-                      description: Complete 5 surveys today.
-                      type: daily
-                      category: surveys
-                      targetValue: 5
-                      xpReward: 200
-                      pointsReward: 50
-                      isActive: true
-                    - _id: 64f1a2b3c4d5e6f7a8b9c0d2
-                      title: Weekly Streak
-                      description: Complete 3 surveys this week.
-                      type: weekly
-                      category: streak
-                      targetValue: 3
-                      xpReward: 500
-                      pointsReward: 100
-                      isActive: true
-
+              example:
+                status: success
+                data:
+                  - _id: 64f1a2b3c4d5e6f7a8b9c0d1
+                    title: Complete 3 Surveys
+                    type: weekly
+                    category: surveys
+                    targetValue: 3
+                    xpReward: 150
+                    pointsReward: 50
+                    isActive: true
   /admin/marketplace/listings:
     post:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
       summary: Create Marketplace Listing
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                title: 10% Amazon Gift Card
-                description: Get 10% off your next Amazon purchase.
-                type: gift_card
-                pointsCost: 500
-                value: 10% Off
-                partnerName: Amazon
-                stock: 100
-                isActive: true
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              title: 10% Amazon Gift Card
+              description: Get 10% off your next Amazon purchase.
+              type: gift_card
+              pointsCost: 500
+              value: 10% Off
+              partnerName: Amazon
+              stock: 100
+              isActive: true
       responses:
         '201':
-          description: Listing created successfully
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    _id: 64f2b3c4d5e6f7a8b9c0d2e3
-                    title: 10% Amazon Gift Card
-                    description: Get 10% off your next Amazon purchase.
-                    type: gift_card
-                    pointsCost: 500
-                    value: 10% Off
-                    partnerName: Amazon
-                    stock: 100
-                    isActive: true
-                    createdAt: '2026-11-06T00:00:00.000Z'
+              example:
+                status: success
+                data:
+                  _id: 64f2b3c4d5e6f7a8b9c0d2e3
+                  title: 10% Amazon Gift Card
+                  type: gift_card
+                  pointsCost: 500
+                  stock: 100
+                  isActive: true
         '400':
-          description: Validation error
+          description: Error response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: failure
-                  code: 400
-                  msg: "Path `title` is required. `airtime` is not a valid enum value for path `type`."
+              example:
+                status: failure
+                code: 400
+                msg: Path `title` is required.
     get:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
@@ -521,87 +673,76 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: List of all marketplace listings
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    - _id: 64f2b3c4d5e6f7a8b9c0d2e3
-                      title: 10% Amazon Gift Card
-                      description: Get 10% off your next Amazon purchase.
-                      type: gift_card
-                      pointsCost: 500
-                      value: 10% Off
-                      partnerName: Amazon
-                      stock: 100
-                      isActive: true
-                    - _id: 64f2b3c4d5e6f7a8b9c0d2e4
-                      title: Premium Upgrade - 1 Month
-                      description: Unlock premium features for 30 days.
-                      type: premium_upgrade
-                      pointsCost: 1000
-                      value: 30 days premium
-                      partnerName: SurveyTools
-                      stock: 999
-                      isActive: true
-
+              example:
+                status: success
+                data:
+                  - _id: 64f2b3c4d5e6f7a8b9c0d2e3
+                    title: 10% Amazon Gift Card
+                    type: gift_card
+                    pointsCost: 500
+                    stock: 100
+                    isActive: true
   /admin/gamification/levels:
     post:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
       summary: Create Level Config
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                level: 2
-                name: Explorer
-                minXP: 1000
-                maxXP: 2500
-                pointsMultiplier: 1.2
-                benefits:
-                  - Extra spin wheel attempt
-                surveyAccess: basic
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              level: 2
+              name: Explorer
+              minXP: 1000
+              maxXP: 2500
+              pointsMultiplier: 1.2
+              benefits:
+                - Extra daily spin
+              surveyAccess: basic
       responses:
         '201':
-          description: Level config created
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    _id: 64f3c4d5e6f7a8b9c0d2e3f4
-                    level: 2
-                    name: Explorer
-                    minXP: 1000
-                    maxXP: 2500
-                    pointsMultiplier: 1.2
-                    benefits:
-                      - Extra spin wheel attempt
-                    surveyAccess: basic
+              example:
+                status: success
+                data:
+                  _id: 64f3c4d5e6f7a8b9c0d2e3f4
+                  level: 2
+                  name: Explorer
+                  minXP: 1000
+                  maxXP: 2500
+                  pointsMultiplier: 1.2
+                  benefits:
+                    - Extra daily spin
     get:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
@@ -609,91 +750,72 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: List of all level configs
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    - _id: 64f3c4d5e6f7a8b9c0d2e3f1
-                      level: 1
-                      name: Novice
-                      minXP: 0
-                      maxXP: 499
-                      benefits:
-                        - Basic surveys
-                      surveyAccess: basic
-                    - _id: 64f3c4d5e6f7a8b9c0d2e3f2
-                      level: 2
-                      name: Explorer
-                      minXP: 500
-                      maxXP: 1999
-                      benefits:
-                        - Basic surveys
-                        - Daily spin
-                      surveyAccess: basic
-                    - _id: 64f3c4d5e6f7a8b9c0d2e3f3
-                      level: 3
-                      name: Master
-                      minXP: 2000
-                      maxXP: 9999
-                      benefits:
-                        - Premium surveys
-                        - Daily spin
-                      surveyAccess: premium
-
+              example:
+                status: success
+                data:
+                  - level: 1
+                    name: Novice
+                    minXP: 0
+                    maxXP: 499
+                  - level: 2
+                    name: Explorer
+                    minXP: 500
+                    maxXP: 1999
   /admin/gamification/vip:
     post:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
       summary: Create VIP Tier Config
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                tier: silver
-                minPoints: 1000
-                maxPoints: 4999
-                conversionRate: 1.2
-                bonusOnRewards: 5
-                supportLevel: priority
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              tier: silver
+              minPoints: 1000
+              maxPoints: 4999
+              conversionRate: 1.2
+              bonusOnRewards: 10
+              supportLevel: priority
       responses:
         '201':
-          description: VIP tier config created
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    _id: 64f4d5e6f7a8b9c0d2e3f4a5
-                    tier: silver
-                    minPoints: 1000
-                    maxPoints: 4999
-                    conversionRate: 1.2
-                    bonusOnRewards: 5
-                    supportLevel: priority
+              example:
+                status: success
+                data:
+                  tier: silver
+                  minPoints: 1000
+                  maxPoints: 4999
+                  conversionRate: 1.2
     get:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
@@ -701,139 +823,114 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: List of all VIP tier configs
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    - tier: bronze
-                      minPoints: 0
-                      maxPoints: 999
-                      conversionRate: 1
-                      bonusOnRewards: 0
-                      supportLevel: standard
-                    - tier: silver
-                      minPoints: 1000
-                      maxPoints: 4999
-                      conversionRate: 1.2
-                      bonusOnRewards: 10
-                      supportLevel: standard
-                    - tier: gold
-                      minPoints: 5000
-                      maxPoints: 19999
-                      conversionRate: 1.5
-                      bonusOnRewards: 25
-                      supportLevel: priority
-                    - tier: platinum
-                      minPoints: 20000
-                      maxPoints: 999999
-                      conversionRate: 2
-                      bonusOnRewards: 50
-                      supportLevel: dedicated
-
+              example:
+                status: success
+                data:
+                  - tier: bronze
+                    minPoints: 0
+                    maxPoints: 999
+                  - tier: silver
+                    minPoints: 1000
+                    maxPoints: 4999
   /admin/gamification/achievements:
     post:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
       summary: Create Achievement
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                title: Survey Veteran
-                description: Complete 10 surveys to unlock this badge.
-                category: surveys
-                triggerValue: 10
-                xpReward: 500
-                pointsReward: 100
-                isActive: true
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              title: Survey Starter
+              description: Complete your first survey
+              category: surveys
+              triggerValue: 1
+              xpReward: 100
+              pointsReward: 50
+              isActive: true
       responses:
         '201':
-          description: Achievement created
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    _id: 64f5e6f7a8b9c0d2e3f4a5b6
-                    title: Survey Veteran
-                    description: Complete 10 surveys to unlock this badge.
-                    category: surveys
-                    triggerValue: 10
-                    xpReward: 500
-                    pointsReward: 100
-                    isActive: true
-
+              example:
+                status: success
+                data:
+                  _id: 64f5e6f7a8b9c0d2e3f4a5b6
+                  title: Survey Starter
+                  triggerValue: 1
   /admin/gamification/bonus-events:
     post:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
       summary: Create Bonus Event
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                title: Weekend 2x Points Boost
-                description: Earn double points on all surveys this weekend.
-                multiplier: 2
-                targetType: all_users
-                startAt: '2026-11-08T00:00:00.000Z'
-                endAt: '2026-11-10T23:59:59.000Z'
-                isActive: true
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              title: Weekend XP Boost
+              description: Earn 2x XP on all surveys this weekend
+              multiplier: 2
+              targetType: all_users
+              startAt: '2026-11-08T00:00:00.000Z'
+              endAt: '2026-11-10T23:59:59.000Z'
+              isActive: true
       responses:
         '201':
-          description: Bonus event created
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    _id: 64f6f7a8b9c0d2e3f4a5b6c7
-                    title: Weekend 2x Points Boost
-                    description: Earn double points on all surveys this weekend.
-                    multiplier: 2
-                    targetType: all_users
-                    startAt: '2026-11-08T00:00:00.000Z'
-                    endAt: '2026-11-10T23:59:59.000Z'
-                    isActive: true
+              example:
+                status: success
+                data:
+                  _id: 64f6f7a8b9c0d2e3f4a5b6c7
+                  title: Weekend XP Boost
+                  multiplier: 2
     get:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
@@ -841,28 +938,23 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: List of all bonus events
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    - _id: 64f6f7a8b9c0d2e3f4a5b6c7
-                      title: Weekend 2x Points Boost
-                      description: Earn double points on all surveys this weekend.
-                      multiplier: 2
-                      targetType: all_users
-                      startAt: '2026-11-08T00:00:00.000Z'
-                      endAt: '2026-11-10T23:59:59.000Z'
-                      isActive: true
-
+              example:
+                status: success
+                data:
+                  - _id: 64f6f7a8b9c0d2e3f4a5b6c7
+                    title: Weekend XP Boost
+                    multiplier: 2
   /admin/users:
     get:
       tags:
@@ -871,9 +963,10 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: page
           in: query
           schema:
@@ -888,73 +981,41 @@ paths:
           in: query
           schema:
             type: string
-          example: john
-        - name: sortBy
-          in: query
-          schema:
-            type: string
-          example: createdAt
-        - name: sortOrder
-          in: query
-          schema:
-            type: string
-          example: desc
+          example: peter
       responses:
         '200':
-          description: Paginated list of users
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  data:
-                    users:
-                      - id: abc123xyz456
-                        fullname: John Doe
-                        email: john.doe@university.edu
-                        department: Computer Science
-                        faculty: Engineering
-                        gender: male
-                        verified: true
-                        admin: false
-                        pointBalance: 350
-                      - id: def456uvw789
-                        fullname: Jane Smith
-                        email: jane.smith@university.edu
-                        department: Economics
-                        faculty: Social Sciences
-                        gender: female
-                        verified: true
-                        admin: false
-                        pointBalance: 120
-                    pagination:
-                      currentPage: 1
-                      totalPages: 6
-                      totalUsers: 114
-                      limit: 20
-                      hasNext: true
-                      hasPrev: false
-
-  /admin/users/{userId}/admin:
+              example:
+                status: success
+                code: 200
+                data:
+                  users:
+                    - id: abc123xyz456
+                      fullname: Peter Parker
+                      email: foluwaseyipeter450@gmail.com
+                      admin: true
+                      pointBalance: 1250
+                  pagination:
+                    currentPage: 1
+                    totalPages: 1
+                    totalUsers: 1
+                    limit: 20
+  '/admin/users/{userId}/admin':
     patch:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
       summary: Make User Admin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                adminStatus: true
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
@@ -962,27 +1023,29 @@ paths:
           example: application/json
         - name: userId
           in: path
+          required: true
           schema:
             type: string
-          required: true
           example: '{{userId}}'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              adminStatus: true
       responses:
         '200':
-          description: Admin status updated
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  msg: User granted admin privileges successfully
-                  data:
-                    userId: abc123xyz456
-                    fullname: John Doe
-                    email: john.doe@university.edu
-                    admin: true
-
+              example:
+                status: success
+                code: 200
+                msg: User granted admin privileges successfully
   /admin/surveys:
     get:
       tags:
@@ -991,9 +1054,10 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: page
           in: query
           schema:
@@ -1004,70 +1068,34 @@ paths:
           schema:
             type: integer
           example: 20
-        - name: published
-          in: query
-          schema:
-            type: string
-          example: 'true'
-        - name: paid
-          in: query
-          schema:
-            type: string
-          example: 'false'
       responses:
         '200':
-          description: Paginated list of surveys with payment info
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  data:
-                    surveys:
-                      - _id: 64a1b2c3d4e5f6a7b8c9d0e1
-                        title: Student Life Survey 2026
-                        description: Tell us about your campus experience
-                        published: true
-                        isPaid: true
-                        no_of_participants: 50
-                        filledCount: 23
-                        remainingSpots: 27
-                        payment:
-                          amount: 15000
-                          datePaid: '2026-11-01T10:30:00.000Z'
-                          referenceNumber: ADMIN_1730123456_abc123
-                        user_id:
-                          id: abc123xyz456
-                          fullname: John Doe
-                          email: john.doe@university.edu
-                    pagination:
-                      currentPage: 1
-                      totalPages: 3
-                      totalSurveys: 45
-                      limit: 20
-                      hasNext: true
-                      hasPrev: false
-
-  /admin/surveys/{surveyId}/mark-paid:
+              example:
+                status: success
+                code: 200
+                data:
+                  surveys:
+                    - _id: 64a1b2c3d4e5f6a7b8c9d0e1
+                      title: Student Life Survey 2026
+                      published: true
+                      isPaid: true
+  '/admin/surveys/{surveyId}/mark-paid':
     post:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
       summary: Mark Survey as Paid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                email: surveyor@example.com
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
@@ -1075,49 +1103,41 @@ paths:
           example: application/json
         - name: surveyId
           in: path
+          required: true
           schema:
             type: string
-          required: true
           example: '{{surveyId}}'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              email: surveyor@example.com
       responses:
         '200':
-          description: Survey marked as paid
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  msg: Survey marked as paid successfully
-                  data:
-                    surveyId: 64a1b2c3d4e5f6a7b8c9d0e1
-                    surveyTitle: Student Life Survey 2026
-                    amount: 15000
-                    calculationBreakdown:
-                      totalQuestions: 10
-                    referenceNumber: ADMIN_1730123456_abc123
-                    paymentDate: '2026-11-06T07:00:00.000Z'
-                    userEmail: surveyor@example.com
-
-  /admin/surveys/{surveyId}/unpublish:
+              example:
+                status: success
+                code: 200
+                msg: Survey marked as paid successfully
+  '/admin/surveys/{surveyId}/unpublish':
     patch:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
       summary: Unpublish Survey (Admin)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                reason: Violates community guidelines
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
@@ -1125,32 +1145,29 @@ paths:
           example: application/json
         - name: surveyId
           in: path
+          required: true
           schema:
             type: string
-          required: true
           example: '{{surveyId}}'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              reason: Violates community guidelines
       responses:
         '200':
-          description: Survey unpublished
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  msg: Survey unpublished successfully
-                  data:
-                    surveyId: 64a1b2c3d4e5f6a7b8c9d0e1
-                    title: Student Life Survey 2026
-                    published: false
-                    unpublishedAt: '2026-11-06T07:30:00.000Z'
-                    unpublishReason: Violates community guidelines
-                    owner:
-                      id: abc123xyz456
-                      fullname: John Doe
-                      email: john.doe@university.edu
-
+              example:
+                status: success
+                code: 200
+                msg: Survey unpublished successfully
   /admin/redemptions:
     get:
       tags:
@@ -1159,67 +1176,22 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
-        - name: page
-          in: query
-          schema:
-            type: integer
-          example: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-          example: 50
-        - name: status
-          in: query
-          schema:
-            type: string
-          example: successful
-        - name: type
-          in: query
-          schema:
-            type: string
-          example: airtime
-        - name: network
-          in: query
-          schema:
-            type: string
-          example: MTN
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: Paginated list of all redemptions
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  data:
-                    redemptions:
-                      - _id: 64b1c2d3e4f5a6b7c8d9e0f1
-                        type: airtime
-                        network: MTN
-                        phoneNumber: '08012345678'
-                        pointsRedeemed: 200
-                        valueReceived: 200
-                        status: successful
-                        transactionReference: AIRT1730123456abc
-                        createdAt: '2026-11-05T14:00:00.000Z'
-                        userId:
-                          fullname: John Doe
-                          email: john.doe@university.edu
-                          id: abc123xyz456
-                    pagination:
-                      currentPage: 1
-                      totalPages: 3
-                      totalRedemptions: 112
-                      limit: 50
-                      hasNext: true
-                      hasPrev: false
-
+              example:
+                status: success
+                code: 200
+                data:
+                  redemptions: []
   /admin/redemptions/stats:
     get:
       tags:
@@ -1228,50 +1200,25 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: Redemption statistics
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  data:
-                    statusCounts:
-                      total: 112
-                      successful: 98
-                      pending: 5
-                      failed: 9
-                    overallStats:
-                      totalPointsRedeemed: 24500
-                      totalValueRedeemed: 24500
-                      avgPointsPerRedemption: 218.75
-                      avgValuePerRedemption: 218.75
-                    typeBreakdown:
-                      - _id: airtime
-                        count: 80
-                        totalPoints: 16000
-                        totalValue: 16000
-                      - _id: data
-                        count: 32
-                        totalPoints: 8500
-                        totalValue: 8500
-                    networkBreakdown:
-                      - _id: MTN
-                        count: 60
-                        totalPoints: 13000
-                        totalValue: 13000
-                      - _id: AIRTEL
-                        count: 30
-                        totalPoints: 7000
-                        totalValue: 7000
-
-  /admin/users/{userId}/redemptions:
+              example:
+                status: success
+                code: 200
+                data:
+                  statusCounts:
+                    total: 0
+                    successful: 0
+  '/admin/users/{userId}/redemptions':
     get:
       tags:
         - 2. Admin Controls (Gamification & Marketplace)
@@ -1279,58 +1226,28 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: userId
           in: path
+          required: true
           schema:
             type: string
-          required: true
           example: '{{userId}}'
       responses:
         '200':
-          description: User's redemption history with stats
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  code: 200
-                  data:
-                    user:
-                      id: abc123xyz456
-                      fullname: John Doe
-                      email: john.doe@university.edu
-                      pointBalance: 150
-                    redemptions:
-                      - _id: 64b1c2d3e4f5a6b7c8d9e0f1
-                        type: airtime
-                        network: MTN
-                        phoneNumber: '08012345678'
-                        pointsRedeemed: 200
-                        valueReceived: 200
-                        status: successful
-                        transactionReference: AIRT1730123456abc
-                        createdAt: '2026-11-05T14:00:00.000Z'
-                    userStats:
-                      totalRedemptions: 5
-                      totalPointsRedeemed: 850
-                      totalValueRedeemed: 850
-                      successfulRedemptions: 4
-                      pendingRedemptions: 0
-                      failedRedemptions: 1
-                    pagination:
-                      currentPage: 1
-                      totalPages: 1
-                      totalRedemptions: 5
-                      limit: 50
-                      hasNext: false
-                      hasPrev: false
-
-  # ─── 3. GAMIFICATION ─────────────────────────────────────────────────────────
-
+              example:
+                status: success
+                code: 200
+                data:
+                  redemptions: []
   /gamification/dashboard:
     get:
       tags:
@@ -1339,69 +1256,71 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: User gamification dashboard
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    xp: 750
-                    level: 2
-                    levelName: Explorer
-                    levelBenefits:
-                      - Basic surveys
-                      - Daily spin
-                    nextLevelXP: 2000
-                    vipTier: bronze
-                    currentStreak: 3
-                    spinsRemaining: 1
-                    pointBalance: 350
-                    activeMissionsCount: 2
-
+              example:
+                status: success
+                data:
+                  xp: 750
+                  level: 2
+                  levelName: Explorer
+                  vipTier: bronze
+                  currentStreak: 3
+                  spinsRemaining: 1
+                  pointBalance: 1250
+                  activeMissionsCount: 1
   /gamification/spin:
     post:
       tags:
         - 3. Gamification
       summary: Spin Wheel
-      requestBody:
-        content: {}
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
       responses:
         '200':
-          description: Spin result with rewards
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    result: points
-                    pointsAwarded: 50
-                    xpAwarded: 20
-                    spinsRemaining: 0
+              example:
+                status: success
+                data:
+                  result: points
+                  pointsAwarded: 50
+                  xpAwarded: 20
+                  spinsRemaining: 0
         '400':
-          description: No spins remaining
+          description: Error response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: failure
-                  msg: No spins remaining for today
-
+              example:
+                status: failure
+                code: 400
+                msg: No spins remaining for today
   /gamification/missions:
     get:
       tags:
@@ -1410,81 +1329,77 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: User's active missions with progress
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    - id: 64c1d2e3f4a5b6c7d8e9f0a1
-                      title: Survey Master
-                      description: Complete 5 surveys today.
-                      type: daily
-                      currentValue: 2
-                      targetValue: 5
-                      completed: false
-                      rewardClaimed: false
-                      xpReward: 200
-                      pointsReward: 50
-                    - id: 64c1d2e3f4a5b6c7d8e9f0a2
-                      title: Weekly Streak
-                      description: Complete 3 surveys this week.
-                      type: weekly
-                      currentValue: 1
-                      targetValue: 3
-                      completed: false
-                      rewardClaimed: false
-                      xpReward: 500
-                      pointsReward: 100
-
-  /gamification/missions/{missionProgressId}/claim:
+              example:
+                status: success
+                data:
+                  - id: 64c1d2e3f4a5b6c7d8e9f0a1
+                    title: Complete 3 Surveys
+                    type: weekly
+                    currentValue: 1
+                    targetValue: 3
+                    completed: false
+                    rewardClaimed: false
+                    xpReward: 150
+                    pointsReward: 50
+  '/gamification/missions/{missionProgressId}/claim':
     post:
       tags:
         - 3. Gamification
       summary: Claim Mission Reward
-      requestBody:
-        content: {}
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: missionProgressId
           in: path
+          required: true
           schema:
             type: string
-          required: true
+          example: '{{missionProgressId}}'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
       responses:
         '200':
-          description: Reward claimed successfully
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  msg: Reward claimed successfully
-                  data:
-                    pointsAwarded: 50
-                    xpAwarded: 200
+              example:
+                status: success
+                msg: Reward claimed successfully
+                data:
+                  pointsAwarded: 50
+                  xpAwarded: 150
         '400':
-          description: Mission not completed or reward already claimed
+          description: Error response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: failure
-                  msg: Mission not completed yet
-
+              example:
+                status: failure
+                code: 400
+                msg: Mission not completed yet
   /gamification/leaderboard:
     get:
       tags:
@@ -1493,9 +1408,10 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: period
           in: query
           schema:
@@ -1503,25 +1419,18 @@ paths:
           example: all_time
       responses:
         '200':
-          description: Top 50 users by XP
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    - rank: 1
-                      fullname: Jane Smith
-                      pic_url: null
-                      xp: 4500
-                      level: 3
-                    - rank: 2
-                      fullname: John Doe
-                      pic_url: null
-                      xp: 750
-                      level: 2
-
+              example:
+                status: success
+                data:
+                  - rank: 1
+                    fullname: Peter Parker
+                    xp: 4500
+                    level: 3
   /gamification/vip-status:
     get:
       tags:
@@ -1530,30 +1439,134 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: User's VIP tier and benefits
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    currentTier: bronze
-                    benefits:
-                      conversionRate: 1
-                      bonusOnRewards: 0
-                      supportLevel: standard
-                    currentPoints: 350
-                    nextTier: silver
-                    pointsToNextTier: 650
-
-  # ─── 4. MARKETPLACE & VOUCHERS ───────────────────────────────────────────────
-
+              example:
+                status: success
+                data:
+                  currentTier: silver
+                  currentPoints: 1250
+                  nextTier: gold
+                  pointsToNextTier: 3750
+  /gamification/vip-tiers:
+    get:
+      tags:
+        - 3. Gamification
+      summary: Get VIP Tiers (Public)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  - tier: bronze
+                    minPoints: 0
+                  - tier: silver
+                    minPoints: 1000
+  /gamification/levels:
+    get:
+      tags:
+        - 3. Gamification
+      summary: Get Levels Ladder (Public)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  - level: 1
+                    name: Novice
+                    minXP: 0
+                  - level: 2
+                    name: Explorer
+                    minXP: 500
+  /gamification/achievements:
+    get:
+      tags:
+        - 3. Gamification
+      summary: Get Achievements
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  - title: Survey Starter
+                    unlocked: true
+  /gamification/spin/history:
+    get:
+      tags:
+        - 3. Gamification
+      summary: Get Spin History
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data: []
+  /gamification/referrals:
+    get:
+      tags:
+        - 3. Gamification
+      summary: Get Referral Info
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  referralCode: PETER123
+                  totalReferrals: 0
   /marketplace/listings:
     get:
       tags:
@@ -1562,93 +1575,76 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: Listings grouped by type
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    premiumUpgrades:
-                      - _id: 64f2b3c4d5e6f7a8b9c0d2e4
-                        title: Premium Upgrade - 1 Month
-                        description: Unlock premium features for 30 days.
-                        type: premium_upgrade
-                        pointsCost: 1000
-                        value: 30 days premium
-                        partnerName: SurveyTools
-                        stock: 999
-                        isActive: true
-                    rewards:
-                      - _id: 64f2b3c4d5e6f7a8b9c0d2e3
-                        title: 10% Amazon Gift Card
-                        description: Get 10% off your next Amazon purchase.
-                        type: gift_card
-                        pointsCost: 500
-                        value: 10% Off
-                        partnerName: Amazon
-                        stock: 97
-                        isActive: true
-
+              example:
+                status: success
+                data:
+                  premiumUpgrades: []
+                  rewards:
+                    - _id: 64f2b3c4d5e6f7a8b9c0d2e3
+                      title: 10% Amazon Gift Card
+                      pointsCost: 500
+                      type: gift_card
   /marketplace/convert:
     post:
       tags:
         - 4. Marketplace & Vouchers
       summary: Convert Points / Buy Voucher
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                pointsToConvert: 500
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              pointsToConvert: 500
       responses:
         '200':
-          description: Points converted and voucher issued
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  msg: Points converted successfully
-                  data:
-                    voucher:
-                      _id: 64d1e2f3a4b5c6d7e8f9a0b1
-                      code: VCHR-A1B2-C3D4-E5F6
-                      type: cash_conversion
-                      value: $5.00
-                      pointsSpent: 500
-                      expiresAt: '2026-12-06T07:00:00.000Z'
-                      used: false
-                    newBalance: 0
+              example:
+                status: success
+                msg: Points converted successfully
+                data:
+                  voucher:
+                    code: VCHR-1234
+                    value: $5.00
+                  newBalance: 750
         '400':
-          description: Insufficient points or invalid request
+          description: Error response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: failure
-                  msg: Insufficient points
-
+              example:
+                status: failure
+                code: 400
+                msg: Insufficient points
   /marketplace/wallet:
     get:
       tags:
@@ -1657,31 +1653,20 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: User's vouchers
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    - _id: 64d1e2f3a4b5c6d7e8f9a0b1
-                      code: VCHR-A1B2-C3D4-E5F6
-                      type: gift_card
-                      value: 10% Off
-                      pointsSpent: 500
-                      used: false
-                      expiresAt: '2026-12-06T07:00:00.000Z'
-                      listingId:
-                        title: 10% Amazon Gift Card
-                        partnerName: Amazon
-                        imageUrl: null
-
+              example:
+                status: success
+                data: []
   /marketplace/transactions:
     get:
       tags:
@@ -1690,35 +1675,21 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: Last 50 point transactions
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    - _id: 64e1f2a3b4c5d6e7f8a9b0c1
-                      type: earned
-                      amount: 50
-                      description: Completed survey - Student Life Survey 2026
-                      balanceAfter: 350
-                      createdAt: '2026-11-05T10:00:00.000Z'
-                    - _id: 64e1f2a3b4c5d6e7f8a9b0c2
-                      type: converted
-                      amount: -500
-                      description: Converted points to $5.00 voucher
-                      balanceAfter: 0
-                      createdAt: '2026-11-04T15:30:00.000Z'
-
-  # ─── 5. GRAPH VISUALIZATIONS ─────────────────────────────────────────────────
-
-  /surveys/{surveyId}/visualizations:
+              example:
+                status: success
+                data: []
+  '/surveys/{surveyId}/visualizations':
     get:
       tags:
         - 5. Graph Visualizations
@@ -1726,9 +1697,16 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
+        - name: surveyId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '{{surveyId}}'
         - name: graphType
           in: query
           schema:
@@ -1739,37 +1717,24 @@ paths:
           schema:
             type: string
           example: '{{questionId}}'
-        - name: surveyId
-          in: path
-          schema:
-            type: string
-          required: true
       responses:
         '200':
-          description: Graph data for a survey question
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    graphType: bar
-                    question: How satisfied are you with campus life?
-                    labels:
-                      - Very Satisfied
-                      - Satisfied
-                      - Neutral
-                      - Dissatisfied
-                    values:
-                      - 12
-                      - 20
-                      - 8
-                      - 3
-
-  # ─── 6. ANALYTICS ────────────────────────────────────────────────────────────
-
-  /surveys/{surveyId}/analytics/overview:
+              example:
+                status: success
+                data:
+                  graphType: bar
+                  labels:
+                    - Option A
+                    - Option B
+                  values:
+                    - 20
+                    - 15
+  '/surveys/{surveyId}/analytics/overview':
     get:
       tags:
         - 6. Analytics
@@ -1777,35 +1742,28 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: surveyId
           in: path
+          required: true
           schema:
             type: string
-          required: true
+          example: '{{surveyId}}'
       responses:
         '200':
-          description: Survey analytics overview
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    totalResponses: 43
-                    completionRate: 86
-                    averageTimeMinutes: 4.5
-                    responsesByDay:
-                      - date: '2026-11-01'
-                        count: 10
-                      - date: '2026-11-02'
-                        count: 15
-                      - date: '2026-11-03'
-                        count: 18
-
+              example:
+                status: success
+                data:
+                  totalResponses: 43
+                  completionRate: 86
   /analytics/engagement:
     get:
       tags:
@@ -1814,26 +1772,23 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: Platform-wide engagement metrics
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    totalUsers: 114
-                    activeUsersLast7Days: 42
-                    totalSurveysCompleted: 320
-                    avgSurveysPerUser: 2.8
-                    totalPointsAwarded: 48000
-
-  /surveys/{surveyId}/analytics/trends:
+              example:
+                status: success
+                data:
+                  totalUsers: 114
+                  activeUsersLast7Days: 42
+  '/surveys/{surveyId}/analytics/trends':
     get:
       tags:
         - 6. Analytics
@@ -1841,53 +1796,44 @@ paths:
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
+        - name: surveyId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '{{surveyId}}'
         - name: timeframe
           in: query
           schema:
             type: string
           example: weekly
-        - name: surveyId
-          in: path
-          schema:
-            type: string
-          required: true
       responses:
         '200':
-          description: Response trends over time
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    timeframe: weekly
-                    trends:
-                      - period: '2026-W44'
-                        responses: 20
-                      - period: '2026-W45'
-                        responses: 23
-
-  /surveys/{surveyId}/analytics/ai-insights:
+              example:
+                status: success
+                data:
+                  trends: []
+  '/surveys/{surveyId}/analytics/ai-insights':
     post:
       tags:
         - 6. Analytics
       summary: Get AI Insights for Survey
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example: {}
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
@@ -1895,220 +1841,1160 @@ paths:
           example: application/json
         - name: surveyId
           in: path
+          required: true
           schema:
             type: string
+          example: '{{surveyId}}'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  summary: Most respondents expressed positive feedback.
+                  sentimentScore: 0.75
+  /v1/kyc/otp/request:
+    post:
+      tags:
+        - 7. OTP Verification
+      summary: Request Phone OTP
+      description: Generates and sends a 6-digit SMS OTP to the provided phone number.
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              phone: '+2348012345678'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: OTP sent successfully
+  /v1/kyc/otp/verify:
+    post:
+      tags:
+        - 7. OTP Verification
+      summary: Verify Phone OTP
+      description: Verifies the 6-digit phone OTP and marks phoneVerified as true.
+      parameters:
+        - name: Authorization
+          in: header
           required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              phone: '+2348012345678'
+              code: '123456'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Phone verified successfully
+        '400':
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: failure
+                code: 400
+                msg: Invalid or expired OTP
+  /v1/kyc/email-otp/request:
+    post:
+      tags:
+        - 7. OTP Verification
+      summary: Request General Email OTP
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              email: foluwaseyipeter450@gmail.com
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: OTP sent to email
+  /v1/kyc/email-otp/verify:
+    post:
+      tags:
+        - 7. OTP Verification
+      summary: Verify General Email OTP
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              email: foluwaseyipeter450@gmail.com
+              code: '123456'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Email verified successfully
+  /v1/kyc/academic-email-otp/request:
+    post:
+      tags:
+        - 7. OTP Verification
+      summary: Request Academic Email OTP (.edu.ng)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              academicEmail: student@unilag.edu.ng
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Academic OTP sent
+  /v1/kyc/academic-email-otp/verify:
+    post:
+      tags:
+        - 7. OTP Verification
+      summary: Verify Academic Email OTP
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              academicEmail: student@unilag.edu.ng
+              code: '654321'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Academic email verified successfully
+  /v1/kyc/researcher/profile:
+    post:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Submit Researcher Profile (Student / Professional / Corporate)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              researcherType: student
+              academicStatus: Undergrad
+              institution: University of Lagos
+              faculty: Engineering
+              department: Computer Science
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Researcher profile saved successfully
+    get:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Get Researcher Profile
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  researcherType: student
+                  institution: University of Lagos
+                  tier: Standard
+  /v1/kyc/researcher/tier:
+    get:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Get Researcher Tier
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                tier: Standard
+  /v1/kyc/account-type:
+    patch:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Update Account Type & Profile (Seamless Migration)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              researcherType: student
+              academicLevel: undergraduate
+              levelOfStudy: 400_level
+              institution: University of Lagos
+              faculty: Engineering
+              department: Computer Science
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Account type and profile updated successfully
+  /v1/kyc/respondent/layer-status:
+    get:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Get Respondent Layer Status
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  layer1: true
+                  layer2Unlocked: true
+                  layer2: false
+                  layer3: false
+  /v1/kyc/respondent/layer1:
+    post:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Submit Layer 1 (Basic Demographics)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              gender: male
+              stateOfOrigin: Lagos
+              stateOfResidence: Lagos
+              lgaOfResidence: Ikeja
+              isStudent: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Layer 1 saved
+  /v1/kyc/respondent/layer2:
+    post:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Submit Layer 2 (Demographics & Socioeconomics)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              educationLevel: bachelors
+              employmentStatus: employed
+              incomeRange: 100000-200000
+              maritalStatus: single
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Layer 2 saved
+  /v1/kyc/respondent/layer3:
+    post:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Submit Layer 3 (Health & Lifestyle — Encrypted)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              bloodGroup: O+
+              genotype: AA
+              hasChronicCondition: false
+              conditions: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Layer 3 encrypted & saved
+  /v1/kyc/respondent/layer4:
+    post:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Submit Layer 4 (Socioeconomic Profile — Encrypted)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              monthlyIncome: 150000
+              housingType: rented
+              transportMode: public
+              deviceType: smartphone
+              dependantsCount: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Layer 4 encrypted & saved
+  /v1/kyc/respondent/layer5:
+    post:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Submit Layer 5 (Cultural Profile — Encrypted)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              religion: christianity
+              ethnicity: yoruba
+              languages:
+                - English
+                - Yoruba
+              maritalStatus: single
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Layer 5 encrypted & saved
+  /v1/kyc/respondent/survey-completed:
+    post:
+      tags:
+        - 8. Profiles & Progressive Layers
+      summary: Trigger Survey Completed Hook (Unlocks Layer 2)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Survey completed recorded
+  /v1/kyc/consent:
+    post:
+      tags:
+        - 9. NDPR & Compliance
+      summary: Grant Consent (NDPR)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              scope: health_data
+              granted: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Consent captured
+  /v1/kyc/consent/marketing:
+    patch:
+      tags:
+        - 9. NDPR & Compliance
+      summary: Revoke Marketing Consent
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              granted: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Marketing consent revoked
+  /v1/kyc/me:
+    delete:
+      tags:
+        - 9. NDPR & Compliance
+      summary: Right to Erasure (Delete Account & Profiles)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: User data permanently erased
+  /verify:
+    post:
+      tags:
+        - 10. User Profile & Legacy Auth
+      summary: Legacy Email OTP Verification
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              code: 123456
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                code: 200
+                msg: User verified
+  /v1/dashboard/corporate/overview:
+    get:
+      tags:
+        - 11. Corporate Dashboard
+      summary: Corporate Overview
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  activeSurveys: 5
+                  totalParticipants: 1200
+  /v1/dashboard/corporate/analytics:
+    get:
+      tags:
+        - 11. Corporate Dashboard
+      summary: Corporate Analytics
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  demographicBreakdown:
+                    age: {}
+                    gender: {}
+  '/v1/dashboard/corporate/invoice/{surveyId}':
+    get:
+      tags:
+        - 11. Corporate Dashboard
+      summary: Get Invoice (PDF Download / Details)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: surveyId
+          in: path
+          required: true
+          schema:
+            type: string
           example: '{{surveyId}}'
       responses:
         '200':
-          description: AI-generated insights for the survey
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  status: success
-                  data:
-                    summary: Most respondents expressed satisfaction with campus facilities but raised concerns about internet connectivity.
-                    keyThemes:
-                      - Campus facilities
-                      - Internet connectivity
-                      - Cafeteria quality
-                    sentimentScore: 0.65
-                    recommendations:
-                      - Improve WiFi coverage in hostels
-                      - Extend cafeteria opening hours
-
-  # ─── 7. REDEMPTION ───────────────────────────────────────────────────────────
-
+              example:
+                status: success
+                data:
+                  invoiceId: INV_123
+                  totalAmount: 500
+  /v1/dashboard/corporate/export:
+    get:
+      tags:
+        - 11. Corporate Dashboard
+      summary: Export Survey Data
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: surveyId
+          in: query
+          required: true
+          schema:
+            type: string
+          example: '{{surveyId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Export generated
+  /surveys:
+    post:
+      tags:
+        - 12. Core Surveys
+      summary: Create Survey
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              title: Consumer Preferences 2026
+              description: A study on consumer preferences in Nigeria
+              no_of_participants: 100
+              points_per_user: 50
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  _id: 64a1b2c3d4e5f6a7b8c9d0e1
+                  title: Consumer Preferences 2026
+    get:
+      tags:
+        - 12. Core Surveys
+      summary: List My Surveys
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  - _id: 64a1b2c3d4e5f6a7b8c9d0e1
+                    title: Consumer Preferences 2026
+                    published: true
+  '/surveys/{surveyId}/bulk-questions':
+    post:
+      tags:
+        - 12. Core Surveys
+      summary: Bulk Add Questions
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: surveyId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '{{surveyId}}'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              questions:
+                - question: What is your preferred mobile network?
+                  type: radio
+                  options:
+                    - MTN
+                    - Airtel
+                    - Glo
+                    - 9mobile
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Questions added successfully
+  '/surveys/{surveyId}':
+    get:
+      tags:
+        - 12. Core Surveys
+      summary: Get Survey Detail
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: surveyId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '{{surveyId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  _id: 64a1b2c3d4e5f6a7b8c9d0e1
+                  title: Consumer Preferences 2026
+                  questions: []
   /redemption/plans:
     get:
       tags:
-        - 7. Redemption
+        - 13. Redemption
       summary: Get Available Data Plans
-      description: Returns all available data plans for MTN, Airtel, Glo, and 9Mobile.
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: All available data plans
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  success: true
-                  message: Data plans fetched successfully
-                  data:
-                    - planid: mtn-1gb-30days
-                      name: 1GB - 30 Days
-                      price: '500'
-                      network: MTN
-                      networkName: MTN
-                    - planid: mtn-2gb-30days
-                      name: 2GB - 30 Days
-                      price: '1000'
-                      network: MTN
-                      networkName: MTN
-                    - planid: airtel-1gb-30days
-                      name: 1GB - 30 Days
-                      price: '500'
-                      network: AIRTEL
-                      networkName: AIRTEL
-
+              example:
+                success: true
+                message: Data plans fetched successfully
+                data:
+                  - planid: mtn-1gb-30days
+                    name: 1GB - 30 Days
+                    price: '500'
+                    network: MTN
   /redemption/airtime:
     post:
       tags:
-        - 7. Redemption
+        - 13. Redemption
       summary: Redeem Points for Airtime
-      description: >-
-        Redeem points for airtime. Minimum amount is ₦100.
-        1 point = ₦1. Requires phone number to be KYC-verified.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                phoneNumber: '08012345678'
-                network: MTN
-                amount: 200
+      description: Redeem points for airtime. Minimum amount is ₦100. 1 point = ₦1. Requires verified phone.
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              phoneNumber: 08012345678
+              network: MTN
+              amount: 200
       responses:
         '200':
-          description: Airtime redeemed successfully
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  success: true
-                  message: Airtime redeemed successfully
-                  data:
-                    phoneNumber: '08012345678'
-                    amount: 200
-                    pointsRedeemed: 200
-                    transactionReference: AIRT1730123456abc
-                    provider: vtpass
+              example:
+                success: true
+                message: Airtime redeemed successfully
+                data:
+                  phoneNumber: 08012345678
+                  amount: 200
+                  pointsRedeemed: 200
+                  transactionReference: AIRT1730123456abc
         '400':
-          description: Insufficient points or amount too low
+          description: Error response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  success: false
-                  message: Insufficient points
-
+              example:
+                status: failure
+                code: 400
+                msg: Insufficient points
   /redemption/data:
     post:
       tags:
-        - 7. Redemption
+        - 13. Redemption
       summary: Redeem Points for Data
-      description: >-
-        Redeem points for a mobile data plan. Provide either a planId
-        from GET /redemption/plans, or an amount to auto-select the best plan.
-        Requires phone number to be KYC-verified.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                phoneNumber: '08012345678'
-                network: MTN
-                planId: mtn-1gb-30days
+      description: Redeem points for a mobile data plan. Provide planId or amount. Requires verified phone.
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
         - name: Content-Type
           in: header
           schema:
             type: string
           example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              phoneNumber: 08012345678
+              network: MTN
+              planId: mtn-1gb-30days
       responses:
         '200':
-          description: Data redeemed successfully
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  success: true
-                  message: Data redeemed successfully
-                  data:
-                    phoneNumber: '08012345678'
-                    planName: 1GB - 30 Days
-                    planSize: 1GB
-                    pointsRedeemed: 500
-                    transactionReference: DATA1730123456xyz
-                    provider: vtpass
+              example:
+                success: true
+                message: Data redeemed successfully
+                data:
+                  phoneNumber: 08012345678
+                  planName: 1GB - 30 Days
+                  pointsRedeemed: 500
+                  transactionReference: DATA1730123456xyz
         '400':
-          description: Insufficient points or invalid plan
+          description: Error response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  success: false
-                  message: Invalid data plan or plan not found
-
+              example:
+                status: failure
+                code: 400
+                msg: Invalid data plan or plan not found
   /redemption/history:
     get:
       tags:
-        - 7. Redemption
+        - 13. Redemption
       summary: Get Redemption History
-      description: Returns the authenticated user's airtime and data redemption history.
       parameters:
         - name: Authorization
           in: header
+          required: true
           schema:
             type: string
-          example: Bearer {{token}}
+          example: 'Bearer {{token}}'
       responses:
         '200':
-          description: User's redemption history
+          description: Successful response
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  success: true
-                  data:
-                    - _id: 64b1c2d3e4f5a6b7c8d9e0f1
-                      type: airtime
-                      network: MTN
-                      phoneNumber: '08012345678'
-                      pointsRedeemed: 200
-                      valueReceived: 200
-                      status: successful
-                      transactionReference: AIRT1730123456abc
-                      createdAt: '2026-11-05T14:00:00.000Z'
-                    - _id: 64b1c2d3e4f5a6b7c8d9e0f2
-                      type: data
-                      network: MTN
-                      phoneNumber: '08012345678'
-                      pointsRedeemed: 500
-                      valueReceived: 500
-                      planName: 1GB - 30 Days
-                      planId: mtn-1gb-30days
-                      status: successful
-                      transactionReference: DATA1730123456xyz
-                      createdAt: '2026-11-04T10:00:00.000Z'
+              example:
+                success: true
+                data:
+                  - _id: 64b1c2d3e4f5a6b7c8d9e0f1
+                    type: airtime
+                    network: MTN
+                    phoneNumber: 08012345678
+                    pointsRedeemed: 200
+                    valueReceived: 200
+                    status: successful
