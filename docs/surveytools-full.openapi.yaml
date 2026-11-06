@@ -3,7 +3,7 @@ info:
   title: SurveyTools Comprehensive API Collection
   description: >-
     Collection featuring Auth, Admin Gamification, Gamification,
-    Marketplace/Vouchers, and Visualizations APIs.
+    Marketplace/Vouchers, Redemption, and Visualizations APIs.
   version: 1.0.0
 servers:
   - url: http://localhost:5003
@@ -14,7 +14,44 @@ tags:
   - name: 4. Marketplace & Vouchers
   - name: 5. Graph Visualizations
   - name: 6. Analytics
+  - name: 7. Redemption
+
 paths:
+
+  # ─── 1. AUTHENTICATION ───────────────────────────────────────────────────────
+
+  /auth/register:
+    post:
+      tags:
+        - 1. Authentication
+      summary: Register New User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                first_name: John
+                last_name: Doe
+                email: john.doe@university.edu
+                password: StrongPass123!
+                confirm_password: StrongPass123!
+                department: Computer Science
+                faculty: Engineering
+                gender: male
+                instituition: University of Lagos
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json: {}
+
   /auth/login:
     post:
       tags:
@@ -39,6 +76,157 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
+  /verify:
+    post:
+      tags:
+        - 1. Authentication
+      summary: Verify Email (OTP)
+      description: >-
+        Submit the OTP code sent to the user's email to verify their account.
+        Requires a valid auth token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                code: 123456
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /user/profile:
+    get:
+      tags:
+        - 1. Authentication
+      summary: Get User Profile
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /user/points:
+    get:
+      tags:
+        - 1. Authentication
+      summary: Get User Points Balance
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /update-user:
+    patch:
+      tags:
+        - 1. Authentication
+      summary: Update User Profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                first_name: John
+                last_name: Updated
+                gender: male
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /forget-password:
+    post:
+      tags:
+        - 1. Authentication
+      summary: Forgot Password (Send Reset Email)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: user@example.com
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /reset-password:
+    post:
+      tags:
+        - 1. Authentication
+      summary: Reset Password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: user@example.com
+                code: 123456
+                newPassword: NewStrongPass123!
+                confirmPassword: NewStrongPass123!
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  # ─── 2. ADMIN CONTROLS ───────────────────────────────────────────────────────
+
   /admin/gamification/missions:
     post:
       tags:
@@ -57,6 +245,7 @@ paths:
                 targetValue: 5
                 xpReward: 200
                 pointsReward: 50
+                isActive: true
       parameters:
         - name: Authorization
           in: header
@@ -69,10 +258,26 @@ paths:
             type: string
           example: application/json
       responses:
+        '201':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Get All Missions (Admin)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
         '200':
           description: Successful response
           content:
             application/json: {}
+
   /admin/marketplace/listings:
     post:
       tags:
@@ -91,6 +296,7 @@ paths:
                 value: 10% Off
                 partnerName: Amazon
                 stock: 100
+                isActive: true
       parameters:
         - name: Authorization
           in: header
@@ -103,10 +309,26 @@ paths:
             type: string
           example: application/json
       responses:
+        '201':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Get All Marketplace Listings (Admin)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
         '200':
           description: Successful response
           content:
             application/json: {}
+
   /admin/gamification/levels:
     post:
       tags:
@@ -122,8 +344,10 @@ paths:
                 name: Explorer
                 minXP: 1000
                 maxXP: 2500
+                pointsMultiplier: 1.2
                 benefits:
                   - Extra spin wheel attempt
+                surveyAccess: basic
       parameters:
         - name: Authorization
           in: header
@@ -136,10 +360,358 @@ paths:
             type: string
           example: application/json
       responses:
+        '201':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Get All Level Configs (Admin)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
         '200':
           description: Successful response
           content:
             application/json: {}
+
+  /admin/gamification/vip:
+    post:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Create VIP Tier Config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                tier: silver
+                minPoints: 1000
+                maxPoints: 4999
+                conversionRate: 1.2
+                bonusOnRewards: 5
+                supportLevel: priority
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Get All VIP Tier Configs (Admin)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /admin/gamification/achievements:
+    post:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Create Achievement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: Survey Veteran
+                description: Complete 10 surveys to unlock this badge.
+                category: surveys
+                triggerValue: 10
+                xpReward: 500
+                pointsReward: 100
+                isActive: true
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /admin/gamification/bonus-events:
+    post:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Create Bonus Event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: Weekend 2x Points Boost
+                description: Earn double points on all surveys this weekend.
+                multiplier: 2
+                targetType: all_users
+                startAt: '2026-11-08T00:00:00.000Z'
+                endAt: '2026-11-10T23:59:59.000Z'
+                isActive: true
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Get All Bonus Events (Admin)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /admin/users:
+    get:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Get All Users (Admin)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /admin/users/{userId}/admin:
+    patch:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Make User Admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                adminStatus: true
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: userId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: '{{userId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /admin/surveys:
+    get:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Get All Surveys (Admin)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /admin/surveys/{surveyId}/mark-paid:
+    post:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Mark Survey as Paid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: surveyor@example.com
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: surveyId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: '{{surveyId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /admin/surveys/{surveyId}/unpublish:
+    patch:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Unpublish Survey (Admin)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                reason: Violates community guidelines
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: surveyId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: '{{surveyId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /admin/redemptions:
+    get:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Get All Redemptions (Admin)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /admin/redemptions/stats:
+    get:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Get Redemption Stats (Admin)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /admin/users/{userId}/redemptions:
+    get:
+      tags:
+        - 2. Admin Controls (Gamification & Marketplace)
+      summary: Get User Redemption History (Admin)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: userId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: '{{userId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  # ─── 3. GAMIFICATION ─────────────────────────────────────────────────────────
+
   /gamification/dashboard:
     get:
       tags:
@@ -156,6 +728,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
   /gamification/spin:
     post:
       tags:
@@ -174,6 +747,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
   /gamification/missions:
     get:
       tags:
@@ -190,6 +764,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
   /gamification/missions/{missionProgressId}/claim:
     post:
       tags:
@@ -213,6 +788,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
   /gamification/leaderboard:
     get:
       tags:
@@ -234,6 +810,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
   /gamification/vip-status:
     get:
       tags:
@@ -250,6 +827,9 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
+  # ─── 4. MARKETPLACE & VOUCHERS ───────────────────────────────────────────────
+
   /marketplace/listings:
     get:
       tags:
@@ -266,6 +846,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
   /marketplace/convert:
     post:
       tags:
@@ -294,6 +875,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
   /marketplace/wallet:
     get:
       tags:
@@ -310,6 +892,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
   /marketplace/transactions:
     get:
       tags:
@@ -326,6 +909,9 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
+  # ─── 5. GRAPH VISUALIZATIONS ─────────────────────────────────────────────────
+
   /surveys/{surveyId}/visualizations:
     get:
       tags:
@@ -357,6 +943,9 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
+  # ─── 6. ANALYTICS ────────────────────────────────────────────────────────────
+
   /surveys/{surveyId}/analytics/overview:
     get:
       tags:
@@ -378,6 +967,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
   /analytics/engagement:
     get:
       tags:
@@ -394,6 +984,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
   /surveys/{surveyId}/analytics/trends:
     get:
       tags:
@@ -415,6 +1006,148 @@ paths:
           schema:
             type: string
           required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /surveys/{surveyId}/analytics/ai-insights:
+    post:
+      tags:
+        - 6. Analytics
+      summary: Get AI Insights for Survey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: surveyId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: '{{surveyId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  # ─── 7. REDEMPTION ───────────────────────────────────────────────────────────
+
+  /redemption/plans:
+    get:
+      tags:
+        - 7. Redemption
+      summary: Get Available Data Plans
+      description: Returns all available data plans for MTN, Airtel, Glo, and 9Mobile.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /redemption/airtime:
+    post:
+      tags:
+        - 7. Redemption
+      summary: Redeem Points for Airtime
+      description: >-
+        Redeem points for airtime. Minimum amount is ₦100.
+        Points are deducted at a 1:1 ratio (1 point = ₦1).
+        Requires phone number to be verified (KYC).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                phoneNumber: '08012345678'
+                network: MTN
+                amount: 200
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /redemption/data:
+    post:
+      tags:
+        - 7. Redemption
+      summary: Redeem Points for Data
+      description: >-
+        Redeem points for a mobile data plan. Provide either a specific planId
+        (from /redemption/plans) or an amount to auto-select the best matching plan.
+        Requires phone number to be verified (KYC).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                phoneNumber: '08012345678'
+                network: MTN
+                planId: 'mtn-1gb-30days'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
+  /redemption/history:
+    get:
+      tags:
+        - 7. Redemption
+      summary: Get Redemption History
+      description: Returns the authenticated user's airtime and data redemption history.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
       responses:
         '200':
           description: Successful response
