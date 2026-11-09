@@ -4,12 +4,20 @@ const { z } = require('zod');
 
 // Shared core fields — required for ALL users
 const coreShape = {
-  firstName:   z.string().min(1, 'firstName is required'),
-  lastName:    z.string().min(1, 'lastName is required'),
-  email:       z.string().email('must be a valid email'),
-  password:    z.string().min(8, 'password must be at least 8 characters'),
-  userType:    z.enum(['researcher', 'respondent']),
-  dateOfBirth: z.string().datetime(),
+  firstName:    z.string().min(1, 'firstName is required'),
+  lastName:     z.string().min(1, 'lastName is required'),
+  email:        z.string().email('must be a valid email'),
+  password:     z.string().min(8, 'password must be at least 8 characters'),
+  userType:     z.enum(['researcher', 'respondent']),
+  dateOfBirth:  z.string().datetime(),
+  // Optional referral code — 10-character alphanumeric, case-insensitive
+  referralCode: z
+    .string()
+    .trim()
+    .refine((val) => !val || val.length === 10, {
+      message: 'Referral codes must be exactly 10 characters',
+    })
+    .optional(),
 };
 
 // Researcher signup — only core fields. Type-specific profile collected via POST /v1/kyc/researcher/profile

@@ -38,9 +38,17 @@ paths:
               stateOfResidence: Lagos
               lgaOfResidence: Ikeja
               isStudent: false
+              referralCode: REFCODE123
       responses:
         '201':
           description: User created successfully
+          content:
+            application/json:
+              example:
+                status: success
+                data:
+                  userId: usr_98a7b6c5d4e3f2a1
+                  referralApplied: true
 
   /v1/kyc/otp/request:
     post:
@@ -482,6 +490,7 @@ components:
         password: { type: string, minLength: 8 }
         userType: { type: string, enum: [researcher, respondent] }
         dateOfBirth: { type: string, format: date-time }
+        referralCode: { type: string, minLength: 10, maxLength: 10, description: Optional 10-character referral code }
 
     SignupResearcherBody:
       allOf:

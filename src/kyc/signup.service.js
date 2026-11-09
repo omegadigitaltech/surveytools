@@ -4,16 +4,25 @@ const bcrypt = require('bcryptjs');
 const { AppError } = require('../../lib/app-error');
 const User = require('../../model/user');
 const RespondentProfile = require('./respondent-profile.model');
+const { UserGamification } = require('../../model/gamification');
 const { generateID_users } = require('../../middleware/helper');
+const { validateReferralCode, applyReferralRewards } = require('../gamification/referral.service');
 
 /**
- * @returns {{ register: (data: any) => Promise<{ userId: string }> }}
+ * @returns {{ register: (data: any) => Promise<{ userId: string, referralApplied: boolean }> }}
  */
 function createSignupService() {
   async function register(data) {
     const dob = new Date(data.dateOfBirth);
     const age = Math.floor((Date.now() - dob) / 3.156e10);
     if (age < 18) throw new AppError(400, 'Must be 18 or older to register');
+
+    // Pre-validate referral code BEFORE creating the user so we can return an
+    // error without leaving an orphaned user record if the code is invalid.
+    let referrerProfile = null;
+    if (data.referralCode && data.referralCode.trim()) {
+      referrerProfile = await validateReferralCode(data.referralCode);
+    }
 
     const hashedPassword = await bcrypt.hash(data.password, 12);
 
@@ -62,7 +71,24 @@ function createSignupService() {
         });
       }
 
-      return { userId: user.id };
+      // If a valid referral code was provided, create/find the gamification profile
+      // and apply referral rewards to both parties.
+      let referralApplied = false;
+      if (referrerProfile) {
+        const mongoUserId = user._id || user.id;
+        let newGamifProfile = await UserGamification.findOne({ userId: mongoUserId });
+        if (!newGamifProfile) {
+          newGamifProfile = await UserGamification.create({ userId: mongoUserId });
+        }
+        await applyReferralRewards(referrerProfile, newGamifProfile, mongoUserId.toString());
+        referralApplied = true;
+      }
+
+      const response = { userId: user.id };
+      if (referralApplied) {
+        response.referralApplied = true;
+      }
+      return response;
     } catch (err) {
       if (err.code === 11000) throw new AppError(400, 'Email already registered');
       throw err;

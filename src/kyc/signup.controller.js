@@ -17,11 +17,14 @@ function createSignupController({ signupService }) {
       throw new AppError(400, result.error.issues[0].message);
     }
 
-    const { userId } = await signupService.register(result.data);
+    const { userId, referralApplied } = await signupService.register(result.data);
 
     res.status(201).json({
       status: 'success',
-      data: { userId }
+      data: {
+        userId,
+        referralApplied: Boolean(referralApplied),
+      }
     });
   }
 
