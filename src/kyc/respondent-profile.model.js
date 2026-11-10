@@ -10,7 +10,7 @@ const encryptedFieldSchema = new mongoose.Schema({
 
 const respondentProfileSchema = new mongoose.Schema({
   userId:           { type: String, ref: 'User', required: true, unique: true, index: true },
-  phoneNumber:      { type: String, required: true },
+  phoneNumber:      { type: String, default: '' },
   dateOfBirth:      { type: Date, required: true },
   gender:           { type: String, enum: ['male', 'female', 'non-binary', 'prefer-not-to-say'], required: true },
   stateOfOrigin:    { type: String },

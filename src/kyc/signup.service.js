@@ -36,8 +36,9 @@ function createSignupService() {
       referrerProfile = await validateReferralCode(data.referralCode);
     }
 
+    let user = null;
     try {
-      const user = await User.create({
+      user = await User.create({
         id:          userIdStr,
         fullname:    `${data.firstName} ${data.lastName}`,
         email:       data.email,
@@ -57,7 +58,7 @@ function createSignupService() {
       if (data.userType === 'respondent') {
         await RespondentProfile.create({
           userId:           userIdStr,
-          phoneNumber:      '', // populated when phone OTP is verified
+          phoneNumber:      data.phoneNumber || '', // populated now if provided, or via phone OTP verification
           dateOfBirth:      dob,
           gender:           data.gender,
           stateOfOrigin:    data.stateOfOrigin,
@@ -94,6 +95,9 @@ function createSignupService() {
       }
       return response;
     } catch (err) {
+      if (user && user._id) {
+        await User.findByIdAndDelete(user._id).catch(() => {});
+      }
       if (err.code === 11000) throw new AppError(400, 'Email already registered');
       throw err;
     }

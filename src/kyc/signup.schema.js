@@ -10,6 +10,7 @@ const coreShape = {
   password:     z.string({ required_error: 'password is required' }).min(8, 'password must be at least 8 characters'),
   userType:     z.enum(['researcher', 'respondent'], { required_error: 'userType is required' }),
   dateOfBirth:  z.string({ required_error: 'dateOfBirth is required' }).datetime('dateOfBirth must be a valid ISO datetime string'),
+  phoneNumber:  z.string().optional(),
   // Optional referral code — 10-character alphanumeric, case-insensitive
   referralCode: z
     .string()
