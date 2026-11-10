@@ -128,24 +128,16 @@ describe('Gamification Service — getReferrals', () => {
     expect(result.referralCode).toHaveLength(10);
   });
 
-  it('lazily creates a profile and generates a referral code if profile does not exist', async () => {
+  it('throws AppError(404) with helpful message if gamification profile does not exist', async () => {
     const UserGamification = {
       findOne: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue({ populate: jest.fn().mockResolvedValue(null) }) }),
-      create: jest.fn().mockImplementation(({ userId, referralCode }) => Promise.resolve({
-        userId,
-        referralCode,
-        referralCount: 0,
-        referredBy: null,
-      })),
     };
 
     const service = createGamificationService({ LevelConfig: {}, Achievement: {}, UserGamification, SpinHistory: {}, User: {} });
-    const result = await service.getReferrals(mongoUserId);
 
-    expect(UserGamification.create).toHaveBeenCalledTimes(1);
-    expect(result.referralCode).toBeTruthy();
-    expect(result.referralCode).toHaveLength(10);
-    expect(result.referralCount).toBe(0);
-    expect(result.referredBy).toBeNull();
+    await expect(service.getReferrals(mongoUserId)).rejects.toMatchObject({
+      status: 404,
+      message: expect.stringContaining('complete at least one gamification activity'),
+    });
   });
 });

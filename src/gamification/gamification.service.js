@@ -104,11 +104,12 @@ function createGamificationService({ LevelConfig, Achievement, UserGamification,
   // ─── REFERRALS ────────────────────────────────────────────────────────────────
 
   /**
-   * Returns the user's referral info. If they don't have a gamification profile or
-   * referral code yet, they are lazily created and saved before returning.
+   * Returns the user's referral info. If they don't have a referral code yet,
+   * one is generated and saved before returning.
    *
    * @param {string} mongoUserId - The user's MongoDB _id (ObjectId string)
    * @returns {Promise<object>} Referral data including code, count, and referred-by info
+   * @throws {AppError} 404 if the user has not initiated/participated in gamification yet
    */
   async function getReferrals(mongoUserId) {
     let profile = await UserGamification.findOne({ userId: mongoUserId })
@@ -116,23 +117,14 @@ function createGamificationService({ LevelConfig, Achievement, UserGamification,
       .populate('referredBy', 'fullname');
 
     if (!profile) {
-      const newReferralCode = uuidv4().replace(/-/g, '').slice(0, 10).toUpperCase();
-      if (typeof UserGamification.create === 'function') {
-        profile = await UserGamification.create({
-          userId: mongoUserId,
-          referralCode: newReferralCode,
-        });
-      } else {
-        profile = new UserGamification({
-          userId: mongoUserId,
-          referralCode: newReferralCode,
-        });
-        if (typeof profile.save === 'function') {
-          await profile.save();
-        }
-      }
-      log.info({ mongoUserId }, 'gamification profile created lazily on getReferrals');
-    } else if (!profile.referralCode) {
+      throw new AppError(
+        404,
+        'Gamification profile not found. You must complete at least one gamification activity (e.g. spinning the wheel or viewing your dashboard) before unlocking your referral code.'
+      );
+    }
+
+    // Generate a referral code if one doesn't exist yet
+    if (!profile.referralCode) {
       profile.referralCode = uuidv4().replace(/-/g, '').slice(0, 10).toUpperCase();
       await profile.save();
       log.info({ mongoUserId }, 'referral code generated');
