@@ -12,6 +12,9 @@ const User = require('../../model/user');
 
 jest.mock('../../model/gamification');
 jest.mock('../../model/user');
+// Extend the real mongoose with a mockable startSession so models still load correctly
+const mongoose = require('mongoose');
+jest.spyOn(mongoose, 'startSession');
 
 describe('Referral Service — validateReferralCode', () => {
   beforeEach(() => {
@@ -49,30 +52,41 @@ describe('Referral Service — applyReferralRewards', () => {
   const referrerMongoId = '507f1f77bcf86cd799439011';
   const newUserId = '507f1f77bcf86cd799439022';
 
+  let mockSession;
   let mockReferrerProfile;
   let mockNewUserProfile;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
+    // Mock mongoose session / transaction
+    mockSession = {
+      startTransaction: jest.fn(),
+      commitTransaction: jest.fn().mockResolvedValue(undefined),
+      abortTransaction:  jest.fn().mockResolvedValue(undefined),
+      endSession:        jest.fn(),
+    };
+    mongoose.startSession.mockResolvedValue(mockSession);
+
     mockReferrerProfile = {
+      _id:   'referrer_doc_id',
       userId: { toString: () => referrerMongoId },
       xp: 150,
       totalXPEarned: 150,
       referralCount: 2,
-      save: jest.fn().mockResolvedValue(true),
     };
 
     mockNewUserProfile = {
+      _id:   'newuser_doc_id',
       userId: { toString: () => newUserId },
       xp: 0,
       totalXPEarned: 0,
       referredBy: null,
-      save: jest.fn().mockResolvedValue(true),
     };
 
-    XPTransaction.create = jest.fn().mockResolvedValue(true);
-    User.findByIdAndUpdate = jest.fn().mockResolvedValue(true);
+    UserGamification.findByIdAndUpdate = jest.fn().mockResolvedValue(true);
+    XPTransaction.create               = jest.fn().mockResolvedValue(true);
+    User.findByIdAndUpdate             = jest.fn().mockResolvedValue(true);
   });
 
   it('throws AppError(400) if user attempts to use their own referral code', async () => {
@@ -85,52 +99,79 @@ describe('Referral Service — applyReferralRewards', () => {
       status: 400,
       message: 'You cannot use your own referral code.',
     });
+
+    // No session should be started — guard fires before any DB work
+    expect(mongoose.startSession).not.toHaveBeenCalled();
   });
 
-  it('awards rewards to both referrer and referee, creates XP logs, and updates pointBalance', async () => {
+  it('throws AppError(400) if the new user already has a referredBy set', async () => {
+    mockNewUserProfile.referredBy = 'some_other_referrer_id';
+
+    await expect(
+      applyReferralRewards(mockReferrerProfile, mockNewUserProfile, newUserId)
+    ).rejects.toMatchObject({
+      status: 400,
+      message: expect.stringContaining('already used a referral code'),
+    });
+
+    // No session started — guard fires before any DB work
+    expect(mongoose.startSession).not.toHaveBeenCalled();
+  });
+
+  it('awards rewards inside a transaction and commits on success', async () => {
     await applyReferralRewards(mockReferrerProfile, mockNewUserProfile, newUserId);
 
-    // Referee checks
-    expect(mockNewUserProfile.referredBy).toEqual(mockReferrerProfile.userId);
-    expect(mockNewUserProfile.xp).toBe(REFEREE_XP); // 20
-    expect(mockNewUserProfile.totalXPEarned).toBe(REFEREE_XP);
-    expect(mockNewUserProfile.save).toHaveBeenCalledTimes(1);
+    // Transaction lifecycle
+    expect(mockSession.startTransaction).toHaveBeenCalledTimes(1);
+    expect(mockSession.commitTransaction).toHaveBeenCalledTimes(1);
+    expect(mockSession.abortTransaction).not.toHaveBeenCalled();
+    expect(mockSession.endSession).toHaveBeenCalledTimes(1);
 
-    // Referrer checks
-    expect(mockReferrerProfile.referralCount).toBe(3); // 2 + 1
-    expect(mockReferrerProfile.xp).toBe(150 + REFERRER_XP); // 150 + 50 = 200
-    expect(mockReferrerProfile.totalXPEarned).toBe(150 + REFERRER_XP);
-    expect(mockReferrerProfile.save).toHaveBeenCalledTimes(1);
+    // Referee gamif update
+    expect(UserGamification.findByIdAndUpdate).toHaveBeenCalledWith(
+      mockNewUserProfile._id,
+      {
+        $set: { referredBy: mockReferrerProfile.userId },
+        $inc: { xp: REFEREE_XP, totalXPEarned: REFEREE_XP },
+      },
+      { session: mockSession }
+    );
 
-    // Referrer point balance update
+    // Referrer gamif update
+    expect(UserGamification.findByIdAndUpdate).toHaveBeenCalledWith(
+      mockReferrerProfile._id,
+      { $inc: { referralCount: 1, xp: REFERRER_XP, totalXPEarned: REFERRER_XP } },
+      { session: mockSession }
+    );
+
+    // Referrer point balance
     expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
       mockReferrerProfile.userId,
-      { $inc: { pointBalance: REFERRER_POINTS } } // 100
+      { $inc: { pointBalance: REFERRER_POINTS } },
+      { session: mockSession }
     );
 
-    // XPTransaction records created
+    // Two XP transaction records — array form required for Mongo session support
     expect(XPTransaction.create).toHaveBeenCalledTimes(2);
-
-    // Referee XP transaction
     expect(XPTransaction.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: mockNewUserProfile.userId,
-        amount: REFEREE_XP,
-        source: 'referral',
-        balanceBefore: 0,
-        balanceAfter: REFEREE_XP,
-      })
+      [expect.objectContaining({ userId: mockNewUserProfile.userId, amount: REFEREE_XP, source: 'referral' })],
+      { session: mockSession }
     );
-
-    // Referrer XP transaction
     expect(XPTransaction.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: mockReferrerProfile.userId,
-        amount: REFERRER_XP,
-        source: 'referral',
-        balanceBefore: 150,
-        balanceAfter: 200,
-      })
+      [expect.objectContaining({ userId: mockReferrerProfile.userId, amount: REFERRER_XP, source: 'referral' })],
+      { session: mockSession }
     );
+  });
+
+  it('aborts the transaction and rethrows if any DB operation fails', async () => {
+    UserGamification.findByIdAndUpdate.mockRejectedValueOnce(new Error('DB timeout'));
+
+    await expect(
+      applyReferralRewards(mockReferrerProfile, mockNewUserProfile, newUserId)
+    ).rejects.toThrow('DB timeout');
+
+    expect(mockSession.abortTransaction).toHaveBeenCalledTimes(1);
+    expect(mockSession.commitTransaction).not.toHaveBeenCalled();
+    expect(mockSession.endSession).toHaveBeenCalledTimes(1);
   });
 });

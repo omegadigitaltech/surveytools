@@ -1,5 +1,6 @@
 'use strict';
 
+const mongoose = require('mongoose');
 const { UserGamification, XPTransaction } = require('../../model/gamification');
 const User = require('../../model/user');
 const { AppError } = require('../../lib/app-error');
@@ -48,7 +49,11 @@ async function validateReferralCode(referralCode) {
  * Applies a referral after both the new user and their gamification profile
  * have been created. Assumes the code was already validated by validateReferralCode().
  *
- * Rewards:
+ * Guards:
+ *   - Self-referral: throws 400 if referrer and new user are the same person
+ *   - Already referred: throws 400 if the new user already has a referredBy set
+ *
+ * Rewards (all-or-nothing inside a Mongo transaction):
  *   - Referrer: +${REFERRER_XP} XP, +${REFERRER_POINTS} points
  *   - New user (referee): +${REFEREE_XP} XP signup bonus
  *
@@ -56,62 +61,99 @@ async function validateReferralCode(referralCode) {
  * @param {object} newUserProfile   - UserGamification document of the new user (freshly created)
  * @param {string} newUserMongoId   - MongoDB _id string of the new user
  * @returns {Promise<void>}
- * @throws {AppError} 400 if self-referral is detected
+ * @throws {AppError} 400 if self-referral or already-referred is detected
  */
 async function applyReferralRewards(referrerProfile, newUserProfile, newUserMongoId) {
-  // Self-referral guard (edge case: pre-validation can't catch this since user didn't exist yet)
+  // ── Guard: self-referral ────────────────────────────────────────────────────
+  // Edge case: pre-validation can't catch this since the user didn't exist yet
   if (referrerProfile.userId.toString() === newUserMongoId.toString()) {
     throw new AppError(400, 'You cannot use your own referral code.');
   }
 
-  // ── Reward the new user (referee) ───────────────────────────────────────────
-  const refereeBefore = newUserProfile.xp || 0;
-  newUserProfile.referredBy = referrerProfile.userId;
-  newUserProfile.xp = (newUserProfile.xp || 0) + REFEREE_XP;
-  newUserProfile.totalXPEarned = (newUserProfile.totalXPEarned || 0) + REFEREE_XP;
-  if (typeof newUserProfile.save === 'function') {
-    await newUserProfile.save();
+  // ── Guard: already referred ─────────────────────────────────────────────────
+  // Prevents a user from claiming referral rewards more than once
+  if (newUserProfile.referredBy) {
+    throw new AppError(
+      400,
+      'You have already used a referral code. Only one referral code can be applied per account.'
+    );
   }
 
-  await XPTransaction.create({
-    userId:        newUserProfile.userId,
-    amount:        REFEREE_XP,
-    source:        'referral',
-    description:   'Referral signup bonus — joined using a referral code',
-    balanceBefore: refereeBefore,
-    balanceAfter:  newUserProfile.xp,
-  });
+  // ── All-or-nothing transaction ───────────────────────────────────────────────
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  // ── Reward the referrer ──────────────────────────────────────────────────────
-  const referrerBefore = referrerProfile.xp || 0;
-  referrerProfile.referralCount = (referrerProfile.referralCount || 0) + 1;
-  referrerProfile.xp = (referrerProfile.xp || 0) + REFERRER_XP;
-  referrerProfile.totalXPEarned = (referrerProfile.totalXPEarned || 0) + REFERRER_XP;
-  if (typeof referrerProfile.save === 'function') {
-    await referrerProfile.save();
+  try {
+    // Reward the new user (referee)
+    const refereeBefore = newUserProfile.xp || 0;
+    const refereeXPAfter = refereeBefore + REFEREE_XP;
+
+    await UserGamification.findByIdAndUpdate(
+      newUserProfile._id,
+      {
+        $set:  { referredBy: referrerProfile.userId },
+        $inc:  { xp: REFEREE_XP, totalXPEarned: REFEREE_XP },
+      },
+      { session }
+    );
+
+    await XPTransaction.create(
+      [{
+        userId:        newUserProfile.userId,
+        amount:        REFEREE_XP,
+        source:        'referral',
+        description:   'Referral signup bonus — joined using a referral code',
+        balanceBefore: refereeBefore,
+        balanceAfter:  refereeXPAfter,
+      }],
+      { session }
+    );
+
+    // Reward the referrer
+    const referrerBefore = referrerProfile.xp || 0;
+    const referrerXPAfter = referrerBefore + REFERRER_XP;
+
+    await UserGamification.findByIdAndUpdate(
+      referrerProfile._id,
+      { $inc: { referralCount: 1, xp: REFERRER_XP, totalXPEarned: REFERRER_XP } },
+      { session }
+    );
+
+    await User.findByIdAndUpdate(
+      referrerProfile.userId,
+      { $inc: { pointBalance: REFERRER_POINTS } },
+      { session }
+    );
+
+    await XPTransaction.create(
+      [{
+        userId:        referrerProfile.userId,
+        amount:        REFERRER_XP,
+        source:        'referral',
+        description:   'Referral reward — a new user signed up with your code',
+        balanceBefore: referrerBefore,
+        balanceAfter:  referrerXPAfter,
+      }],
+      { session }
+    );
+
+    await session.commitTransaction();
+
+    log.info({
+      newUserId:      newUserMongoId,
+      referrerId:     referrerProfile.userId.toString(),
+      referrerXP:     REFERRER_XP,
+      referrerPoints: REFERRER_POINTS,
+      refereeXP:      REFEREE_XP,
+    }, 'referral rewards applied');
+
+  } catch (err) {
+    await session.abortTransaction();
+    log.error({ err, newUserMongoId }, 'referral rewards transaction aborted');
+    throw err;
+  } finally {
+    session.endSession();
   }
-
-  // Award points to the referrer's User.pointBalance
-  await User.findByIdAndUpdate(referrerProfile.userId, {
-    $inc: { pointBalance: REFERRER_POINTS }
-  });
-
-  await XPTransaction.create({
-    userId:        referrerProfile.userId,
-    amount:        REFERRER_XP,
-    source:        'referral',
-    description:   'Referral reward — a new user signed up with your code',
-    balanceBefore: referrerBefore,
-    balanceAfter:  referrerProfile.xp,
-  });
-
-  log.info({
-    newUserId:  newUserMongoId,
-    referrerId: referrerProfile.userId.toString(),
-    referrerXP: REFERRER_XP,
-    referrerPoints: REFERRER_POINTS,
-    refereeXP:  REFEREE_XP,
-  }, 'referral rewards applied');
 }
 
 module.exports = {
