@@ -17,19 +17,23 @@ function createSignupService() {
     const age = Math.floor((Date.now() - dob) / 3.156e10);
     if (age < 18) throw new AppError(400, 'Must be 18 or older to register');
 
-    // Pre-validate referral code BEFORE creating the user so we can return an
-    // error without leaving an orphaned user record if the code is invalid.
-    let referrerProfile = null;
-    if (data.referralCode && data.referralCode.trim()) {
-      referrerProfile = await validateReferralCode(data.referralCode);
-    }
-
     const hashedPassword = await bcrypt.hash(data.password, 12);
 
     // Retry until a collision-free ID is found, matching the pattern in controllers/auth.js
     let userIdStr = generateID_users(16);
     while (await User.findOne({ id: userIdStr })) {
       userIdStr = generateID_users(16);
+    }
+
+    // Check for duplicate email explicitly before spending time on referral validation
+    // so the user sees the email error rather than a referral error when both are wrong.
+    const emailExists = await User.findOne({ email: data.email });
+    if (emailExists) throw new AppError(400, 'Email already registered');
+
+    // Pre-validate referral code AFTER email check — email errors take priority
+    let referrerProfile = null;
+    if (data.referralCode && data.referralCode.trim()) {
+      referrerProfile = await validateReferralCode(data.referralCode);
     }
 
     try {

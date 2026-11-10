@@ -49,14 +49,9 @@ const postRegister = async (req, res) => {
       });
     }
 
-    // Pre-validate referral code if provided
-    let referrerProfile = null;
-    if (referralCode && typeof referralCode === 'string' && referralCode.trim()) {
-      const { validateReferralCode } = require('../src/gamification/referral.service');
-      referrerProfile = await validateReferralCode(referralCode);
-    }
-
-    // Check if email exists
+    // Check if email exists first — before any referral validation
+    // so the user gets the most relevant error (not "invalid referral code"
+    // when the real problem is a duplicate email).
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -93,6 +88,13 @@ const postRegister = async (req, res) => {
         },
         token,
       });
+    }
+
+    // Pre-validate referral code AFTER email check — so email errors take priority
+    let referrerProfile = null;
+    if (referralCode && typeof referralCode === 'string' && referralCode.trim()) {
+      const { validateReferralCode } = require('../src/gamification/referral.service');
+      referrerProfile = await validateReferralCode(referralCode);
     }
 
     // Create new user
