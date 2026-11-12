@@ -33,6 +33,8 @@ tags:
     description: 'Survey creation, bulk question management, and survey details'
   - name: 13. Redemption
     description: Direct telecom airtime and mobile data plan redemption with verified phone
+  - name: 14. Form Integration
+    description: 'External form integrations: Typeform, Tally, Google Forms OAuth, and SurveyHeart CSV snapshots'
 paths:
   /v1/kyc/register:
     post:
@@ -2998,3 +3000,410 @@ paths:
                     pointsRedeemed: 200
                     valueReceived: 200
                     status: successful
+  /v1/forms/import:
+    post:
+      tags:
+        - 14. Form Integration
+      summary: Import External Form
+      description: Imports a Typeform, Tally, or Google Form by URL. Fetches form metadata, question definitions, and baseline response count. Automatically registers webhooks for Typeform and Tally.
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  description: URL of the form to import (Typeform, Tally, or Google Forms edit URL)
+            example:
+              url: 'https://tally.so/r/dbaxKz'
+      responses:
+        '201':
+          description: Form imported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  _id: 64b1c2d3e4f5a6b7c8d9e0f1
+                  researcherId: '5089731142013239'
+                  platform: tally
+                  platformFormId: dbaxKz
+                  originalUrl: 'https://tally.so/r/dbaxKz'
+                  title: Hello World In JAVA
+                  description: ''
+                  questions:
+                    - ref: 13c6c7e2-4add-49a9-ae28-4e9ba30f53d1
+                      label: Full Name
+                      type: short_text
+                      required: true
+                      options: []
+                  snapshotResponseCount: 0
+                  postImportResponseCount: 0
+                  status: active
+        '400':
+          description: Invalid URL or unsupported platform
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: failure
+                code: 400
+                msg: 'Unsupported platform. Supported URL domains: typeform.com, tally.so, docs.google.com (Google Forms).'
+        '403':
+          description: Google Forms authorization required
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: failure
+                code: 403
+                msg: 'Google Forms authorization required. Visit GET /v1/forms/oauth/google/start to connect your Google account.'
+        '409':
+          description: Form already imported
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: failure
+                code: 409
+                msg: This form has already been imported
+  /v1/forms:
+    get:
+      tags:
+        - 14. Form Integration
+      summary: List Imported Forms
+      description: Returns all imported forms for the authenticated researcher, with optional platform filter and pagination.
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: platform
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [typeform, tally, google_forms, csv_import]
+          example: tally
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+          example: 20
+      responses:
+        '200':
+          description: List of imported forms
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  forms:
+                    - _id: 64b1c2d3e4f5a6b7c8d9e0f1
+                      platform: tally
+                      platformFormId: dbaxKz
+                      title: Hello World In JAVA
+                      snapshotResponseCount: 0
+                      postImportResponseCount: 0
+                      status: active
+                      createdAt: '2026-11-11T16:25:02.000Z'
+                  total: 1
+                  page: 1
+                  totalPages: 1
+  /v1/forms/{id}:
+    get:
+      tags:
+        - 14. Form Integration
+      summary: Get Form Detail
+      description: Returns the full details of a single imported form including questions and response counts.
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 64b1c2d3e4f5a6b7c8d9e0f1
+      responses:
+        '200':
+          description: Form detail retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  _id: 64b1c2d3e4f5a6b7c8d9e0f1
+                  researcherId: '5089731142013239'
+                  platform: tally
+                  platformFormId: dbaxKz
+                  originalUrl: 'https://tally.so/r/dbaxKz'
+                  title: Hello World In JAVA
+                  description: ''
+                  questions:
+                    - ref: 13c6c7e2-4add-49a9-ae28-4e9ba30f53d1
+                      label: Full Name
+                      type: short_text
+                      required: true
+                      options: []
+                  snapshotResponseCount: 0
+                  postImportResponseCount: 0
+                  status: active
+        '404':
+          description: Form not found
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: failure
+                code: 404
+                msg: Imported form not found
+  /v1/forms/csv-upload:
+    post:
+      tags:
+        - 14. Form Integration
+      summary: Upload CSV Snapshot (SurveyHeart)
+      description: Uploads a CSV export from SurveyHeart as a one-time snapshot. Max file size 5MB. Parses CSV headers as questions and counts data rows as initial responses.
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - title
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: SurveyHeart CSV export file
+                title:
+                  type: string
+                  description: Title for the imported survey
+                  example: SurveyHeart Customer Feedback
+      responses:
+        '201':
+          description: CSV snapshot imported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                data:
+                  _id: 64b1c2d3e4f5a6b7c8d9e0f1
+                  platform: csv_import
+                  platformFormId: csv_5089731142013239_1794408439462
+                  title: SurveyHeart Customer Feedback
+                  snapshotResponseCount: 25
+                  postImportResponseCount: 0
+                  status: active
+        '400':
+          description: Invalid file or missing parameters
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: failure
+                code: 400
+                msg: Only CSV files are allowed
+  /v1/forms/oauth/google/start:
+    get:
+      tags:
+        - 14. Form Integration
+      summary: Start Google OAuth
+      description: Initiates the Google OAuth2 flow for connecting a Google account to import Google Forms. Returns a 302 redirect to the Google consent screen.
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+      responses:
+        '302':
+          description: Redirect to Google consent screen
+          headers:
+            Location:
+              schema:
+                type: string
+              example: 'https://accounts.google.com/o/oauth2/v2/auth?...'
+  /v1/forms/oauth/google/callback:
+    get:
+      tags:
+        - 14. Form Integration
+      summary: Google OAuth Callback
+      description: OAuth2 callback endpoint. Receives the authorization code from Google, exchanges it for access/refresh tokens, and saves them encrypted.
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'Bearer {{token}}'
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+          example: '4/0Abc123xyz...'
+      responses:
+        '200':
+          description: Google Forms connected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Google Forms connected successfully
+        '400':
+          description: Missing authorization code
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: failure
+                code: 400
+                msg: Missing authorization code from Google
+  /v1/forms/webhooks/typeform:
+    post:
+      tags:
+        - 14. Form Integration
+      summary: Typeform Inbound Webhook
+      description: Inbound webhook receiver for Typeform responses. Verifies the HMAC-SHA256 signature in the typeform-signature header and increments the response count.
+      parameters:
+        - name: typeform-signature
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'sha256=abcdef1234567890...'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              event_id: 'evt_123'
+              event_type: 'form_response'
+              form_response:
+                form_id: 'abc123'
+                token: 'tok_123'
+                submitted_at: '2026-11-11T12:00:00Z'
+                answers: []
+      responses:
+        '200':
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Webhook processed
+        '401':
+          description: Invalid signature
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: failure
+                code: 401
+                msg: Webhook signature verification failed
+  /v1/forms/webhooks/tally:
+    post:
+      tags:
+        - 14. Form Integration
+      summary: Tally Inbound Webhook
+      description: Inbound webhook receiver for Tally responses. Verifies the HMAC-SHA256 signature in the tally-signature header and increments the response count.
+      parameters:
+        - name: tally-signature
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 'abcdef1234567890...'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              eventId: 'evt_123'
+              eventType: 'FORM_RESPONSE'
+              createdAt: '2026-11-11T12:00:00Z'
+              data:
+                responseId: 'resp_123'
+                formId: 'dbaxKz'
+                submittedAt: '2026-11-11T12:00:00Z'
+                fields: []
+      responses:
+        '200':
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+                message: Webhook processed
+        '401':
+          description: Invalid signature
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: failure
+                code: 401
+                msg: Webhook signature verification failed
