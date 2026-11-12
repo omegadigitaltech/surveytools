@@ -4,10 +4,12 @@ const bcrypt = require('bcryptjs');
 const { AppError } = require('../../lib/app-error');
 const User = require('../../model/user');
 const RespondentProfile = require('./respondent-profile.model');
+const { UserGamification } = require('../../model/gamification');
 const { generateID_users } = require('../../middleware/helper');
+const { validateReferralCode, applyReferralRewards } = require('../gamification/referral.service');
 
 /**
- * @returns {{ register: (data: any) => Promise<{ userId: string }> }}
+ * @returns {{ register: (data: any) => Promise<{ userId: string, referralApplied: boolean }> }}
  */
 function createSignupService() {
   async function register(data) {
@@ -23,8 +25,20 @@ function createSignupService() {
       userIdStr = generateID_users(16);
     }
 
+    // Check for duplicate email explicitly before spending time on referral validation
+    // so the user sees the email error rather than a referral error when both are wrong.
+    const emailExists = await User.findOne({ email: data.email });
+    if (emailExists) throw new AppError(400, 'Email already registered');
+
+    // Pre-validate referral code AFTER email check — email errors take priority
+    let referrerProfile = null;
+    if (data.referralCode && data.referralCode.trim()) {
+      referrerProfile = await validateReferralCode(data.referralCode);
+    }
+
+    let user = null;
     try {
-      const user = await User.create({
+      user = await User.create({
         id:          userIdStr,
         fullname:    `${data.firstName} ${data.lastName}`,
         email:       data.email,
@@ -44,7 +58,7 @@ function createSignupService() {
       if (data.userType === 'respondent') {
         await RespondentProfile.create({
           userId:           userIdStr,
-          phoneNumber:      '', // populated when phone OTP is verified
+          phoneNumber:      data.phoneNumber || '', // populated now if provided, or via phone OTP verification
           dateOfBirth:      dob,
           gender:           data.gender,
           stateOfOrigin:    data.stateOfOrigin,
@@ -62,8 +76,28 @@ function createSignupService() {
         });
       }
 
-      return { userId: user.id };
+      // If a valid referral code was provided, create/find the gamification profile
+      // and apply referral rewards to both parties.
+      let referralApplied = false;
+      if (referrerProfile) {
+        const mongoUserId = user._id || user.id;
+        let newGamifProfile = await UserGamification.findOne({ userId: mongoUserId });
+        if (!newGamifProfile) {
+          newGamifProfile = await UserGamification.create({ userId: mongoUserId });
+        }
+        await applyReferralRewards(referrerProfile, newGamifProfile, mongoUserId.toString());
+        referralApplied = true;
+      }
+
+      const response = { userId: user.id };
+      if (referralApplied) {
+        response.referralApplied = true;
+      }
+      return response;
     } catch (err) {
+      if (user && user._id) {
+        await User.findByIdAndDelete(user._id).catch(() => {});
+      }
       if (err.code === 11000) throw new AppError(400, 'Email already registered');
       throw err;
     }

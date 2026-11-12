@@ -128,7 +128,7 @@ describe('Gamification Service — getReferrals', () => {
     expect(result.referralCode).toHaveLength(10);
   });
 
-  it('throws AppError(404) if profile does not exist', async () => {
+  it('throws AppError(404) with helpful message if gamification profile does not exist', async () => {
     const UserGamification = {
       findOne: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue({ populate: jest.fn().mockResolvedValue(null) }) }),
     };
@@ -137,7 +137,7 @@ describe('Gamification Service — getReferrals', () => {
 
     await expect(service.getReferrals(mongoUserId)).rejects.toMatchObject({
       status: 404,
-      message: 'Gamification profile not found',
+      message: expect.stringContaining('complete at least one gamification activity'),
     });
   });
 });

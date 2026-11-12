@@ -109,6 +109,7 @@ function createGamificationService({ LevelConfig, Achievement, UserGamification,
    *
    * @param {string} mongoUserId - The user's MongoDB _id (ObjectId string)
    * @returns {Promise<object>} Referral data including code, count, and referred-by info
+   * @throws {AppError} 404 if the user has not initiated/participated in gamification yet
    */
   async function getReferrals(mongoUserId) {
     let profile = await UserGamification.findOne({ userId: mongoUserId })
@@ -116,7 +117,10 @@ function createGamificationService({ LevelConfig, Achievement, UserGamification,
       .populate('referredBy', 'fullname');
 
     if (!profile) {
-      throw new AppError(404, 'Gamification profile not found');
+      throw new AppError(
+        404,
+        'Gamification profile not found. You must complete at least one gamification activity (e.g. spinning the wheel or viewing your dashboard) before unlocking your referral code.'
+      );
     }
 
     // Generate a referral code if one doesn't exist yet
@@ -128,7 +132,7 @@ function createGamificationService({ LevelConfig, Achievement, UserGamification,
 
     return {
       referralCode:   profile.referralCode,
-      referralCount:  profile.referralCount,
+      referralCount:  profile.referralCount || 0,
       referredBy:     profile.referredBy
         ? { fullname: profile.referredBy.fullname }
         : null,

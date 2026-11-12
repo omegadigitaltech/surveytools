@@ -104,6 +104,12 @@ paths:
                 isStudent:
                   type: boolean
                   example: false
+                referralCode:
+                  type: string
+                  minLength: 10
+                  maxLength: 10
+                  description: Optional 10-character referral code
+                  example: REFCODE123
             example:
               firstName: John
               lastName: Doe
@@ -115,6 +121,7 @@ paths:
               stateOfResidence: Lagos
               lgaOfResidence: Ikeja
               isStudent: false
+              referralCode: REFCODE123
       responses:
         '201':
           description: User registered successfully
@@ -128,6 +135,7 @@ paths:
                 message: User created successfully
                 data:
                   userId: usr_98a7b6c5d4e3f2a1
+                  referralApplied: true
         '400':
           description: Error response
           content:
@@ -137,7 +145,7 @@ paths:
               example:
                 status: failure
                 code: 400
-                msg: Email already registered or age must be 18+
+                msg: Email already registered, age must be 18+, or invalid referral code
   /auth/register:
     post:
       tags:
@@ -204,6 +212,12 @@ paths:
                 instituition:
                   type: string
                   example: University of Lagos
+                referralCode:
+                  type: string
+                  minLength: 10
+                  maxLength: 10
+                  description: Optional 10-character referral code
+                  example: REFCODE123
             example:
               first_name: John
               last_name: Doe
@@ -215,6 +229,7 @@ paths:
               faculty: Engineering
               gender: male
               instituition: University of Lagos
+              referralCode: REFCODE123
       responses:
         '201':
           description: User registered successfully
@@ -240,6 +255,7 @@ paths:
                     verified: false
                     admin: false
                     pointBalance: 0
+                  referralApplied: true
                 token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         '400':
           description: Error response
@@ -250,7 +266,7 @@ paths:
               example:
                 status: failure
                 code: 400
-                msg: Email already exists or required fields missing
+                msg: Email already exists, required fields missing, or invalid referral code
   /auth/login:
     post:
       tags:

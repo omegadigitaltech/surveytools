@@ -19,6 +19,7 @@ const postRegister = async (req, res) => {
       gender,
       userType,
       type,
+      referralCode,
     } = req.body;
 
     // Validate required fields
@@ -48,7 +49,9 @@ const postRegister = async (req, res) => {
       });
     }
 
-    // Check if email exists
+    // Check if email exists first — before any referral validation
+    // so the user gets the most relevant error (not "invalid referral code"
+    // when the real problem is a duplicate email).
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -87,6 +90,13 @@ const postRegister = async (req, res) => {
       });
     }
 
+    // Pre-validate referral code AFTER email check — so email errors take priority
+    let referrerProfile = null;
+    if (referralCode && typeof referralCode === 'string' && referralCode.trim()) {
+      const { validateReferralCode } = require('../src/gamification/referral.service');
+      referrerProfile = await validateReferralCode(referralCode);
+    }
+
     // Create new user
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -110,6 +120,20 @@ const postRegister = async (req, res) => {
       password: hashedPassword,
     });
 
+    // Apply referral rewards if a valid code was provided
+    let referralApplied = false;
+    if (referrerProfile) {
+      const { UserGamification } = require('../model/gamification');
+      const { applyReferralRewards } = require('../src/gamification/referral.service');
+      const mongoUserId = user._id || user.id;
+      let newGamifProfile = await UserGamification.findOne({ userId: mongoUserId });
+      if (!newGamifProfile) {
+        newGamifProfile = await UserGamification.create({ userId: mongoUserId });
+      }
+      await applyReferralRewards(referrerProfile, newGamifProfile, mongoUserId.toString());
+      referralApplied = true;
+    }
+
     const { verified } = await getVerification(user.id);
     const redirectUrl = verified
       ? req.session.referer || url
@@ -130,6 +154,7 @@ const postRegister = async (req, res) => {
       data: {
         redirectUrl,
         user,
+        referralApplied,
       },
       token,
     });
@@ -142,6 +167,14 @@ const postRegister = async (req, res) => {
         status: "failure",
         code: 400,
         msg: "Email already exists",
+      });
+    }
+
+    if (error.status || error.statusCode) {
+      return res.status(error.status || error.statusCode).json({
+        status: "failure",
+        code: error.status || error.statusCode,
+        msg: error.message,
       });
     }
 
