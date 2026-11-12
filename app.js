@@ -44,6 +44,8 @@ const researcherProfileRoutes = require('./src/kyc/researcher-profile.routes');
 const erasureRoutes = require('./src/kyc/erasure.routes');
 const researcherTierRoutes = require('./src/kyc/researcher-tier.routes');
 const accountTypeRoutes = require('./src/kyc/account-type.routes');
+const formIntegrationWebhookRoutes = require('./src/form-integration/form-integration.webhook-routes');
+const formIntegrationRoutes = require('./src/form-integration/form-integration.routes');
 
 const app = express();
 require('./middleware/passport');
@@ -118,6 +120,10 @@ app.get('/api-docs.json', (req, res) => res.json(mergedSwaggerDoc));
 
 // ReDoc UI documentation
 app.get('/redoc', redoc({ title: 'SurveyTools Unified API Docs', specUrl: '/api-docs.json' }));
+
+// Form Integration webhooks require raw body for HMAC signature verification — must mount before json body parser
+app.use('/v1/forms', formIntegrationWebhookRoutes);
+
 app.use(bodyParser.json());
 // app.set("view engine", "ejs");
 app.use(express.json());
@@ -212,6 +218,9 @@ app.use('/', analyticsRouter);
 
 const corporateDashboardRoutes = require('./src/corporate-dashboard/corporate-dashboard.routes');
 app.use('/v1/dashboard', corporateDashboardRoutes);
+
+// Form Integration routes — authenticated researcher endpoints
+app.use('/v1/forms', formIntegrationRoutes);
 
 
 // KYC routes — additive, never modifies existing routes
