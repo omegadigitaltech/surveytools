@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import useAuthStore from "../../../store/useAuthStore";
 import { errorIncludes, submitConsent, submitLayer } from "../../../utils/kycApi";
 import { KYC_ROUTES } from "../../../utils/kycFlow";
 
@@ -30,9 +29,12 @@ export default function useLayerSubmit() {
         toast.info("You've already completed this section.");
         navigate(next, { replace: true });
       } else if (errorIncludes(err, "phone not verified")) {
-        // Layer 1 needs a verified phone; the stored flag was out of date
-        useAuthStore.getState().setRequiresPhoneVerification(true);
-        navigate(KYC_ROUTES.phone, { replace: true });
+        // The backend still gates Layer 1 on phoneVerified even though account
+        // verification moved to email. Sending the user to /verify would loop,
+        // so explain instead until the backend gate is switched.
+        toast.error(
+          "We can't save your profile right now. Please try again later.",
+        );
       } else if (err.status === 403) {
         toast.warning(err.message);
         navigate(KYC_ROUTES.home, { replace: true });

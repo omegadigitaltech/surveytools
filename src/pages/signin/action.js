@@ -4,7 +4,7 @@ import { login } from "../../utils/kycApi";
 const action = async ({ formData }) => {
   try {
     const json = await login(formData.get("email"), formData.get("password"));
-    const { user, requiresPhoneVerification } = json.data;
+    const { user, requiresEmailVerification } = json.data;
 
     toast.success(json.msg);
     return {
@@ -13,7 +13,7 @@ const action = async ({ formData }) => {
       userEmail: user.email,
       userName: user.fullname,
       userType: user.userType,
-      requiresPhoneVerification: Boolean(requiresPhoneVerification),
+      requiresEmailVerification: Boolean(requiresEmailVerification),
     };
   } catch (err) {
     // 401 here means bad credentials; never say which field was wrong

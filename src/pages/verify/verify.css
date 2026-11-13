@@ -52,10 +52,12 @@ font-size: 1.4rem;
 .verify_codes input:focus{
 border: 1px solid var(--base);
 }
-.verify_codes input.verify-phone{
+.verify_codes input.verify-email{
     width: 100%;
     max-width: 22rem;
     font-size: 1.1rem;
+    color: #475569;
+    cursor: not-allowed;
 }
 .verify-error{
     color: #dc2626;

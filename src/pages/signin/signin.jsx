@@ -42,9 +42,9 @@ const SignIn = () => {
         email: response.userEmail,
         name: response.userName,
         userType: response.userType,
-        requiresPhoneVerification: response.requiresPhoneVerification,
+        requiresEmailVerification: response.requiresEmailVerification,
       });
-      // Unverified phones go to OTP; otherwise resume KYC where it stopped
+      // Unverified emails go to OTP; otherwise resume KYC where it stopped
       navigate(await getPostAuthRoute(response), { replace: true });
     } else {
       setLoading(false);

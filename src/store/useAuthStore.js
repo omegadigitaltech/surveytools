@@ -17,8 +17,8 @@ const useAuthStore = create(
       // Accounts from before account types may be respondents who already
       // posted surveys. null = not checked yet. Kept in memory only.
       ownsSurveys: null,
-      // From the login response; true until the phone OTP is verified
-      requiresPhoneVerification: false,
+      // From the login response; true until the account email OTP is verified
+      requiresEmailVerification: false,
       currentSurveyId: '',
       signupEmail: '',
       isLogoutVisible: false,
@@ -27,7 +27,7 @@ const useAuthStore = create(
       hasPaid: false,
 
       // Action to set authentication data after successful login
-      setAuthData: ({ token, email, name, userType, requiresPhoneVerification }) => {
+      setAuthData: ({ token, email, name, userType, requiresEmailVerification }) => {
         // Legacy pages still read the token from localStorage directly
         localStorage.setItem('token', token);
         set({
@@ -38,11 +38,11 @@ const useAuthStore = create(
           userType,
           researcherTier: '',
           ownsSurveys: null,
-          requiresPhoneVerification,
+          requiresEmailVerification,
         });
       },
 
-      setRequiresPhoneVerification: (value) => set({ requiresPhoneVerification: value }),
+      setRequiresEmailVerification: (value) => set({ requiresEmailVerification: value }),
 
       setResearcherTier: (tier) => set({ researcherTier: tier || '' }),
 
@@ -81,7 +81,7 @@ const useAuthStore = create(
           userType: '',
           researcherTier: '',
           ownsSurveys: null,
-          requiresPhoneVerification: false,
+          requiresEmailVerification: false,
           currentSurveyId: '',
         });
       }
@@ -98,7 +98,7 @@ const useAuthStore = create(
         userInst: state.userInst,
         userType: state.userType,
         researcherTier: state.researcherTier,
-        requiresPhoneVerification: state.requiresPhoneVerification
+        requiresEmailVerification: state.requiresEmailVerification
       })
     }
   )

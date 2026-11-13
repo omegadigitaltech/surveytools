@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Form, Link } from "react-router-dom";
 import config from "../../config/config";
 import useAuthStore from "../../store/useAuthStore";
@@ -22,6 +22,8 @@ import Report from "./Report";
 import useAppStore from "../../store/useAppStore";
 import DashboardMain from "./DashboardMain";
 import { getMySurveys } from "../ResearcherDashboard/ResearcherDashboardApi";
+import useDashboardStore from "../../store/useDashboardStore";
+import * as gamificationApi from "../rewards/rewardsApi";
 // import ContestModal from "../../components/ContestModal";
 
 const Dashboard = () => {
@@ -37,7 +39,13 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingPoints, setIsLoadingPoints] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [dashboardStats, setDashboardStats] = useState(null);
+  const [pointsError, setPointsError] = useState(false);
+  // GET /gamification/dashboard: level, XP, streak and (once exposed) boosts
+  const [statsState, setStatsState] = useState({ loading: true, error: null, data: null });
+  // The user's Mongo _id, to find their entries in each survey's submittedUsers
+  const [myUserId, setMyUserId] = useState(null);
+  const [myUserIdError, setMyUserIdError] = useState(false);
+  const statsVersion = useDashboardStore((s) => s.statsVersion);
   const [dashboardMissions, setDashboardMissions] = useState([]);
 
   // zustand
@@ -137,11 +145,13 @@ const Dashboard = () => {
 
         if (response.ok) {
           setPointBalance(json.data.points);
+          setPointsError(false);
         } else {
           throw new Error(json.msg || "Failed to fetch points");
         }
       } catch (error) {
         console.error("Error fetching points:", error);
+        setPointsError(true);
         // toast.error("Error loading points balance");
       } finally {
         setIsLoadingPoints(false);
@@ -151,21 +161,83 @@ const Dashboard = () => {
     fetchPointBalance();
   }, [authToken]);
 
+  // Level / XP / streak / boost. Re-runs after a spin (statsVersion).
+  const fetchStats = useCallback(async () => {
+    if (!authToken) return;
+    setStatsState((prev) => ({ ...prev, loading: true, error: null }));
+    try {
+      const data = await gamificationApi.getDashboard(authToken);
+      setStatsState({ loading: false, error: null, data });
+      // The dashboard carries the balance too; keep the shared one in step
+      const { pointBalance: fromDashboard } = gamificationApi.readDashboard(data);
+      if (typeof fromDashboard === "number") {
+        setPointBalance(fromDashboard);
+        setPointsError(false);
+      }
+    } catch (error) {
+      console.error("Error fetching gamification stats:", error);
+      setStatsState((prev) => ({ ...prev, loading: false, error }));
+    }
+  }, [authToken, setPointBalance]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats, statsVersion]);
+
+  const fetchMyUserId = useCallback(async () => {
+    if (!authToken) return;
+    setMyUserIdError(false);
+    try {
+      setMyUserId(await gamificationApi.getMyUserId(authToken));
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setMyUserIdError(true);
+    }
+  }, [authToken]);
+
+  useEffect(() => {
+    fetchMyUserId();
+  }, [fetchMyUserId]);
+
+  const dashStats = useMemo(
+    () => (statsState.data ? gamificationApi.readDashboard(statsState.data) : null),
+    [statsState.data],
+  );
+  const activeBoost = useMemo(
+    () => (statsState.data ? gamificationApi.readActiveBoost(statsState.data) : null),
+    [statsState.data],
+  );
+
+  // Survey counts, derived from GET /surveys (published surveys only); no
+  // endpoint returns them. `surveys` starts as the store's initial array, so a
+  // new array reference means the fetch has answered (even with zero surveys).
+  const initialSurveys = useRef(surveys);
+  const surveysLoaded = surveys !== initialSurveys.current || surveys.length > 0;
+  const surveyCounts = useMemo(() => {
+    const isOpen = (s) => (s.participantCounts?.remaining ?? 1) > 0;
+    const doneByMe = (s) =>
+      Boolean(myUserId) &&
+      (s.submittedUsers || []).some((u) => String(u?._id ?? u) === myUserId);
+    return {
+      active: surveys.filter(isOpen).length,
+      available: surveys.filter((s) => isOpen(s) && !doneByMe(s)).length,
+      completed: surveys.filter(doneByMe).length,
+    };
+  }, [surveys, myUserId]);
+  // null = still loading / unknown, shown as a placeholder
+  const countFor = (key) => {
+    if (!surveysLoaded) return null;
+    if (key !== "active" && !myUserId) return null;
+    return surveyCounts[key];
+  };
+
   useEffect(() => {
     const fetchGamificationData = async () => {
       try {
-        const statsRes = await fetch(`${config.API_URL}/gamification/dashboard`, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
         const missionsRes = await fetch(`${config.API_URL}/gamification/missions`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
-        
-        if (statsRes.ok) {
-          const statsJson = await statsRes.json();
-          setDashboardStats(statsJson.data);
-        }
-        
+
         if (missionsRes.ok) {
           const missionsJson = await missionsRes.json();
           // Get only daily missions for the dashboard widget
@@ -199,7 +271,16 @@ const Dashboard = () => {
     <>
       <section className="dashboard px-6">
         <div className="dashboard_inner pt-0">
-          <DashboardMain pointBalance={pointBalance} stats={dashboardStats} />
+          <DashboardMain
+            pointBalance={pointBalance}
+            pointsLoading={isLoadingPoints && pointBalance === null}
+            pointsError={pointsError && pointBalance === null}
+            stats={dashStats}
+            statsLoading={statsState.loading && !statsState.data}
+            statsError={statsState.error && !statsState.data ? statsState.error : null}
+            onRetryStats={fetchStats}
+            boost={activeBoost}
+          />
           <div className="dash_head flex mt-8">
             <Form className="classForm">
               <div className="search desktop flex">
@@ -438,21 +519,30 @@ const Dashboard = () => {
                <div className="grid grid-cols-2 gap-4">
                  <div className="border border-[#00A5B5]/20 rounded-xl p-4 bg-blue-50/30">
                    <p className="text-xs sm:text-sm  font-semibold text-[#00A5B5] mb-2 leading-tight w-2/3">Available Surveys</p>
-                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">12</p>
+                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">{countFor("available") ?? "–"}</p>
                  </div>
+                 {/* No endpoint or survey field tracks pending surveys yet */}
                  <div className="border border-green-200 rounded-xl p-4 bg-green-50/30">
                    <p className="text-xs sm:text-sm  font-semibold text-green-600 mb-2 leading-tight w-2/3">Pending Surveys</p>
-                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">12</p>
+                   <p className="text-2xl lg:text-3xl font-bold text-gray-800" title="Not available yet">–</p>
                  </div>
                  <div className="border border-blue-200 rounded-xl p-4 bg-blue-50/30">
                    <p className="text-xs sm:text-sm  font-semibold text-blue-600 mb-2 leading-tight w-2/3">Active Surveys</p>
-                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">6</p>
+                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">{countFor("active") ?? "–"}</p>
                  </div>
                  <div className="border border-gray-200 rounded-xl p-4">
                    <p className="text-xs sm:text-sm  font-semibold text-gray-600 mb-2 leading-tight w-2/3">Completed Surveys</p>
-                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">6</p>
+                   <p className="text-2xl lg:text-3xl font-bold text-gray-800">{countFor("completed") ?? "–"}</p>
                  </div>
                </div>
+               {myUserIdError && (
+                 <p className="text-xs text-gray-500 mt-3">
+                   Couldn&apos;t load your completed surveys.{" "}
+                   <button type="button" className="underline text-[#00A5B5]" onClick={fetchMyUserId}>
+                     Try again
+                   </button>
+                 </p>
+               )}
             </div>
           </div>
           

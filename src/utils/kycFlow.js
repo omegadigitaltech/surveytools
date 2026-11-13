@@ -6,7 +6,7 @@ import { getLayerStatus, getResearcherTier } from "./kycApi";
 import useAuthStore from "../store/useAuthStore";
 
 export const KYC_ROUTES = {
-  phone: "/verify",
+  verify: "/verify",
   layer1: "/register/personalinfo",
   layer2: "/register/education",
   enrichment: "/register/healthlifestyle",
@@ -31,9 +31,9 @@ export const routeFromLayerStatus = (status) => {
   return KYC_ROUTES.home;
 };
 
-// Where to send a user right after login or phone verification.
-export const getPostAuthRoute = async ({ userType, requiresPhoneVerification }) => {
-  if (requiresPhoneVerification) return KYC_ROUTES.phone;
+// Where to send a user right after login or email verification.
+export const getPostAuthRoute = async ({ userType, requiresEmailVerification }) => {
+  if (requiresEmailVerification) return KYC_ROUTES.verify;
 
   try {
     if (isResearcher(userType)) {

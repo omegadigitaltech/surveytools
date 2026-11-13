@@ -92,14 +92,49 @@ export const resetPassword = (payload) =>
 /*  OTP                                                                       */
 /* -------------------------------------------------------------------------- */
 
+// Codes are 6 digits and expire after 10 minutes. Each new request invalidates
+// the previous code. Both steps are rate-limited per IP (5 requests / 10
+// verifies per 15 minutes); the limiter answers 429 with a plain-text body.
+
+// Phone OTP is unused while the SMS provider is down; kept for when it returns
 export const requestPhoneOtp = (phone) => post("/v1/kyc/otp/request", { phone });
 export const verifyPhoneOtp = (phone, code) =>
   post("/v1/kyc/otp/verify", { phone, code });
 
+// Account verification. A successful verify sets emailVerified AND overwrites
+// the account email with the one submitted, so only ever send the account's.
 export const requestEmailOtp = (email) =>
   post("/v1/kyc/email-otp/request", { email });
 export const verifyEmailOtp = (email, code) =>
   post("/v1/kyc/email-otp/verify", { email, code });
+
+// Student researchers: .edu.ng only. Sets academicEmailVerified (+ emailVerified)
+export const requestAcademicEmailOtp = (email) =>
+  post("/v1/kyc/academic-email-otp/request", { email });
+export const verifyAcademicEmailOtp = (email, code) =>
+  post("/v1/kyc/academic-email-otp/verify", { email, code });
+
+// Maps the documented OTP failures to user-facing text. Message matches mirror
+// src/kyc/email-otp.service.js in the backend.
+export const describeOtpError = (err) => {
+  if (err?.status === 429) {
+    return "Too many attempts. Please wait 15 minutes and try again.";
+  }
+  if (errorIncludes(err, "expired")) {
+    return "This code has expired. Request a new one.";
+  }
+  if (errorIncludes(err, "no active otp")) {
+    // Never requested, or replaced by a newer code
+    return "This code is no longer valid. Request a new one.";
+  }
+  if (errorIncludes(err, "invalid otp")) {
+    return "Incorrect code. Please check it and try again.";
+  }
+  return err?.message || "Something went wrong. Please try again.";
+};
+
+export const isOtpStale = (err) =>
+  errorIncludes(err, "expired") || errorIncludes(err, "no active otp");
 
 /* -------------------------------------------------------------------------- */
 /*  Respondent layers                                                         */

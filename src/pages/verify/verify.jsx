@@ -3,95 +3,98 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import useAuthStore from "../../store/useAuthStore";
 import {
+  describeOtpError,
   errorIncludes,
+  isOtpStale,
   logoutSession,
-  requestPhoneOtp,
-  verifyPhoneOtp,
+  requestEmailOtp,
+  verifyEmailOtp,
 } from "../../utils/kycApi";
-import {
-  E164_REGEX,
-  OTP_REGEX,
-  getPostAuthRoute,
-  normalizePhone,
-} from "../../utils/kycFlow";
+import { OTP_REGEX, getPostAuthRoute } from "../../utils/kycFlow";
 import otp from "../../assets/img/otp.png";
 import "./verify.css";
 
+// Values mirror the backend (src/kyc/email-otp.*, config/kyc-config.js)
 const CODE_LENGTH = 6;
-const OTP_LIFETIME = 600; // seconds; the backend expires codes after 10 minutes
+const OTP_LIFETIME = 600; // seconds; codes expire after 10 minutes
 const RESEND_COOLDOWN = 60; // a new request invalidates the previous code
+const RATE_LIMIT_WINDOW = 900; // 15-minute per-IP window on both steps
 
 const formatTime = (s) =>
   `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+
+const emptyDigits = () => Array(CODE_LENGTH).fill("");
 
 const Verify = () => {
   const navigate = useNavigate();
   const inputRefs = useRef([]);
   const {
-    requiresPhoneVerification,
+    requiresEmailVerification,
     userType,
+    userEmail,
     authToken,
-    setRequiresPhoneVerification,
+    setRequiresEmailVerification,
     logout,
   } = useAuthStore();
 
-  const [step, setStep] = useState("phone"); // "phone" | "code"
-  const [phoneInput, setPhoneInput] = useState("");
-  const [phone, setPhone] = useState(""); // normalised E.164 the code was sent to
-  const [digits, setDigits] = useState(Array(CODE_LENGTH).fill(""));
+  // Locked to the account email: the backend overwrites the account email
+  // with whatever address is verified, so it must never be user-editable.
+  const email = (userEmail || "").trim();
+
+  const [step, setStep] = useState("email"); // "email" | "code"
+  const [digits, setDigits] = useState(emptyDigits);
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState("");
   const [expiresIn, setExpiresIn] = useState(0);
   const [resendIn, setResendIn] = useState(0);
+  const [lockedIn, setLockedIn] = useState(0); // verify rate-limit lockout
 
-  // One ticking clock drives both the expiry and the resend cooldown
+  // One ticking clock drives expiry, resend cooldown and lockout
   useEffect(() => {
-    if (expiresIn <= 0 && resendIn <= 0) return;
+    if (expiresIn <= 0 && resendIn <= 0 && lockedIn <= 0) return;
     const timer = setTimeout(() => {
       setExpiresIn((s) => Math.max(s - 1, 0));
       setResendIn((s) => Math.max(s - 1, 0));
+      setLockedIn((s) => Math.max(s - 1, 0));
     }, 1000);
     return () => clearTimeout(timer);
-  }, [expiresIn, resendIn]);
+  }, [expiresIn, resendIn, lockedIn]);
 
-  if (!requiresPhoneVerification && !verifying) {
+  if (!requiresEmailVerification && !verifying) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const sendCode = async (target) => {
+  const focusFirst = () => setTimeout(() => inputRefs.current[0]?.focus(), 0);
+
+  const sendCode = async () => {
     setSending(true);
     setError("");
     try {
-      await requestPhoneOtp(target);
-      setPhone(target);
+      await requestEmailOtp(email);
       setStep("code");
-      setDigits(Array(CODE_LENGTH).fill(""));
+      setDigits(emptyDigits());
       setExpiresIn(OTP_LIFETIME);
       setResendIn(RESEND_COOLDOWN);
-      toast.success(`Code sent to ${target}`);
-      setTimeout(() => inputRefs.current[0]?.focus(), 0);
+      toast.success(`Code sent to ${email}`);
+      focusFirst();
     } catch (err) {
-      setError(err.message);
+      if (err.status === 429) setResendIn(RATE_LIMIT_WINDOW);
+      setError(describeOtpError(err));
     } finally {
       setSending(false);
     }
   };
 
-  const handlePhoneSubmit = (e) => {
+  const handleSendSubmit = (e) => {
     e.preventDefault();
-    const target = normalizePhone(phoneInput.trim());
-    if (!E164_REGEX.test(target)) {
-      setError("Enter a valid phone number, e.g. +2348012345678.");
-      return;
-    }
-    sendCode(target);
+    sendCode();
   };
 
   const finish = async () => {
-    setRequiresPhoneVerification(false);
+    setRequiresEmailVerification(false);
     navigate(
-      await getPostAuthRoute({ userType, requiresPhoneVerification: false }),
+      await getPostAuthRoute({ userType, requiresEmailVerification: false }),
       { replace: true },
     );
   };
@@ -107,24 +110,21 @@ const Verify = () => {
     setVerifying(true);
     setError("");
     try {
-      await verifyPhoneOtp(phone, code);
-      toast.success("Phone verified successfully.");
+      await verifyEmailOtp(email, code);
+      toast.success("Email verified successfully.");
       await finish();
     } catch (err) {
-      if (errorIncludes(err, "already used")) {
-        // The phone is already confirmed: nothing left to do here
-        await finish();
-        return;
-      }
-      if (errorIncludes(err, "expired") || errorIncludes(err, "no active otp")) {
+      if (isOtpStale(err)) {
+        // Let the user request a fresh code straight away
         setExpiresIn(0);
         setResendIn(0);
-        setError("This code has expired. Request a new one.");
+      } else if (err.status === 429) {
+        setLockedIn(RATE_LIMIT_WINDOW);
       } else if (errorIncludes(err, "invalid otp")) {
-        setError("Incorrect code. Please try again.");
-      } else {
-        setError(err.message);
+        setDigits(emptyDigits());
+        focusFirst();
       }
+      setError(describeOtpError(err));
       setVerifying(false);
     }
   };
@@ -155,23 +155,25 @@ const Verify = () => {
     navigate("/signin", { replace: true });
   };
 
+  const expired = step === "code" && expiresIn <= 0;
+  const verifyDisabled = verifying || lockedIn > 0 || expired;
+
   return (
     <section className="verify">
       <div className="verify_inner form-coll flex wrap">
-        <h2>Verify Phone Number</h2>
+        <h2>Verify Email Address</h2>
         <div className="verify_info_inner">
           <div className="verify_info flex">
             <div className="v_info">
-              {step === "phone" ? (
+              {step === "email" ? (
                 <>
-                  <h3>Enter your phone number</h3>
-                  <p>We&apos;ll text you a {CODE_LENGTH}-digit code to confirm it&apos;s you.</p>
-                  <p>Nigerian numbers can start with 0, e.g. 08012345678.</p>
+                  <h3>Confirm your email address</h3>
+                  <p>We&apos;ll email you a {CODE_LENGTH}-digit code to confirm it&apos;s you.</p>
                 </>
               ) : (
                 <>
                   <h3>Fill in the boxes below with the code</h3>
-                  <p>Check the SMS sent to {phone}</p>
+                  <p>Check the inbox (and spam folder) for {email}</p>
                   <p>
                     {expiresIn > 0
                       ? `The code expires in ${formatTime(expiresIn)}.`
@@ -184,26 +186,34 @@ const Verify = () => {
           </div>
 
           <div className="verify_codes">
-            {step === "phone" ? (
-              <form onSubmit={handlePhoneSubmit} noValidate>
+            {step === "email" ? (
+              <form onSubmit={handleSendSubmit} noValidate>
                 <div className="flex input_codes">
                   <input
-                    className="verify-phone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    placeholder="+2348012345678"
-                    value={phoneInput}
-                    onChange={(e) => setPhoneInput(e.target.value)}
-                    aria-label="Phone number"
-                    aria-invalid={Boolean(error)}
-                    disabled={sending}
+                    className="verify-email"
+                    type="email"
+                    value={email}
+                    readOnly
+                    aria-readonly="true"
+                    aria-label="Account email"
                   />
                 </div>
+                {!email && (
+                  <p className="verify-error" role="alert">
+                    We couldn&apos;t find the email on your account. Please sign in again.
+                  </p>
+                )}
                 {error && <p className="verify-error" role="alert">{error}</p>}
                 <div className="flex verify-sec">
-                  <button className="verify-enter" disabled={sending}>
-                    {sending ? "Sending..." : "Send Code"}
+                  <button
+                    className="verify-enter"
+                    disabled={!email || sending || resendIn > 0}
+                  >
+                    {sending
+                      ? "Sending..."
+                      : resendIn > 0
+                        ? `Try again in ${formatTime(resendIn)}`
+                        : "Send code"}
                   </button>
                 </div>
               </form>
@@ -221,6 +231,7 @@ const Verify = () => {
                       onKeyDown={(e) => handleKeyDown(e, index)}
                       ref={(el) => (inputRefs.current[index] = el)}
                       aria-label={`Digit ${index + 1}`}
+                      aria-invalid={Boolean(error)}
                       disabled={verifying}
                     />
                   ))}
@@ -231,31 +242,24 @@ const Verify = () => {
                     Didn’t receive the code?{" "}
                     <span className="verify-count">
                       {resendIn > 0 ? (
-                        `Resend in ${resendIn}s`
+                        `Resend in ${formatTime(resendIn)}`
                       ) : (
                         <button
                           type="button"
-                          onClick={() => sendCode(phone)}
+                          onClick={sendCode}
                           disabled={sending}
                         >
                           {sending ? "Sending..." : "Resend"}
                         </button>
                       )}
                     </span>
-                    {" · "}
-                    <button
-                      type="button"
-                      className="verify-count"
-                      onClick={() => {
-                        setStep("phone");
-                        setError("");
-                      }}
-                    >
-                      Change number
-                    </button>
                   </p>
-                  <button className="verify-enter" disabled={verifying}>
-                    {verifying ? "Verifying..." : "Verify"}
+                  <button className="verify-enter" disabled={verifyDisabled}>
+                    {verifying
+                      ? "Verifying..."
+                      : lockedIn > 0
+                        ? `Try again in ${formatTime(lockedIn)}`
+                        : "Verify"}
                   </button>
                 </div>
               </form>

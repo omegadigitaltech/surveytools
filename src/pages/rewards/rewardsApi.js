@@ -106,7 +106,11 @@ export async function getPoints(token) {
 
 export const getDashboard = (token) => get("/gamification/dashboard", token);
 
-// -> { level, levelName, xp } from the dashboard payload (any field may be null)
+// GET /gamification/dashboard answers (backend controllers/gamification.js):
+//   { xp, level, levelName, levelBenefits, nextLevelXP, vipTier, currentStreak,
+//     spinsRemaining, pointBalance, activeMissionsCount }
+// nextLevelXP is the next level's cumulative minXP, or null at the top level.
+// -> { level, levelName, xp, nextLevelXP, streak, pointBalance } (any may be null)
 export function readDashboard(d) {
   const src = asObject(d);
   const user = asObject(src.user);
@@ -122,7 +126,51 @@ export function readDashboard(d) {
     level,
     levelName: levelObj.name || src.levelName || "",
     xp,
+    nextLevelXP: firstNumber(src.nextLevelXP) ?? null,
+    streak: firstNumber(src.currentStreak) ?? null,
+    pointBalance: firstNumber(src.pointBalance) ?? null,
   };
+}
+
+// -> { multiplier, expiresAt: Date } for the strongest unexpired points boost, or null.
+// The backend keeps boosts on the gamification profile as
+// activeBoosts: [{ type, multiplier, expiresAt }], but NO endpoint returns them
+// yet (not the dashboard, profile or points endpoint). This reads that model
+// shape so the banner lights up once the dashboard includes it; until then it
+// returns null and the banner stays hidden.
+export function readActiveBoost(d) {
+  const src = asObject(d);
+  if (d && !Array.isArray(src.activeBoosts)) {
+    warnShape(
+      "dashboard",
+      "no activeBoosts in the payload; the points boost banner cannot be shown",
+      d,
+    );
+    return null;
+  }
+  const now = Date.now();
+  let best = null;
+  for (const b of src.activeBoosts || []) {
+    const multiplier = Number(b?.multiplier);
+    const expiresAt = new Date(b?.expiresAt);
+    if (!(multiplier > 1) || Number.isNaN(expiresAt.getTime())) continue;
+    if (expiresAt.getTime() <= now) continue;
+    if (!best || multiplier > best.multiplier) best = { multiplier, expiresAt };
+  }
+  return best;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Profile                                                                   */
+/* -------------------------------------------------------------------------- */
+
+// GET /user/profile answers { data: { user, requires... } } -> the user's Mongo _id
+// (what surveys list in `submittedUsers`)
+export async function getMyUserId(token) {
+  const d = await get("/user/profile", token);
+  const id = d?.user?._id;
+  if (!id) warnShape("profile", "no user._id in the profile payload", d);
+  return id ? String(id) : null;
 }
 
 // -> spins left today, or undefined when the payload doesn't say
@@ -173,52 +221,37 @@ export function readVipTier(v) {
 /*  Missions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-// Mission model: { title, description, type, category, targetValue, xpReward, pointsReward }.
-// The list may be mission docs with progress merged in, or progress docs with the
-// mission nested under `mission` / `missionId`. Claiming needs the progress id.
+// GET /gamification/missions answers a flat list of the user's mission-progress
+// docs (backend controllers/gamification.js getMissions):
+//   [{ id, title, description, type, currentValue, targetValue, completed,
+//      rewardClaimed, xpReward, pointsReward }]
+// `id` is the UserMissionProgress _id, which is what the claim endpoint takes.
+// status: "claimed" | "completed" | "" (in progress)
 const normalizeMission = (item) => {
-  const nested = asObject(item.mission);
-  const nestedRef = asObject(item.missionId);
-  const mission = Object.keys(nested).length ? nested : nestedRef;
-  const isProgressDoc = Object.keys(mission).length > 0;
-  const m = { ...mission, ...item };
+  const id = item.id ?? item._id;
+  if (!id) warnShape("missions", "no progress `id`; the mission cannot be claimed", item);
 
-  const claimId = isProgressDoc
-    ? item._id
-    : (item.missionProgressId ?? item.progressId ?? item.progress?._id ?? item._id);
-  if (!isProgressDoc && !item.missionProgressId && !item.progressId && !item.progress?._id) {
-    warnShape(
-      "missions",
-      "no progress id found; claiming with the mission _id, which may be rejected",
-      item,
-    );
-  }
-
-  const targetValue = Number(m.targetValue) || 0;
-  const currentValue =
-    firstNumber(m.currentValue, m.progressValue, item.progress?.currentValue,
-      typeof m.progress === "number" ? m.progress : undefined) ?? 0;
-  let status = String(m.status || item.progress?.status || "").toLowerCase();
-  if (m.isClaimed || m.claimed) status = "claimed";
-  else if (!status && (m.isCompleted || m.completed)) status = "completed";
+  let status = "";
+  if (item.rewardClaimed) status = "claimed";
+  else if (item.completed) status = "completed";
 
   return {
-    id: mission._id || item._id,
-    claimId,
-    title: m.title || "",
-    description: m.description || "",
-    type: String(m.type || "").toLowerCase(),
-    pointsReward: Number(m.pointsReward) || 0,
-    xpReward: Number(m.xpReward) || 0,
-    currentValue,
-    targetValue,
+    id: id ? String(id) : "",
+    claimId: id ? String(id) : "",
+    title: item.title || "",
+    description: item.description || "",
+    type: String(item.type || "").toLowerCase(),
+    pointsReward: Number(item.pointsReward) || 0,
+    xpReward: Number(item.xpReward) || 0,
+    currentValue: Number(item.currentValue) || 0,
+    targetValue: Number(item.targetValue) || 0,
     status,
   };
 };
 
 export async function getMissions(token) {
   const d = await get("/gamification/missions", token);
-  return listOf(d, "missions", "missions", "dailyMissions").map(normalizeMission);
+  return listOf(d, "missions", "missions").map(normalizeMission);
 }
 
 // -> { data, msg }
@@ -303,8 +336,61 @@ export async function getAchievements(token) {
 /*  Spin wheel                                                                */
 /* -------------------------------------------------------------------------- */
 
-// -> { data, msg }   (data holds the reward and possibly the spins left)
+// -> { data, msg }   read `data` with readSpinResult
 export const spin = (token) => post("/gamification/spin", token);
+
+// Backend results (SpinHistory.result enum) that grant a boost; only
+// 2x_multiplier changes survey points (it becomes a 2x_points boost for 24h).
+const BOOST_RESULTS = ["2x_multiplier", "speed_up", "jackpot"];
+const RESULT_LABELS = {
+  try_again: "No win this time",
+  jackpot: "Jackpot",
+  "2x_multiplier": "2x Points Boost",
+  "1x_multiplier": "1x Multiplier",
+  speed_up: "Speed Up",
+};
+
+// One spin, from POST /gamification/spin ({ result, pointsAwarded, xpAwarded,
+// spinsRemaining }) or a GET /gamification/spin/history entry (same fields plus
+// boostApplied and spinDate).
+// -> { result, label, won, boostApplied, boostMultiplier, spinsLeft, date }
+export function readSpinResult(d, { fromSpin = false } = {}) {
+  const src = asObject(d);
+  const result = typeof src.result === "string" ? src.result : "";
+  const points = Number(src.pointsAwarded) || 0;
+  const xp = Number(src.xpAwarded) || 0;
+
+  if (fromSpin && d && typeof src.boostApplied !== "boolean") {
+    warnShape(
+      "spin",
+      "no boostApplied in the spin response; inferring it from `result`",
+      d,
+    );
+  }
+  const boostApplied =
+    typeof src.boostApplied === "boolean"
+      ? src.boostApplied
+      : BOOST_RESULTS.includes(result);
+
+  const rewards = [
+    points > 0 && `${points.toLocaleString()} points`,
+    xp > 0 && `${xp.toLocaleString()} XP`,
+  ].filter(Boolean);
+  let label = RESULT_LABELS[result] || "";
+  if (rewards.length) label = label ? `${label}: ${rewards.join(" + ")}` : rewards.join(" + ");
+  if (!label && result) label = result.replace(/_/g, " ");
+  if (d && !result) warnShape("spin", "no `result` field", d);
+
+  return {
+    result,
+    label: label || "Reward",
+    won: result !== "try_again" && (points > 0 || xp > 0 || boostApplied),
+    boostApplied,
+    boostMultiplier: result === "2x_multiplier" ? 2 : null,
+    spinsLeft: readSpinsLeft(d),
+    date: src.spinDate || src.createdAt || null,
+  };
+}
 
 export async function getSpinHistory(token) {
   const d = await get("/gamification/spin/history", token);
@@ -315,10 +401,32 @@ export async function getSpinHistory(token) {
 /*  Marketplace                                                               */
 /* -------------------------------------------------------------------------- */
 
-// Listing model: { title, description, type, pointsCost, value, partnerName, stock }
+// GET /marketplace/listings answers active listings grouped by type
+// (backend controllers/marketplace.js):
+//   { premiumUpgrades: Listing[], rewards: Listing[] }
+// Listing model: { _id, title, description, type: "discount" | "gift_card" |
+//   "premium_upgrade", pointsCost, value, partnerName, imageUrl, stock (-1 = unlimited) }
+const normalizeListing = (l) => ({
+  ...l,
+  _id: String(l._id ?? l.id ?? ""),
+  title: l.title || "",
+  type: String(l.type || "").toLowerCase(),
+  pointsCost: Number(l.pointsCost) || 0,
+  stock: firstNumber(l.stock) ?? -1,
+});
+
+// -> { rewards, premiumUpgrades }
 export async function getListings(token) {
   const d = await get("/marketplace/listings", token);
-  return listOf(d, "listings", "listings", "items");
+  const src = asObject(d);
+  if (d != null && !Array.isArray(src.rewards)) {
+    warnShape("listings", "no `rewards` list in the payload", d);
+  }
+  return {
+    rewards: (Array.isArray(src.rewards) ? src.rewards : []).map(normalizeListing),
+    premiumUpgrades: (Array.isArray(src.premiumUpgrades) ? src.premiumUpgrades : [])
+      .map(normalizeListing),
+  };
 }
 
 export async function getWallet(token) {
@@ -331,6 +439,11 @@ export async function getTransactions(token) {
   return listOf(d, "transactions", "transactions");
 }
 
-// -> { data, msg }   body per the collection: { pointsToConvert }
+// POST /marketplace/convert takes { pointsToConvert } for a raw cash conversion
+// or { listingId } to buy a listing (the backend charges the listing's cost).
+// -> { data: { voucher, newBalance }, msg }
 export const convertPoints = (token, pointsToConvert) =>
   post("/marketplace/convert", token, { pointsToConvert });
+
+export const buyListing = (token, listingId) =>
+  post("/marketplace/convert", token, { listingId });

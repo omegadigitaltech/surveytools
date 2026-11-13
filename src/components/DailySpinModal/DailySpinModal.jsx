@@ -2,27 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import useAuthStore from '../../store/useAuthStore';
 import useAppStore from '../../store/useAppStore';
+import useDashboardStore from '../../store/useDashboardStore';
 import * as api from '../../pages/rewards/rewardsApi';
 
 const SPIN_DURATION_MS = 3000; // matches the CSS transition on the wheel
-
-// The backend may return the reward as a string, a number of points, or an object
-const formatReward = (r) => {
-  if (r === null || r === undefined) return '';
-  if (typeof r === 'number') return `${r.toLocaleString()} points`;
-  if (typeof r === 'string') return r;
-  if (typeof r === 'object') {
-    const label = r.label || r.name || r.title || r.description;
-    if (label) return label;
-    const amount = r.points ?? r.pointsAwarded ?? r.xp ?? r.amount ?? r.value;
-    if (typeof amount === 'number') {
-      const unit = r.type && r.type !== 'points' ? String(r.type).replace(/_/g, ' ') : 'points';
-      return `${amount.toLocaleString()} ${unit}`;
-    }
-    return r.type ? String(r.type).replace(/_/g, ' ') : '';
-  }
-  return '';
-};
 
 const isToday = (d) => {
   if (!d) return false;
@@ -36,6 +19,9 @@ const DailySpinModal = ({ onClose }) => {
   const [spinRemaining, setSpinRemaining] = useState(1);
   const { authToken } = useAuthStore();
   const { setPointBalance } = useAppStore();
+  const bumpStatsVersion = useDashboardStore((s) => s.bumpStatsVersion);
+  // The latest spin's result, shown under the button (boost message lives here)
+  const [lastResult, setLastResult] = useState(null);
 
   const [history, setHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(true);
@@ -78,7 +64,7 @@ const DailySpinModal = ({ onClose }) => {
         setSpinRemaining(fromDashboard);
       } else if (entries.length > 0) {
         // No count from the backend: assume one spin a day and check today's history
-        const spunToday = entries.some((e) => isToday(e.createdAt || e.spunAt || e.date));
+        const spunToday = entries.some((e) => isToday(api.readSpinResult(e).date));
         if (spunToday) setSpinRemaining(0);
       }
     });
@@ -91,6 +77,7 @@ const DailySpinModal = ({ onClose }) => {
     }
 
     hasSpun.current = true;
+    setLastResult(null);
     setSpinning(true);
     const startedAt = Date.now();
     // Add extra rotations for effect
@@ -110,19 +97,22 @@ const DailySpinModal = ({ onClose }) => {
 
       afterSpin(() => {
         setSpinning(false);
-        const rewardRaw = data?.reward ?? data?.prize ?? data?.pointsWon ?? data?.points;
-        const reward = formatReward(rewardRaw) || "Some Points!";
+        const spun = api.readSpinResult(data, { fromSpin: true });
+        setLastResult(spun);
 
-        const left = api.readSpinsLeft(data);
-        setSpinRemaining((prev) => (left !== undefined ? left : Math.max(0, prev - 1)));
+        setSpinRemaining((prev) =>
+          spun.spinsLeft !== undefined ? spun.spinsLeft : Math.max(0, prev - 1),
+        );
 
-        toast.success(`You won: ${reward}`);
+        if (spun.won) toast.success(`You won: ${spun.label}`);
+        else toast.info(`${spun.label}. Come back tomorrow for another spin!`);
         setHistory((prev) => [
-          { _id: `local-${Date.now()}`, label: reward, createdAt: new Date().toISOString() },
+          { ...data, _id: `local-${Date.now()}`, spinDate: new Date().toISOString() },
           ...prev,
         ]);
 
-        // Winnings change the balance, so re-sync it
+        // Winnings change the balance, XP and boosts: re-sync them
+        bumpStatsVersion();
         api
           .getPoints(authToken)
           .then((value) => {
@@ -200,6 +190,24 @@ const DailySpinModal = ({ onClose }) => {
           </button>
           <div className="text-sm text-gray-500 font-semibold mb-4">Spin remaining : {spinRemaining}</div>
 
+          {lastResult?.boostApplied && (
+            <div className="flex items-start gap-2 text-xs text-left text-white bg-gradient-to-r from-[#008303] to-[#0096B8] p-3 rounded-lg mb-3">
+              <span className="material-icons text-sm">bolt</span>
+              <p>
+                {lastResult.boostMultiplier ? (
+                  <>
+                    <span className="font-bold">{lastResult.boostMultiplier}x Points Boost activated!</span>{' '}
+                    Points from surveys you complete in the next 24 hours are multiplied by {lastResult.boostMultiplier}.
+                  </>
+                ) : (
+                  <>
+                    <span className="font-bold">Boost applied!</span> It has been added to your account.
+                  </>
+                )}
+              </p>
+            </div>
+          )}
+
           <div className="flex items-start gap-2 text-xs text-left bg-gray-50 p-3 rounded-lg border border-gray-100">
             <span className="material-icons text-yellow-500 text-sm">lightbulb</span>
             <p><span className="font-bold">Tip:</span> Come back daily to spin the wheel and win more rewards</p>
@@ -234,9 +242,7 @@ const DailySpinModal = ({ onClose }) => {
               ) : (
                 <ul className="space-y-2">
                   {history.map((h, i) => {
-                    const when = h.createdAt || h.spunAt || h.date;
-                    const label =
-                      h.label || formatReward(h.reward ?? h.prize ?? h.pointsWon ?? h.points ?? h) || 'Reward';
+                    const { label, date: when } = api.readSpinResult(h);
                     return (
                       <li
                         key={h._id || h.id || i}

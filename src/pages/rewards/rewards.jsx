@@ -726,7 +726,7 @@ const MarketplaceTab = ({ token, pointBalance }) => {
       loadWalletAndActivity(),
     ]);
     if (listingsRes.status === "fulfilled") {
-      setListings(listingsRes.value);
+      setListings(listingsRes.value.rewards);
     } else {
       setErrors((prev) => ({ ...prev, listings: listingsRes.reason }));
       toast.error("Failed to load marketplace");
@@ -740,7 +740,7 @@ const MarketplaceTab = ({ token, pointBalance }) => {
 
   // Use the balance in the convert response if present, else re-fetch it
   const syncBalance = (data) => {
-    const remaining = data?.remainingPoints;
+    const remaining = data?.newBalance;
     if (typeof remaining === "number") setPointBalance(remaining);
     else refreshPointBalance(token, setPointBalance);
   };
@@ -769,20 +769,27 @@ const MarketplaceTab = ({ token, pointBalance }) => {
     }
   };
 
-  // Redeem a marketplace listing.
-  // NOTE: the collection has no listing-redemption endpoint; POST /marketplace/convert
-  // only takes { pointsToConvert }, so this converts the listing's cost into a
-  // voucher without telling the backend which listing was chosen. Needs a
-  // backend contract (e.g. a listingId field) before it can redeem the item itself.
+  // Redeem a marketplace listing: POST /marketplace/convert with { listingId };
+  // the backend charges the listing's cost and decrements its stock.
   const handleRedeem = async (listing) => {
+    if (listing.stock === 0) {
+      toast.error("This reward is out of stock");
+      return;
+    }
     if ((listing.pointsCost || 0) > maxBalance) {
       toast.error("Insufficient points for this reward");
       return;
     }
     setRedeemingId(listing._id);
     try {
-      const { data, msg } = await api.convertPoints(token, listing.pointsCost);
+      const { data, msg } = await api.buyListing(token, listing._id);
       toast.success(msg || `${listing.title} redeemed!`);
+      // Stock changed server-side; reflect it locally (-1 = unlimited)
+      setListings((prev) =>
+        prev.map((l) =>
+          l._id === listing._id && l.stock > 0 ? { ...l, stock: l.stock - 1 } : l,
+        ),
+      );
       await loadWalletAndActivity();
       syncBalance(data);
     } catch (err) {
@@ -1023,7 +1030,8 @@ const MarketplaceTab = ({ token, pointBalance }) => {
             Rewards Marketplace
           </h3>
           <div className="flex gap-2 flex-wrap">
-            {["all", "gift_card", "food", "electronics"].map((f) => (
+            {/* Listing types from the backend model (premium_upgrade is listed separately) */}
+            {["all", "gift_card", "discount"].map((f) => (
               <button
                 key={f}
                 onClick={() => setActiveFilter(f)}
@@ -1072,6 +1080,7 @@ const MarketplaceTab = ({ token, pointBalance }) => {
                 key={item._id}
                 item={item}
                 redeeming={redeemingId === item._id}
+                outOfStock={item.stock === 0}
                 onRedeem={() => handleRedeem(item)}
               />
             ))
@@ -1244,7 +1253,7 @@ const MarketplaceTab = ({ token, pointBalance }) => {
 };
 
 // ── Marketplace item card ──────────────────────────────────────────────────────
-const MarketplaceItem = ({ item, redeeming, onRedeem }) => {
+const MarketplaceItem = ({ item, redeeming, outOfStock, onRedeem }) => {
   const { title, partnerName, pointsCost, value, imageUrl } = item;
   return (
     <div className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm flex flex-col">
@@ -1282,10 +1291,10 @@ const MarketplaceItem = ({ item, redeeming, onRedeem }) => {
           </div>
           <button
             onClick={onRedeem}
-            disabled={redeeming}
+            disabled={redeeming || outOfStock}
             className="text-[#00A5B5] bg-blue-50 px-4 py-1.5 rounded-full text-xs font-bold hover:bg-[#00A5B5] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {redeeming ? "..." : "Redeem"}
+            {redeeming ? "..." : outOfStock ? "Out of stock" : "Redeem"}
           </button>
         </div>
       </div>

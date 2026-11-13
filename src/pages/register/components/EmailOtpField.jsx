@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
-import { requestEmailOtp, verifyEmailOtp } from "../../../utils/kycApi";
+import {
+  describeOtpError,
+  requestAcademicEmailOtp,
+  verifyAcademicEmailOtp,
+} from "../../../utils/kycApi";
 import { OTP_REGEX, isEduNgEmail } from "../../../utils/kycFlow";
 import { Field } from "./fields";
 
@@ -11,9 +15,6 @@ export default function EmailOtpField({ label, email, onEmailChange, verified, o
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [message, setMessage] = useState("");
-
-  const describe = (err) =>
-    err.status === 429 ? "Too many attempts. Please wait 15 minutes." : err.message;
 
   const handleEmailChange = (value) => {
     onEmailChange(value);
@@ -32,11 +33,11 @@ export default function EmailOtpField({ label, email, onEmailChange, verified, o
     setSending(true);
     setMessage("");
     try {
-      await requestEmailOtp(email.trim());
+      await requestAcademicEmailOtp(email.trim());
       setSent(true);
       setMessage("We sent a 6-digit code to your institutional email.");
     } catch (err) {
-      setMessage(describe(err));
+      setMessage(describeOtpError(err));
     } finally {
       setSending(false);
     }
@@ -50,14 +51,10 @@ export default function EmailOtpField({ label, email, onEmailChange, verified, o
     setVerifying(true);
     setMessage("");
     try {
-      await verifyEmailOtp(email.trim(), code);
+      await verifyAcademicEmailOtp(email.trim(), code);
       onVerified(true);
     } catch (err) {
-      setMessage(
-        /no active otp|expired/i.test(err.message)
-          ? "This code has expired. Send a new one."
-          : describe(err),
-      );
+      setMessage(describeOtpError(err));
     } finally {
       setVerifying(false);
     }

@@ -91,7 +91,7 @@ const router = createBrowserRouter(
         <Route element={<RoleRoute allow="respondent" />}>
           <Route path="answersurvey/:id" element={<AnswerSurvey />} />
         </Route>
-        <Route element={<HomeLayout />}>
+        <Route element={<HomeLayout compactFooter />}>
           <Route element={<RoleRoute allow="researcher" allowSurveyOwners />}>
             <Route path="surveyquestion" element={<SurveyQuestion />} action={postAction} />
           </Route>
@@ -143,7 +143,7 @@ const router = createBrowserRouter(
       </Route>
       <Route element={<AuthLayout />}>
         {/* Signed in, phone not yet verified */}
-        <Route element={<ProtectRoute requirePhone={false} />}>
+        <Route element={<ProtectRoute requireVerification={false} />}>
           <Route path="verify" element={<Verify />} />
         </Route>
 
