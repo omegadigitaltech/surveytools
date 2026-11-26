@@ -3,6 +3,7 @@
 const { createEmailOtpService } = require('../../src/kyc/email-otp.service');
 const { createEmailOtpController } = require('../../src/kyc/email-otp.controller');
 const { createAcademicEmailOtpController } = require('../../src/kyc/academic-email-otp.controller');
+const { requestAcademicEmailOtpBody } = require('../../src/kyc/academic-email-otp.schema');
 const User = require('../../model/user');
 
 jest.mock('../../model/user');
@@ -146,6 +147,25 @@ describe('Email OTP & Academic Email OTP Services', () => {
       }));
       expect(mockEmailClient.send).toHaveBeenCalled();
     });
+
+    it('accepts uppercase institutional domain (.EDU.NG) case-insensitively', async () => {
+      const schemaResult = requestAcademicEmailOtpBody.safeParse({ email: 'Student@UI.EDU.NG' });
+      expect(schemaResult.success).toBe(true);
+
+      const service = createEmailOtpService({
+        emailClient: mockEmailClient,
+        otpRepo: mockOtpRepo,
+        kycConfig,
+        allowedDomain: '.edu.ng',
+      });
+
+      await service.requestOtp('Student@UI.EDU.NG');
+
+      expect(mockOtpRepo.create).toHaveBeenCalledWith(expect.objectContaining({
+        email: 'Student@UI.EDU.NG',
+      }));
+      expect(mockEmailClient.send).toHaveBeenCalled();
+    });
   });
 
   describe('Controllers', () => {
@@ -211,6 +231,29 @@ describe('Email OTP & Academic Email OTP Services', () => {
         success: true,
         message: 'Academic OTP verified successfully',
       }));
+    });
+
+    it('General Email OTP Controller throws 409 when email already belongs to another user', async () => {
+      const mockService = {
+        requestOtp: jest.fn().mockResolvedValue(),
+        verifyOtp: jest.fn().mockResolvedValue(true),
+      };
+      User.findOneAndUpdate.mockRejectedValueOnce(Object.assign(new Error('E11000'), { code: 11000 }));
+      const controller = createEmailOtpController({ emailOtpService: mockService });
+
+      const req = {
+        userId: 'user-123',
+        body: { email: 'taken@example.com', code: '123456' },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      await expect(controller.verifyOtp(req, res)).rejects.toMatchObject({
+        status: 409,
+        message: 'This email address is already associated with another account',
+      });
     });
   });
 });

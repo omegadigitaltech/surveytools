@@ -1,6 +1,7 @@
 const Queue = require('bull');
 const nodemailer = require('nodemailer');
 const User = require('../model/user');
+const { isBrevoConfigured, sendViaBrevo } = require('../lib/brevo-email');
 
 // Set up Redis connection with fallback to local Redis
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
@@ -10,6 +11,10 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 let emailQueue = null;
 let redisConnected = false;
 let redisWarningLogged = false;
+let lastProbeAttemptAt = 0;
+let initPromise = null;
+const REDIS_PROBE_TIMEOUT_MS = 5000;
+const REDIS_RETRY_COOLDOWN_MS = 30000;
 
 // Pre-check Redis availability before handing off to Bull.
 // Bull's ioredis client throws unhandled promise rejections when Redis is
@@ -27,32 +32,36 @@ function probeRedis(url) {
       port = parseInt(parsed.port, 10) || port;
     } catch (_) {}
 
+    let settled = false;
+    const done = (ok) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      socket.destroy();
+      resolve(ok);
+    };
+
     const socket = net.createConnection({ host, port });
-    const timer = setTimeout(() => {
-      socket.destroy();
-      resolve(false);
-    }, 1000);
+    const timer = setTimeout(() => done(false), REDIS_PROBE_TIMEOUT_MS);
 
-    socket.on('connect', () => {
-      clearTimeout(timer);
-      socket.destroy();
-      resolve(true);
-    });
-
-    socket.on('error', () => {
-      clearTimeout(timer);
-      resolve(false);
-    });
+    socket.on('connect', () => done(true));
+    socket.on('error', () => done(false));
   });
 }
 
-// Initialize queue asynchronously — if Redis is offline we skip Bull entirely
-(async () => {
+// Initialize queue lazily/asynchronously — if Redis is offline during early boot, later calls can re-probe after cooldown
+async function initEmailQueue() {
+  if (emailQueue) return emailQueue;
+  lastProbeAttemptAt = Date.now();
+
   const redisAvailable = await probeRedis(REDIS_URL);
 
   if (!redisAvailable) {
-    console.warn(`⚠️ Redis is unavailable at ${REDIS_URL}. Background email queue is disabled; critical emails will be sent directly.`);
-    return;
+    if (!redisWarningLogged) {
+      console.warn(`⚠️ Redis is unavailable at ${REDIS_URL}. Background email queue is disabled; critical emails will be sent directly.`);
+      redisWarningLogged = true;
+    }
+    return null;
   }
 
   try {
@@ -74,6 +83,7 @@ function probeRedis(url) {
 
     emailQueue.on('ready', () => {
       redisConnected = true;
+      redisWarningLogged = false;
       console.log('✅ Email queue connected to Redis successfully');
     });
 
@@ -121,12 +131,17 @@ function probeRedis(url) {
       console.error(`Email job ${job.id} failed with error: ${err.message}`);
     });
 
+    redisConnected = true;
     console.log('✅ Email queue initialized successfully');
+    return emailQueue;
   } catch (error) {
     console.warn('⚠️ Failed to initialize email queue:', error.message);
     emailQueue = null;
+    return null;
   }
-})();
+}
+
+initPromise = initEmailQueue();
 
 
 // Configure email transporter
@@ -147,7 +162,8 @@ async function sendSurveyPublishedNotification(data) {
   
   // Ensure we have the creator ID in the right format
   const creatorId = survey.user_id._id || survey.user_id;
-  const transporter = getEmailTransporter();
+  const useBrevo = isBrevoConfigured();
+  const transporter = useBrevo ? null : getEmailTransporter();
   
   // Get all users (excluding the survey creator)
   const users = await User.find({ 
@@ -168,7 +184,7 @@ async function sendSurveyPublishedNotification(data) {
   
   // Create a batch of emails
   const emailPromises = users.map(user => {
-    return transporter.sendMail({
+    const mail = {
       from: `${process.env.EMAIL_USER || "tech.digitalomega@gmail.com"}`,
       to: user.email,
       subject: `New Survey Available: ${survey.title}`,
@@ -194,7 +210,10 @@ async function sendSurveyPublishedNotification(data) {
           </p>
         </div>
       `
-    });
+    };
+    return useBrevo
+      ? sendViaBrevo({ to: mail.to, subject: mail.subject, html: mail.html })
+      : transporter.sendMail(mail);
   });
   
   // Send emails in batches to avoid overwhelming the email server
@@ -214,9 +233,19 @@ async function sendSurveyPublishedNotification(data) {
 
 // Send direct email (for password reset, confirmations, etc.)
 async function sendDirectEmail(emailData) {
-  const transporter = getEmailTransporter();
-  
   try {
+    if (isBrevoConfigured()) {
+      const result = await sendViaBrevo({
+        to: emailData.to,
+        subject: emailData.subject,
+        html: emailData.html,
+        text: emailData.text || '',
+      });
+      console.log(`Direct email sent successfully via Brevo to ${emailData.to}`);
+      return result;
+    }
+
+    const transporter = getEmailTransporter();
     const result = await transporter.sendMail({
       from: `${process.env.EMAIL_USER || "tech.digitalomega@gmail.com"}`,
       to: emailData.to,
@@ -255,8 +284,16 @@ const addEmailToQueue = async (emailTypeOrData, data, options = {}) => {
     return Promise.resolve({ status: 'error', message: 'Invalid parameters' });
   }
 
-  // If Redis is offline or queue is not available, fallback directly for direct transactional emails
-  if (!emailQueue || !redisConnected) {
+  // Wait for initial boot probe or re-probe lazily if Redis started slower than app boot
+  if (initPromise) {
+    await initPromise;
+  }
+  if (!emailQueue && Date.now() - lastProbeAttemptAt > REDIS_RETRY_COOLDOWN_MS) {
+    initPromise = initEmailQueue();
+    await initPromise;
+  }
+
+  const sendDirectlyOrSkip = async () => {
     if (jobData.emailType === 'direct-email' || jobData.emailType === 'password-reset' || jobData.emailType === 'password-reset-confirmation') {
       try {
         console.log(`Redis queue is offline; sending direct email to ${jobData.data.to || jobData.data.email}`);
@@ -266,24 +303,33 @@ const addEmailToQueue = async (emailTypeOrData, data, options = {}) => {
         console.error('Direct email fallback failed:', err);
         return { status: 'error', message: err.message };
       }
-    } else {
-      console.warn(`Redis queue is offline; skipped background batch notification for ${jobData.emailType}`);
-      return { status: 'skipped', message: 'Queue unavailable' };
     }
+    console.warn(`Redis queue is offline; skipped background batch notification for ${jobData.emailType}`);
+    return { status: 'skipped', message: 'Queue unavailable' };
+  };
+
+  // If Redis is offline or queue is not available, fallback directly for direct transactional emails
+  if (!emailQueue || !redisConnected) {
+    return sendDirectlyOrSkip();
   }
-  
-  return emailQueue.add(
-    jobData,
-    { 
-      attempts: 3,
-      backoff: {
-        type: 'exponential',
-        delay: 5000
-      },
-      removeOnComplete: true,
-      ...options
-    }
-  );
+
+  try {
+    return await emailQueue.add(
+      jobData,
+      {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 5000
+        },
+        removeOnComplete: true,
+        ...options
+      }
+    );
+  } catch (queueErr) {
+    console.warn(`Failed to enqueue email job (${queueErr.message}); falling back`);
+    return sendDirectlyOrSkip();
+  }
 };
 
 module.exports = {

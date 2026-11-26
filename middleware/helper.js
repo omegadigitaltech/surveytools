@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const User = require("../model/user");
 const Sentiment = require("sentiment");
+const { isBrevoConfigured, sendViaBrevo } = require("../lib/brevo-email");
 
 const sentiment = new Sentiment();
 
@@ -57,10 +58,20 @@ async function sendNotification(email, owner, text, title) {
 
   let transport;
   try {
-    transport = await transporter.sendMail(mailOptions);
-    console.log("Email sent");
+    if (isBrevoConfigured()) {
+      transport = await sendViaBrevo({
+        to: email,
+        subject: title,
+        html: htmlContent,
+        fromEmail: process.env.EMAIL,
+      });
+      console.log("Email sent via Brevo");
+    } else {
+      transport = await transporter.sendMail(mailOptions);
+      console.log("Email sent");
+    }
   } catch (error) {
-    console.error("Nodemailer EAUTH or connection error silently caught:", error.message);
+    console.error("Email send error silently caught:", error.message);
   }
 
   return { transport: transport };

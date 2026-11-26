@@ -6,7 +6,7 @@ const getAcademicEmailDomain = () => process.env.KYC_STUDENT_EMAIL_DOMAIN || '.e
 
 const requestAcademicEmailOtpBody = z.object({
   email: z.string().email({ message: 'Must be a valid email address' }).refine(
-    (val) => val.endsWith(getAcademicEmailDomain()),
+    (val) => val.toLowerCase().endsWith(getAcademicEmailDomain().toLowerCase()),
     () => ({ message: `Must be a valid ${getAcademicEmailDomain()} academic email` })
   ),
 });

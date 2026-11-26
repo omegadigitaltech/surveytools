@@ -48,6 +48,8 @@ const formIntegrationWebhookRoutes = require('./src/form-integration/form-integr
 const formIntegrationRoutes = require('./src/form-integration/form-integration.routes');
 
 const app = express();
+// Trust the first proxy hop (Render / Cloudflare) so express-rate-limit identifies client IPs without ERR_ERL_UNEXPECTED_X_FORWARDED_FOR
+app.set('trust proxy', 1);
 require('./middleware/passport');
 
 const allowedOrigins = ['http://localhost:5000', 'http://localhost:5173'];
@@ -167,20 +169,25 @@ const checkRedisConnection = () => {
 
   return new Promise((resolve) => {
     const net = require('net');
-    const socket = net.createConnection({ host, port });
-    const timer = setTimeout(() => { socket.destroy(); resolve(false); }, 2000);
-
-    socket.on('connect', () => {
+    let settled = false;
+    const done = (ok) => {
+      if (settled) return;
+      settled = true;
       clearTimeout(timer);
       socket.destroy();
+      resolve(ok);
+    };
+    const socket = net.createConnection({ host, port });
+    const timer = setTimeout(() => done(false), 5000);
+
+    socket.on('connect', () => {
       console.log('✅ Redis connected successfully');
-      resolve(true);
+      done(true);
     });
 
     socket.on('error', () => {
-      clearTimeout(timer);
       console.warn(`⚠️ Redis unavailable at ${REDIS_URL}. Email notifications queue is disabled; the app will still function normally.`);
-      resolve(false);
+      done(false);
     });
   });
 };
