@@ -663,11 +663,13 @@ const forgetPassword = async (req, res) => {
     const code = crypto.randomInt(100000, 1000000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    // Hash before storing so a DB read cannot be weaponised to reset accounts
+    // Hash before storing so a DB read cannot be weaponised to reset accounts.
+    // Use updateOne so unrelated legacy/enum fields on User cannot block password resets.
     const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
-    user.resetPasswordToken = hashedCode;
-    user.resetPasswordExpires = expiresAt;
-    await user.save();
+    await User.updateOne(
+      { _id: user._id },
+      { $set: { resetPasswordToken: hashedCode, resetPasswordExpires: expiresAt } }
+    );
 
     const emailData = {
       to: user.email,
@@ -758,9 +760,12 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    // Token already atomically consumed above — just update the password
-    user.password = await bcrypt.hash(newPassword, 10);
-    await user.save();
+    // Token already atomically consumed above — update password directly without triggering full-doc validation
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await User.updateOne(
+      { _id: user._id },
+      { $set: { password: hashedPassword } }
+    );
 
     const emailData = {
       to: user.email,

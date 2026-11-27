@@ -34,10 +34,17 @@ function createEmailOtpController({ emailOtpService }) {
     await emailOtpService.verifyOtp(email, code);
 
     // Update the User document now that email is verified
-    await User.findOneAndUpdate(
-      { id: req.userId }, 
-      { emailVerified: true, email: email }
-    );
+    try {
+      await User.findOneAndUpdate(
+        { id: req.userId },
+        { emailVerified: true, email }
+      );
+    } catch (err) {
+      if (err.code === 11000) {
+        throw new AppError(StatusCodes.CONFLICT, 'This email address is already associated with another account');
+      }
+      throw err;
+    }
 
     res.status(StatusCodes.OK).json({
       success: true,

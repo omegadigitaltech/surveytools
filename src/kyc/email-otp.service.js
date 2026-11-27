@@ -32,7 +32,7 @@ function createEmailOtpService({ emailClient, otpRepo, kycConfig, allowedDomain 
    * @returns {Promise<void>}
    */
   async function requestOtp(email) {
-    if (allowedDomain && !email.endsWith(allowedDomain)) {
+    if (allowedDomain && !email.toLowerCase().endsWith(allowedDomain.toLowerCase())) {
       throw new AppError(400, `This verification step requires a valid ${allowedDomain} email address`);
     }
 
